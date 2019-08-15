@@ -1,0 +1,376 @@
+
+\begin{tabular}{|r|c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  & scales with $n$ & scales with (dependant on) $p$ \\
+  \hline
+  \hline
+  number of clusters & \checkmark & increases for small $p$ \\ \hline
+  size of clusters & only for large $p$ & \checkmark\\ \hline
+  number of cluster growths & \checkmark & \checkmark\\ \hline
+  number of merging events & \checkmark & increases for small $p$ \\ \hline
+  number of child clusters & only for large $p$ & increases for small $p$ \\ \hline
+\end{tabular}\\
+
+\subsection*{Peeling algorithm: main components}
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{cluster}{Cluster}
+\SetKwData{erloc}{ErLoc}\SetKwData{anloc}{AnLoc}
+\SetKwData{clusters}{Clusters}
+\SetKwData{graph}{Graph}
+\SetKwData{neigh}{Neighbors}
+
+\SetKwFunction{FVN}{FindVertexNeighbors}
+
+\KwData{\anloc $=$ anyon locations, \erloc $=$ erasure locations}
+\KwResult{\graph object containing all the Clusters}
+\BlankLine
+
+\nlset{n} \For{\vertex in \anloc}{
+    \If{\vertex not $\in$ \graph}{
+    add \vertex to \graph}
+    \If{\vertex $\notin$ \clusters}{
+        add new \cluster\;
+        \nlset{1} \neigh $=$ \FVN{\vertex, \cluster} (Al. \ref{al:fvn})\;
+        \nlset{+n} \While(\tcc*[h]{a maximum of n extra vertices are added on initial loop}){\neigh $\neq$ None}{
+            \For{\vertex in \neigh}{
+                \nlset{1} new \neigh $=$ \FVN{\vertex, \cluster}
+            }
+        }
+    }
+}
+\BlankLine
+\comp{O(n)}
+\caption{FindClusters}\label{al:fc}
+\end{algorithm}
+
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{cluster}{Cluster}
+\SetKwData{graph}{Graph}\SetKwData{bound}{Boundary}
+\SetKwData{edge}{Edge}\SetKwData{hedge}{HalfEdge}
+\SetKwData{neigh}{Neighbors}\SetKwData{pcluster}{ParentCluster}
+\SetKwData{remlist}{RemList}\SetKwData{mergelist}{MergeList}
+\SetKwData{nblist}{NewBoundaryList}
+\SetKwData{clusters}{Clusters}
+
+\SetKwFunction{sgc}{SelectGrowClusters}
+\SetKwFunction{gpc}{GetParentCluster}
+\SetKwFunction{fvn}{FindVertexNeighbors}
+
+\KwData{\graph containing even and uneven clusters}
+\KwResult{\graph containing only even clusters}
+\BlankLine
+
+\nlset{n} select \cluster with \sgc (Al. \ref{al:sgc}) \;
+\nlset{$\downarrow$}\While{uneven \clusters $\in$ \graph}{
+    \nlset{n} \For(\tcc*[h]{total cluster growths scales with n}){\cluster in selection}{
+        \For{\bound (\edge, near \vertex, far \vertex) in \cluster}{
+            \BlankLine
+            
+            \eIf{near \hedge $\notin$ \clusters}{
+                \tcc{edge not grown, first growth-step}
+                \cluster\ $\leftarrow$ near \hedge \;
+                \eIf{far \hedge $\in$ \clusters}{
+                    \cluster\ $\leftarrow$ \edge \;
+                    \nlset{n} \pcluster $=$ \gpc{far \edge}\ (Al. \ref{al:gpc})\;
+                    \eIf{\pcluster $=$ \cluster}{
+                        \remlist $\leftarrow$ \bound
+                    }{
+                        \mergelist $\leftarrow$ (\cluster, \pcluster)
+                    }
+                }{
+                    no action, edge is grown a half-step
+                }
+                \BlankLine
+                
+            }{
+                \tcc{edge is already half-grown, second growth-step}
+                \cluster $\leftarrow$ \hedge\;
+                \eIf{far \vertex $\notin$ \clusters}{
+                    \cluster $\leftarrow$ \vertex \;
+                    \nblist $\leftarrow$ far \vertex
+                }{
+                    \pcluster $=$ \gpc{far \vertex} \;
+                    \If{\pcluster $\neq$ \cluster}{
+                        \mergelist $\leftarrow$ (\cluster, \pcluster)
+                    }
+                }
+            }
+        }
+        \BlankLine
+        \nlset{n} \For(\tcc*[h]{dependant on number of merges}){\bound in \remlist}{
+            \tcc{these boundaries are excluded from second growth-step}
+            remove \bound from \cluster
+        }
+        \BlankLine
+        \nlset{1} \For(\tcc*[h]{dependant on cluster size}){\vertex in \nblist}{
+            \tcc{vertices lie on far end of completely grown edge, this is the new boundary}
+            find new \bound with \fvn (Al. \ref{al:fvn})
+        }
+    }
+    \BlankLine
+    \nlset{n} \For{\cluster 1, \cluster 2) in \mergelist}{
+        \nlset{n} \pcluster 1 $=$ \gpc{\cluster 1}\;
+        \nlset{n} \pcluster 2 $=$ \gpc{\cluster 2}\;
+        \If{not already merged}{
+            \cluster 1 $\cup$ \cluster 2
+        }
+    }
+    select grow clusters with \sgc \;
+}
+
+\BlankLine
+\comp{$O(n^2)$}
+\caption{GrowClusters}\label{al:gc}
+\end{algorithm}
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{cluster}{Cluster}
+\SetKwData{graph}{Graph}\SetKwData{bound}{Boundary}
+\SetKwData{edge}{Edge}\SetKwData{hedge}{HalfEdge}
+\SetKwData{neigh}{Neighbors}\SetKwData{pcluster}{ParentCluster}
+\SetKwData{newn}{NewNodes}\SetKwData{nvertex}{NeighborVertex}
+\SetKwData{clusters}{Clusters}
+
+\SetKwFunction{sgc}{SelectGrowClusters}
+\SetKwFunction{gpc}{GetParentCluster}
+\SetKwFunction{fvn}{FindVertexNeighbors}
+
+\KwData{\graph containing even clusters}
+\KwResult{\graph containing clusters of trees}
+\BlankLine
+
+\nlset{n} \For{\cluster in \graph}{
+    get random \vertex from \cluster\;
+    mark \vertex as traversed\;
+    \newn $\leftarrow$ \vertex\;
+    \nlset{$\downarrow$} \While(){\newn $\neq$ None}{
+        \nlset{1} \For(\tcc*[h]{dependant on cluster size}){\vertex in \newn}{
+            get \neigh (edges, vertices) of \vertex $\in$ \cluster\;
+            \For{neighbor \vertex, \edge) in \neigh}{
+                \eIf{neighbor \vertex is traversed}{
+                    remove neighbor edge from \cluster
+                }{
+                    mark neighbor \vertex as traversed\;
+                    \newn $\leftarrow$ neighbor \vertex
+                }
+            }
+        }
+    }
+}
+
+
+\BlankLine
+\comp{O(n)}
+\caption{TraverseTrees}\label{al:tt}
+\end{algorithm}
+
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{cluster}{Cluster}
+\SetKwData{graph}{Graph}\SetKwData{bound}{Boundary}
+\SetKwData{edge}{Edge}\SetKwData{hedge}{HalfEdge}
+\SetKwData{neigh}{Neighbors}\SetKwData{pcluster}{ParentCluster}
+\SetKwData{newn}{NewNodes}\SetKwData{nvertex}{NeighborVertex}
+\SetKwData{clusters}{Clusters}
+
+\SetKwFunction{sgc}{SelectGrowClusters}
+\SetKwFunction{gpc}{GetParentCluster}
+\SetKwFunction{fvn}{FindVertexNeighbors}
+
+\KwData{\graph containing clusters of trees}
+\KwResult{\graph containing the matching, syndrome edges}
+\BlankLine
+
+\nlset{n} \For{\cluster in \graph}{
+    \nlset{$\downarrow$} \For{\vertex in \cluster}{
+        \nlset{1} \While(\tcc*[h]{dependant on cluster size}){$\#$ connected \edge $=$ 1}{
+            remove \edge from \cluster\;
+            \If{\vertex $=$ anyon}{
+                matching $\leftarrow$ \edge\;
+                remove anyon status of \vertex\;
+                flip anyon status of opposite \vertex
+            }
+            opposite \vertex is new \vertex
+        }
+    }
+}
+
+
+\BlankLine
+\comp{O(n)}
+\caption{PeelTrees}\label{al:pt}
+\end{algorithm}
+
+\FloatBarrier
+\subsection*{Peeling algorithm: functions}
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{edge}{Edge}
+\SetKwData{cluster}{Cluster}\SetKwData{bound}{Boundary}
+\SetKwData{erloc}{ErLoc}\SetKwData{anloc}{AnLoc}
+\SetKwData{graph}{Graph}
+\SetKwData{neigh}{Neighbors}
+
+\SetKwFunction{FVN}{}
+
+\KwData{\vertex, \cluster}
+\KwResult{\neigh of input \vertex within the \cluster}
+\BlankLine
+
+\nlset{1} \For{neighboring \vertex, \edge of input \vertex}{
+    \eIf(\tcc*[h]{newly found vertices and edges}){\vertex $\notin$ \graph}{
+        \graph $\leftarrow$ \vertex, \edge\;
+        \If{\vertex $\in$ \anloc}{
+            \vertex is an anyon
+        }
+    }{
+        \If(\tcc*[h]{vertex already added but edge not}){\edge $\notin$ \graph}{
+            \graph $\leftarrow$ \edge
+        }
+    }
+    \eIf{\edge $\in$ \erloc}{
+        add \vertex, \edge to \cluster\;
+        \If{\vertex $\notin$ a \cluster}{
+            \neigh $\leftarrow$ \vertex
+        }
+    }{
+        \bound of \cluster $\leftarrow$ (\vertex, \edge)
+    }
+}
+\BlankLine
+\comp{$O(1)$}
+\caption{FindVertexNeighbors}\label{al:fvn}
+\end{algorithm}
+
+
+
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{edge}{Edge}
+\SetKwData{cluster}{Cluster}\SetKwData{pcluster}{ParentCluster}
+\SetKwData{bound}{Boundary}
+\SetKwData{erloc}{ErLoc}\SetKwData{anloc}{AnLoc}
+\SetKwData{graph}{Graph}
+\SetKwData{neigh}{Neighbors}
+
+\SetKwFunction{FVN}{}
+
+\KwData{\graph}
+\KwResult{list of \cluster objects selected for growth}
+\BlankLine
+
+\nlset{n} \For{\cluster, \pcluster in \graph}{
+    \If{\cluster is \pcluster}{
+        select \cluster for growth
+    }
+}
+\If(\tcc*[h]{only smallers Clusters are selected}){Weighted growth}{
+    \nlset{n} find smallest cluster size\;
+    \nlset{n} find clusters with smallers size
+}
+
+\BlankLine
+\comp{$O(n)$}
+\caption{SelectGrowthClusters}\label{al:sgc}
+\end{algorithm}
+
+
+\begin{algorithm}[h]
+\newcommand{\forcond}{$i=0$ \KwTo $n$}
+\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}
+\SetKwFor{While}{while}{:}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{vertex}\SetKwData{edge}{edge}
+\SetKwData{cluster}{Cluster}\SetKwData{pcluster}{ParentCluster}
+\SetKwData{bound}{boundary}
+\SetKwData{erloc}{ErLoc}\SetKwData{anloc}{AnLoc}
+\SetKwData{graph}{Graph}
+\SetKwData{clusterindex}{ClusterIndex}
+
+\SetKwFunction{FVN}{}
+
+\KwData{\cluster}
+\KwResult{\pcluster}
+\BlankLine
+
+\pcluster $=$ \clusterindex(\cluster)\;
+\nlset{n} \While{\pcluster $\
+neq$ \cluster}{
+    \cluster $=$ \pcluster\;
+    \pcluster $=$ \clusterindex(\cluster)
+}
+
+
+\BlankLine
+\comp{$O(n)$}
+\caption{GetParentCluster}\label{al:gpc}
+\end{algorithm}
