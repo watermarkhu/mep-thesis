@@ -1,0 +1,10 @@
+
+\chapter{The toric code}
+
+\section{Decoders}
+\subsection{The optimal decoder}
+\subsection{Minimum Weight Perfect Matching}
+\subsection{The Union-Find decoder}
+The fastest known algorithm for the MWPM problem still has a time complexity of $O(\abs{A}\sqrt{\abs{V}}) = O(n^2\sqrt{n})$ where $n$ is the number of qubits. To reduce this time complexity, an algorithm has been developed with a time complexity of $O(n\alpha(n))$ [1], where $\alpha$ is an inverse Ackermann function, which is smaller than 3 for any practical input size (see the appendix for the exact definition). The algorithm in this thesis is the weighted growth version of the decoder described in [1], as this has a higher threshold than the original version. It should be noted that it has small differences with the algorithm fully described in [1], as the weighted growth version is not fully described. The name is a reference to the main part of the algorithm, the use of the Union-Find data-structure algorithm developed by Tarjan [5].
+\\\\
+To get an almost linear time complexity, the syndrome is first reduced to an erasure syndrome, which can be decoded in linear time. First of all, the peeling decoder for the erasure syndrome will be explained. 
