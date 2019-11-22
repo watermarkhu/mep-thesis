@@ -1,0 +1,12 @@
+\chapter{Threshold simulations}
+
+To test for the threshold Pauli error value, we simulate for a large number of samples at various lattice sizes for a range of Pauli error rates around $p = 0.1$. For the threshold, only Pauli X errors are considered, as Pauli Z errors will give the same result. For each lattice size and Pauli error rate, the samples will return a probability rate of successful decodings $P_{succes}$. We will then fit the data to the function (\cite{chengyang}, equation 43):
+\begin{eqnarray}
+% \nonumber % Remove numbering (before each equation)
+P_{succes} &=& A + Bx + Cx^2 + \begin{cases}
+                                D_{even}\cdot L^{-1/\mu_{even}} &\mbox{L even}\\
+                                D_{odd}\cdot L^{-1/\mu_{odd}} &\mbox{L odd}
+                              \end{cases}\\
+\mbox{with } x &=& (p - p_{thres})L^{1/\nu}
+\end{eqnarray}\label{eq.4.fit}
+where all but $P_{succes}$, $p$ and $L$ are fitting parameters. Note that there are distinct values for $D$ and $\mu$ for even and odd lattices. This is due to a discrepancy in the decoder threshold caused by a nonnegligible finite-size effect for even and odd lattices. Therefore, for each fit done on any dataset, only data from even or odd lattices will be selected. The fitting of the data will be done in Python using a least squared method. 

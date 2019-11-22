@@ -1,0 +1,90 @@
+\chapter{Bucket sort}\label{ap.bucketsort}
+
+\paragraph{Maximum number of growth iterations}
+To categorize the clusters into buckets, we need to know how many buckets we would need. To find out, let us look at two generators that are placed maximally far from each other. On a even toric lattice with length $l$, they are placed $l/2$ horizontally and $l/2$ vertically from each other. If clusters from each bucket grow simultaneously by a half-edge, these two single-generator clusters would meet each other after $l$ iterations, or including odd lattices, after $2\lfloor l/2 \rfloor$ iterations. As illustrated in figure \ref{3.fig.maxgrowthit}, we see that now the entire lattice is covered, thus this is exactly the number of iterations needed.
+
+\begin{lemma}
+  Given a toric lattice with size $\{l,l\}$, a maximum number of $N_B = 2\lfloor l/2 \rfloor$ buckets is required for all generators to be connected, where clusters from each bucket is grown simultaneously.
+\end{lemma}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{max_growth_iterations.pdf}
+  \caption{If two single-generator clusters are placed a) maximally far from each other, b) a maximal number of growth iterations is needed. c) After $2\lfloor l/2 \rfloor$ iterations, the entire lattice is covered.}\label{3.fig.maxgrowthit}
+\end{figure}
+
+\paragraph{Analytical cluster categorization}
+To sort or place the clusters into the buckets, we can again look at the case of the two generators. We presume that each growth iteration of the cluster is started from a different bucket. Knowing this, we can use the sequence of the size of the single-generator cluster as it grows.
+
+\begin{equation}\label{3.eq.sequence}
+  S_{cluster, i} = 1, 1, 5, 5, 13, 13, 25, 25, 41, 41, 61, 61, ...
+\end{equation}
+
+Note that a cluster does not increase in size in alternating iterations, as the growth of half-edges does not add new vertices to the cluster. We ignore these duplicate numbers for now. We find that this series of numbers can be written as a finite sum.
+
+\begin{equation}\label{3.eq.series}
+% \nonumber % Remove numbering (before each equation)
+  S'_{cluster}(i) = 1 + \sum_{0}^{x=i} 4x = 2i(i+1) + 1
+\end{equation}
+
+We now have a very simple analytical function to place clusters into buckets, where the number of elements per bucket increases linearly with $4i + 8$. For a cluster of size $S$, its bucket number $i$ can be calculated by rewriting and flooring equation \ref{3.eq.series} $i=\lfloor (\sqrt{2S-1} - 1)/2 \rfloor$. Now earlier we disregarded the duplicate entries is $S_{cluster, i}$, so we need to take an extra step to check whether a cluster is in its half-grown state. These buckets are illustrated in figure \ref{3.fig.bucketsranges}a.
+
+\begin{definition}[Bucket place method 1]\label{3.def.placebucket1}
+  A cluster with size $S$ is placed in bucket number $i$ of $l$ buckets with $i=2\lfloor (\sqrt{2S-1} - 1)/2 \rfloor$ if cluster is fully grown, or $i=2\lfloor (\sqrt{2S-1} - 1)/2 \rfloor + 1$ otherwise.
+\end{definition}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{buckets_ranges.pdf}
+  \caption{The first six buckets for a) method A from definition \ref{3.def.placebucket1} and b) method B from definition \ref{3.def.placebucket2}. Even buckets contains fully grown clusters, odd buckets contain half-grown clusters of the same size.}\label{3.fig.bucketsranges}
+\end{figure}
+
+Single-generator clusters, or clusters with size 1, is never caused by an only an erasure error. It might therefore by useful to give these clusters their own bucket, such that these single-generator clusters are always grown first, such as in figure \ref{3.fig.bucketsranges}b.
+
+\begin{definition}[Bucket place method 2]\label{3.def.placebucket2}
+  For separate single-generator buckets, check whether the cluster has size 1, in which case the clusters belongs in bucket 0 or 1 depending on its growth state. Otherwise, a cluster with size $S$ belongs in bucket number $i$ of $l$ buckets with $i=2\lfloor (\sqrt{2S-3} - 1)/2 \rfloor + 1$ if cluster is fully grown, or $i=2\lfloor (\sqrt{2S-3} - 1)/2 \rfloor + 2$ otherwise.
+\end{definition}
+
+To compare method 1 of definition \ref{3.def.placebucket1} and method 2 of definition \ref{3.def.placebucket2}, let us find the size of the largest odd possible on a lattice. Given that any two odd parity clusters grow simultaneously, this size is $S_{max} = (\lfloor l/2\rfloor-1)l$. We calculate the bucket number (for the half-grown state) for both methods and plot them versus the lattice size in figure \ref{3.fig.maxbucket}. The bucket number of the largest odd parity cluster for method 2 is exactly the largest available bucket. Therefore method 2 is most probably superior.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\linewidth]{max_bucket.pdf}
+  \caption{The largest bucket that will be utilized for methods A and B (see fig. \ref{3.fig.bucketsranges}). Method A does not utilize the largest two buckets. }\label{3.fig.maxbucket}
+\end{figure}
+
+The big benefit of this type of bucket sort is that we do not need to look at existing entries in the buckets. Only thing that is necessary is to initialize the buckets, which can be done in linear time.
+
+\paragraph{Growing a bucket}
+
+The procedure for the Union-Find decoder using the bucket sort algorithm is now to sequentially grow the buckets starting from bucket 0, which contains all the single-generator clusters. From each bucket, which can be a simple list, clusters are popped from the bucket, grown, and placed into a new bucket, a process which we will call \emph{growing a bucket}. In the case that no merge happens, clusters from even bucket $i$ are placed in odd bucket $i+1$. However, what happens to clusters grown from odd bucket $j$? It would be problematic if a cluster can be placed in even bucket $j-1$, which has the same size range, as that bucket comes first in the sequence, and thus will not be grown again. To proof that this will never happen, let's state the following:
+
+\begin{lemma}
+  A cluster with size $S_i = 2(i+1)(i+2) + 1$ grown from a single-generator cluster has the least number of neighbor vertices of all clusters of size $S_i$.
+\end{lemma}
+
+This is equivalent to saying that single-generator seeded cluster with size $S_i$ will have the least amount of new vertices added to itself for all clusters with the same size. This is fairly easy to proof, as there can be no more compactly organized cluster than a cluster grown from a single generator. We know odd parity clusters from this most compactly organized set must go into the next bucket, as the size of this set if clusters is what defines the sequence (eq. \ref{3.eq.sequence}). Thus less compactly organized odd parity clusters must at least grow into the next even bucket, and potentially grow into a higher even bucket.
+
+\begin{lemma}
+  In the case of no merging event, clusters from even bucket $i$ are grown into bucket $i+1$, and cluster from odd bucket $j$ are grown into bucket $j+2k+1$ with $k \in \mathbb{N}_0$.
+\end{lemma}
+
+We now know that our buckets can be grown sequentially, where we need not to worry about buckets that already been emptied.
+
+\paragraph{Merging}
+Up until now we have avoided talking about the merging of clusters, so let us finally address this. In the original paper of the Union-Find algorithm, when two clusters merge, one needs to check for the larger cluster between the two, and make the smaller cluster the child of the bigger cluster, which lowers the depth of the tree and is called the \emph{weighted union rule}. Applied to the toric lattice, the Union-Find decoder also needs to append the boundary list (which contains all the boundary edges of a cluster) of the smaller cluster onto the list of the larger cluster.
+
+In our application, instead of appending the entire boundary list, we just add a pointer at the parent cluster to the child cluster. As a parent can have many children, the pointers are appended to a \emph{children list}. When growing a cluster, we first check if this cluster has any child clusters. If yes, these child clusters will be grown first by popping them from the list, but any new vertices will always be added to the parent cluster. Also during and after a merge, we make sure that any new vertices are always added to the parent cluster. Any child will exist in the list of a parent for one iteration, after which its boundaries will be grown, and the child is absorbed into the parent. This method also works recursively by keeping track of the root cluster instead of the parent cluster, and many levels of parent-child relationships can exists.
+
+\paragraph{Faulty entries}
+Now let us first be clear: \emph{only uneven parity clusters will be placed in buckets, but each bucket does not only contain uneven parity clusters}. As a merge happens between two uneven parity clusters A and B during growth of B, cluster A has already been placed in a bucket. But clusters A is now part of cluster AB and is even. So, to prevent growth of the \emph{faulty entry}, we just need to have an extra check of the parity of the root cluster.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{cluster_merge_A.pdf}
+  \caption{bla}\label{3.fig.clustermergeB}
+\end{figure}
+
+\paragraph{Wastebasket}
+If the lattice consists of more than just the two single-generator clusters, it is entirely possible for odd parity clusters to grow larger than $S_{max} = (l/2-1)l$. The bucketing formulas also does not prevent itself from outputting a larger bucket number than the available number of buckets. The elegance of this method is that whenever a cluster has a bucket number $i_1>l$, there will always be another \emph{smaller} cluster with bucket number $i_2\leq l$ that will merge into the larger cluster, which evens the parity. In another words, if a clusters bucket number $i$ is computed to be larger than $l$, we can figuratively put the cluster into the \emph{wastebasket}.
+

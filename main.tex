@@ -1,21 +1,60 @@
-\documentclass[titlepage]{report}
-\usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\usepackage[section]{placeins}
-\usepackage[vlined, boxed]{algorithm2e}
+\documentclass[11pt, a4paper, twoside, titlepage, usenames,dvipsnames]{report}
+\usepackage[page, title, titletoc]{appendix}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
-\usepackage{tikz}
-\usetikzlibrary{quantikz,shapes}
+\usepackage[section]{placeins}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath}
 \usepackage{physics}
 \usepackage{adjustbox}
 
+\setlength{\parindent}{24pt}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{theorem}{Theorem}[chapter]
+
+% Set graphics folder
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[format=plain, font=it]{caption}
+\usepackage[format=plain, font=it]{subcaption}
+\graphicspath{{"../../../OneDrive - Delft University of Technology/MEP - thesis Mark/Figures/ch_toric_code/"}}
+
+% Set algorithm2e package settings
+\usepackage[linesnumbered, vlined]{algorithm2e}
+\SetStartEndCondition{ }{}{}
+\SetKwProg{Fn}{def}{\string:}{}
+\SetKw{KwTo}{in}
+\SetKwFor{For}{for}{\string:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{ then}{elif}{else:}{}
+\SetKwFor{While}{while}{ do}{}
+\SetAlgoNoEnd\DontPrintSemicolon
+
+% Set algorithm title custom box
+\usepackage[most]{tcolorbox}
+\tcbset{algotitle/.style={title={ \strut Algorithm~\thetcbcounter\ifstrempty{#1}{\ignorespaces}{:~#1}}}}
+\newtcolorbox[auto counter]{algo}[1][]{
+    colback=white, colframe=black, boxrule=0.5pt,
+    titlerule=0pt, sharp corners, colbacktitle=white,enhanced,
+    attach boxed title to top center={yshift=-10pt},
+    boxed title style={boxrule=-1pt},
+    fonttitle=\bfseries, coltitle=black, algotitle={}, #1}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{xparse}
+\NewDocumentCommand{\codeword}{v}{\texttt{\textcolor{MidnightBlue}{#1}}}
+\NewDocumentCommand{\codefunc}{v}{\texttt{\textcolor{OliveGreen}{#1}}}
+
+\lstset{language=C,keywordstyle={\bfseries \color{blue}}}
+% Set quantikz settings
+\usepackage{tikz}
+\usetikzlibrary{quantikz,shapes}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 \SetAlFnt{\footnotesize}
-\setlength{\parindent}{0pt}
 \tikzset{bellstar/.style ={draw, star,star points = 8, star point height = 1em, star point ratio = 1.8, minimum size = 1em, inner sep = 0pt}}
 \tikzset{selection/.style={draw, signal, signal to =south, minimum size = 1em, inner sep = 0pt}}
 \tikzset{sel/.style={label position = below, yshift = 0.5cm}}
-
 
 
 \title{mep-thesis}
@@ -25,58 +64,22 @@
 
 \begin{document}
 
-\begin{titlepage}
-	\newcommand{\HRule}{\rule{\linewidth}{0.3mm}}
-	\center
+\include{_titlepage}
 
-	\textsc{\Large Delft University of Technology}\\[1.5cm]
-
-	\textsc{\large Master's Thesis}\\[0.5cm]
-
-    \vfill
-
-	\HRule\\[1cm]
-
-	{\huge\bfseries Quantum Error Correction of Patch-Loss of the Surface Code}\\[0.4cm]
-
-	\HRule\\[1.8cm]
-
-	\begin{minipage}{0.4\textwidth}
-		\begin{flushleft}
-			\large
-			\textit{Author}\\
-			S. \textsc{Hu}
-		\end{flushleft}
-	\end{minipage}
-	~
-	\begin{minipage}{0.4\textwidth}
-		\begin{flushright}
-			\large
-			\textit{Supervisor}\\
-			D. \textsc{Elkouss} % Supervisor's name
-		\end{flushright}
-	\end{minipage}
-
-
-	%------------------------------------------------
-	%	Date
-	%------------------------------------------------
-
-	\vfill\vfill\vfill % Position the date 3/4 down the remaining page
-
-	{\large\today} % Date, change the \today to a set date if you want to
-	\vfill % Push the date up 1/4 of the remaining page
-
-\end{titlepage}
-
-
+\tableofcontents
 
 \include{preliminary_report}
 
 \include{introduction}
 
 \include{ch_toric_code}
-\include{peeling_objects_1}
+
+\include{ch_threshold_results}
+%\include{peeling_objects_1}
+
+\begin{appendices}
+  \include{ap_bucket_sort}
+\end{appendices}
 
 
 \bibliographystyle{unsrt}

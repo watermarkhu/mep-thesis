@@ -88,16 +88,17 @@ Another approach which yields a higher enhanced fidelity utilizes two noisy Bell
   \end{tikzcd}
 \end{center}
 
-\begin{center}0
-\begin{adjustbox}{width=\textwidth}
-  \begin{tikzcd}[row sep={0.75cm,between origins}]
-    \qw & \qw & \qw &&&\qw&\qw&\qw&\qw &&&& \gate[wires=3,style=selection,label style=sel]{\sigma} \vqw{4} & \qw &&& \qw & \qw & \gate[style=bellstar]{} \vqw{4} &\ctrl{1} & \meterD{X}&\qw \\
-    \qw & \gate[wires=2,style=selection,label style=sel]{\sigma} \vqw{4} & \qw &&&\gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \meterD{X} &\qw &&&&  & \qw &&& \gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \qw & \gate{Z} & \meterD{X} &\qw \\
-    \qw & & \qw &&& \qw &\gate{\sigma}&\qw&\qw &&&&  & \qw &&&\qw &\gate{\sigma}&\qw&\qw&\qw&\qw\\
-    &&&= &&& &&&&& &&& =\\
-    \qw & \qw & \qw &&&\qw&\qw&\qw&\qw &&&& \gate[wires=3,style=selection,label style=sel]{\sigma} & \qw &&& \qw & \qw & \gate[style=bellstar]{} &\ctrl{1} & \meterD{X} &\qw\\
-    \qw & \gate[wires=2,style=selection,label style=sel]{\sigma} & \qw  &&&\gate[style=bellstar]{} & \ctrl{1} & \meterD{X} &\qw &&&& &\qw &&&\gate[style=bellstar]{} & \ctrl{1} & \qw & \gate{Z} &  \meterD{X} & \qw \\
-    \qw & & \qw &&& \qw &\gate{\sigma}&\qw&\qw &&&& & \qw &&&\qw &\gate{\sigma}&\qw&\qw&\qw&\qw
-  \end{tikzcd}
-\end{adjustbox}
-\end{center} 
+
+%\begin{center}
+%\begin{adjustbox}{width=\textwidth}
+%  \begin{tikzcd}[row sep={0.75cm,between origins}]
+%    \qw & \qw & \qw &&&\qw&\qw&\qw&\qw &&&& \gate[wires=3,style=selection,label style=sel]{\sigma} \vqw{4} & \qw &&& \qw & \qw & \gate[style=bellstar]{} \vqw{4} &\ctrl{1} & \meterD{X}&\qw \\
+%    \qw & \gate[wires=2,style=selection,label style=sel]{\sigma} \vqw{4} & \qw &&&\gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \meterD{X} &\qw &&&&  & \qw &&& \gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \qw & \gate{Z} & \meterD{X} &\qw \\
+%    \qw & & \qw &&& \qw &\gate{\sigma}&\qw&\qw &&&&  & \qw &&&\qw &\gate{\sigma}&\qw&\qw&\qw&\qw\\
+%    &&&= &&& &&&&& &&& =\\
+%    \qw & \qw & \qw &&&\qw&\qw&\qw&\qw &&&& \gate[wires=3,style=selection,label style=sel]{\sigma} & \qw &&& \qw & \qw & \gate[style=bellstar]{} &\ctrl{1} & \meterD{X} &\qw\\
+%    \qw & \gate[wires=2,style=selection,label style=sel]{\sigma} & \qw  &&&\gate[style=bellstar]{} & \ctrl{1} & \meterD{X} &\qw &&&& &\qw &&&\gate[style=bellstar]{} & \ctrl{1} & \qw & \gate{Z} &  \meterD{X} & \qw \\
+%    \qw & & \qw &&& \qw &\gate{\sigma}&\qw&\qw &&&& & \qw &&&\qw &\gate{\sigma}&\qw&\qw&\qw&\qw
+%  \end{tikzcd}
+%\end{adjustbox}
+%\end{center}
