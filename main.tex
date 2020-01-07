@@ -49,7 +49,7 @@
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 % Set quantikz settings
 \usepackage{tikz}
-\usetikzlibrary{quantikz,shapes}
+\usetikzlibrary{quantikz,shapes,calc}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 \SetAlFnt{\footnotesize}
 \tikzset{bellstar/.style ={draw, star,star points = 8, star point height = 1em, star point ratio = 1.8, minimum size = 1em, inner sep = 0pt}}
@@ -70,17 +70,19 @@
 
 \include{preliminary_report}
 
-\include{introduction}
+\include{chapters/introduction}
 
-\include{ch_qec_basics}
+\include{chapters/ch_qec_basics}
 
-\include{ch_toric_code}
+\include{chapters/ch_toric_code}
 
-\include{ch_threshold_results}
+\include{chapters/ch_ufdecoder_modifications}
+
+\include{chapters/ch_threshold_results}
 %\include{peeling_objects_1}
 
 \begin{appendices}
-  \include{ap_bucket_sort}
+  \include{appendices/ap_bucket_sort}
 \end{appendices}
 
 

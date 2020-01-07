@@ -1,0 +1,143 @@
+
+\def\QS{15}
+\def\s{1.5}
+\def\lw{0.4}
+
+\tikzset{
+  qubit/.style={line width=\lw,circle,draw,fill=white,minimum size=\QS},
+  bound/.style={line width=\lw,circle, fill=gray!50, minimum size=\QS},
+  line/.style={line width=\lw},
+  xer/.style={line width=\lw,circle,draw,fill=red!50,inner sep=0,text width=\QS,align=center},
+  zer/.style={line width=\lw,circle,draw,fill=cyan!50,inner sep=0,text width=\QS,align=center},
+  yer/.style={line width=\lw,circle,draw,fill=orange!50,inner sep=0,text width=\QS,align=center},
+  plaq/.style={fill=cyan!20},
+  vert/.style={red!50, line width=4*\lw},
+  synz/.style={cyan!50, line width=4*\lw},
+  synx/.style={red!50, line width=4*\lw},
+  empty/.style={inner sep=0},
+  arrow/.style={->, line width=2*\lw}
+  }
+
+\pgfdeclarelayer{bg}
+\pgfdeclarelayer{edges}
+\pgfdeclarelayer{qubits}
+\pgfsetlayers{bg,edges,qubits,main}
+
+\newcommand{\MINUS}[1]{%
+  \number\numexpr#1-1\relax%
+}
+
+
+\newcommand\DRAWTORIC[1]{
+  % Draws a toric lattice
+  % var 0:    lattice size
+
+  \def\LS{\MINUS{#1}}
+  \begin{pgfonlayer}{edges}
+    \foreach \x in {0,...,\LS}{
+      \draw (0,\s*\x) -- (\s*\LS+\s,\s*\x) (\s*\x, -\s) -- (\s*\x, \s*\LS);
+      \draw[dotted] (0,\s*\x - \s/2) -- (\s*\LS+\s,\s*\x - \s/2) (\s*\x + \s/2, -\s) -- (\s*\x + \s/2, \s*\LS);
+      }
+    \draw[dashed] (0, -\s) -- (\s*\LS+\s, -\s) -- (\s*\LS+\s, \s*\LS);
+  \end{pgfonlayer}
+  \begin{pgfonlayer}{qubits}
+    \foreach \x in {0,...,\LS}
+      \foreach \y in {0,...,\LS}{
+         \node [qubit] (N-\x-\y-0) at (\s*\x + \s/2, \s*\y) {};
+         \node [qubit] (N-\x-\y-1) at (\s*\x, \s*\y - \s/2) {};
+         \node [empty] (P-\x-\y) at (\s*\x + \s/2, \s*\y - \s/2) {};
+         \node [empty] (S-\x-\y) at (\s*\x, \s*\y) {};
+         }
+    \foreach \x in {0,...,\LS}{
+      \node [bound] (By-\x) at (\s*\LS+\s, \s*\x - \s/2) {};
+      \node [bound] (Bx-\x) at (\s*\x + \s/2, -\s) {};
+    }
+
+  \end{pgfonlayer}
+}
+
+\newcommand\DRAWPLANAR[1]{
+  % Draws a planar lattice
+  % var 0:    lattice size
+
+  \def\LS{\MINUS{#1}}
+  \begin{pgfonlayer}{edges}
+    \foreach \x in {1,...,\LS}{
+      \draw (\s/2,\s*\x) -- (\s*\LS+\s/2,\s*\x) (\s*\x, 0) -- (\s*\x, \s*\LS);
+      \draw[dotted] (\s*\x + \s/2, 0) -- (\s*\x + \s/2, \s*\LS) (\s/2,\s*\x - \s/2) -- (\s*\LS+\s/2,\s*\x - \s/2);
+      }
+    \draw (\s/2,0) -- (\s*\LS+\s/2,0);
+    \draw[dotted] (\s/2, 0) -- (\s/2, \s*\LS);
+  \end{pgfonlayer}
+  \begin{pgfonlayer}{qubits}
+    \foreach \x in {1,...,\LS}
+      \foreach \y in {1,...,\LS}{
+         \node [qubit] (N-\x-\y-0) at (\s*\x + \s/2, \s*\y) {};
+         \node [qubit] (N-\x-\y-1) at (\s*\x, \s*\y - \s/2) {};
+         \node [empty] (P-\x-\y) at (\s*\x + \s/2, \s*\y - \s/2) {};
+         \node [empty] (S-\x-\y) at (\s*\x, \s*\y) {};
+         }
+    \foreach \x in {0,...,\LS}{
+      \node [qubit] (N-\x-0-0) at (\s*\x + \s/2, 0) {};
+      \node [qubit] (N-0-\x-0) at (\s/2, \s*\x) {};
+    }
+  \end{pgfonlayer}
+}
+
+
+\newcommand\DRAWERROR[4]{
+  % Draws a toric lattice
+  % var 0:    y coordinate
+  % var 1:    x coordinate
+  % var 2:    td coordinate
+  % var 3:    error type x,y,z
+  \def\y{#1}
+  \def\x{#2}
+  \begin{pgfonlayer}{qubits}    % select the background layer
+    \ifstrequal{#4}{x}%
+      {\ifstrequal{#3}{0}
+        {\node [xer] (\y,\x,0) at (\s*\x + \s/2, \s*\y) {\tiny X};}
+        {\node [xer] (\y,\x,0) at (\s*\x, \s*\y - \s/2) {\tiny X};}}
+      {}
+    \ifstrequal{#4}{z}%
+      {\ifstrequal{#3}{0}
+        {\node [zer] (\y,\x,0) at (\s*\x + \s/2, \s*\y) {\tiny Z};}
+        {\node [zer] (\y,\x,0) at (\s*\x, \s*\y - \s/2) {\tiny Z};}}
+      {}
+    \ifstrequal{#4}{y}%
+      {\ifstrequal{#3}{0}
+        {\node [yer] (\y,\x,0) at (\s*\x + \s/2, \s*\y) {\tiny Y};}
+        {\node [yer] (\y,\x,0) at (\s*\x, \s*\y - \s/2) {\tiny Y};}}
+      {}
+  \end{pgfonlayer}
+}
+
+\newcommand\DRAWPLAQ[2]{
+  % Draws a plaquette
+  % var 0:    y coordinate
+  % var 1:    x coordinate
+  \def\y{#1}
+  \def\x{#2}
+  \begin{pgfonlayer}{bg}
+    \fill[plaq] (\x*\s,\y*\s) rectangle (\x*\s+\s,\y*\s-\s);
+  \end{pgfonlayer}
+}
+
+\newcommand\DRAWSTAR[3]{
+  % Draws a star
+  % var 0:    y coordinate
+  % var 1:    x coordinate
+  % var 2:    lattice size
+  \def\y{#1}
+  \def\x{#2}
+  \def\LS{\MINUS{#3}}
+  \begin{pgfonlayer}{edges}
+    \ifstrequal{\x}{0}
+    {\draw[vert] (\LS*\s-\s/2, \y*\s) -- (\LS*\s, \y*\s);}
+    {\draw[vert] (\x*\s-\s/2, \y*\s) -- (\x*\s, \y*\s);}
+    \ifstrequal{\y}{\LS}
+    {\draw[vert] (\x*\s, -\s) -- (\x*\s, -\s/2);}
+    {\draw[vert] (\x*\s, \y*\s) -- (\x*\s, \y*\s +\s/2);}
+    \draw[vert] (\x*\s, \y*\s - \s/2) -- (\x*\s, \y*\s) -- (\x*\s + \s/2, \y*\s);
+  \end{pgfonlayer}
+}

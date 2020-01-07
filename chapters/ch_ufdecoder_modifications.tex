@@ -1,0 +1,93 @@
+\chapter{Modifications to the Union-Find decoder}
+
+
+\section{Object oriented approach}
+
+Others who have implemented weighted growth (wrongly) use an algorithm that has a time complexity of $\mathcal{O}(n\log n)$, which is worse than the main algorithm \cite{nando}. We will introduce a weighted growth algorithm that has a linear time complexity, and therefore preserving the inverse Ackermann time complexity of the Union-Find decoder.
+
+\subsection{A new data structure}
+
+\subsection{Finding clusters}
+
+\section{Bucket Cluster Sort (BCS)}
+To further increase the error threshold for the Union-Find decoder from $9.2\%$ to $9.9\%$, Nickerson implements weighted growth, where clusters are grown in increasing order based on their sizes \cite{delfosse2017}. However, the main problem with weighted growth is that the clusters now need to be sorted, and that after each growth iteration another round of sorting is necessary, due to the fact that the clusters have changed sizes due to growth and merges, and the order of clusters may have been changed. Nickerson has not given a description of how weighted growth in implemented. From a review of the Union-Find decoder, an implementation of weighted growth is described using \emph{Heapsort}, which has been incorrectly described as linear as its time complexity is also $\mathcal{O}(n\log(n))$ \cite{nando}. As the complexity of the algorithm is now dominated by the Union-Find algorithm, we need to make sure that weighted growth does not add to this complexity. To avoid this iterative sorting, we need to make sure that the insertion of a new element in our sorted list of clusters does not depend on the values in that list.
+
+The Bucket Cluster sorting algorithm as described in this section is evolved from a more complicated version that is described in appendix \ref{ap.bucketsort}, which has a sub-linear complexity of $\mathcal{O}(\sqrt{n})$.
+
+\subsection{How to sort for weighted growth using BCS}
+
+Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size of the cluster $S$ is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
+
+Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters with size $S_A <<S_B$, growth of cluster B will add $\sim k_B/2$ "incorrect" edges on average, whereas growth of cluster A will add $\sim k_A/2 << k_B/2$ edges as $k_A \propto S_A$ and $k_B \propto S_B$. However, if $S_A \simeq S_B$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_A = S_B$. Thus clusters with the same size can be grown "simultaneously", as there is no benefit to grow one before another.
+
+\begin{lemma}
+  Weighted growth of cluster A with size $S_A << S_B$ ensures that a smaller amount of "incorrect" edges is added, compared with growth of cluster B.
+\end{lemma}
+
+The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
+
+\subsubsection{Growing a bucket}
+The procedure for the Union-Find decoder using the bucket sort algorithm is now to sequentially grow the clusters from a bucket starting from bucket 0, which contain the smallest single-generator clusters of size 1. After a round of growth, in the case of no merge event, these clusters are grown half edges, but are still size 1. We would therefore need twice as many buckets to differentiate between clusters without and with half-edges. Let us call them full-edged and half-edged clusters, respectively. Starting from bucket 0, even buckets contain full-edged clusters and odd buckets contain half-edged clusters of the same size. To grow a bucket, clusters are popped from the bucket, grown on the boundary, after which the clusters is to be distributed in a bucket again. In the case of no merge event, clusters grown from even bucket $i$ must be placed in odd bucket $i + 1$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $j + 2k + 1$ with $k \in \mathbb{N}_0$. Also in the case of a merge event of clusters A and B, the new cluster AB must be placed in a bucket $i_{AB} > i_A, i_{AB} > i_B$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied".
+\begin{lemma}
+  Buckets can be grown sequentially after each other as new clusters will always be placed in a higher bucket than the current one.
+\end{lemma}
+
+\subsubsection{Faulty entries}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{cluster_merge_A.pdf}
+  \caption{Faulty entries of clusters can occur in the buckets, a) cluster that should not be there due to a merge event. Situation a can be solved by checking the parity of the cluster. Checking the parity of the root cluster solves a) and b). Checking the bucket\_number of the root cluster solves all.}\label{3.fig.clustermergeB}
+\end{figure}
+
+Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters A and B during growth of B, cluster A has already been placed in a bucket, as it was still odd after its growth. But cluster A is now part of cluster AB and has even parity, and the entry of cluster A is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
+
+Furthermore, it is possible that another cluster C merges onto AB, such that the cluster ABC is odd again. Now, the faulty entry of cluster A passes the previous test. To solve this issue, we store an extra \codeword{bucket_number} at the root of a cluster. Whenever a cluster increases in size or merges to an odd parity cluster, we first update the \codeword{bucket_number} to the appropriate value and place it in its bucket. If the cluster merges to an even parity cluster, we update the \codeword{bucket_number} to \codeword{None}. Now, every time a cluster is popped from bucket $i$, we can just check weather the current bucket corresponds to the \codeword{bucket_number} of the root cluster.
+
+\subsubsection{Number of buckets}
+How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now trivial. But we need to make sure that the decoder \emph{can} give a solution. As we are only placing odd parity clusters in buckets, and clusters of the same size grow "simultaneously", the largest odd parity cluster should only cover about half the lattice, while another odd parity cluster of the same size covers the other half. Any odd parity cluster that is larger than that should now grow as there should always be a smaller cluster available to grow instead. We can show that the largest odd parity cluster size is $S_M = L\times(\lfloor L/2\rfloor - 1)$ with $L=\sqrt{n}$ on a square lattice. This results to $N_b = 2L\times(\lfloor L/2\rfloor - 1)$ buckets. Any odd parity cluster with bucket number larger $N_b$ shall be assigned \codeword{bucket_number=None} and will not be placed in a bucket, as there is no bucket available.
+
+\subsubsection{Largest bucket occurrence}
+Not all buckets will be filled depending on the configuration of the lattice. It would therefore be redundant to go through all buckets just to find out that the majority of them is empty. To combat this, we can keep track of the largest bucket occurrence $i_{M,o}$. Whenever a bucket $i$ has been emptied and $i = i_{M,o}$, we can break out of the bucket loop to skip the remainder of the buckets.
+
+\subsection{Complexity of BCS}
+Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\mathcal{O}(1)$. There are a maximum of $\mathcal{O}(L^2) = \mathcal{O}(n)$ buckets to go through. Thus the overall complexity of $\mathcal{O}(n\alpha(N))$ is preserved.
+
+\subsection{The BCS Union-Find decoder}
+
+
+
+
+\section{Delayed Merge of boundary lists (DM)}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{parent_child_A.pdf}
+  \caption{The parent-child method for merging boundary lists. By storing a list of pointers of child clusters at the parent cluster, we needn't append the full boundary list from the child to the parent cluster. The tree representation (TR) is shown on the top right. } \label{3.fig.parentchildA}
+\end{figure}
+
+When two clusters merge, one needs to check for the larger cluster between the two, and make the smaller cluster the child of the bigger cluster, which lowers the depth of the tree and is called the \emph{weighted union rule}. Applied to the toric lattice, the Union-Find decoder also needs to append the boundary list (which contains all the boundary edges of a cluster) of the smaller cluster onto the list of the larger cluster. This method, as explained before, requires that the new boundary list needs to be checked again.
+
+In our application, instead of appending the entire boundary list, we just add a pointer stored at the parent cluster to the child cluster. As a parent can have many children, the pointers are appended to a list \codeword{children}. When growing a cluster, we first check if this cluster has any child clusters. If yes, these child clusters will be grown first by popping them from the list, but any new vertices will always be added to the parent cluster. Also during and after a merge, we make sure that any new vertices are always added to the parent cluster. Any child will exist in the list of a parent for one round of growth, after which its boundaries will be grown, and the child is absorbed into the parent. This method also works recursively by keeping track of the root cluster instead of just the parent cluster, and many levels of parent-child relationships can exists, but again, only for one round of growth.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{parent_child_B.pdf}
+  \caption{Growing a merged boundary using the parent-child method. The tree representation (TR) is shown on the top right. }\label{3.fig.parentchildB}
+\end{figure}
+
+
+\section{Growing Edge Priority based on path degeneracy (GEP)} 
+
+\subsection{Degeneracy on connecting edges between Clusters (GEP-C)}
+\subsection{Degeneracy on Vertices with connecting edges (GEP-V)}
+
+\section{Growth Delay based on Matching Potential (GDMP)}
+
+
+
+
+
+
+
+

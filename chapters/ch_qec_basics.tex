@@ -93,28 +93,28 @@ In the quantum three-bit repetition code, we can very simply deduct which qubit 
 
 \section{Stabilizer Formalism}
 
-As we have seen above, we can use the Pauli group $\mathcal{P}_n$ to easily describe a quantum error correcting code of $n$ qubits, without explicitly looking at the \emph{state} of the qubit. This powerful technique is called the \emph{stabilizer formalism}, and is the most widely formalism used to describe topological codes, such as the \emph{surface code}. 
+As we have seen above, we can use the Pauli group $\mathcal{P}_n$ to easily describe a quantum error correcting code of $n$ qubits, without explicitly looking at the \emph{state} of the qubit. This powerful technique is called the \emph{stabilizer formalism}, and is the most widely formalism used to describe topological codes, such as the \emph{surface code}.
 
 A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators, a set of \emph{stabilizer generators} which form the \emph{stabilizer group} $\mathcal{S}$, which is an Abelian subgroup of the Pauli group, and a set of encoded \emph{logical operators}. A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that:
 \begin{align}
   & S\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \mathcal{S} &
 \end{align}
-These elements of the of the stabilizer group are most simply referred to as \emph{stabilizers}. This Abelian group of stabilizers can be written by a set of independent generators $S_j$ of size $n_S$, where any stabilizer $S$ can be written as
+These elements of the of the stabilizer group are most simply referred to as \emph{stabilizers}. The elements of this Abelian group can be written by a set of independent generators $S_j$ of size $n_S$, where any stabilizer $S$ can be written as
 \begin{align}
  & S = \prod_{j}S_j^{a_j}, && a\_j \in {0, 1} &
 \end{align}
-The set of generators $S_j$ is \emph{independent} if no generator can be written as a product of generators. This implies that any stabilizer can be written in terms of the bitstring $a_1, a_2, ...a_{n_S}$ and that the stabilizer group takes up $n_S$ degrees of freedom of the Hilbert space of $n$ qubits. The remaining $n-n_S = n_L$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $n_L$ logical qubits are to be encoded by $n$ qubits, we require a total of $n_S = n-n_L$ independent stabilizer generators. 
+The set of generators $S_j$ is \emph{independent} if no generator can be written as a product of other generators. This implies that any stabilizer can be written in terms of the bitstring $a_1, a_2, ...a_{n_S}$ and that the stabilizer group takes up $n_S$ degrees of freedom of the Hilbert space of $n$ qubits. The remaining $n-n_S = n_L$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $n_L$ logical qubits are to be encoded by $n$ qubits, we require a total of $n_S = n-n_L$ independent stabilizer generators.
 
 
 \subsubsection{Encoded logical operators}
 
-Next to the set of stabilizers, we can construct the set of logical operators that will act on the encoded qubits from a set commutation rules. First of all, all logical operators must commute with all elements of the stabilizers, as any Pauli operator which anticommutes with a stabilizer cannot leave the codespace invariant. Note that his means that a logical operator is not unique, as it can be multiplied with an element of the stabilizer. Secondly, we can impose commutation rules for the logical operators themselves based on the Pauli operators that they are representing. For example, logical $\bar{X}$ and $\bar{Z}$ operators must anticommute.
+Next to the set of stabilizers, we can construct the set of logical operators that will act on the encoded qubits from a set commutation rules. First of all, all logical operators must commute with all elements of the stabilizers, as a logical operator is made up from Pauli operators, and any Pauli operator which anticommutes with a stabilizer cannot leave the codespace invariant. Note that his means that a logical operator is not unique, as it can be multiplied with an element of the stabilizer. Secondly, we can impose commutation rules for the logical operators themselves based on the Pauli operators that they are representing. For example, logical $\bar{X}$ and $\bar{Z}$ operators must anticommute.
 
-The minimum weight of the logical operator determines the distance $d$ of the error correcting code. This is thus the minimal amount of errors that can cause a logical failure. Together with the total number of qubits $n$ and number of logical qubits $k$, they provide a rough measure of the error correcting capabilities of the code. 
+The minimum weight of the logical operator determines the distance $d$ of the error correcting code. This is thus the minimal amount of errors that can cause a logical failure. Together with the total number of qubits $n$ and number of logical qubits $k$, they provide a rough measure of the error correcting capabilities of the code.
 
 \subsubsection{Error detection procedure}
 
-As the stabilizers are a set of Pauli operators, they correspond to blip-flip or phase-flip errors that may have happened on any of our $n$ qubits. Furthermore, as any stabilizer leaves all states  $\ket{\psi}_i$ invariant, measuring the stabilizers does not disrupt the encoded information. If no error has occurred, all stabilizer measurements will return a '+1' eigenvalue, while any '-1' outcome points to the presence of errors. 
+As the stabilizers are a set of Pauli operators, they correspond to blip-flip or phase-flip errors that may have happened on any of our $n$ qubits. Furthermore, as any stabilizer leaves all states  $\ket{\psi}_i$ invariant, measuring the stabilizers does not disrupt the encoded information. If no error has occurred, all stabilizer measurements will return a '+1' eigenvalue, while any '-1' outcome points to the presence of errors.
 
 This outcome is dependent on whether an error caused by the error operator $E$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\mathcal{P}_n$. If $E$ and generator $S_j$ commute then,
 \begin{equation}
@@ -128,12 +128,12 @@ and the post-error state is a -1 eigenstate of $S_j$. Errors on stabilizers code
 
 \subsubsection{Error correction or decoding}
 
-From the measurement outcomes of a stabilizer measurement, we can deduce which error $E$ must have caused the syndrome. However, this relationship is not always one-to-one, as an error $E$ and its multiplication with a stabilizer $ES$ will lead to an identical syndrome. This is called the \emph{code degeneracy}. The choice of the most appropriate error to correct is not a trivial task, and algorithms that are tasked to automate this process are called \emph{decoders}. 
+From the measurement outcomes of a stabilizer measurement, we can deduce which error $E$ must have caused the syndrome. However, this relationship is not always one-to-one, as an error $E$ and its multiplication with a stabilizer $ES$ will lead to an identical syndrome. This is called the \emph{code degeneracy}. The choice of the most appropriate error to correct is not a trivial task, and algorithms that are tasked to automate this process are called \emph{decoders}.
 
 
 \subsubsection{The three-qubit code}
 
-The quantum three-bit repetition code we already covered can now be described in the stabilizer formalism. We had already found that the logical operators are encoded $\bar{X} = XXX$ and $\bar{Z} = ZII$. Other logical operators also exist up to a stabilizer. The stabilizer generators are needed to complete its description. We had found that two parity measurements, for example $ZZI$ and $IZZ$, will identify the error, as they will either commute or anticommute with the error. 
+The quantum three-bit repetition code we already covered can now be described in the stabilizer formalism. We had already found that the logical operators are encoded $\bar{X} = XXX$ and $\bar{Z} = ZII$. Other logical operators also exist up to a stabilizer. The stabilizer generators are needed to complete its description. We had found that two parity measurements, for example $ZZI$ and $IZZ$, will identify the error, as they will either commute or anticommute with the error.
 
 The resulting measurement of '+1' or '-1' eigenvalues make up the syndrome. De decoder algorithm here is quite simple, but fails in the case if there is more than 1 bit-flip error. The code has $n=3$ and $n_S=2$ which results in the expected $n_L = 1$ encoded bits. The distance $d$ of the is 1, which conforms that there are certain errors, in this case phase-flip errors, which this code cannot detect.
 
@@ -146,6 +146,6 @@ with the logical operators up to a stabilizer:
 \begin{align}
   & \bar{X} = XXXXX && \bar{Z} = ZIIII &
 \end{align}
-This codes now has $n=5$ bits with $n_S = 4$ stabilizers, which means it still encodes for a single bit. 
+This codes now has $n=5$ bits with $n_S = 4$ stabilizers, which means it still encodes for a single bit.
 
 
