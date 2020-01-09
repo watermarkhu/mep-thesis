@@ -12,8 +12,8 @@
   yer/.style={line width=\lw,circle,draw,fill=orange!50,inner sep=0,text width=\QS,align=center},
   plaq/.style={fill=cyan!20},
   vert/.style={red!50, line width=4*\lw},
-  synz/.style={cyan!50, line width=4*\lw},
-  synx/.style={red!50, line width=4*\lw},
+  synz/.style={cyan!50, line width=4*\lw, line cap=round},
+  synx/.style={purple!25, line width=4*\lw, line cap=round},
   empty/.style={inner sep=0},
   arrow/.style={->, line width=2*\lw}
   }
@@ -45,19 +45,21 @@
       \foreach \y in {0,...,\LS}{
          \node [qubit] (N-\x-\y-0) at (\s*\x + \s/2, \s*\y) {};
          \node [qubit] (N-\x-\y-1) at (\s*\x, \s*\y - \s/2) {};
-         \node [empty] (P-\x-\y) at (\s*\x + \s/2, \s*\y - \s/2) {};
-         \node [empty] (S-\x-\y) at (\s*\x, \s*\y) {};
+         \coordinate (P-\x-\y) at (\s*\x + \s/2, \s*\y - \s/2);
+         \coordinate (S-\x-\y) at (\s*\x, \s*\y);
          }
     \foreach \x in {0,...,\LS}{
       \node [bound] (By-\x) at (\s*\LS+\s, \s*\x - \s/2) {};
       \node [bound] (Bx-\x) at (\s*\x + \s/2, -\s) {};
+      \coordinate (S-\x-#1) at (\s*\x, -\s);
+      \coordinate (S-#1-\x) at (\s*#1, \s*\x);
     }
 
   \end{pgfonlayer}
 }
 
 \newcommand\DRAWPLANAR[1]{
-  % Draws a planar lattice
+  % Draws a planar lattice#1
   % var 0:    lattice size
 
   \def\LS{\MINUS{#1}}
@@ -74,8 +76,8 @@
       \foreach \y in {1,...,\LS}{
          \node [qubit] (N-\x-\y-0) at (\s*\x + \s/2, \s*\y) {};
          \node [qubit] (N-\x-\y-1) at (\s*\x, \s*\y - \s/2) {};
-         \node [empty] (P-\x-\y) at (\s*\x + \s/2, \s*\y - \s/2) {};
-         \node [empty] (S-\x-\y) at (\s*\x, \s*\y) {};
+         \coordinate (P-\x-\y) at (\s*\x + \s/2, \s*\y - \s/2);
+         \coordinate (S-\x-\y) at (\s*\x, \s*\y);
          }
     \foreach \x in {0,...,\LS}{
       \node [qubit] (N-\x-0-0) at (\s*\x + \s/2, 0) {};
@@ -91,21 +93,21 @@
   % var 1:    x coordinate
   % var 2:    td coordinate
   % var 3:    error type x,y,z
-  \def\y{#1}
-  \def\x{#2}
+  \def\x{#1}
+  \def\y{#2}
   \begin{pgfonlayer}{qubits}    % select the background layer
     \ifstrequal{#4}{x}%
-      {\ifstrequal{#3}{0}
+      {\ifnumequal{#3}{0}
         {\node [xer] (\y,\x,0) at (\s*\x + \s/2, \s*\y) {\tiny X};}
         {\node [xer] (\y,\x,0) at (\s*\x, \s*\y - \s/2) {\tiny X};}}
       {}
     \ifstrequal{#4}{z}%
-      {\ifstrequal{#3}{0}
+      {\ifnumequal{#3}{0}
         {\node [zer] (\y,\x,0) at (\s*\x + \s/2, \s*\y) {\tiny Z};}
         {\node [zer] (\y,\x,0) at (\s*\x, \s*\y - \s/2) {\tiny Z};}}
       {}
     \ifstrequal{#4}{y}%
-      {\ifstrequal{#3}{0}
+      {\ifnumequal{#3}{0}
         {\node [yer] (\y,\x,0) at (\s*\x + \s/2, \s*\y) {\tiny Y};}
         {\node [yer] (\y,\x,0) at (\s*\x, \s*\y - \s/2) {\tiny Y};}}
       {}
@@ -116,8 +118,8 @@
   % Draws a plaquette
   % var 0:    y coordinate
   % var 1:    x coordinate
-  \def\y{#1}
-  \def\x{#2}
+  \def\x{#1}
+  \def\y{#2}
   \begin{pgfonlayer}{bg}
     \fill[plaq] (\x*\s,\y*\s) rectangle (\x*\s+\s,\y*\s-\s);
   \end{pgfonlayer}
@@ -128,16 +130,15 @@
   % var 0:    y coordinate
   % var 1:    x coordinate
   % var 2:    lattice size
-  \def\y{#1}
-  \def\x{#2}
-  \def\LS{\MINUS{#3}}
+  \def\x{#1}
+  \def\y{#2}
   \begin{pgfonlayer}{edges}
-    \ifstrequal{\x}{0}
-    {\draw[vert] (\LS*\s-\s/2, \y*\s) -- (\LS*\s, \y*\s);}
-    {\draw[vert] (\x*\s-\s/2, \y*\s) -- (\x*\s, \y*\s);}
-    \ifstrequal{\y}{\LS}
-    {\draw[vert] (\x*\s, -\s) -- (\x*\s, -\s/2);}
-    {\draw[vert] (\x*\s, \y*\s) -- (\x*\s, \y*\s +\s/2);}
+    \ifnumequal{\x}{0}
+      {\draw[vert] (#3*\s-\s/2, \y*\s) -- (#3*\s, \y*\s);}
+      {\draw[vert] (\x*\s-\s/2, \y*\s) -- (\x*\s, \y*\s);}
+    \ifnumequal{\y}{\LS}
+      {\draw[vert] (\x*\s, -\s) -- (\x*\s, -\s/2);}
+      {\draw[vert] (\x*\s, \y*\s) -- (\x*\s, \y*\s +\s/2);}
     \draw[vert] (\x*\s, \y*\s - \s/2) -- (\x*\s, \y*\s) -- (\x*\s + \s/2, \y*\s);
   \end{pgfonlayer}
 }

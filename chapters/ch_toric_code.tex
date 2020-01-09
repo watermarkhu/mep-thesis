@@ -14,7 +14,7 @@
     \node [align=left, right] at (3*\s + .5, .5*\s) {periodic boundary};
 
   \end{tikzpicture}
-  \caption{The toric code is defined as a $L\times L$ lattice (here $L=3$) with periodic boundary conditions. The edges on the lattice, which represents the qubits, make up faces and vertices.}\label{fig:sf_toriclattice}
+  \caption{The toric code is defined as a $L\times L$ lattice (here $L=3$) with periodic boundary conditions. The edges on the lattice, which represents the qubits, make up faces and vertices.}\label{sf:fig_toriclattice}
 \end{figure}
 
 The variant of the stabilizer codes that we are going to explore in this thesis is Kitaev's \emph{surface code}, which is of the category of \emph{topological codes}. Among this category, the surface code is preferable as it offers the highest error tolerance under realise noise channels and requires only local stabilizer measurements of physically neighboring qubits. Two variants of the surface code will be considered here, the \emph{toric code} in section \ref{sec:surface_toric} and the \emph{planar code} in section \ref{sec:surface_planar}. The various error channels our code will undergo is explained in section \ref{sec:surface_error}, and various decoders are detailed in \ref{sec:surface_decoders}.
@@ -22,7 +22,7 @@ The variant of the stabilizer codes that we are going to explore in this thesis 
 
 \section{The toric code}\label{sec:surface_toric}
 
-The \emph{toric code} is defined by arranging qubits on the edges of a square lattice with periodic boundary conditions, as seen in Figure \ref{fig:sf_toriclattice}. The name of the toric code lends itself from the torus, or donut, shape, where any point on the surface of the torus will encounter itself after traversing the torus in either x or y directions. Hence, the top edge of the toric code meets the bottom edge, whereas the left edge meets the right. On a $L\times L$ grid there are $N = 2L^2$ edges and the same amount of physical qubits. This topology of qubit arrangement plays an important part in encoding the logical qubits, which is stored in the non-trivial cycles on the torus. Errors, beneath a certain threshold, will only introduce local effects and does not change these cycles.
+The \emph{toric code} is defined by arranging qubits on the edges of a square lattice with periodic boundary conditions, as seen in Figure \ref{sf:fig_toriclattice}. The name of the toric code lends itself from the torus, or donut, shape, where any point on the surface of the torus will encounter itself after traversing the torus in either x or y directions. Hence, the top edge of the toric code meets the bottom edge, whereas the left edge meets the right. On a $L\times L$ grid there are $N = 2L^2$ edges and the same amount of physical qubits. This topology of qubit arrangement plays an important part in encoding the logical qubits, which is stored in the non-trivial cycles on the torus. Errors, beneath a certain threshold, will only introduce local effects and does not change these cycles.
 
 \subsection{Stabilizer generators}
 
@@ -35,8 +35,8 @@ To define a stabilizer code, we need to specify the $m$ independent stabilizer g
     \DRAWPLAQ{1}{1}
     \DRAWERROR{1}{1}{0}{z}
     \DRAWERROR{1}{1}{1}{z}
-    \DRAWERROR{0}{1}{0}{z}
-    \DRAWERROR{1}{2}{1}{z}
+    \DRAWERROR{1}{0}{0}{z}
+    \DRAWERROR{2}{1}{1}{z}
     \node[below of=Bx-1] {(a)};
   \end{tikzpicture}
   \hspace{1cm}
@@ -45,15 +45,15 @@ To define a stabilizer code, we need to specify the $m$ independent stabilizer g
     \DRAWSTAR{1}{1}{3}
     \DRAWERROR{1}{1}{1}{x}
     \DRAWERROR{1}{1}{0}{x}
-    \DRAWERROR{2}{1}{1}{x}
-    \DRAWERROR{1}{0}{0}{x}
+    \DRAWERROR{1}{2}{1}{x}
+    \DRAWERROR{0}{1}{0}{x}
     \node[below of=Bx-1] {(b)};
   \end{tikzpicture}
-  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. }\label{fig:sf_stabilizers}
+  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. }\label{sf:fig_stabilizers}
 \end{figure}
 
 \paragraph{Plaquette operators}
-For every face $f$ on our lattice, we define a plaquette operator $P_f$, consisting of tensor product of Pauli Z operators on qubits on these edges (see Figure \ref{fig:sf_toriclattice}a),
+For every face $f$ on our lattice, we define a plaquette operator $P_f$, consisting of tensor product of Pauli Z operators on qubits on these edges (see Figure \ref{sf:fig_toriclattice}a),
 \begin{equation}\label{eq:sf_plaquette}
   P_f = \bigotimes_{i\in Q(f)} Z_i
 \end{equation}
@@ -61,107 +61,202 @@ where $Q(f)$ is the set of qubits touching face $f$. On a $L\times L$ grid there
 
 \paragraph{Star operators}
 
-Similarly, for every vertex $v$ on our lattice, we define a star operator $S_v$, consisting of tensor product of Pauli X operators on qubits neighboring the vertex (see Figure \ref{fig:sf_toriclattice}b),
+Similarly, for every vertex $v$ on our lattice, we define a star operator $S_v$, consisting of tensor product of Pauli X operators on qubits neighboring the vertex (see Figure \ref{sf:fig_toriclattice}b),
 \begin{equation}\label{eq:sf_plaquette}
   S_v = \bigotimes_{i\in Q(v)} X_i
 \end{equation}
 where $Q(v)$ is the set of qubits neighboring vertex $v$. On a $L\times L$ grid there are $L^2$ plaquettes.
 
-The full stabilizer of the code can be generated by multiplying elements of the generator operators. Consider two plaquette operators. These two operators will either share one boundary consisting of a qubit, or none. This means that the Pauli Z operator on the boundary qubit will add up to identity as they commute. The result is that the product of the plaquette operators will consists of the overall boundary Pauli operators of the joint plaquette (see Figure \ref{fig:sf_multistab}a).
+The full stabilizer of the code $\mathcal{S}$ can be generated by multiplying elements of the generator operators. Consider two plaquette operators. These two operators will either share one boundary consisting of a qubit, or none. This means that the Pauli Z operator on the boundary qubit will add up to identity as they commute. The result is that the product of the plaquette operators will consists of the overall boundary Pauli operators of the joint plaquette (see Figure \ref{sf:fig_multistab}a).
 
-However, if all plaquettes are applied to the lattice, no boundary will be left. Thus the product of all plaquettes is the identity, which means that the full set of plaquettes are not independent. The full set of stabilizer generators can therefore be completed by simply removing a single plaquette from all available plaquettes. There are therefore $L^2 - 1$ independent plaquette operators. 
+However, if all plaquettes are applied to the lattice, no boundary will be left. Thus the product of all plaquettes is the identity, which means that the full set of plaquettes are not independent. The full set of plaquette generators can therefore be completed by simply removing a single plaquette from all available plaquettes. There are therefore $L^2 - 1$ independent plaquette operators.
 
-The multiplication of star operators follow the same properties as the plaquette operators described above (see Figure \ref{fig:sf_multistab}b). Thus there are also $L^2 - 1$ independent star operators, which sum up to $N_S = 2L^2 - 2$ independent stabilizers. 
+The multiplication of star operators follow the same properties as the plaquette operators described above (see Figure \ref{sf:fig_multistab}b). Thus there are also $L^2 - 1$ independent star operators, which are the star generators. This sums up to $N_S = 2L^2 - 2$ independent stabilizer generators.
 
 \begin{figure}
   \centering
   \begin{tikzpicture}
     \DRAWTORIC{3}
     \DRAWPLAQ{1}{1}
-    \DRAWPLAQ{1}{0}
-    \DRAWPLAQ{2}{0}
+    \DRAWPLAQ{0}{1}
+    \DRAWPLAQ{0}{2}
     \DRAWERROR{1}{1}{0}{z}
-    \DRAWERROR{0}{1}{0}{z}
-    \DRAWERROR{1}{2}{1}{z}
-    \DRAWERROR{0}{0}{0}{z}
-    \DRAWERROR{1}{0}{1}{z}
-    \DRAWERROR{2}{0}{1}{z}
-    \DRAWERROR{2}{0}{0}{z}
+    \DRAWERROR{1}{0}{0}{z}
     \DRAWERROR{2}{1}{1}{z}
+    \DRAWERROR{0}{0}{0}{z}
+    \DRAWERROR{0}{1}{1}{z}
+    \DRAWERROR{0}{2}{1}{z}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{1}{2}{1}{z}
     \node[below of=Bx-1] {(a)};
   \end{tikzpicture}
   \hspace{1cm}
   \begin{tikzpicture}
     \DRAWTORIC{3}
     \DRAWSTAR{1}{1}{3}
-    \DRAWSTAR{0}{2}{3}
-    \DRAWSTAR{1}{2}{3}
-    \DRAWERROR{2}{1}{1}{x}
-    \DRAWERROR{1}{0}{0}{x}
+    \DRAWSTAR{2}{0}{3}
+    \DRAWSTAR{2}{1}{3}
+    \DRAWERROR{1}{2}{1}{x}
+    \DRAWERROR{0}{1}{0}{x}
     \DRAWERROR{2}{2}{1}{x}
     \DRAWERROR{1}{1}{1}{x}
-    \DRAWERROR{0}{1}{0}{x}
-    \DRAWERROR{0}{2}{1}{x}
-    \DRAWERROR{0}{2}{0}{x}
-    \DRAWERROR{1}{2}{0}{x}
+    \DRAWERROR{1}{0}{0}{x}
+    \DRAWERROR{2}{0}{1}{x}
+    \DRAWERROR{2}{0}{0}{x}
+    \DRAWERROR{2}{1}{0}{x}
     \node[below of=Bx-1] {(b)};
   \end{tikzpicture}
-  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. }\label{fig:sf_multistab}
+  \caption{Multiplication of (a) plaquette and (b) star operators will result in a operator that consists of the Pauli operators that reside on the overall boundary of the joint plaquettes or stars. }\label{sf:fig_multistab}
 \end{figure}
 
+\subsection{Dual lattice}
+Note that if we shift our lattice half a cell down, and half a cell to the right, we can create a \emph{dual} lattice. This dual lattice has the same size and same boundary conditions as the \emph{primal} lattice, but every plaquette in the primal lattice is a star in the dual lattice, and every star in the primal lattice is a plaquette in the dual lattice. The edges of the dual lattice are plotted with dotted lines in the figures.
+
+This interesting property of \emph{lattice duality} leads to the fact that plaquette and star operators are in fact the same, and we can choose from either that is best suited for the calculation. The multiplication of operators is best pictured in the plaquette picture, for example. For the square lattice in the toric code, the dual lattice is coincidentally also square. For other types of topological codes with non-square lattices, the dual lattice has a different lattice structure than the primal lattice. We will not explore these kind of lattices in this thesis.
 
 \subsection{Encoded qubits}
-Since there are $N = L^2$ qubits and $N_S = 2L^2 - 2$ independent stabilizers, we must have $N_L = N - N_S = 2$ encoded qubits and therefore 4 logical operators $\bar{X}_1, \bar{X}_2, \bar{Z}_1$ and $\bar{Z}_2$. 
+Since there are $N = L^2$ qubits and $N_S = 2L^2 - 2$ independent stabilizers, we must have $N_L = N - N_S = 2$ encoded qubits and therefore 4 logical operators $\bar{X}_1, \bar{X}_2, \bar{Z}_1$ and $\bar{Z}_2$.
 
-Recall the logical operators consists of the Pauli operators, and must commute with all stabilizer generators, but cannot be part of the stabilizer itself. We can construct the logical operators by starting with, for example, a single Pauli Z operator. It commutes with all plaquette operators trivially. In terms of the star operators, this single Pauli Z operator commutes with all but the two neighboring qubits, as all others apply to different qubits. Adding another Pauli Z operator will shift will of the anticommuting neighboring star operators. We know see that a closed loop of Z operators around the torus does not have neighboring star operators, and therefore commute with all stabilizers. As the torus has two directions we can loop over, these are the logical $\bar{Z}$ operators (see Figure \ref{fig:sf_logical}a). Analogously, we can construct the logical $\bar{X}$ operators in the same way (Figure \ref{fig:sf_logical}b).
+Recall the logical operators consists of the Pauli operators, and must commute with all stabilizer generators, but cannot be part of the stabilizer itself. We can construct the logical operators by starting with, for example, a single Pauli Z operator. It commutes with all plaquette operators trivially. In terms of the star operators, this single Pauli Z operator commutes with all but the two neighboring qubits, as all others apply to different qubits. Adding another Pauli Z operator will shift will of the anticommuting neighboring star operators. We know see that a closed loop of Z operators around the torus does not have neighboring star operators, and therefore commute with all stabilizers. As the torus has two directions we can loop over, these are the logical $\bar{Z}$ operators (see Figure \ref{sf:fig_logical}a). Analogously, we can construct the logical $\bar{X}$ operators in the same way (Figure \ref{sf:fig_logical}b).
+
+Note that these logical operators are not unique. As the logical operators commute with the stabilizers, these $\bar{X}$ and $\bar{Z}$ operators can be multiplied with e.g. a plaquette or star operator, respectively, which create a diversion from its original path. But as the path still loops around the torus, this is still a valid logical operator.
+
+The logical operators have a minimum length of $L$ qubits, which is also the distance of the toric code. The toric code is therefore a $[L^2,2,L]$ in the [n,k,d] notation. This implies that the toric code might be more robust against errors if the size of the lattice is increased. Later we will see that this is also very much dependent on the type of decoder that is used, and that different decoders will lead to different regimes of error for which this reasoning is true.
 
 \def\QS{10}
 \def\s{1}
+
 \begin{figure}
   \centering
   \begin{tikzpicture}
     \DRAWTORIC{5}
-    \DRAWERROR{2}{0}{1}{z}
-    \DRAWERROR{2}{1}{1}{z}
-    \DRAWERROR{2}{2}{1}{z}
-    \DRAWERROR{2}{3}{1}{z}
-    \DRAWERROR{2}{4}{1}{z}
-    \DRAWERROR{0}{3}{0}{z}
-    \DRAWERROR{1}{3}{0}{z}
-    \DRAWERROR{2}{3}{0}{z}
-    \DRAWERROR{3}{3}{0}{z}
-    \DRAWERROR{4}{3}{0}{z}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{1}{2}{0}{z}
+    \DRAWERROR{2}{2}{0}{z}
+    \DRAWERROR{3}{2}{0}{z}
+    \DRAWERROR{4}{2}{0}{z}
+    \DRAWERROR{3}{0}{1}{z}
+    \DRAWERROR{3}{1}{1}{z}
+    \DRAWERROR{3}{2}{1}{z}
+    \DRAWERROR{3}{3}{1}{z}
+    \DRAWERROR{3}{4}{1}{z}
     \begin{pgfonlayer}{edges}
-      \draw[synz] (N-0-2-1) -- (By-2);
-      \draw[synz] (Bx-3) -- (N-3-4-0);
+      \draw[synz] (S-0-2) -- (S-5-2);
+      \draw[synz] (S-3-4) -- (S-3-5);
     \end{pgfonlayer}
     \node[below of=Bx-2] {(a)};
   \end{tikzpicture}
   \hspace{1cm}
   \begin{tikzpicture}
     \DRAWTORIC{5}
-    \DRAWERROR{2}{0}{0}{x}
-    \DRAWERROR{2}{1}{0}{x}
-    \DRAWERROR{2}{2}{0}{x}
-    \DRAWERROR{2}{3}{0}{x}
-    \DRAWERROR{2}{4}{0}{x}
-    \DRAWERROR{0}{3}{1}{x}
-    \DRAWERROR{1}{3}{1}{x}
-    \DRAWERROR{2}{3}{1}{x}
-    \DRAWERROR{3}{3}{1}{x}
-    \DRAWERROR{4}{3}{1}{x}
+    \DRAWERROR{0}{2}{1}{x}
+    \DRAWERROR{1}{2}{1}{x}
+    \DRAWERROR{2}{2}{1}{x}
+    \DRAWERROR{3}{2}{1}{x}
+    \DRAWERROR{4}{2}{1}{x}
+    \DRAWERROR{3}{0}{0}{x}
+    \DRAWERROR{3}{1}{0}{x}
+    \DRAWERROR{3}{2}{0}{x}
+    \DRAWERROR{3}{3}{0}{x}
+    \DRAWERROR{3}{4}{0}{x}
     \begin{pgfonlayer}{edges}
-      \draw[synx] (S-0-2) -- (S-0-2 -| 5*\s, 0);
-      \draw[synx] (S-3-4) -- (S-3-4 |- 0, -\s);
+      \draw[synx] (N-0-2-1) -- (By-2);
+      \draw[synx] (Bx-3) -- (N-3-4-0);
     \end{pgfonlayer}
     \node[below of=Bx-2] {(b)};
   \end{tikzpicture}
-  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. }\label{fig:sf_logical}
+  \caption{The logical (a) $\bar{X}$ and (b) $\bar{Z}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus. }\label{sf:fig:logical}
 \end{figure}
 
 \subsection{Error detection}
+As discussed in the previous chapter, errors are detected by measuring the set of stabilizer generators. As we have seen in the previous section, this consists of all but one plaquette operators $P_f$ and all but one star operators $S_v$. Let us first consider to measure all of them.
+
+In the case of a single $Z$ error, the neighboring plaquette operators will commute with this error, as it consists of Pauli Z operators itself. But the neighboring star operators anticommutes with this error. Similarly, a single $X$ error commutes with neighboring star operators but anticommutes with neighboring plaquette operators. A $Y$ error is a combination of $X$ and $Z$ operators and therefore anticommutes with all neighboring generator operators.
+
+In the case of two $Z$ errors, the star operators between the two errors now commute with the errors, creating a virtual path between them. This is a general property: given any string of errors, the generator operators at the end of the string will anticommute with the errors and measure -1. For $Z$ errors, star operators at the end of strings on the primal lattice will measure -1. The detection of $X$ errors occur in the same way, albeit now the strings of errors is defined on the \emph{dual} lattice, and plaquette errors will measure -1 at the end of these strings.
+
+Since $Z$ and $X$ errors independently affect different types of stabilizer measurements (stars and plaquettes, respectively), these two types of errors can be considered independently in two error correction processes. The two processes are analogous, up to the duality of the lattice. Therefore, for the remainder of the section, only $Z$ errors, which leave a string of errors on the primal lattice, will be considered.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \DRAWTORIC{5}
+    \DRAWERROR{1}{2}{0}{z}
+    \DRAWERROR{2}{4}{1}{x}
+    \DRAWERROR{3}{1}{0}{y}
+    \DRAWERROR{1}{0}{0}{z}
+    \DRAWERROR{0}{0}{0}{z}
+    \DRAWPLAQ{1}{4}
+    \DRAWPLAQ{2}{4}
+    \DRAWSTAR{1}{2}{5}
+    \DRAWSTAR{2}{2}{5}
+    \DRAWSTAR{0}{0}{5}
+    \DRAWSTAR{2}{0}{5}
+    \DRAWPLAQ{3}{1}
+    \DRAWPLAQ{3}{2}
+    \DRAWSTAR{3}{1}{5}
+    \DRAWSTAR{4}{1}{5}
+    \begin{pgfonlayer}{edges}
+      \draw[synz] (N-0-0-0) -- (N-1-0-0);
+    \end{pgfonlayer}
+    \node[below of=Bx-2] {(a)};
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \DRAWTORIC{5}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{2}{2}{0}{z}
+    \DRAWERROR{3}{2}{0}{z}
+    \DRAWERROR{4}{2}{0}{z}
+    \DRAWSTAR{1}{2}{5}
+    \DRAWSTAR{2}{2}{5}
+    \begin{pgfonlayer}{edges}
+      \draw[synz] (N-0-2-0) -- (S-0-2) (N-2-2-0) -- (S-5-2);
+    \end{pgfonlayer}
+    \node[below of=Bx-2] {(b)};
+  \end{tikzpicture}
+  \hspace{1cm}
+    \begin{tikzpicture}
+    \DRAWTORIC{5}
+    \DRAWERROR{1}{2}{1}{z}
+    \DRAWERROR{1}{1}{1}{z}
+    \DRAWERROR{1}{0}{0}{z}
+    \DRAWERROR{2}{0}{1}{z}
+    \DRAWERROR{2}{4}{1}{z}
+    \DRAWERROR{2}{3}{1}{z}
+    \DRAWSTAR{1}{2}{5}
+    \DRAWSTAR{2}{2}{5}
+    \begin{pgfonlayer}{edges}
+      \draw[synz] (N-1-2-1) -- (S-1-0) -- (S-2-0) -- (S-2-5) (S-2-4) -- (N-2-3-1);
+    \end{pgfonlayer}
+    \node[below of=Bx-2] {(c)};
+  \end{tikzpicture}
+  \hspace{1cm}
+    \begin{tikzpicture}
+    \DRAWTORIC{5}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{4}{2}{0}{z}
+    \DRAWERROR{4}{2}{1}{z}
+    \DRAWERROR{4}{1}{1}{z}
+    \DRAWERROR{3}{0}{0}{z}
+    \DRAWERROR{3}{0}{1}{z}
+    \DRAWERROR{3}{4}{1}{z}
+    \DRAWERROR{3}{3}{1}{z}
+    \DRAWERROR{2}{2}{0}{z}
+    \DRAWSTAR{1}{2}{5}
+    \DRAWSTAR{2}{2}{5}
+    \begin{pgfonlayer}{edges}
+      \draw[synz] (N-0-2-0) -- (S-0-2) (N-2-2-0) -- (S-3-2) -- (S-3-4);
+      \draw[synz] (S-3-5) -- (S-3-0) -- (S-4-0) -- (S-4-2) -- (S-5-2);
+    \end{pgfonlayer}
+    \node[below of=Bx-2] {(d)};
+  \end{tikzpicture}
+  \caption{The logical (a) $\bar{X}$ and (b) $\bar{Z}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus. }\label{sf:fig:errors}
+\end{figure}
+
 \subsection{Error correction}
 
+\subsection{Code threshold}
 
 \section{Error channels}\label{sec:surface_error}
 
