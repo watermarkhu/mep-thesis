@@ -17,7 +17,7 @@
   \caption{The toric code is defined as a $L\times L$ lattice (here $L=3$) with periodic boundary conditions. The edges on the lattice, which represents the qubits, make up faces and vertices.}\label{sf:fig_toriclattice}
 \end{figure}
 
-The variant of the stabilizer codes that we are going to explore in this thesis is Kitaev's \emph{surface code}, which is of the category of \emph{topological codes}. Among this category, the surface code is preferable as it offers the highest error tolerance under realise noise channels and requires only local stabilizer measurements of physically neighboring qubits. Two variants of the surface code will be considered here, the \emph{toric code} in section \ref{sec:surface_toric} and the \emph{planar code} in section \ref{sec:surface_planar}. The various error channels our code will undergo is explained in section \ref{sec:surface_error}, and various decoders are detailed in \ref{sec:surface_decoders}.
+The variant of the stabilizer codes that we are going to explore in this thesis is Kitaev's \emph{surface code}, which is of the category of \emph{topological codes}. Among this category, the surface code is preferable as it offers the highest error tolerance under realise noise channels and requires only local stabilizer measurements of physically neighboring qubits. Two variants of the surface code will be considered here, the \emph{toric code} in section \ref{sec:surface_toric} and the \emph{planar code} in section \ref{sec:surface_planar}, and various decoders are detailed in \ref{sec:surface_decoders}.
 
 
 \section{The toric code}\label{sec:surface_toric}
@@ -49,6 +49,27 @@ To define a stabilizer code, we need to specify the $m$ independent stabilizer g
     \DRAWERROR{0}{1}{0}{x}
     \node[below of=Bx-1] {(b)};
   \end{tikzpicture}
+  
+  \begin{center}
+    \hspace{1cm}
+    \begin{tikzcd}[row sep={0.5cm,between origins}]
+      \lstick{$Q_1$} & \qw & \qw & \qw & \ctrl{5} & \qw \\
+      \lstick{$Q_2$}& \qw & \qw & \ctrl{4} & \qw & \qw \\
+      \lstick{$Q_3$} & \qw & \ctrl{3} & \qw & \qw & \qw \\
+      \lstick{$Q_4$} & \ctrl{2} & \qw & \qw & \qw & \qw \\
+      &&&&&&&\\
+      \lstick{$P_f$} & \ctrl{} & \ctrl{} & \ctrl{} & \ctrl{} & \meter{}
+    \end{tikzcd}
+    \begin{tikzcd}[row sep={0.5cm,between origins}]
+      \lstick{$Q_1$} & \qw & \qw & \qw & \targ{} & \qw \\
+      \lstick{$Q_2$} & \qw & \qw & \targ{} & \qw & \qw \\
+      \lstick{$Q_3$} & \qw & \targ{} & \qw & \qw & \qw \\
+      \lstick{$Q_4$} & \targ{} & \qw & \qw & \qw & \qw \\
+      &&&&&&&\\
+      \lstick{$S_v$} & \ctrl{-2} & \ctrl{-3} & \ctrl{-4} & \ctrl{-5} & \meter{}
+    \end{tikzcd}
+  \end{center}
+    
   \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. }\label{sf:fig_stabilizers}
 \end{figure}
 
@@ -62,7 +83,7 @@ where $Q(f)$ is the set of qubits touching face $f$. On a $L\times L$ grid there
 \paragraph{Star operators}
 
 Similarly, for every vertex $v$ on our lattice, we define a star operator $S_v$, consisting of tensor product of Pauli X operators on qubits neighboring the vertex (see Figure \ref{sf:fig_toriclattice}b),
-\begin{equation}\label{eq:sf_plaquette}
+\begin{equation}\label{eq:sf_star}
   S_v = \bigotimes_{i\in Q(v)} X_i
 \end{equation}
 where $Q(v)$ is the set of qubits neighboring vertex $v$. On a $L\times L$ grid there are $L^2$ plaquettes.
@@ -117,7 +138,7 @@ This interesting property of \emph{lattice duality} leads to the fact that plaqu
 \subsection{Encoded qubits}
 Since there are $N = L^2$ qubits and $N_S = 2L^2 - 2$ independent stabilizers, we must have $N_L = N - N_S = 2$ encoded qubits and therefore 4 logical operators $\bar{X}_1, \bar{X}_2, \bar{Z}_1$ and $\bar{Z}_2$.
 
-Recall the logical operators consists of the Pauli operators, and must commute with all stabilizer generators, but cannot be part of the stabilizer itself. We can construct the logical operators by starting with, for example, a single Pauli Z operator. It commutes with all plaquette operators trivially. In terms of the star operators, this single Pauli Z operator commutes with all but the two neighboring qubits, as all others apply to different qubits. Adding another Pauli Z operator will shift will of the anticommuting neighboring star operators. We know see that a closed loop of Z operators around the torus does not have neighboring star operators, and therefore commute with all stabilizers. As the torus has two directions we can loop over, these are the logical $\bar{Z}$ operators (see Figure \ref{sf:fig_logical}a). Analogously, we can construct the logical $\bar{X}$ operators in the same way (Figure \ref{sf:fig_logical}b).
+Recall the logical operators consists of the Pauli operators, and must commute with all stabilizer generators, but cannot be part of the stabilizer itself. We can construct the logical operators by starting with, for example, a single Pauli Z operator. It commutes with all plaquette operators trivially. In terms of the star operators, this single Pauli Z operator commutes with all but the two neighboring qubits, as all others apply to different qubits. Adding another Pauli Z operator will shift will of the anticommuting neighboring star operators. We know see that a closed loop of Z operators around the torus does not have neighboring star operators, and therefore commute with all stabilizers. As the torus has two directions we can loop over, these are the logical $\bar{Z}$ operators (see Figure \ref{sf:fig_logical}a-b). Analogously, we can construct the logical $\bar{X}$ operators in the same way (Figure \ref{sf:fig_logical}c-d).
 
 Note that these logical operators are not unique. As the logical operators commute with the stabilizers, these $\bar{X}$ and $\bar{Z}$ operators can be multiplied with e.g. a plaquette or star operator, respectively, which create a diversion from its original path. But as the path still loops around the torus, this is still a valid logical operator.
 
@@ -144,7 +165,8 @@ The logical operators have a minimum length of $L$ qubits, which is also the dis
       \draw[synz] (S-0-2) -- (S-5-2);
       \draw[synz] (S-3-4) -- (S-3-5);
     \end{pgfonlayer}
-    \node[below of=Bx-2] {(a)};
+    \node[above=.25cm of S-3-4] {(a)};
+    \node[left=.25cm of S-0-2] {(b)};
   \end{tikzpicture}
   \hspace{1cm}
   \begin{tikzpicture}
@@ -163,17 +185,18 @@ The logical operators have a minimum length of $L$ qubits, which is also the dis
       \draw[synx] (N-0-2-1) -- (By-2);
       \draw[synx] (Bx-3) -- (N-3-4-0);
     \end{pgfonlayer}
-    \node[below of=Bx-2] {(b)};
+    \node[above=.25cm of N-3-4-0] {(c)};
+    \node[right=.25cm of By-2] {(d)};
   \end{tikzpicture}
-  \caption{The logical (a) $\bar{X}$ and (b) $\bar{Z}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus. }\label{sf:fig:logical}
+  \caption{The logical (a) $\bar{X}_1$, (b) $\bar{X}_2$, (c) $\bar{Z}_1$ and (d) $\bar{Z}_2$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus. }\label{sf:fig_logical}
 \end{figure}
 
 \subsection{Error detection}
 As discussed in the previous chapter, errors are detected by measuring the set of stabilizer generators. As we have seen in the previous section, this consists of all but one plaquette operators $P_f$ and all but one star operators $S_v$. Let us first consider to measure all of them.
 
-In the case of a single $Z$ error, the neighboring plaquette operators will commute with this error, as it consists of Pauli Z operators itself. But the neighboring star operators anticommutes with this error. Similarly, a single $X$ error commutes with neighboring star operators but anticommutes with neighboring plaquette operators. A $Y$ error is a combination of $X$ and $Z$ operators and therefore anticommutes with all neighboring generator operators.
+In the case of a single $Z$ error (Fig \ref{sf:fig_degenerate}a.i), the neighboring plaquette operators will commute with this error, as it consists of Pauli Z operators itself. But the neighboring star operators anticommutes with this error according to equation \ref{qec:eq:stabmeas}. Similarly, a single $X$ error (Fig \ref{sf:fig_degenerate}a.ii) commutes with neighboring star operators but anticommutes with neighboring plaquette operators. A $Y$ error is a combination of $X$ and $Z$ operators and therefore anticommutes with all neighboring generator operators (Fig \ref{sf:fig_degenerate}a.iii).
 
-In the case of two $Z$ errors, the star operators between the two errors now commute with the errors, creating a virtual path between them. This is a general property: given any string of errors, the generator operators at the end of the string will anticommute with the errors and measure -1. For $Z$ errors, star operators at the end of strings on the primal lattice will measure -1. The detection of $X$ errors occur in the same way, albeit now the strings of errors is defined on the \emph{dual} lattice, and plaquette errors will measure -1 at the end of these strings.
+In the case of two $Z$ errors (Fig \ref{sf:fig_degenerate}a.iv), the star operators between the two errors now commute with the errors, creating a virtual path between them. This is a general property: given any string of errors, the generator operators at the end of the string will anticommute with the errors and measure -1. For $Z$ errors, star operators at the end of strings on the primal lattice will measure -1. The detection of $X$ errors occur in the same way, albeit now the strings of errors is defined on the \emph{dual} lattice, and plaquette errors will measure -1 at the end of these strings.
 
 Since $Z$ and $X$ errors independently affect different types of stabilizer measurements (stars and plaquettes, respectively), these two types of errors can be considered independently in two error correction processes. The two processes are analogous, up to the duality of the lattice. Therefore, for the remainder of the section, only $Z$ errors, which leave a string of errors on the primal lattice, will be considered.
 
@@ -199,7 +222,12 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
     \begin{pgfonlayer}{edges}
       \draw[synz] (N-0-0-0) -- (N-1-0-0);
     \end{pgfonlayer}
-    \node[below of=Bx-2] {(a)};
+    \node[below=.25cm of Bx-2] {(a)};
+    \node[script] at (P-1-2) {\textit{(i)}};
+    \node[script] at (P-1-4) {\textit{(ii)}};
+    \node[script] at (P-3-1) {\textit{(iii)}};
+    \node[script] at (P-1-0) {\textit{(iv)}};
+
   \end{tikzpicture}
   \hspace{1cm}
   \begin{tikzpicture}
@@ -213,7 +241,7 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
     \begin{pgfonlayer}{edges}
       \draw[synz] (N-0-2-0) -- (S-0-2) (N-2-2-0) -- (S-5-2);
     \end{pgfonlayer}
-    \node[below of=Bx-2] {(b)};
+    \node[below=.25cm of Bx-2] {(b)};
   \end{tikzpicture}
   \hspace{1cm}
     \begin{tikzpicture}
@@ -229,7 +257,7 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
     \begin{pgfonlayer}{edges}
       \draw[synz] (N-1-2-1) -- (S-1-0) -- (S-2-0) -- (S-2-5) (S-2-4) -- (N-2-3-1);
     \end{pgfonlayer}
-    \node[below of=Bx-2] {(c)};
+    \node[below=.25cm of Bx-2] {(c)};
   \end{tikzpicture}
   \hspace{1cm}
     \begin{tikzpicture}
@@ -249,30 +277,183 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
       \draw[synz] (N-0-2-0) -- (S-0-2) (N-2-2-0) -- (S-3-2) -- (S-3-4);
       \draw[synz] (S-3-5) -- (S-3-0) -- (S-4-0) -- (S-4-2) -- (S-5-2);
     \end{pgfonlayer}
-    \node[below of=Bx-2] {(d)};
+    \node[below=.25cm of Bx-2] {(d)};
   \end{tikzpicture}
-  \caption{The logical (a) $\bar{X}$ and (b) $\bar{Z}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus. }\label{sf:fig:errors}
+  \caption{(a) Stabilizer generators that anticommute with the error will measure -1, which are (i) the neighboring star operators for a Z error, (ii) the neighboring plaquette operators for an X error, and (iii) both star and plaquette operators for a Y error. In the case of a string of errors (iv), only the stabilizer generators at the end of these strings will anticommute with the error. Due to code degeneracy, the single Z error in (a.i) $E$ has the syndrome as (b) $E\bar{Z}_1$, (c) $E\bar{Z}_2$ and (d) $E\bar{Z}_1\bar{Z}_2$. }\label{sf:fig_degenerate}
 \end{figure}
 
 \subsection{Error correction}
 
-\subsection{Code threshold}
+An error $E$ can be corrected by applying it again to the lattice. The error operator $E$ is however unknown. We must therefore try to identify the correct operator given the measured syndrome. As mentioned in the previous chapter, this relationship between error does not always map one-to-one, which it is not in the surface code. An error $E$ can be multiplied with some operator $L$ that commutes with the stabilizer and they will result in the same syndrome.
 
-\section{Error channels}\label{sec:surface_error}
+If $L$ is in the stabilizer $\mathcal{S}$, the product of the identified correction operator $C=E'$ with the real error operator $E$ will leave the code invariant. The resulting operator $CE=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $E$, $E\bar{Z}_1$, $E\bar{Z}_2$, $E\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorised into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
 
-\section{The planar code}\label{sec:surface_planar}
+\subsection{Quasiparticle picture}
+
+The processes of error detection and correction can alternatively be presented in the \emph{quasiparticle picture}, where the anticommuting stabilizer measurements act like excitations on the lattice, which behave like the quasiparticles \emph{anyons}. A single error creates a pair of anyons, and a chain of errors causes movement of the anyon on the lattice. A pair of anyons can also annihilate each other when two error chains merge. The correction of errors can thus be viewed of movement of the correction chains until all anyons are annihilated. The quasiparticle picture removes the distracting underlying lattice from the problem, and decoding becomes simply identifying the right pairing between anyons to minimize the chance of a logical error.
+
+Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the errors suffered in Figure \ref{sf:fig_degenerate}a, which has suffered Z (blue lines) and X errors (red lines). The corresponding anyons can either be of the star type (red circle) or plaquette type (blue circle). Figure \ref{fig:quasiparticle}b shows a successful decoding. Note that here not all pairs are correctly identified, but the resulting loop still is in the same class of operators. In figure \ref{fig:quasiparticle}c the correction has failed as the resulting loop in the correction is in a difference class compared to the error. As the loop still commutes with the stabilizer, no error can be detected, but the encoded qubit has acquired a logical error.
 
 \begin{figure}
   \centering
   \begin{tikzpicture}
-    \DRAWPLANAR{4}
+    \draw (0,0) rectangle (4,4);
+    \node[circle, fill=red!50, minimum size=4] (N1) at (0.5,0.4) {};
+    \node[circle, fill=red!50, minimum size=4] (N2) at (2,0.7) {};
+    \node[circle, fill=red!50, minimum size=4] (N3) at (2.5,1.2) {};
+    \node[circle, fill=red!50, minimum size=4] (N4) at (3.6,1) {};
+    \node[circle, fill=red!50, minimum size=4] (N5) at (0.75,2.1) {};
+    \node[circle, fill=red!50, minimum size=4] (N6) at (1.95,1.8) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N7) at (1.6, 3.4) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N8) at (2.7, 3.5) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N9) at (3.2, 1.5) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N10) at (3.1, 0.6) {};
+    \draw[cyan!50, line width = 2] (N1) to[in=170, out=20] (N2);
+    \draw[cyan!50, line width = 2] (N3) to[in=180, out=-10] (N4);
+    \draw[cyan!50, line width = 2] (N5) to[in=170, out=-20] (N6);
+    \draw[red!50, line width = 2] (N7) to[in=160, out=15] (N8);
+    \draw[red!50, line width = 2] (N9) to[in=90, out=250] (N10);
+    \node at (2, -.5) {(a)};
   \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \draw (0,0) rectangle (4,4);
+    \node[circle, fill=red!50, minimum size=4] (N1) at (0.5,0.4) {};
+    \node[circle, fill=red!50, minimum size=4] (N2) at (2,0.7) {};
+    \node[circle, fill=red!50, minimum size=4] (N3) at (2.5,1.2) {};
+    \node[circle, fill=red!50, minimum size=4] (N4) at (3.6,1) {};
+    \node[circle, fill=red!50, minimum size=4] (N5) at (0.75,2.1) {};
+    \node[circle, fill=red!50, minimum size=4] (N6) at (1.95,1.8) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N7) at (1.6, 3.4) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N8) at (2.7, 3.5) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N9) at (3.2, 1.5) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N10) at (3.1, 0.6) {};
+    \draw[cyan!50, line width=2] (N1) to[in=170, out=20] (N2);
+    \draw[cyan!50, line width=2] (N3) to[in=180, out=-10] (N4);
+    \draw[cyan!50, line width=2] (N5) to[in=170, out=-20] (N6);
+    \draw[red!50, line width=2] (N7) to[in=160, out=15] (N8);
+    \draw[red!50, line width=2] (N9) to[in=90, out=250] (N10);
+    \draw[cyan!50, dashed, line width=2] (N1) to[out=90, in=270] (N5);
+    \draw[cyan!50, dashed, line width=2] (N2) to[out=80, in=275] (N6);
+    \draw[cyan!50, dashed, line width=2] (N3) to[out=10, in=160] (N4);
+    \draw[red!50, dashed, line width=2] (N7) to[out=-20, in=195] (N8);
+    \draw[red!50, dashed, line width=2] (N9) to[out=290, in=75] (N10);
+    \node at (2, -.5) {(b)};
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \draw (0,0) rectangle (4,4);
+    \node[circle, fill=red!50, minimum size=4] (N1) at (0.5,0.4) {};
+    \node[circle, fill=red!50, minimum size=4] (N2) at (2,0.7) {};
+    \node[circle, fill=red!50, minimum size=4] (N3) at (2.5,1.2) {};
+    \node[circle, fill=red!50, minimum size=4] (N4) at (3.6,1) {};
+    \node[circle, fill=red!50, minimum size=4] (N5) at (0.75,2.1) {};
+    \node[circle, fill=red!50, minimum size=4] (N6) at (1.95,1.8) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N7) at (1.6, 3.4) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N8) at (2.7, 3.5) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N9) at (3.2, 1.5) {};
+    \node[circle, fill=cyan!50, minimum size=4] (N10) at (3.1, 0.6) {};
+    \draw[yellow, line width=6, opacity=.3] (N3) to[in=180, out=-10] (N4);
+    \draw[yellow, line width=6, opacity=.3] (N5) to[in=170, out=-20] (N6);
+    \draw[yellow, line width=6, opacity=.3] (N3) to[out=120, in=-30] (N6);
+    \draw[yellow, line width=6, opacity=.3] (N5) to[out=200, in=45] (0, 1.75);
+    \draw[yellow, line width=6, opacity=.3] (N4) to[out=80, in=225] (4, 1.75);
+    \draw[cyan!50, line width=2] (N1) to[in=170, out=20] (N2);
+    \draw[cyan!50, line width=2] (N3) to[in=180, out=-10] (N4);
+    \draw[cyan!50, line width=2] (N5) to[in=170, out=-20] (N6);
+    \draw[red!50, line width=2] (N7) to[in=160, out=15] (N8);
+    \draw[red!50, line width=2] (N9) to[in=90, out=250] (N10);
+    \draw[cyan!50, dashed, line width=2] (N1) to[out=0, in=200] (N2);
+    \draw[cyan!50, dashed, line width=2] (N3) to[out=120, in=-30] (N6);
+    \draw[cyan!50, dashed, line width=2] (N5) to[out=200, in=45] (0, 1.75);
+    \draw[cyan!50, dashed, line width=2] (N4) to[out=80, in=225] (4, 1.75);
+    \draw[red!50, dashed, line width=2] (N7) to[out=-20, in=195] (N8);
+    \draw[red!50, dashed, line width=2] (N9) to[out=290, in=75] (N10);
+    \node at (2, -.5) {(c)};
+  \end{tikzpicture}
+  \caption{The quasiparticle picture of stabilizer measurements. Anticommuting stabilizers behave as anyons (circles), where a chain of errors (lines) creates a pair of anyons. Figure (b) shows a successful decoding of (a). Figure (c) shows a pairing that resulted in a correction operator that is in a different class as the error operator, which acquires a logical error.}\label{fig:quasiparticle}
+\end{figure}
+
+
+\subsection{Code threshold}
+Since the distance $d$ of the toric code on a $L\times L$ is $L$, we would expect that we can improve the robustness of the code by increasing the lattice size $L$. However, this also increases the total number of errors in the lattice, that adds an increased level of complexity in choosing the correct correction operator.
+
+In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $p_C$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $p_C$. The point of transition in the error rate is called the \emph{code threshold} $p_{th}$.
+
+The code threshold is not the only parameter that determines the potential of a certain code for practical use. The behavior for error rates far below the threshold is also important, as is the number of physical qubits needed to achieve the sought after level of error suppression. Nevertheless, the code threshold provides us with a very easy and useful tool to benchmark different codes and different decoding algorithms, and to compare them with each other. Therefore, in this thesis we will heavily rely on the value of the code threshold. The value of the threshold is heavily dependent on the chosen error model and the physical conditions of the stabilizer measurements. To compare different decoding algorithms, we therefore will use independent and identically distributed errors (i.i.d. noise), which is the \emph{independent noise model} from section \ref{qec:sec_errormodels}.
+
+For the toric code, when the only source of errors is i.i.d. noise under the independent noise model, and all measurements can be made perfectly, the \emph{optimal threshold} has been proven to be 10.9\% (see section \ref{sec:optimal_decoder}). However, to achieve this value, one needs to consider all possible error configurations on the lattice to identify the correction operator $C$ that is most likely to be equal to the error operator $E$. This is a computationally heavy task that scales exponentially with the lattice size. It is therefore an impractical approach in reality.
+
+Luckily, there exists other decoding algorithms that can find a solution much faster, albeit at the cost of reducing the code threshold. Edmond's \emph{Minimum Weight Perfect Matching} (MWPM) decoder scales cubic with the system, which allows for faster decoding, and achieves a code threshold of 10.3\% (section \ref{sec:MWPMdecoder}). Including faulty measurements the threshold drops down to 2.9\%. The \emph{Union-Find} decoder is a relatively new addition to the set of decoders for the surface code. It scales \emph{almost} linearly with the system, and has a code threshold of 9.9\% (section \ref{sec:UFdecoder}). In this thesis, we will try to combine certain properties of different decoders. In particular, we have created a heuristic for minimum weight which can be applied to the Union-Find decoder.
+
+\section{The planar code}\label{sec:surface_planar}
+
+Another variant of the surface code is the \emph{planar code}, which disposes the periodic boundary conditions of the torus. This allows the qubits to be placed onto a flat 2D surface. For real systems in which the qubits physically interact with each other, this is a huge benefit. Therefore, in this thesis, we will consider both toric and planar variants of the surface code. 
+
+\paragraph{Stabilizer generators}
+There are a few key differences between the planar and toric codes. First of all, a new type of stabilizer generators define the non-periodic boundary of the lattice, which are referred to as \emph{EDGE operators}. These EDGE operators have only 3 neighboring qubits and are therefore the tensor product of 3 Pauli operators. The EDGE-plaquette operators lie at the east and west boundaries of the lattice (Figure \ref{sf:fig_planar}a) and the EDGE-star $S_{vE}$ operators lie at the north and south boundaries of the lattice (Figure \ref{sf:fig_planar}b). In the middle of the lattice, the bulk of the stabilizer generators still consist of 4 Pauli operators, identical to the ones in the toric code (Figure \ref{sf:fig_planar}c-d). Note that the stabilizer generators are still defined by equation \ref{eq:sf_plaquette} and \ref{eq:sf_star}, but now the relevant faces and vertices contain three neighboring qubits.
+
+\paragraph{Stabilizer violoations}
+A second key difference is that now not all errors will cause two stabilizer violations. In the bulk of the qubits on the lattice, a single error will still cause two neighboring stabilizers to measure -1, or create two anyons. At the boundary however, it now may be the case that an error is only included in one plaquette or star operator. This will also mean the decoding in the quasiparticle picture requires a slightly different approach, as we will see later.
+
+\paragraph{Logical qubits}
+Furthermore, we can inspect that a planar surface of dimension $L$ has $N = 2L^2-2L+1$ physical qubits. We can also find that there are $2L^2-2L$ stabilizer generators. As the boundary is now non-periodic, all generators are now independent, and therefore the number independent generators is $N_S = 2L^2-2L$. This means that the planar code encodes $N_L = N-N_S = 1$ a single logical qubit. The logical $\bar{X}$ and $\bar{Z}$ operators are pictured in Figure \ref{sf:fig_planar}e-f. 
+
+\def\QS{15}
+\def\s{1.5}
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    \DRAWPLANAR{4}
+    \DRAWPLAQ{1}{1}
+    \DRAWEPLAQ{0}{3}
+    \DRAWSTAR{3}{1}{4}
+    \DRAWESTAR{2}{3}
+    \DRAWERROR{1}{1}{0}{z}
+    \DRAWERROR{1}{1}{1}{z}
+    \DRAWERROR{1}{0}{0}{z}
+    \DRAWERROR{2}{1}{1}{z}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{0}{3}{0}{z}
+    \DRAWERROR{1}{3}{1}{z}
+    \DRAWERROR{1}{3}{0}{x}
+    \DRAWERROR{2}{3}{0}{x}
+    \DRAWERROR{2}{3}{1}{x}
+    \DRAWERROR{2}{1}{0}{x}
+    \DRAWERROR{3}{1}{0}{x}
+    \DRAWERROR{3}{1}{1}{x}
+    \DRAWERROR{3}{2}{1}{x}
+    \node[script] at (P-1-1) {(c)};
+    \node[script] at (S-3-1) {(d)};
+    \node[script] at (P-0-3) {(a)};
+    \node[script] at (S-2-3) {(b)};
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \DRAWPLANAR{4}
+    \DRAWERROR{0}{1}{0}{z}
+    \DRAWERROR{1}{1}{0}{z}
+    \DRAWERROR{2}{1}{0}{y}
+    \DRAWERROR{3}{1}{0}{z}
+    \DRAWERROR{2}{0}{0}{x}
+    \DRAWERROR{2}{2}{0}{x}
+    \DRAWERROR{2}{3}{0}{x}
+    \begin{pgfonlayer}{edges}
+      \draw[synz] (N-0-1-0) -- (N-3-1-0);
+      \draw[synx] (N-2-3-0) -- (N-2-0-0);
+    \end{pgfonlayer}
+    \node[script, above=.05cm of S-1-1] {(e)};
+    \node[script, right=.05cm of P-2-3] {(f)};
+  \end{tikzpicture}
+
+  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. }\label{sf:fig_planar}
 \end{figure}
 
 \section{Decoders}\label{sec:surface_decoders}
-\subsection{The optimal decoder}
-\subsection{Minimum Weight Perfect Matching}
-\subsection{The Union-Find decoder}
+\subsection{The optimal decoder}\label{sec:optimal_decoder}
+\subsection{Minimum Weight Perfect Matching}\label{sec:MWPMdecoder}
+\subsection{The Union-Find decoder}\label{sec:UFdecoder}
 
 Even the fastest MWPM algorithms still have a quadratic time complexity of $\mathcal{O}(n^2\sqrt{n})$, where $n$ is the number of qubits. In order to realistically utilize a decoder with increasing decoding success rates using increasing lattice size, we would need to have a better time complexity. Luckily, an alternative algorithm called the Peeling Decoder has been developed which can solve errors over the erasure channel with a linear time complexity $\mathcal{O}(n)$ \cite{delfosse2017}. The Union-Find Decoder builds on top of the Peeling Decoder to solve for Pauli errors with a time complexity of $\mathcal{O}(n\alpha(n))$, where $\alpha$ is an inverse Ackermann function, which is smaller than 3 for any practical input size \cite{nickerson2017}. However, these algorithms have a tradeoff in the form of a decrease in the error threshold, and has the reported value of $p_{UF} = 9.2\%$.
 

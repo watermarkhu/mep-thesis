@@ -15,7 +15,8 @@
   synz/.style={cyan!50, line width=4*\lw, line cap=round},
   synx/.style={purple!25, line width=4*\lw, line cap=round},
   empty/.style={inner sep=0},
-  arrow/.style={->, line width=2*\lw}
+  arrow/.style={->, line width=2*\lw},
+  script/.style={rectangle, fill=white, opacity=.5, text opacity=1, inner sep=0}
   }
 
 \pgfdeclarelayer{bg}
@@ -82,6 +83,8 @@
     \foreach \x in {0,...,\LS}{
       \node [qubit] (N-\x-0-0) at (\s*\x + \s/2, 0) {};
       \node [qubit] (N-0-\x-0) at (\s/2, \s*\x) {};
+      \coordinate (P-0-\x) at (\s/2, \s*\x - \s/2);
+      \coordinate (S-\x-0) at (\s*\x, 0);
     }
   \end{pgfonlayer}
 }
@@ -125,6 +128,19 @@
   \end{pgfonlayer}
 }
 
+\newcommand\DRAWEPLAQ[2]{
+  % Draws a plaquette
+  % var 1:    x coordinate
+  % var 2:    y coordinate
+  \def\x{#1}
+  \def\y{#2}
+  \begin{pgfonlayer}{bg}
+    \ifnumequal{\x}{0}
+      {\fill[plaq] (.5*\s,\y*\s) rectangle (\s,\y*\s-\s);}
+      {\fill[plaq] (\x*\s,\y*\s) rectangle (\x*\s + .5*\s,\y*\s-\s);}
+  \end{pgfonlayer}
+}
+
 \newcommand\DRAWSTAR[3]{
   % Draws a star
   % var 0:    y coordinate
@@ -140,5 +156,20 @@
       {\draw[vert] (\x*\s, -\s) -- (\x*\s, -\s/2);}
       {\draw[vert] (\x*\s, \y*\s) -- (\x*\s, \y*\s +\s/2);}
     \draw[vert] (\x*\s, \y*\s - \s/2) -- (\x*\s, \y*\s) -- (\x*\s + \s/2, \y*\s);
+  \end{pgfonlayer}
+}
+
+
+\newcommand\DRAWESTAR[2]{
+  % Draws a star
+  % var 1:    x coordinate
+  % var 2:    y coordinate
+  \def\x{#1}
+  \def\y{#2}
+  \begin{pgfonlayer}{edges}
+    \ifnumequal{\y}{0}
+      {\draw[vert] (\x*\s, 0) -- (\x*\s, \s/2);}
+      {\draw[vert] (\x*\s, \y*\s) -- (\x*\s, \y*\s-\s/2);}
+    \draw[vert] (\x*\s - \s/2, \y*\s) -- (\x*\s + \s/2, \y*\s);
   \end{pgfonlayer}
 }
