@@ -10,26 +10,40 @@ Others who have implemented weighted growth (wrongly) use an algorithm that has 
 \subsection{Finding clusters}
 
 \section{Bucket Cluster Sort (BCS)}
-To further increase the error threshold for the Union-Find decoder from $9.2\%$ to $9.9\%$, Nickerson implements weighted growth, where clusters are grown in increasing order based on their sizes \cite{delfosse2017}. However, the main problem with weighted growth is that the clusters now need to be sorted, and that after each growth iteration another round of sorting is necessary, due to the fact that the clusters have changed sizes due to growth and merges, and the order of clusters may have been changed. Nickerson has not given a description of how weighted growth in implemented. From a review of the Union-Find decoder, an implementation of weighted growth is described using \emph{Heapsort}, which has been incorrectly described as linear as its time complexity is also $\mathcal{O}(n\log(n))$ \cite{nando}. As the complexity of the algorithm is now dominated by the Union-Find algorithm, we need to make sure that weighted growth does not add to this complexity. To avoid this iterative sorting, we need to make sure that the insertion of a new element in our sorted list of clusters does not depend on the values in that list.
+To further increase the error threshold for the Union-Find decoder from $9.2\%$ to $9.9\%$, Nickerson implements weighted growth, where clusters are grown in increasing order based on their sizes \cite{delfosse2017}. However, the main problem with weighted growth is that the clusters now need to be sorted, and that after each growth iteration another round of sorting is necessary, due to the fact that the clusters have changed sizes due to growth and merges, and the order of clusters may have been changed. Nickerson has not given a description of how weighted growth in implemented. As the complexity of the algorithm is now dominated by the Union-Find algorithm, we need to make sure that weighted growth does not add to this complexity. To avoid this iterative sorting, we need to make sure that the insertion of a new element in our sorted list of clusters does not depend on the values in that list.
 
 The Bucket Cluster sorting algorithm as described in this section is evolved from a more complicated version that is described in appendix \ref{ap.bucketsort}, which has a sub-linear complexity of $\mathcal{O}(\sqrt{n})$.
 
 \subsection{How to sort for weighted growth using BCS}
 
-Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size of the cluster $S$ is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
+Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
 
-Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters with size $S_A <<S_B$, growth of cluster B will add $\sim k_B/2$ "incorrect" edges on average, whereas growth of cluster A will add $\sim k_A/2 << k_B/2$ edges as $k_A \propto S_A$ and $k_B \propto S_B$. However, if $S_A \simeq S_B$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_A = S_B$. Thus clusters with the same size can be grown "simultaneously", as there is no benefit to grow one before another.
+Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $C_\alpha, C_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $C_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $C_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
 
-\begin{lemma}
-  Weighted growth of cluster A with size $S_A << S_B$ ensures that a smaller amount of "incorrect" edges is added, compared with growth of cluster B.
+\begin{lemma}\label{lem:incorrectedges}
+  For two clusters $C_\alpha, C_\beta$ with size $S_\alpha << S_\beta$ the number of vertices in the clusters, $Grow(S_\beta)$ will add a smaller amount of \emph{incorrect} edges to the cluster, which are edges that are not part of the matching.
 \end{lemma}
 
-The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
+The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets, which replaces the odd cluster list $\mathcal{L}$. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
 
 \subsubsection{Growing a bucket}
-The procedure for the Union-Find decoder using the bucket sort algorithm is now to sequentially grow the clusters from a bucket starting from bucket 0, which contain the smallest single-generator clusters of size 1. After a round of growth, in the case of no merge event, these clusters are grown half edges, but are still size 1. We would therefore need twice as many buckets to differentiate between clusters without and with half-edges. Let us call them full-edged and half-edged clusters, respectively. Starting from bucket 0, even buckets contain full-edged clusters and odd buckets contain half-edged clusters of the same size. To grow a bucket, clusters are popped from the bucket, grown on the boundary, after which the clusters is to be distributed in a bucket again. In the case of no merge event, clusters grown from even bucket $i$ must be placed in odd bucket $i + 1$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $j + 2k + 1$ with $k \in \mathbb{N}_0$. Also in the case of a merge event of clusters A and B, the new cluster AB must be placed in a bucket $i_{AB} > i_A, i_{AB} > i_B$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied".
-\begin{lemma}
-  Buckets can be grown sequentially after each other as new clusters will always be placed in a higher bucket than the current one.
+The procedure for the Union-Find decoder using the bucket sort algorithm is now to sequentially grow the clusters from a bucket starting from bucket 0, which contain the smallest single-generator clusters of size 1. After a round of growth, in the case of no merge event, these clusters are grown half edges, but are still size 1. We would therefore need twice as many buckets to differentiate between clusters without and with half-edges. Let us call them full-edged and half-edged clusters, respectively. Starting from bucket 0, even buckets contain full-edged clusters and odd buckets contain half-edged clusters of the same size. To grow a bucket, clusters are popped from the bucket, grown on the boundary, after which the clusters is to be distributed in a bucket again in a subroutine named \codefunc{Place}.
+
+\begin{equation}\label{eq:bucket_place}
+  \codefunc{Place}(C) = \begin{cases}
+               C\rightarrow b_{2(S_C-1)}, & \mbox{if $S_C$ even} \\
+               C\rightarrow b_{2(S_C-1)+1}, & \mbox{otherwise}
+             \end{cases}
+\end{equation}
+
+In the case of no merge event, clusters grown from even bucket $b_i$ must be placed in odd bucket $b_{i + 1}$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $b_{j + 2k + 1}$ with $k \in \mathbb{N}_0$ the number of added vertices. Also in the case of a union event of clusters $C_\alpha$ and $C_\beta$, the new cluster $\codefunc{union}(C_\alpha, C_\beta) = C_{\alpha\beta}$ must be placed in a bucket $b_{\alpha\beta} > b_{\alpha}, b_{\alpha\beta} > b_{\beta}$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied". This ensures that for two clusters $C_\alpha$ and $C_\beta$ with $S_\alpha < S_\beta$, cluster A will be grown first, adding a fewer amount of "incorrect" edges as per lemma \ref{lem:incorrectedges}. Clusters of the same size $S_\alpha=S_\beta$ are placed in the same bucket and their order of growth is dependent on their order of placements.
+
+\begin{theorem}\label{the:bucket_order}
+  Weighted grown is achieved by growing the odd clusters sequentially starting from bucket $b_0$. Grown odd clusters from bucket $b_c$ are added back to the bucket list using the \codefunc{place} subroutine, in a bucket $b_{g}$ where $g > c$.
+\end{theorem}
+
+\begin{lemma}\label{lem:bucket_suborder}
+  Clusters $C_\alpha$ and $C_\beta$ with $S_\alpha = S_\beta$ are placed int the same bucket $b_{S_\alpha}$, and their growing order is dependent on the order of placement within the bucket.
 \end{lemma}
 
 \subsubsection{Faulty entries}
@@ -40,15 +54,183 @@ The procedure for the Union-Find decoder using the bucket sort algorithm is now 
   \caption{Faulty entries of clusters can occur in the buckets, a) cluster that should not be there due to a merge event. Situation a can be solved by checking the parity of the cluster. Checking the parity of the root cluster solves a) and b). Checking the bucket\_number of the root cluster solves all.}\label{3.fig.clustermergeB}
 \end{figure}
 
-Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters A and B during growth of B, cluster A has already been placed in a bucket, as it was still odd after its growth. But cluster A is now part of cluster AB and has even parity, and the entry of cluster A is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
+Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters $C_\alpha$ and $C_\beta$ during growth of $C_\beta$, cluster $C_\alpha$ has already been placed in a bucket, as it was still odd after its growth. But cluster $C_\alpha$ is now part of cluster $AB$ and has even parity, and the entry of cluster $C_\alpha$ is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
 
-Furthermore, it is possible that another cluster C merges onto AB, such that the cluster ABC is odd again. Now, the faulty entry of cluster A passes the previous test. To solve this issue, we store an extra \codeword{bucket_number} at the root of a cluster. Whenever a cluster increases in size or merges to an odd parity cluster, we first update the \codeword{bucket_number} to the appropriate value and place it in its bucket. If the cluster merges to an even parity cluster, we update the \codeword{bucket_number} to \codeword{None}. Now, every time a cluster is popped from bucket $i$, we can just check weather the current bucket corresponds to the \codeword{bucket_number} of the root cluster.
+Furthermore, it is possible that another cluster $C_\gamma$ merges onto $C_{\alpha\beta}$, such that the cluster $C_{\alpha\beta\gamma}$ is odd again. Now, the faulty entry of cluster A passes the previous test. To solve this issue, we store an extra bucket number $C_b$ at the root of a cluster. Whenever a cluster increases in size or merges to an odd parity cluster, we first update the $C_b$ to the appropriate value and place it in its bucket. If the cluster merges to an even parity cluster, we update the $C_b$ to $Null$. Now, every time a cluster is popped from bucket $i$, we can just check weather the current bucket corresponds to the $C_b$ of the root cluster.
+
+\begin{lemma}\label{lem:bucket_faulty}
+  Each bucket $b_i$ does not necessary contain clusters that still belong to $b_i$. Growth of these faulty entries are prevented by storing the bucket number $j$ at the cluster $C_b = j$ during \codefunc{Place} and checking for $i=j$ and odd cluster parity add the beginning of \codefunc{Grow}.
+\end{lemma}
 
 \subsubsection{Number of buckets}
-How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now trivial. But we need to make sure that the decoder \emph{can} give a solution. As we are only placing odd parity clusters in buckets, and clusters of the same size grow "simultaneously", the largest odd parity cluster should only cover about half the lattice, while another odd parity cluster of the same size covers the other half. Any odd parity cluster that is larger than that should now grow as there should always be a smaller cluster available to grow instead. We can show that the largest odd parity cluster size is $S_M = L\times(\lfloor L/2\rfloor - 1)$ with $L=\sqrt{n}$ on a square lattice. This results to $N_b = 2L\times(\lfloor L/2\rfloor - 1)$ buckets. Any odd parity cluster with bucket number larger $N_b$ shall be assigned \codeword{bucket_number=None} and will not be placed in a bucket, as there is no bucket available.
+How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now trivial. But we need to make sure that the decoder \emph{can} give a solution. Consider an odd cluster $C_\mu$ of size $S_\alpha~n/2$ which covers half the lattice. There must exists another odd cluster $C_\beta$ for matchings to exists, which has size $S_\beta\leq n/2$.
+As per lemma \ref{the:bucket_order}, $C_\beta$ will grow before $C_\alpha$. As the remaining number of vertices is $n-S_\alpha-S_\beta$, $C_\beta$ can never grow larger than $C_\alpha$ and will merge into $C_\alpha$ if no other odd cluster exists. There exists a maximum cluster size $S_\mu$ for which after $\codefunc{Grow}(C_\mu)$ this is true. This cluster size $S_\mu$ is dependent on the code and the parity of lattice size $L$. We illustrate in figure \ref{fig:bucket_cmsizes} the clusters $C_\mu$ for the toric and planar code. Their maximum odd cluster size $S_\mu$ is listed in table \ref{tab_smax}, where $L'=L-1$ for the planar code.
+
+\begin{lemma}
+  Once an odd cluster $C_\alpha$ has reached a size $S_\alpha > S_\mu$, it is certain that a smaller cluster $C_\beta$ will grow in size before the bucket of $C_\alpha$ is reached, and it will merge into an even cluster $\codefunc{Union}(C_\alpha, C_\beta) = C_{\alpha\beta}$.
+\end{lemma}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|c|c|}
+    \hline
+    % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+     & $L$ even & $L$ odd \\
+     \hline
+    Toric & $S_\mu = L\times (\frac{L}{2}-1) -1$ & $S_\mu = L\times ( \frac{L'}{2} -2) + (\frac{L'}{2}-1)$ \\
+    \hline
+    Planar & $S_\mu = L \times (\frac{L}{2} -1) $  & $S_\mu = L'\times \frac{L'}{2} -1$ \\
+    \hline
+  \end{tabular}
+  \caption{The maximum cluster size $S_\mu$ for which it is not certain that another cluster will merge onto the current cluster, or the maximum cluster size for which a cluster is allowed to grow.  }\label{tab_smax}
+\end{table}
+
+
+This maximum cluster size $S_\mu$ for growth determines the number of buckets $k + 1$ we will need.
+\begin{equation}\label{eq:bucket_numbuckets}
+  k = 2(S_\mu-1)
+\end{equation}
+Any cluster with size $S\leq S_\mu$ will be placed into a bucket according to equation \ref{eq:bucket_place}. If $S>S_\mu$, the cluster will not be placed into a bucket, and shall be assigned bucket number $C_b=Null$, as there is no bucket available.
+
+
+\def\QS{10}
+\def\s{1}
+\begin{figure}[h]
+  \centering
+
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+        \begin{tikzpicture}
+        \DRAWTORIC{5}
+        \DRAWPLAQ{0}{0}
+        \DRAWPLAQ{0}{1}
+        \DRAWPLAQ{0}{2}
+        \DRAWPLAQ{0}{3}
+        \DRAWPLAQ{0}{4}
+        \DRAWPLAQ{1}{0}
+        \DRAWPLAQ{1}{1}
+        \DRAWPLAQ{2}{3}
+        \DRAWPLAQ{2}{4}
+        \DRAWPLAQ{3}{0}
+        \DRAWPLAQ{3}{1}
+        \DRAWPLAQ{3}{2}
+        \DRAWPLAQ{3}{3}
+        \DRAWPLAQ{3}{4}
+        \end{tikzpicture}
+        \caption{Toric odd $L=5$}
+  \end{subfigure}
+  \hspace{1cm}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+      \begin{tikzpicture}
+        \DRAWPLANAR{6}
+        \DRAWPLAQ{1}{1}
+        \DRAWPLAQ{2}{1}
+        \DRAWPLAQ{4}{1}
+        \DRAWPLAQ{1}{2}
+        \DRAWPLAQ{2}{2}
+        \DRAWPLAQ{4}{2}
+        \DRAWPLAQ{1}{3}
+        \DRAWPLAQ{4}{3}
+        \DRAWPLAQ{1}{4}
+        \DRAWPLAQ{4}{4}
+        \DRAWPLAQ{3}{4}
+        \DRAWPLAQ{1}{5}
+        \DRAWPLAQ{4}{5}
+        \DRAWPLAQ{3}{5}
+        \DRAWPLAQ{3}{3}
+        \DRAWEPLAQ{0}{1}
+        \DRAWEPLAQ{5}{1}
+        \DRAWEPLAQ{0}{2}
+        \DRAWEPLAQ{5}{2}
+        \DRAWEPLAQ{0}{3}
+        \DRAWEPLAQ{5}{3}
+        \DRAWEPLAQ{0}{4}
+        \DRAWEPLAQ{5}{4}
+        \DRAWEPLAQ{0}{5}
+        \DRAWEPLAQ{5}{5}
+      \end{tikzpicture}
+    \caption{Planar even $L=6$}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+      \begin{tikzpicture}
+        \DRAWTORIC{6}
+        \DRAWPLAQ{0}{0}
+        \DRAWPLAQ{1}{0}
+        \DRAWPLAQ{3}{0}
+        \DRAWPLAQ{4}{0}
+        \DRAWPLAQ{0}{1}
+        \DRAWPLAQ{1}{1}
+        \DRAWPLAQ{3}{1}
+        \DRAWPLAQ{4}{1}
+        \DRAWPLAQ{0}{2}
+        \DRAWPLAQ{1}{2}
+        \DRAWPLAQ{3}{2}
+        \DRAWPLAQ{4}{2}
+        \DRAWPLAQ{0}{3}
+        \DRAWPLAQ{1}{3}
+        \DRAWPLAQ{3}{3}
+        \DRAWPLAQ{4}{3}
+        \DRAWPLAQ{0}{4}
+        \DRAWPLAQ{1}{4}
+        \DRAWPLAQ{3}{4}
+        \DRAWPLAQ{4}{4}
+        \DRAWPLAQ{0}{5}
+        \DRAWPLAQ{2}{5}
+        \DRAWPLAQ{3}{5}
+        \DRAWPLAQ{4}{5}
+    \end{tikzpicture}
+    \caption{Toric even $L=6$}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+      \begin{tikzpicture}
+        \DRAWPLANAR{7}
+        \DRAWPLAQ{1}{1}
+        \DRAWPLAQ{2}{1}
+        \DRAWPLAQ{4}{1}
+        \DRAWPLAQ{5}{1}
+        \DRAWPLAQ{1}{2}
+        \DRAWPLAQ{2}{2}
+        \DRAWPLAQ{4}{2}
+        \DRAWPLAQ{5}{2}
+        \DRAWPLAQ{1}{3}
+        \DRAWPLAQ{2}{3}
+        \DRAWPLAQ{4}{3}
+        \DRAWPLAQ{5}{3}
+        \DRAWPLAQ{1}{4}
+        \DRAWPLAQ{2}{4}
+        \DRAWPLAQ{4}{4}
+        \DRAWPLAQ{5}{4}
+        \DRAWPLAQ{1}{5}
+        \DRAWPLAQ{2}{5}
+        \DRAWPLAQ{4}{5}
+        \DRAWPLAQ{5}{5}
+        \DRAWPLAQ{1}{6}
+        \DRAWPLAQ{4}{6}
+        \DRAWPLAQ{5}{6}
+        \DRAWEPLAQ{0}{1}
+        \DRAWEPLAQ{6}{1}
+        \DRAWEPLAQ{0}{2}
+        \DRAWEPLAQ{6}{2}
+        \DRAWEPLAQ{0}{3}
+        \DRAWEPLAQ{6}{3}
+        \DRAWEPLAQ{0}{4}
+        \DRAWEPLAQ{6}{4}
+        \DRAWEPLAQ{0}{5}
+        \DRAWEPLAQ{6}{5}
+        \DRAWEPLAQ{0}{6}
+        \DRAWEPLAQ{6}{6}
+      \end{tikzpicture}
+    \caption{Planar odd $L=7$}
+  \end{subfigure}
+  \caption{The clusters $C_\mu$ with maximum cluster size $S_\mu$ that is allowed to grow is pictured for each case on the left. On the right, another cluster $C_\beta$ is pictured that has a maximum size while still separated from $C_\mu$.}\label{fig:bucket_cmsizes}
+\end{figure}
+
 
 \subsubsection{Largest bucket occurrence}
-Not all buckets will be filled depending on the configuration of the lattice. It would therefore be redundant to go through all buckets just to find out that the majority of them is empty. To combat this, we can keep track of the largest bucket occurrence $i_{M,o}$. Whenever a bucket $i$ has been emptied and $i = i_{M,o}$, we can break out of the bucket loop to skip the remainder of the buckets.
+Not all buckets will be filled depending on the configuration of the lattice. It would therefore be redundant to go through all buckets just to find out that the majority of them is empty. To combat this, we can keep track of the largest filled bucket $b_M$. Whenever a bucket $b_i$ has been emptied and $i = M$, we can break out of the bucket loop to skip the remainder of the buckets.
 
 \subsection{Complexity of BCS}
 Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\mathcal{O}(1)$. There are a maximum of $\mathcal{O}(L^2) = \mathcal{O}(n)$ buckets to go through. Thus the overall complexity of $\mathcal{O}(n\alpha(N))$ is preserved.
@@ -77,12 +259,54 @@ In our application, instead of appending the entire boundary list, we just add a
 \end{figure}
 
 
-\section{Growing Edge Priority based on path degeneracy (GEP)} 
+\section{Growing Edge Priority based on path degeneracy (GEP)}
 
 \subsection{Degeneracy on connecting edges between Clusters (GEP-C)}
 \subsection{Degeneracy on Vertices with connecting edges (GEP-V)}
 
-\section{Growth Delay based on Matching Potential (GDMP)}
+\section{Growth Delay based on Matching Potential (EVENGROW)}
+
+For the UF-decoder, each cluster $C^\alpha$ is represented by a set of vertices $\mathcal{V}^\alpha = \{v_1, v_2, v_3 ... v_{C^\alpha_s}\}$, where $C^\alpha_s$ is the size of the cluster. Here, the $\mathcal{V}^\alpha$ is stored in a tree, and each tree root is a unique identifier of the cluster. When new vertices $v_n$ are added during \codefunc{Grow}$(C^\alpha)$, they are added to the tree as a child of the root. When an edge is fully grown, we traverse the tree from the two neighboring vertices $v_x$, $v_y$ to their roots using $\codefunc{Find}(v_x)$ and $\codefunc{Find}(v_y)$ respectively. If $\codefunc{Find}(v_x) \neq \codefunc{Find}(v_y)$ the cluster are merged using $\codefunc{Union}(v_x, v_y)$ by making one vertex a child of another's root. The depth of the tree $\mathcal{V}^\alpha$ is kept low due to \emph{path compression} and \emph{weighted union} of clusters.
+
+\subsection{Node representation of cluster}
+
+
+In order to delay the growth of certain nodes in the cluster, we need to additionally store the set of nodes $\mathcal{N}^\alpha = \{n^1, n^2, .... n^N\}$, which may contain both syndrome-nodes $a^i$ and junction-nodes $j^i$, and is also stored in a tree. Note that superscripts does not stand for "to the power of", but rather a indexer. We reserver the subscript for node variables. As the calculation of node-parities and node-delays is dependant on the direction in which $\mathcal{N}^\alpha$ is traversed, we store the root at $C^\alpha$ such that growth occurs in the same direction as the delay calculation.
+
+
+\begin{theorem}
+  The set of nodes $\mathcal{N}^\alpha = \{n^1, n^2, .... n^N\}$ of cluster $C^\alpha$ is stored as a tree with root $n^{r, \alpha}$, and exists next to the exists set of vertices $\mathcal{V}^\alpha$. The function of $\mathcal{N}^\alpha$ is to store the list of boundary edges at the nodes and growing each node according to the calculated node delay.
+\end{theorem}
+
+
+\subsection{Node delay calculation}
+
+\begin{lemma}
+  Any node $n_i \in \mathcal{N}^\alpha$ is a valid root.
+\end{lemma}
+
+\begin{theorem}
+  The node parity $n^i_p$ is defined as the parity of the number of children nodes of node $n^i$, and is thus dependant on which node is set as root. 
+\end{theorem}
+
+\begin{lemma}
+ Calculation of node delay is only valid if \codefunc{calc_delay} is called on the same root as \codefunc{calc_parity}. After this calculation, we can again set an arbitrary node $n^i \in \mathcal{N}^\alpha$ as root. 
+\end{lemma}
+
+\subsection{Growing a cluster}
+
+The boundary list for each cluster is not stored at $C^\alpha$, but separately stored at each of the nodes $n^i$ in $\mathcal{N}^\alpha$. To grow a cluster $\codefunc{Grow}(C^\alpha)$, we now traverse all $n^i \in \mathcal{N}^\alpha$ from the root $n^{r, \alpha}$ and apply $\codefunc{GrowNode}(n^i)$, which increases the support of all boundary edges at node $n^i$ by 1. If this node hasn't waited enough $n^i_w - n^i_d - C^\alpha_{md}> 0$, we skip this node, add to the wait $n^i_w = n^i_w +1$ and apply \codefunc{GrowNode} on its children. New vertices grown from node $n^i$ are added to $\mathcal{V}^\alpha$, while storing the node at each new vertex $v^j_n = n^i$. New boundary edges are appended to the boundary lists stored each node $n_j$. The number of nodes in $\mathcal{N}^\alpha$ and the shape of the tree therefore does not change while no merge between clusters has happened.
+
+\begin{lemma}
+  A cluster is grown by calling $\codefunc{GrowNode}(n^{r,\alpha})$, which first checks for the wait of the current node $n^i_w - n^i_d - C^\alpha_{md}> 0$ to grow its boundary edges, and then recursively applies \codefunc{GrowNode} to its children. 
+\end{lemma}
+
+\subsection{Joint of node sets}
+With the addition of the node set $\mathcal{N}$, during a union of clusters $C^\alpha$ and $C^\beta$, we have to additionally combine the node sets $\mathcal{N}^{\alpha}$ and $\mathcal{N}^\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\mathcal{V}$ we $\codefunc{Union}(v^\alpha, v^\beta)$, the two vertices spanning the edge connecting two clusters. On node set $\mathcal{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha=v_n^\alpha, n^\beta=v_n^\beta$ that connects to vertices $v^\alpha, v^\beta$, respectively. From now on, with merge of clusters $C^\alpha$ and $C^\beta$, we refer to the combination of these two routines. 
+
+
+\subsection{Complexity of EVENGROW}
+
 
 
 
