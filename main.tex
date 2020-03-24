@@ -47,8 +47,14 @@
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{xparse}
+\usepackage{todonotes}
+
+
 \NewDocumentCommand{\codeword}{v}{\texttt{\textcolor{MidnightBlue}{#1}}}
 \NewDocumentCommand{\codefunc}{v}{\texttt{\textcolor{OliveGreen}{#1}}}
+\newcommand{\m}[1]{\mathcal{#1}}
+\newcommand{\nset}{\mathcal{N}}
+\newcommand{\pre}[1]{ {}^{#1} }
 
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 % Set quantikz settings

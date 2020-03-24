@@ -34,7 +34,7 @@ A pure qubit state can also be a superposition of the bases states and is encode
 
 \subsection{Pauli operators}\label{subsec:pauli}
 
-The Pauli operations are unitary operations on single qubits, and will be applied very often throughout this thesis. Including the identity operator, the Pauli group on a single qubit, $\mathcal{P}_1$, consists of:
+The Pauli operations are unitary operations on single qubits, and will be applied very often throughout this thesis. Including the identity operator, the Pauli group on a single qubit, $\m{P}_1$, consists of:
 \begin{align}
   X = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} &&
   Y = \begin{bmatrix} 0 & -i \\ i & 0 \end{bmatrix} &&
@@ -49,16 +49,16 @@ Additionally, the Pauli Z operator introduces phase errors on a quantum bit:
 \begin{align}\label{eq:eqc_phaseflip}
   & Z\ket{0} = -\ket{0} && Z\ket{1} = -\ket{1} &
 \end{align}
-The elements of the Pauli group on $n$ qubits, $\mathcal{P}_n$, consists of tensor products of single qubit Pauli operators, such that  $\mathcal{P}_n = \mathcal{P}_1^{\otimes n}$. We use the index of a Pauli operator to indicated on which qubit it has operated on, while other qubits are acted on by the identify. In cases without indices, the order of the operators indicate the qubit it acts on. For example, element $P=X_1\otimes X_2 = XX$ on the three-bit repetition code means that qubit 1 and 2 have been acted on by the Pauli X operator, while qubit 3 is acted on by the identity. The tensor product symbol is often omitted for clarity, such that the above operation can be also written as  $P=X_1X_2$. The \emph{weight} of an operator is the number of qubits on which it does not act non-trivially. On the pure  three-qubit encoded state, a bit-flip error on the second qubit is applied as:
+The elements of the Pauli group on $n$ qubits, $\m{P}_n$, consists of tensor products of single qubit Pauli operators, such that  $\m{P}_n = \m{P}_1^{\otimes n}$. We use the index of a Pauli operator to indicated on which qubit it has operated on, while other qubits are acted on by the identify. In cases without indices, the order of the operators indicate the qubit it acts on. For example, element $P=X_1\otimes X_2 = XX$ on the three-bit repetition code means that qubit 1 and 2 have been acted on by the Pauli X operator, while qubit 3 is acted on by the identity. The tensor product symbol is often omitted for clarity, such that the above operation can be also written as  $P=X_1X_2$. The \emph{weight} of an operator is the number of qubits on which it does not act non-trivially. On the pure  three-qubit encoded state, a bit-flip error on the second qubit is applied as:
 \begin{equation}\label{eq:qec_3bitflip}
   X_2\ket{\psi}_L = (I\otimes X \otimes I) \ket{\psi}_L = \alpha\ket{010} + \beta\ket{101}
 \end{equation}
 
 \subsection{Logical operations}
 
-In order to do computations on the encoded qubit of our three-bit repetition code, we wish to find the Pauli operators in $\mathcal{P}_3$ which flips any basis of the basis states of the encoded qubit to the other. We find that $X\otimes X\otimes X$ transforms $\ket{0}_L$ to $\ket{1}_L$, which is known as the logical bit-flip.
+In order to do computations on the encoded qubit of our three-bit repetition code, we wish to find the Pauli operators in $\m{P}_3$ which flips any basis of the basis states of the encoded qubit to the other. We find that $X\otimes X\otimes X$ transforms $\ket{0}_L$ to $\ket{1}_L$, which is known as the logical bit-flip.
 
-Furthermore, we now have the logical Z operator which must map $\ket{0}_L$ to $-\ket{0}_L$ and $\ket{1}_L$ to $-\ket{1}_L$. We see that for example $Z\otimes I\otimes I$ achieves this, but also any other $\mathcal{P}_3$ operator with two identities and one Pauli Z operator. Thus there are multiple operators that achieves the same. We formalize the logical operators as
+Furthermore, we now have the logical Z operator which must map $\ket{0}_L$ to $-\ket{0}_L$ and $\ket{1}_L$ to $-\ket{1}_L$. We see that for example $Z\otimes I\otimes I$ achieves this, but also any other $\m{P}_3$ operator with two identities and one Pauli Z operator. Thus there are multiple operators that achieves the same. We formalize the logical operators as
 \begin{align}\label{eq:qec_3bitlogical}
   \bar{X} = XXX && \bar{Z} = ZII
 \end{align}
@@ -93,22 +93,22 @@ Furthermore, we see that no configuration of ancilla qubits could be set up for 
 
 \subsection{Error correction}
 
-As the error has been identified, we can apply correct Pauli operator from $\mathcal{P}_3$ to correct the error. In the above case, we wish to apply $IXI$ to clip the second qubit to correct the code.
+As the error has been identified, we can apply correct Pauli operator from $\m{P}_3$ to correct the error. In the above case, we wish to apply $IXI$ to clip the second qubit to correct the code.
 
 In the quantum three-bit repetition code, we can very simply deduct which qubit has encountered an error from the combination of uneven parity measurements. This is called \emph{decoding} the error and is the main function of a \emph{decoder}. More complex error correcting codes involves decoding algorithms which are far more complex than in the three-bit repetition code, which we will see more of later.
 
 
 \section{Stabilizer Formalism}\label{sec:stabilizerformalism}
 
-As we have seen above, we can use the Pauli group $\mathcal{P}_n$ to easily describe a quantum error correcting code of $n$ qubits, without explicitly looking at the \emph{state} of the qubit. This powerful technique is called the \emph{stabilizer formalism} \cite{gottesman1997stabilizer}, and is the most widely formalism used to describe topological codes.
+As we have seen above, we can use the Pauli group $\m{P}_n$ to easily describe a quantum error correcting code of $n$ qubits, without explicitly looking at the \emph{state} of the qubit. This powerful technique is called the \emph{stabilizer formalism} \cite{gottesman1997stabilizer}, and is the most widely formalism used to describe topological codes.
 
-A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators, a set of \emph{stabilizer generators} which form the \emph{stabilizer group} $\mathcal{S}$, which is an Abelian subgroup of the Pauli group, and a set of encoded \emph{logical operators}. A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that:
+A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators, a set of \emph{stabilizer generators} which form the \emph{stabilizer group} $\m{S}$, which is an Abelian subgroup of the Pauli group, and a set of encoded \emph{logical operators}. A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that:
 \begin{align}
-  & S\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \mathcal{S} &
+  & S\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \m{S} &
 \end{align}
 These elements of the of the stabilizer group are most simply referred to as \emph{stabilizers}. The elements of this Abelian group can be written by a set of independent generators $S_j$ of size $N_S$, where any stabilizer $S$ can be written as
 \begin{align}
- & \mathcal{S} = \prod_{j}S_j^{a_j}, && a\_j \in {0, 1} &
+ & \m{S} = \prod_{j}S_j^{a_j}, && a\_j \in {0, 1} &
 \end{align}
 The set of generators $S_j$ is \emph{independent} if no generator can be written as a product of other generators. This implies that any stabilizer can be written in terms of the bitstring $a_1, a_2, ...a_{N_S}$ and that the stabilizer group takes up $n_S$ degrees of freedom of the Hilbert space of $N$ qubits. The remaining $N-N_S = N_L$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $N_L$ logical qubits are to be encoded by $n$ qubits, we require a total of $N_S = N-N_L$ independent stabilizer generators.
 
@@ -123,7 +123,7 @@ The minimum weight of the logical operator determines the distance $d$ of the er
 
 As the stabilizers are a set of Pauli operators, they correspond to blip-flip or phase-flip errors that may have happened on any of our $n$ qubits. Furthermore, as any stabilizer leaves all states  $\ket{\psi}_i$ invariant, measuring the stabilizers does not disrupt the encoded information. If no error has occurred, all stabilizer measurements will return a '+1' eigenvalue, while any '-1' outcome points to the presence of errors, which we will call a \emph{stabilizer violation}.
 
-This outcome is dependent on whether an error caused by the error operator $E$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\mathcal{P}_n$. If $E$ and generator $S_j$ commute then,
+This outcome is dependent on whether an error caused by the error operator $E$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $E$ and generator $S_j$ commute then,
 \begin{equation}
   S_jE\ket{\psi} = ES_j\ket{\psi} = E\ket{\psi}
 \end{equation}
@@ -131,7 +131,7 @@ which means that the post-error state is a +1 eigenstate of $S_j$. If $E$ and ge
 \begin{equation}\label{qec:eq:stabmeas}
   S_jE\ket{\psi} = -ES_j\ket{\psi} = -E\ket{\psi}
 \end{equation}
-and the post-error state is a -1 eigenstate of $S_j$. Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns a series of eigenvalue outcomes that is called the \emph{syndrome}. However, it is not necessary to measure all operators in the stabilizer group $\mathcal{S}$. Measuring the set of independent stabilizer generators $S_j$ suffices as any other stabilizer is just a combination of already measured states.
+and the post-error state is a -1 eigenstate of $S_j$. Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns a series of eigenvalue outcomes that is called the \emph{syndrome}. However, it is not necessary to measure all operators in the stabilizer group $\m{S}$. Measuring the set of independent stabilizer generators $S_j$ suffices as any other stabilizer is just a combination of already measured states.
 
 \subsection{Error models}\label{qec:sec_errormodels}
 
