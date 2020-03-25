@@ -92,148 +92,13 @@ This maximum cluster size $S_\mu$ for growth determines the number of buckets $k
 \end{equation}
 Any cluster with size $S\leq S_\mu$ will be placed into a bucket according to equation \ref{eq:bucket_place}. If $S>S_\mu$, the cluster will not be placed into a bucket, and shall be assigned bucket number $C_b=Null$, as there is no bucket available.
 
-
-\def\QS{10}
-\def\s{1}
-\begin{figure}[h]
-  \centering
-
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-        \begin{tikzpicture}
-        \DRAWTORIC{5}
-        \DRAWPLAQ{0}{0}
-        \DRAWPLAQ{0}{1}
-        \DRAWPLAQ{0}{2}
-        \DRAWPLAQ{0}{3}
-        \DRAWPLAQ{0}{4}
-        \DRAWPLAQ{1}{0}
-        \DRAWPLAQ{1}{1}
-        \DRAWPLAQ{2}{3}
-        \DRAWPLAQ{2}{4}
-        \DRAWPLAQ{3}{0}
-        \DRAWPLAQ{3}{1}
-        \DRAWPLAQ{3}{2}
-        \DRAWPLAQ{3}{3}
-        \DRAWPLAQ{3}{4}
-        \end{tikzpicture}
-        \caption{Toric odd $L=5$}
-  \end{subfigure}
-  \hspace{1cm}
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-      \begin{tikzpicture}
-        \DRAWPLANAR{6}
-        \DRAWPLAQ{1}{1}
-        \DRAWPLAQ{2}{1}
-        \DRAWPLAQ{4}{1}
-        \DRAWPLAQ{1}{2}
-        \DRAWPLAQ{2}{2}
-        \DRAWPLAQ{4}{2}
-        \DRAWPLAQ{1}{3}
-        \DRAWPLAQ{4}{3}
-        \DRAWPLAQ{1}{4}
-        \DRAWPLAQ{4}{4}
-        \DRAWPLAQ{3}{4}
-        \DRAWPLAQ{1}{5}
-        \DRAWPLAQ{4}{5}
-        \DRAWPLAQ{3}{5}
-        \DRAWPLAQ{3}{3}
-        \DRAWEPLAQ{0}{1}
-        \DRAWEPLAQ{5}{1}
-        \DRAWEPLAQ{0}{2}
-        \DRAWEPLAQ{5}{2}
-        \DRAWEPLAQ{0}{3}
-        \DRAWEPLAQ{5}{3}
-        \DRAWEPLAQ{0}{4}
-        \DRAWEPLAQ{5}{4}
-        \DRAWEPLAQ{0}{5}
-        \DRAWEPLAQ{5}{5}
-      \end{tikzpicture}
-    \caption{Planar even $L=6$}
-  \end{subfigure}
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-      \begin{tikzpicture}
-        \DRAWTORIC{6}
-        \DRAWPLAQ{0}{0}
-        \DRAWPLAQ{1}{0}
-        \DRAWPLAQ{3}{0}
-        \DRAWPLAQ{4}{0}
-        \DRAWPLAQ{0}{1}
-        \DRAWPLAQ{1}{1}
-        \DRAWPLAQ{3}{1}
-        \DRAWPLAQ{4}{1}
-        \DRAWPLAQ{0}{2}
-        \DRAWPLAQ{1}{2}
-        \DRAWPLAQ{3}{2}
-        \DRAWPLAQ{4}{2}
-        \DRAWPLAQ{0}{3}
-        \DRAWPLAQ{1}{3}
-        \DRAWPLAQ{3}{3}
-        \DRAWPLAQ{4}{3}
-        \DRAWPLAQ{0}{4}
-        \DRAWPLAQ{1}{4}
-        \DRAWPLAQ{3}{4}
-        \DRAWPLAQ{4}{4}
-        \DRAWPLAQ{0}{5}
-        \DRAWPLAQ{2}{5}
-        \DRAWPLAQ{3}{5}
-        \DRAWPLAQ{4}{5}
-    \end{tikzpicture}
-    \caption{Toric even $L=6$}
-  \end{subfigure}
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-      \begin{tikzpicture}
-        \DRAWPLANAR{7}
-        \DRAWPLAQ{1}{1}
-        \DRAWPLAQ{2}{1}
-        \DRAWPLAQ{4}{1}
-        \DRAWPLAQ{5}{1}
-        \DRAWPLAQ{1}{2}
-        \DRAWPLAQ{2}{2}
-        \DRAWPLAQ{4}{2}
-        \DRAWPLAQ{5}{2}
-        \DRAWPLAQ{1}{3}
-        \DRAWPLAQ{2}{3}
-        \DRAWPLAQ{4}{3}
-        \DRAWPLAQ{5}{3}
-        \DRAWPLAQ{1}{4}
-        \DRAWPLAQ{2}{4}
-        \DRAWPLAQ{4}{4}
-        \DRAWPLAQ{5}{4}
-        \DRAWPLAQ{1}{5}
-        \DRAWPLAQ{2}{5}
-        \DRAWPLAQ{4}{5}
-        \DRAWPLAQ{5}{5}
-        \DRAWPLAQ{1}{6}
-        \DRAWPLAQ{4}{6}
-        \DRAWPLAQ{5}{6}
-        \DRAWEPLAQ{0}{1}
-        \DRAWEPLAQ{6}{1}
-        \DRAWEPLAQ{0}{2}
-        \DRAWEPLAQ{6}{2}
-        \DRAWEPLAQ{0}{3}
-        \DRAWEPLAQ{6}{3}
-        \DRAWEPLAQ{0}{4}
-        \DRAWEPLAQ{6}{4}
-        \DRAWEPLAQ{0}{5}
-        \DRAWEPLAQ{6}{5}
-        \DRAWEPLAQ{0}{6}
-        \DRAWEPLAQ{6}{6}
-      \end{tikzpicture}
-    \caption{Planar odd $L=7$}
-  \end{subfigure}
-  \caption{The clusters $C_\mu$ with maximum cluster size $S_\mu$ that is allowed to grow is pictured for each case on the left. On the right, another cluster $C_\beta$ is pictured that has a maximum size while still separated from $C_\mu$.}\label{fig:bucket_cmsizes}
-\end{figure}
-
+\input{tikzfigs/bucket_largestcluster}
 
 \subsubsection{Largest bucket occurrence}
 Not all buckets will be filled depending on the configuration of the lattice. It would therefore be redundant to go through all buckets just to find out that the majority of them is empty. To combat this, we can keep track of the largest filled bucket $b_M$. Whenever a bucket $b_i$ has been emptied and $i = M$, we can break out of the bucket loop to skip the remainder of the buckets.
 
 \subsection{Complexity of BCS}
-Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\m{O}(1)$. There are a maximum of $\m{O}(L^2) = \m{O}(n)$ buckets to go through. Thus the overall complexity of $\m{O}(n\alpha(N))$ is preserved.
+Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\m{O}(1)$. There are a maximum of $\m{O}(L^2) = \m{O}(N)$ buckets to go through. Thus the overall complexity of $\m{O}(N\alpha(N))$ is preserved.
 
 \subsection{The BCS Union-Find decoder}
 
@@ -269,7 +134,7 @@ In our application, instead of appending the entire boundary list, we just add a
 For the UF-decoder, each cluster $C^\alpha$ is represented by a set of vertices $\m{V}^\alpha = \{v_1, v_2, v_3 ... v_{C^\alpha_s}\}$, where $C^\alpha_s$ is the size of the cluster. Here, the $\m{V}^\alpha$ is stored in a tree, and each tree root is a unique identifier of the cluster. When new vertices $v_n$ are added during \codefunc{Grow}$(C^\alpha)$, they are added to the tree as a child of the root. When an edge is fully grown, we traverse the tree from the two neighboring vertices $v_x$, $v_y$ to their roots using $\codefunc{Find}(v_x)$ and $\codefunc{Find}(v_y)$ respectively. If $\codefunc{Find}(v_x) \neq \codefunc{Find}(v_y)$ the cluster are merged using $\codefunc{Union}(v_x, v_y)$ by making one vertex a child of another's root. The depth of the tree $\m{V}^\alpha$ is kept low due to \emph{path compression} and \emph{weighted union} of clusters.
 
 
-[uneven growth potential in a cluster]
+\todo[inline]{explain uneven growth potential in a cluster}
 
 \subsection{Node representation of cluster}
 
@@ -296,26 +161,33 @@ In order to delay the growth of certain nodes in the cluster, we need to additio
 The \emph{ancestry} is the path along which the parent-child relationships are defined between the nodes of a given set.
 
 \begin{lemma}\label{lem:nodecalc_parity}
-  The node parity $n^i_p$ is defined as the parity of the number of children nodes of node $n^i$, and is thus dependant on which node is set as root. If the ancestry in a set changes, node parities within the set become "undefined" and need to be recalculated. If some odd number of nodes is attached to $n^j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.   
+  The node parity $n^i_p$ is defined as the parity of the number of children nodes of node $n^i$, and is thus dependant on which node is set as root. If the ancestry in a set changes, node parities within the set become "undefined" and need to be recalculated. If some odd number of nodes is attached to $n^j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.
 \end{lemma}
 
 \todo[inline]{delay calculation}
+\todo[inline]{parity inversion, bisect delays}
 
 \begin{lemma}\label{lem:nodecalc_ancestrypath}
- The calculation of node delays is only valid while node parities within the set are defined along the same ancestry as the node delay calculation. 
+ The calculation of node delays is only valid while node parities within the set are defined along the same ancestry as the node delay calculation.
 \end{lemma}
 
 \begin{lemma}\label{lem:nodecalc_undefineddelay}
-  As the delay of a certain node $n^i$ becomes undefined, the delays of all children nodes of $n^i$ also becomes undefined. 
+  As the delay of a certain node $n^i$ becomes undefined, the delays of all children nodes of $n^i$ also becomes undefined.
 \end{lemma}
 
 \begin{lemma}\label{lem:nodecalc_junction}
-  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}. 
+  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}.
 \end{lemma}
 
 \todo[inline]{parity calculation}
 
-To calculate the parities and delays in a given node set $\m{N}$ with "undefined" node parities and delays, we have to traverse the entire set. We denote the node set size as $S_\m{N}$ as the total number of nodes $n^i \in \m{N}$. Note that node set size is different from cluster size, which is the size of Vertex set $\m{V}$, and is referred to as $S_\m{V}$ from now on.
+To calculate the parities and delays in a given node set $\m{N}$ with "undefined" node parities and delays, we have to traverse the entire set. We denote the node set size as $S_\m{N}$ as the total number of nodes $n^i \in \m{N}$. Note that node set size is different from cluster size, which is the size of Vertex set $\m{V}$, and is referred to as $S_\m{V}$ from now on. For any cluster $C$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
+\begin{lemma}\label{lem:upperboundsize}
+  Node set size is upper bounded by cluster or vertex set size. 
+    \begin{equation}\label{eq:upperboundsize}
+      S_\nset \leq S_\vset
+    \end{equation}
+\end{lemma}
 
 \begin{theorem}
   To prepare a cluster with node set $\m{N}$ and node root $n^r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{calc_parity}(n^r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{calc_delay}(n^r)$.
@@ -332,10 +204,16 @@ The boundary list for each cluster is not stored at $C^\alpha$, but separately s
 \subsection{Joint of node sets}
 With the addition of the node set $\m{N}$, during a union of clusters $C^\alpha$ and $C^\beta$, we have to additionally combine the node sets $\m{N}^{\alpha}$ and $\m{N}^\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we $\codefunc{Union}(v^\alpha, v^\beta)$, the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha=v_n^\alpha, n^\beta=v_n^\beta$ that connects to vertices $v^\alpha, v^\beta$, respectively. From now on, when we talk about the "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}^\alpha$ and $\m{V}^\beta$" or the "joint of node sets $\m{N}^{\alpha}$ and $\m{N}^\beta$", we always refer to the combination of these two routines.
 
-Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{calc_parity} and \codefunc{calc_delay}. As the structure of the tree is crucial in computing the parities and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$. Our rules will be dependant on the parities of the joining node sets, which is the parity of the number of syndrome-node in the set. This is due to that junction-nodes do not add to the count of the number of children nodes per lemma \ref{lem:nodecalc_junction}. Note that the parity of a node set $\m{N}_p$ is therefore exactly the same as the parity of a cluster $C_p$, which also refer to the number of syndromes in the cluster.
+Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{calc_parity} and \codefunc{calc_delay}. As the structure of the tree is crucial in computing the parities and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$. First of all, we note that while the node set does not change, the parities and delays within the node set stay valid. 
+
+\begin{lemma}\label{lem:nodesetunchanged}
+  While node set $\nset$ is unchanged, the calculated parities and delays within the set are valid. 
+\end{lemma}
+
+Our rules will be dependant on the parities of the joining node sets, which is the parity of the number of syndrome-node in the set. This is due to that junction-nodes do not add to the count of the number of children nodes per lemma \ref{lem:nodecalc_junction}. Note that the parity of a node set $\m{N}_p$ is therefore exactly the same as the parity of a cluster $C_p$, which also refer to the number of syndromes in the cluster.
 
 \begin{lemma}
-  The parity of node set $\m{N}_p$ is the parity in the number of syndrome-nodes $\sigma^i \in \m{N}$. The parity of node set $\m{N}_p$ is analogous to cluster parity $C_p$. 
+  The parity of node set $\m{N}_p$ is the parity in the number of syndrome-nodes $\sigma^i \in \m{N}$. The parity of node set $\m{N}_p$ is analogous to cluster parity $C_p$.
 \end{lemma}
 
 \subsubsection{Joint to even node set}
@@ -352,36 +230,53 @@ However, it is entirely possible that another cluster grows, and merges onto the
 
 The joint operation of an even $\m{N}^e$ and an odd node set $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this joining is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The joint of these two sets leaves a new odd node set $\m{N}_{new}^o$ with subsets $\m{N}'^e$ and $\m{N}'^o$, referring to the original node sets. We are provided with two choices, a) make $n^e$ child of $n^o$, or b) make $n^o$ child of $n^e$. Note that the child node $n^c$ will become the \emph{sub-root} if subset $\m{N}'^c$.
 
-If the subset $\m{N}'^e$ consists of only two odd node sets $\m{N}^o_0, \m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $\m{N}''^o_0$ is preserved and $n_1$ is the sub-root of $\m{N}''^o_1$. We see that the parities in all ancestors of $n^0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $\m{N}'^{e}$. 
+If the subset $\m{N}'^e$ consists of only two odd node sets $\m{N}^o_0, \m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $\m{N}''^o_0$ is preserved and $n_1$ is the sub-root of $\m{N}''^o_1$. We see that the parities in all ancestors of $n^0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $\m{N}'^{e}$.
 
 For case a), an even number of nodes of $\m{N}'^e$ is attached to $n^o$, and the ancestry in $\m{N}'^o$ hasn't changed. This means that the parities in $\m{N}'^o$ do not change per lemma \ref{lem:nodecalc_parity}, and the delays in $\m{N}'^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $\m{N}'^e$, as the ancestry path has changed, we are certain to traverse $\m{N}'^e$ from the sub-root $n^e$ to calculate the delays in this subset which is in the order of $S_{\m{N}^e}$.
 
 In case b), as an odd number of nodes of $\m{N}'^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $\m{N}'^{o}$ has changed, we are certain to traverse $\m{N}'^o$ from the sub-root $n^o$ to calculate the delays which is in the order of $S_{\m{N}^o}$. The node parity changes in $\m{N}'^e$ will be dependant on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $\m{N}'^e$ a value $S_e \leq S_{\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{\m{N}^o}$.
 
-For $\m{N}'^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still a trivial task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{\m{N}^o} < S_{\m{N}^e}$. But as the number of subsets in $\m{N}'^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $\m{N}'^e$ entirely $S_e \rightarrow S_{\m{N}^e}$. To simplify things, we always choose case a. 
+For $\m{N}'^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still a trivial task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{\m{N}^o} < S_{\m{N}^e}$. But as the number of subsets in $\m{N}'^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $\m{N}'^e$ entirely $S_e \rightarrow S_{\m{N}^e}$. To simplify things, we always choose case a.
 
 \begin{theorem}\label{the:nodejoint}
-  The union of node sets $\m{N}^\alpha, \m{N}^\beta$ on nodes $n^\alpha, n^\beta$ respectively is performed with $\codefunc{Joint}(n^\alpha, n^\beta)$. If the resulting node set $\m{N}$ is odd, one of $\m{N}^\alpha$ and $ \m{N}^\beta$ is odd while the other is even, and $\codefunc{Joint}(n^\alpha, n^\beta)$ makes the node of the even set $n^e$ a child of the node of the odd set $n^o$. If the resulting node set $\m{N}$ is even, the choice is arbitrary. 
+  The union of node sets $\m{N}^\alpha, \m{N}^\beta$ on nodes $n^\alpha, n^\beta$ respectively is performed with $\codefunc{Joint}(n^\alpha, n^\beta)$. If the resulting node set $\m{N}$ is odd, one of $\m{N}^\alpha$ and $ \m{N}^\beta$ is odd while the other is even, and $\codefunc{Joint}(n^\alpha, n^\beta)$ makes the node of the even set $n^e$ a child of the node of the odd set $n^o$. If the resulting node set $\m{N}$ is even, the choice is arbitrary.
 \end{theorem}
 
 
 
 \subsection{Multiple joints per growth iteration}
 
-[store sub-roots of even subsets at the root of the set, perform parity and delay calculation not directly after joint, but rather before growth]
+\todo[inline]{[store sub-roots of even subsets at the root of the set, perform parity and delay calculation not directly after joint, but rather before growth}
 
 
 \begin{lemma}\label{lem:oddisevenodd}
-  An odd node set $\nset$ that is the result of some joint operations must consist of an odd subset $\nset'^o$ and an even subset $\nset'^e$, where the even subset $\nset'^e$ may consist of smaller sub-subsets $\nset''$. 
+  An odd node set $\nset$ that is the result of some joint operations must consist of an odd subset $\nset'^o$ and an even subset $\nset'^e$, where the even subset $\nset'^e$ may consist of smaller sub-subsets $\nset''$.
 \end{lemma}
 
 \begin{theorem}\label{the:calclist}
-  For each joint operation between odd node set $\m{N}^o$ and even node set $\m{N}^e$ on nodes $n^o, n^e$ per theorem \ref{the:nodejoint}, we store the sub-root $n^e$ of subset $\m{N}'^e$ to a list $\m{C}$ at root $r^o$ of the resulting set $\m{N}^{res}$ of cluster $C^{res}$ 
+  For each joint operation between odd node set $\m{N}^o$ and even node set $\m{N}^e$ on nodes $n^o, n^e$ per theorem \ref{the:nodejoint}, we store the sub-root $n^e$ of subset $\m{N}'^e$ to a list $\m{C}$ at root $r^o$ of the resulting set $\m{N}^{res}$ of cluster $C^{res}$. 
   \begin{equation}\label{eq:the_nodejoint}
     n^e \rightarrow \m{C}_{r^o}
   \end{equation}
-  If cluster $C$ is selected for growth as per theorem \ref{the:bucket_order}, we first check for nodes in $\m{C}_{n^r}$ at root and apply $\codefunc{calc_parity}(n^i)$ and $\codefunc{calc_delay}(n^i)$ for all nodes $n^i \in \m{C}_{n^r}$ to calculate parities and delays in undefined parts of the set. We then call $\codefunc{GrowNode}(n^r)$ per theorem \ref{the:grownode}. 
+  If cluster $C$ is selected for growth as per theorem \ref{the:bucket_order}, we first check for nodes in $\m{C}_{n^r}$ at root and apply $\codefunc{calc_parity}(n^i)$ and $\codefunc{calc_delay}(n^i)$ for all nodes $n^i \in \m{C}_{n^r}$ to calculate parities and delays in undefined parts of the set. We then call $\codefunc{GrowNode}(n^r)$ per theorem \ref{the:grownode}.
 \end{theorem}
+\todo[inline]{this should not be a theorem}
+
+
+
+
+\begin{lemma}\label{lem:delaywhengrown}
+  Parity and delay calculations are only performed on a the undefined part of a node set when a cluster is grown, not directly after a joint operation.
+\end{lemma}
+
+
+\begin{theorem}\label{the:delayonce}
+  Undefined parts of an odd node set $\nset^o$ are defined as a set $\m{C}_{\nset^o}$ of sub-roots from which all children (including sub-roots) are undefined, and is stored at root node $n^{\nset^o}_r$. If before it has grown, node set $\nset^o$ is joint with another odd node set, which then act as the even set $\pre{\uparrow}\nset^e$ in a larger joint event, the sub-root of $\pre{\uparrow}\nset^e$ is stored at $n^{\pre{\uparrow}\nset^o}_r$. Delay and parity calculations will then traverse all undefined paths only once. 
+\end{theorem}
+
+\todo[inline]{replace root superscript r with lowerscript r}
+
+\subsection{Pseudocode}
 
 \subsection{Complexity of EVENGROW}
 
@@ -389,54 +284,116 @@ The contribution to the time complexity of the UF-EG decoder compared to the UF-
 
 \subsubsection{Delay complexity}
 
-Consider an odd cluster represented by node set size $S_{\m{N}}$ that consists of some number of subclusters $'C^i$ with node subsets $'\nset^i$. As this cluster is odd, it will be selected for growth. And because it consists of a number of subsets, $\nset$ is bound to consist of an odd subset $'\nset^o$ and an even subset $'\nset^e$ (lemma \ref{lem:oddisevenodd}) on which we are to calculate the parities and delays (theorem \ref{the:calclist}).
+Consider an odd cluster represented by node set $\pre{k-1}\nset^o$ with set size $S_{\pre{k-1}\m{N}^o}$ that is the result of union between a number of clusters $\pre{k}C_i$ with node subsets $\pre{k}\nset_i$. Here $k$ indicates a \emph{generation}, where larger $k$ indicates a more distant descendent generation of smaller clusters. As $\pre{k-1}\nset^o$ is odd, it will be selected for growth. And because it consists of a number of subsets, $\pre{k01}\nset^o$ is bound to consist of an odd subset $\pre{k}\nset^o_0$ and an even subset $\pre{k}\nset^e$ (lemma \ref{lem:oddisevenodd}) on which we are to calculate the parities and delays (theorem \ref{the:calclist}).
 
 \paragraph{Fragmentation of a node set}
 
-Let us call this division of odd set into smaller odd and even subsets the \emph{partial fragmentation} of $\nset^o$. We can continue to partially fragment $'\nset^o$ into $''\nset^{o,o}$ and $''\nset^{o,e}$ the same way. We can apply an \emph{intermediate fragmentation} of $'\nset^e$ into 2 odd subsets $\{'\nset^{o_1}, '\nset^{o_2}\}$, and call the fragmentation of $\nset^o$ into a set of node sets $\m{F} = \{'\nset^o, '\nset^{o_1}, '\nset^{o_2}\}$ a \emph{fragmentation step}. Note that a note set $\nset^o$ can only be fragmented if $S_{\nset^o} \geq 3$, in which case the resulting subsets have size 1. 
+Let us call this division of odd set into smaller odd and even subsets the \emph{partial fragmentation} $f_1$ of $\pre{k-1}\nset^o$. We can apply another partial fragmentation $f_2$ of $\pre{k}\nset^e$ into 2 odd subsets $\m{F}'_k=\{\pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$, and call the 2 fragmentations $f_1, f_2$ of $\pre{k}\nset^o$ into a set of node sets $\m{F}_k = \{\pre{1}\nset^o_0, \pre{1}\nset^{o}_1, \pre{1}\nset^{o}_2\}$ a \emph{fragmentation step} $f$. Each odd subset $\pre{k}\nset^o_i$ of $\m{F}_k$ can continue to be partially fragmented by $f_1$ into $\pre{k+1}\nset^{o,o}_{i, 0}$ and $\pre{k+1}\nset^{o,e}_i$ the same way. Note that a node set $\nset^o$ can only be fragmented if $S_{\nset^o} \geq 3$, in which case the resulting subsets have size 1.
 
 \begin{lemma}\label{lem:partialfrag}
-  Let the division of an odd node set $\nset^o$ into subsets $\m{F}_0'=\{'\nset^o, '\nset^e\}$ and subsequently into $\m{F}_0 = \{'\nset^o, '\nset^{o_1}, '\nset^{o_2}\}$ be the a fragmentation step of $\nset$.
+  Let the separation of an odd node set $\pre{k-1}\nset^o$ into subsets $\m{F}_k'=\{\pre{k}\nset^o_0, \pre{k}\nset^e\}$ be the partial fragmentation $f_1$ and subsequently into subsets $\m{F}_k= \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$ be $f_2$ of $\nset$. The combination of the two is a fragmentation step $f$.
   \begin{equation}\label{eq:partialfrag}
-    \m{F}_0 = f(\nset^o) = f'(\{'\nset^o, '\nset^e\}) = \{'\nset^o, '\nset^{o_1}, '\nset^{o_2}\} \hspace{.3cm} | \hspace{.3cm} \bigcup \m{F} =\nset^o, \bigcap \m{F} = \emptyset, S_{\nset^o} \geq 3
+    \m{F}_k = f(\pre{k-1}\nset^o) = f_2(f_1(\pre{k-1}\nset^o)) = f_2(\{\pre{k}\nset^o_0, \pre{k}\nset^e\}) = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\} \hspace{.3cm} | \hspace{.3cm} S_{\pre{k}\nset^o_i} \geq 3
   \end{equation}
 \end{lemma}
 
-Each odd node set of $\m{F}_0$ can undergo the same fragmentation step into odd subsets, leaving us again with a set of node subsets $\m{F}_1$. We can do this some $p$ times until our resulting set of node sets $\m{F}_{p-1}$ consists only of smallest possible node subsets $'^*\nset^o_m$ where $S_\nset=1$. To find the worst case complexity, we want to maximize the delay complexity within $\nset$, we are to find the sequence of joint operations that maximizes the sum of even node sets sizes $S_{\nset^e}$ in all partial fragmentations in the \emph{full fragmentation} of $\nset$.
+Each odd node set of $\m{F}_k$ can undergo the same fragmentation step into odd subsets, leaving us again with a set of node subsets $\m{F}_{k+1}$. We can do this some $p$ times until our resulting set of node sets $\m{F}_{p}$ consists only of smallest possible node subsets $\nset^o$ where $S_{\nset^o}=1$. To find the worst case complexity, we want to maximize the delay complexity within $\pre{k-1}\nset^o$; we are to find the sequence of joint operations that maximizes the sum of even node sets sizes $S_{\nset^e}$ in all partial fragmentations in the \emph{full fragmentation} $F$ of $\nset^o$.
 
-Looking at this fragmentation from the other way, we have a set of size 1 node sets that undergo joint operations in each intermediate and partial fragmentations. In the intermediate fragmentation, two odd node sets join, and we do not add to the count of $N_delay$. In the partial fragmentation, an odd and an even note sets join, and we have to calculate the delays in the even node set before moving on to the next joint operation. 
+Looking at the fragmentation from the other way, we have a set of size 1 node sets that undergo joint operations in each partial fragmentation. In $f_2$, two odd node sets join, and we do not add to the count of $N_delay$. In $f_1$, an odd and an even note sets join, and we have to calculate the delays in the even node set before moving on to the next joint operation.
 
 \begin{lemma}
   Let the full fragmentation of $\nset$ be
   \begin{equation}\label{eq:fullfrag}
-    F(\nset^o) = \underbrace{f(f(...f(\nset)))}_\text{p times} = \{'^*\nset^{o_0}_m, '^*\nset^{o_1}_m, '^*\nset^{o_2}_m, ... ,'^*\nset^{o_{N_\sigma}}_m \} \hspace{.3cm} | \hspace{.3cm} S_{'^*\nset^{o}_m} = 1, 
+    F(\nset^o) = \underbrace{f(f(...f(\nset)))}_\text{p times} = \{\pre{p}\nset^{o}_1, \pre{p}\nset^{o}_1, \pre{p}\nset^{o}_2, ... ,\pre{p}\nset^{o}_{N_\sigma} \} \hspace{.3cm} | \hspace{.3cm} S_{\pre{p}\nset^{o}_i} = 1,
   \end{equation}
-  where along each fragmentation step $k$ a partial fragmentation $\m{F}'_k$ is produced, the number of delay calculations is
+  where along each fragmentation step $k$ a partial fragmentation set $\m{F}'_k$ is produced, the number of delay calculations is
   \begin{equation}\label{eq:maxdelay}
-    N_{delay} = \sum_{k=0}^{p-1} \sum \{ S_{'^*\nset^e} | \forall \mbox{ even } '^*\nset^e \in \m{F}'_k \}. 
+    N_{delay} = \sum_{k=1}^{p} \sum \{ S_{\pre{k}\nset^e} | \forall \mbox{ even } \pre{k}\nset^e \in \m{F}'_k \}.
   \end{equation}
 \end{lemma}
 
-Note that here we ignore the fact that the intermediate fragmentation of an even node set may not result in two but many odd subsets. Let us call the number of odd subsets the \emph{fragmentation number} $N_f$. If an even node set $\nset^e$ is fragmented with $N_f=2$, a fragmentation steps will be
+\paragraph{Partial fragmentation number} 
+Note that here we ignore the fact that the partial fragmentations of some node set may not result in two but many subsets. Let us call the number of odd subsets the \emph{fragmentation number} $N_f$. For partial fragmentation $f_1$, the separation of the odd node set $\pre{k-1}\nset^o$ must be in 1 odd and 1 even subset per lemma \ref{lem:oddisevenodd}, thus $N_{f_1} = 2$. For partial fragmentation $f_2$, the separation of even set $\pre{k}\nset^e$ can be in $2n_o$ odd and $n_e$ even subsets. But any even subset will be subjected to the same partial fragmentation $f_2$ in the full fragmentation, reducing the fragmentation number to $N_{f_2} = 2n_o$.
+
+To find $N_{f_2} $, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node set $\nset^e$ is fragmented with $\pre{k}N_{f_2}=2$, a fragmentation step of $f_2, f_1$ will be
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
-  \m{F}^e_1 &=& \{ \pre{1} \nset^{o_1}, \pre{1} \nset^{o_2}\},  \\
-  \m{F}'^e_2 &=& \{\pre{2}\nset^{o_1,o}, \pre{2}\nset^{o_1,e}, \pre{2}\nset^{o_2,o}, \pre{2}\nset^{o_2,e} \}. 
-\end{eqnarray*} 
-
-\todo[noline]{change prior subsets from ' to pre-superscript notation}
-
-For $N_f = 4$, a fragmentation step will be
-
+  \m{F}^e_k &=& \{ \pre{k} \nset^{o}_1, \pre{k} \nset^{o}_2\},  \\
+  \m{F}'^e_{k+1} &=& \{\pre{k+1}\nset^{o,o}_{1,0}, \pre{k+1}\nset^{o,e}_1, \pre{k+1}\nset^{o,o}_{2,0}, \pre{k+1}\nset^{o,e}_2 \}.
+\end{eqnarray*}
+For $N_{f_2} = 4$, a fragmentation step will be
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
-  \m{F}^e_1 &=& \{ \pre{1} \nset^{o_1}, \pre{1} \nset^{o_2}\, , \pre{1} \nset^{o_3}\, , \pre{1} \nset^{o_4}\},  \\
-  \m{F}'^e_2 &=& \{\pre{2}\nset^{o_1,o}, \pre{2}\nset^{o_1,e},  \pre{2}\nset^{o_2,o}, \pre{2}\nset^{o_2,e},  \pre{2}\nset^{o_3,o}, \pre{2}\nset^{o_3,e}, \pre{2}\nset^{o_4,o}, \pre{2}\nset^{o_4,e} \}. 
+  \m{F}^e_k &=& \{ \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\,  \pre{k}\nset^{o}_3\, \pre{k}\nset^{o}_4\},  \\
+  \m{F}'^e_{k+1} &=& \{\pre{k+1}\nset^{o,o}_{1,0}, \pre{k+1}\nset^{o,e}_1,  \pre{k+1}\nset^{o,o}_{2,0}, \pre{k+1}\nset^{o,e}_2,  \pre{k+1}\nset^{o,o}_{3,0}, \pre{k+1}\nset^{o,e}_3, \pre{k+1}\nset^{o,o}_{4,0}, \pre{k+1}\nset^{o,e}_4 \}.
 \end{eqnarray*}
 
-If the size of $S_{\nset^o}$ is large enough, the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. This means that the node set size decreases faster towards the minimum size of 3, as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $N_f$ will decrease the number of fragmentation steps and thus the number of delay calculations $N_{delay}$. Thus our decision of $N_f=2$ in lemma \ref{lem:partialfrag} is correct.
+If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node set size decreases faster towards the minimum size of 3 as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $N_{f_2}$ will decrease the number of fragmentation steps and thus the number of delay calculations $N_{delay}$ per equation \ref{eq:maxdelay}. Thus our decision of $N_{f_2}=2$ in lemma \ref{lem:partialfrag} is correct.
 
 \paragraph{Partial fragmentation ratio}
-\todo[inline]{show ratio of 2/3}
+To complete the fragmentation description, we will need to find the fragmentation ratios $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node set sizes of the subsets in $\m{F}_{k-1}$ with respect to the size of $\pre{k}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of subset $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd subset from $f_1$, and $R_1, R_2$ to the odd subsets in $f_2$.
+
+\begin{lemma}\label{lem:fragratio}
+  Let the fragmentation ratios $R_0, R_2, R_2$ be the relative set sizes of the odd subsets in the fragmentation set $\m{F}_{k} = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2 \}$ with respect to set $\pre{k-1}\nset^o$, where
+  \begin{equation}\label{eq:fragratio}
+    R_j = \frac{S_{\pre{k}\nset^o_j}}{S_{\pre{k-1}\nset^o}}
+  \end{equation}
+\end{lemma}
+
+Recall lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this grow process, some $n_v$ vertices are added to the cluster, and some union or joint operations can occur. If no joint operations occur, the node set stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:nodesetunchanged}. We want to minimize $n_v$, as each added vertex here is not a node that can possibly count towards $N_{delay}$, and it is therefore preferable that some joint operations do occur during growth. 
+
+Take the first fragmentation sets $\m{F}'_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of some cluster defined by node set $\pre{k-1}\nset^o$. These partial fragmentation correspond to 2 joint operations, between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_2$, and between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_1$.
+
+If we want to minimize $n_v$ in $f_2$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node set sizes. For $f_1$, the joint event is caused by growth of $\nset^o_0$ in either some bucket $b_j > b_i$ where $ S_{\vset_0} > S_{\vset_1} $, or growth in the same bucket $b_i$ where $S_{\vset_0} = S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$.
+
+To maximize $N_{delay}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_1$. Recall from lemma \ref{lem:upperboundsize} that $S_\nset \leq S_\vset$. We assume the largest possible node set size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
+
+\begin{lemma}\label{lem:thirdratio}
+  A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the values $R_j = \frac{1}{3}$. 
+\end{lemma}
 
 \paragraph{Time complexity}
+
+To find the time complexity cased by the delay calculations, we are left with a single variable $p$, the number of fragmentation steps that can be taken. If we assume that in each growth step not a single non-node vertex is added $n_v = 0$, the full fragmentation of some node set $\nset^o$ is just the continuous division of the set in 3 parts per lemma \ref{lem:thirdratio}, which can be calculated easily. 
+\begin{equation}\label{eq:numfrag}
+  p = \log_3(S_{\nset^o})
+\end{equation}
+In each fragmentation step $\m{F}'_k$, $f_1$ is equivalent to the joint of odd node sets with even node sets where the sum of odd sets sizes is 
+\begin{equation}\label{eq:sumoddsetsize}
+  \sum \{ S_{\pre{k}\nset^o} | \forall \mbox{ odd } \pre{k}\nset^o \in \m{F}'_k \} = \frac{1}{3}S_{\nset^o}, 
+\end{equation}
+and the sum of even node set of sizes is 
+\begin{equation}\label{eq:sumevensetsize}
+  \sum \{ S_{\pre{k}\nset^e} | \forall \mbox{ even } \pre{k}\nset^e \in \m{F}'_k \} = \frac{2}{3}S_{\nset^o}. 
+\end{equation} 
+This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Filling in equation \ref{eq:numfrag} and \ref{eq:sumevensetsize} in \ref{eq:maxdelay}, we find that
+
+\begin{eqnarray}
+% \nonumber % Remove numbering (before each equation)
+\nonumber  N_{delay} &\leq& \sum_{k=1}^{p} \sum \{ S_{\pre{k}\nset^e} | \forall \mbox{ even } \pre{k}\nset^e \in \m{F}'_k \}. \\
+\nonumber   &=& \sum_{k=1}^{\log_3(S_{\nset^o})} \frac{2}{3}S_{\nset^o} \\
+   &=& \frac{2}{3}S_{\nset^o}\log_3(S_{\nset^o})
+\end{eqnarray}
+
+The node set size of set $\nset^o$ is bounded by the lattice size $N$. The worst case time complexity of the delay computation is bounded by $\m{O}(N\log_3(N))$. The real worst-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$. 
+
+\subsubsection{Node complexity} 
+
+To grow a cluster represented by a node set $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the roots. Let's call the total number of times any node is traversed by \codefunc{GrowNode} over $N_{node}$. This is not equal to number of nodes $N_n$ as each node can be traversed many times during growth.
+
+Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_i$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start out with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{node}$. 
+\begin{equation}\label{eq:nnode}
+  N_{node} \leq \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \}
+\end{equation}
+For a full fragmentation of $\nset$ of size $S_\nset$, the sum of all set sizes in each fragmentation set $\m{F}$ is
+\begin{equation}\label{eq:sumsetsfrag}
+  \sum \{S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \} = S_\nset. 
+\end{equation}
+By filling in $p$ we find that
+\begin{eqnarray}
+% \nonumber % Remove numbering (before each equation)
+  \nonumber N_{node} &\leq& \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \} \\
+  \nonumber &=& \sum_{k=1}^{\log_3(S_{\nset^o})} S_\nset \\
+   &=& S_{\nset^o}\log_3(S_{\nset^o}), 
+\end{eqnarray}
+which again corresponds to a worst case time complexity that is bounded by $\m{O}(N\log_3(N))$. 
