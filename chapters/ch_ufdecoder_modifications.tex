@@ -38,7 +38,7 @@ The procedure for the Union-Find decoder using the bucket sort algorithm is now 
 
 In the case of no merge event, clusters grown from even bucket $b_i$ must be placed in odd bucket $b_{i + 1}$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $b_{j + 2k + 1}$ with $k \in \mathbb{N}_0$ the number of added vertices. Also in the case of a union event of clusters $C_\alpha$ and $C_\beta$, the new cluster $\codefunc{union}(C_\alpha, C_\beta) = C_{\alpha\beta}$ must be placed in a bucket $b_{\alpha\beta} > b_{\alpha}, b_{\alpha\beta} > b_{\beta}$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied". This ensures that for two clusters $C_\alpha$ and $C_\beta$ with $S_\alpha < S_\beta$, cluster A will be grown first, adding a fewer amount of "incorrect" edges as per lemma \ref{lem:incorrectedges}. Clusters of the same size $S_\alpha=S_\beta$ are placed in the same bucket and their order of growth is dependent on their order of placements.
 
-All clusters within the same bucket are grown "together"; we first grow all the boundary edges of the clusters in the bucket by half, adding all fully grown edges to the fusion list $\m{F}$ and check for the union and new boundary edges for all clusters together per algorithm \ref{algo:uf}. The order of growth within the bucket is dependent on the order of cluster placement into the bucket. 
+All clusters within the same bucket are grown "together"; we first grow all the boundary edges of the clusters in the bucket by half, adding all fully grown edges to the fusion list $\m{F}$ and check for the union and new boundary edges for all clusters together per algorithm \ref{algo:uf}. The order of growth within the bucket is dependent on the order of cluster placement into the bucket.
 
 \begin{theorem}\label{the:bucket_order}
   Weighted growth is achieved by growing the odd clusters sequentially starting from bucket $b_0$. Grown odd clusters from bucket $b_c$ are added back to the bucket list using the \codefunc{Place} subroutine, in a bucket $b_{g}$ where $g > c$. Clusters $C_\alpha$ and $C_\beta$ with $S_\alpha = S_\beta$ are placed int the same bucket $b_{S_\alpha}$, and are grown together. However, their growing order is dependent on the order of placement within the bucket.
@@ -127,9 +127,9 @@ In our application, instead of appending the entire boundary list, we just add a
 \subsection{Degeneracy on connecting edges between Clusters (GEP-C)}
 \subsection{Degeneracy on Vertices with connecting edges (GEP-V)}
 
-\section{Growth Delay based on Matching Potential (EVENGROW)}
+\section{Balanced Bloom of cluster growth}
 
-For the UF-decoder, each cluster $C^\alpha$ is represented by a set of vertices $\m{V}^\alpha = \{v_1, v_2, v_3 ... v_{C^\alpha_s}\}$, where $C^\alpha_s$ is the size of the cluster. Here, the $\m{V}^\alpha$ is stored in a tree, and each tree root is a unique identifier of the cluster. When new vertices $v_n$ are added during \codefunc{Grow}$(C^\alpha)$, they are added to the tree as a child of the root. When an edge is fully grown, we traverse the tree from the two neighboring vertices $v_x$, $v_y$ to their roots using $\codefunc{Find}(v_x)$ and $\codefunc{Find}(v_y)$ respectively. If $\codefunc{Find}(v_x) \neq \codefunc{Find}(v_y)$ the cluster are merged using $\codefunc{Union}(v_x, v_y)$ by making one vertex a child of another's root. The depth of the tree $\m{V}^\alpha$ is kept low due to \emph{path compression} and \emph{weighted union} of clusters.
+For the UF-decoder, each cluster $C_\alpha$ is represented by a set of vertices $\m{V}_\alpha = \{v_1, v_2, v_3 ... v_{C^\alpha_s}\}$, where $S_\alpha$ is the size of the cluster. Here, the $\m{V}_\alpha$ is stored in a tree, and each tree root is a unique identifier of the cluster. When new vertices $v_{new}$ are added during \codefunc{Grow}$(C_\alpha)$, they are added to the tree as a child of the root. When an edge is fully grown, we add it to a fusion list $\m{F}$, and for all edges in $\m{F}$ the vertex tree for the two neighboring vertices $v_x$, $v_y$ are traversed to their roots using $\codefunc{Find}(v_x)$ and $\codefunc{Find}(v_y)$ respectively. If $\codefunc{Find}(v_x) \neq \codefunc{Find}(v_y)$ the cluster are merged using $\codefunc{Union}(v_x, v_y)$ by making one vertex a child of another's root. The depth of the tree $\m{V}^\alpha$ is kept low due to \emph{path compression} and \emph{weighted union} of clusters.
 
 
 \todo[inline]{explain uneven growth potential in a cluster}
@@ -138,29 +138,50 @@ For the UF-decoder, each cluster $C^\alpha$ is represented by a set of vertices 
 
 \todo[inline]{What are nodes}
 
-\todo[inline]{what can we achieve with delays}
+All vertices that are added to some cluster $C$ during a growth of a cluster can be traced back to some vertex $v$ in the original cluster. We say that these vertices are \emph{seeded} in $v$. All vertices $v$ which seeds the growth of a cluster are nodes $n_i$. The growth of the cluster in the subset that is seeded in $n_i$ is the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster. The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, where the edges between the nodes are the branches in our figurative flower bush.
 
-In order to delay the growth of certain nodes in the cluster, we need to additionally store the set of nodes $\m{N}^\alpha = \{n^1, n^2, .... n^N\}$, which may contain both syndrome-nodes $a^i$ and junction-nodes $j^i$, and is also stored in a tree. Note that superscripts does not stand for "to the power of", but rather a indexer. We reserver the subscript for node variables. As we will see in the next section, the calculation of node-parities and node-delays is dependant on the direction in which $\m{N}^\alpha$ is traversed, we store the root at $C^\alpha$ such that growth occurs in the same direction as the delay calculation.
+The node set size $S_\nset$ is different from cluster size, which is the size of vertex set $\m{V}$, and is referred to as $S_\m{V}$ from now on. For any cluster $C$ with vertex set $\vset$ and node set $\nset$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
+\begin{lemma}\label{lem:upperboundsize}
+  Node set size is upper bounded by cluster or vertex set size.
+    \begin{equation}\label{eq:upperboundsize}
+      S_\nset \leq S_\vset
+    \end{equation}
+\end{lemma}
+
+
+
+\todo[inline]{syndrome-nodes, junction-nodes}
+
+\todo[inline]{what can we achieve with delays, balanced growth}
+
+To be able to bloom each node separately, we cannot store the boundary edges of a cluster in a single list $\m{L}$ at the cluster. In stead, we store the boundary list for each node $n_i$ separately in their own boundary lists $n_i.\m{L}$. Here we use the $object.property$ notation to indicate that the property is stored at the parent object. As we will see in the next section, the calculation of node-delays is dependant on the direction in which $\m{N}_\alpha$ is traversed, we store the root at $C_\alpha$ such that growth occurs in the same direction as the delay calculation.
 
 \begin{theorem}
-  The set of nodes $\m{N}^\alpha = \{n^1, n^2, .... n^N\}$ of cluster $C^\alpha$ is stored as a tree with root $n^{r, \alpha}$, and exists next to the exists set of vertices $\m{V}^\alpha$. The function of $\m{N}^\alpha$ is to store the list of boundary edges at the nodes and growing each node according to the calculated node delay.
+  The set of nodes $\m{N} = \{n_1, n_2, .... n_{\nset}\}$ of cluster $C$ is stored as a tree with root $n_r$, and exists next to the exists set of vertices $\m{V}_\alpha$. The function of $\m{N}_\alpha$ is to store the list of boundary edges at the nodes and growing each node according to the calculated node delay.
 \end{theorem}
 
 
-\subsection{Node delay calculation}
+\subsection{Node parity}
 
 \todo[inline]{explain node parities}
 
 \begin{lemma}
-  Any node $n_i \in \m{N}^\alpha$ is a valid root.
+  Any node $n_i \in \m{N}_\alpha$ is a valid root.
 \end{lemma}
-
 
 The \emph{ancestry} is the path along which the parent-child relationships are defined between the nodes of a given set.
 
 \begin{lemma}\label{lem:nodecalc_parity}
-  The node parity $n^i_p$ is defined as the parity of the number of children nodes of node $n^i$, and is thus dependant on which node is set as root. If the ancestry in a set changes, node parities within the set become "undefined" and need to be recalculated. If some odd number of nodes is attached to $n^j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.
+  The node parity $n_i.p$ is defined as the parity of the number of children nodes of node $n_i$, and is thus dependant on which node is set as root. If the ancestry in a set changes, node parities within the set become "undefined" and need to be recalculated. If some odd number of nodes is attached to $n_j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.
 \end{lemma}
+
+\begin{lemma}\label{lem:nodecalc_junction}
+  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}.
+\end{lemma}
+
+\todo[inline]{parity calculation}
+
+\subsection{Node delay}
 
 \todo[inline]{delay calculation}
 \todo[inline]{parity inversion, bisect delays}
@@ -170,37 +191,25 @@ The \emph{ancestry} is the path along which the parent-child relationships are d
 \end{lemma}
 
 \begin{lemma}\label{lem:nodecalc_undefineddelay}
-  As the delay of a certain node $n^i$ becomes undefined, the delays of all children nodes of $n^i$ also becomes undefined.
+  As the delay of a certain node $n_i$ becomes undefined, the delays of all children nodes of $n_i$ also becomes undefined.
 \end{lemma}
 
-\begin{lemma}\label{lem:nodecalc_junction}
-  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}.
-\end{lemma}
-
-\todo[inline]{parity calculation}
-
-To calculate the parities and delays in a given node set $\m{N}$ with "undefined" node parities and delays, we have to traverse the entire set. We denote the node set size as $S_\m{N}$ as the total number of nodes $n^i \in \m{N}$. Note that node set size is different from cluster size, which is the size of Vertex set $\m{V}$, and is referred to as $S_\m{V}$ from now on. For any cluster $C$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
-\begin{lemma}\label{lem:upperboundsize}
-  Node set size is upper bounded by cluster or vertex set size.
-    \begin{equation}\label{eq:upperboundsize}
-      S_\nset \leq S_\vset
-    \end{equation}
-\end{lemma}
+To calculate the parities and delays in a given node set $\m{N}$ with undefined node parities and delays, we have to traverse the entire set. We denote the node set size as $S_\m{N}$ as the total number of nodes $n_i \in \m{N}$. 
 
 \begin{theorem}
-  To prepare a cluster with node set $\m{N}$ and node root $n^r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{calc_parity}(n^r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{calc_delay}(n^r)$.
+  To prepare a cluster with node set $\m{N}$ and node root $n_r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{calc_parity}(n_r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{calc_delay}(n_r)$.
 \end{theorem}
 
 \subsection{Growing a cluster}
 
-The boundary list for each cluster is not stored at $C^\alpha$, but separately stored at each of the nodes $n^i$ in $\m{N}^\alpha$. To grow a cluster $\codefunc{Grow}(C^\alpha)$, we now traverse all $n^i \in \m{N}^\alpha$ from the root $n^{r, \alpha}$ and apply $\codefunc{GrowNode}(n^i)$, which increases the support of all boundary edges at node $n^i$ by 1. If this node hasn't waited enough $n^i_w - n^i_d - C^\alpha_{md}> 0$, we skip this node, add to the wait $n^i_w = n^i_w +1$ and apply \codefunc{GrowNode} on its children. New vertices grown from node $n^i$ are added to $\m{V}^\alpha$, while storing the node at each new vertex $v^j_n = n^i$. New boundary edges are appended to the boundary lists stored each node $n_j$. The number of nodes in $\m{N}^\alpha$ and the shape of the tree therefore does not change while no merge between clusters has happened.
+The boundary list for each cluster is not stored at $C_\alpha$, but separately stored at each of the nodes $n_i$ in $\m{N}_\alpha$. To grow a cluster $\codefunc{Grow}(C_\alpha)$, we now traverse all $n_i \in \m{N}_\alpha$ from the root $n_r^\alpha$ and apply $\codefunc{Bloom}(n_i)$, which increases the support of all boundary edges in $\m{L}_{n_i}$ at node $n_i$ by 1. If this node hasn't waited enough $n_i.w - n_i.d - C_\alpha.d > 0$, we skip this node, add to the wait $n_i.w = n_i.w +1$ and apply \codefunc{Bloom} on its children. New vertices $v_{new}$ grown from node $n_i$ are added to $\m{V}_\alpha$, while storing the seed node at each new vertex $v_{new}.n = n_i$. New boundary edges are appended to the boundary list $n_i.\m{L}$ stored each seed node $n_i$. The number of nodes in $\m{N}_\alpha$ and the shape of the flower bush tree therefore does not change while no merge between clusters has happened.
 
 \begin{theorem}\label{the:grownode}
-  A cluster is grown by calling $\codefunc{GrowNode}(n^{r,\alpha})$, which first checks for the wait of the current node $n^i_w - n^i_d - C^\alpha_{md}> 0$ to grow its boundary edges, and then recursively applies \codefunc{GrowNode} to its children.
+  A cluster $C_\alpha$ is grown by calling $\codefunc{Bloom}(n_r^\alpha)$, which first checks for the wait of the current node $n_i.w - n_i.d - C_\alpha.d> 0$ to grow its boundary edges, and then recursively applies \codefunc{Bloom} to its children.
 \end{theorem}
 
 \subsection{Joint of node sets}
-With the addition of the node set $\m{N}$, during a union of clusters $C^\alpha$ and $C^\beta$, we have to additionally combine the node sets $\m{N}^{\alpha}$ and $\m{N}^\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we $\codefunc{Union}(v^\alpha, v^\beta)$, the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha=v_n^\alpha, n^\beta=v_n^\beta$ that connects to vertices $v^\alpha, v^\beta$, respectively. From now on, when we talk about the "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}^\alpha$ and $\m{V}^\beta$" or the "joint of node sets $\m{N}^{\alpha}$ and $\m{N}^\beta$", we always refer to the combination of these two routines.
+With the addition of the node set $\m{N}$, during a union of clusters $C_\alpha$ and $C_\beta$, we have to additionally combine the node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we $\codefunc{Union}(v^\alpha, v^\beta)$, the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha=v^\alpha.v, n^\beta=v^\beta.n$ that seeds vertices $v^\alpha, v^\beta$, respectively. From now on, when we talk about the "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}^\alpha$ and $\m{V}^\beta$" or the "joint of node sets $\m{N}^{\alpha}$ and $\m{N}^\beta$", we always refer to the combination of these two routines.
 
 Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{calc_parity} and \codefunc{calc_delay}. As the structure of the tree is crucial in computing the parities and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$. First of all, we note that while the node set does not change, the parities and delays within the node set stay valid.
 
@@ -208,33 +217,33 @@ Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weight
   While node set $\nset$ is unchanged, the calculated parities and delays within the set are valid.
 \end{lemma}
 
-Our rules will be dependant on the parities of the joining node sets, which is the parity of the number of syndrome-node in the set. This is due to that junction-nodes do not add to the count of the number of children nodes per lemma \ref{lem:nodecalc_junction}. Note that the parity of a node set $\m{N}_p$ is therefore exactly the same as the parity of a cluster $C_p$, which also refer to the number of syndromes in the cluster.
+Our rules will be dependant on the parities of the joining node sets, which is the parity of the number of syndrome-node in the set. This is due to that junction-nodes do not add to the count of the number of children nodes per lemma \ref{lem:nodecalc_junction}. Note that the parity of a node set $\m{N}.p$ is therefore exactly the same as the parity of a cluster $C.p$, which also refer to the number of syndromes in the cluster.
 
 \begin{lemma}
-  The parity of node set $\m{N}_p$ is the parity in the number of syndrome-nodes $\sigma^i \in \m{N}$. The parity of node set $\m{N}_p$ is analogous to cluster parity $C_p$.
+  The parity of node set $\m{N}.p$ is the parity in the number of syndrome-nodes $a_i \in \m{N}$. The parity of node set $\m{N}.p$ is analogous to cluster parity $C.p$.
 \end{lemma}
 
 \subsubsection{Joint to even node set}
 
-Let us first consider the joint operation of two or more node sets, where the resulting node set $\m{N}^{e}$ is even. As this also means that the cluster is even, this cluster will not be grown, and naively we could say the we need not to worry about the parties and delays within $\m{N}^{e}$. If we do calculate the parities of a node set with even parity $\m{N}_p$, we will end up with an odd node $n^r_{p=o}$ as root of node set $\m{N}$. It therefore does not make sense to talk about node parities within an even node set. Luckily, but not coincidentally, if a node set is even, the cluster is even and therefore will not grow.
+Let us first consider the joint operation of two or more node sets, where the resulting node set $\m{N}^{e}$ is even. As this also means that the cluster is even, this cluster will not be grown, and naively we could say the we need not to worry about the parties and delays within $\m{N}^{e}$. If we do calculate the parities of a node set with even parity $\m{N}^e$, we will end up with an odd node $n_r.p=o$ as root of node set $\m{N}$. It therefore does not make sense to talk about node parities within an even node set. Luckily, but not coincidentally, if a node set is even, the cluster is even and therefore will not grow.
 
 \begin{lemma}\label{lem:nodecalc_even}
-  Node parities become undefined if multiple node sets joins into a new set $\m{N}$ with even parity $\m{N}_p$.
+  Node parities become undefined if multiple node sets joins into a new set $\m{N}$ with even parity.
 \end{lemma}
 
 However, it is entirely possible that another cluster grows, and merges onto the cluster of $\m{N}^{e}$. In that case, we might think about recovering some of the node parities and delays that were calculated in the subsets of $\m{N}^e$, such that we don't have to traverse $\m{N}^{e}$ entirely for its parities and delays.
 
 \subsubsection{Joint to odd node set}
 
-The joint operation of an even $\m{N}^e$ and an odd node set $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this joining is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The joint of these two sets leaves a new odd node set $\m{N}_{new}^o$ with subsets $\m{N}'^e$ and $\m{N}'^o$, referring to the original node sets. We are provided with two choices, a) make $n^e$ child of $n^o$, or b) make $n^o$ child of $n^e$. Note that the child node $n^c$ will become the \emph{sub-root} if subset $\m{N}'^c$.
+Consider the joint operation of an even $\m{N}^e$ and an odd node set $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this joining is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The joint of these two sets leaves a new odd node set $\m{N}_{new}^o$ with subsets $'\nset^e$ and $'\nset^o$, referring to the original node sets. We are provided with two choices, a) make $n^e$ child of $n^o$, or b) make $n^o$ child of $n^e$. Note that the child node $n^c$ will become the \emph{sub-root} in subset $'\m{N}^c$, where the ancestry in the subset has been reset in the new sub-root. 
 
-If the subset $\m{N}'^e$ consists of only two odd node sets $\m{N}^o_0, \m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $\m{N}''^o_0$ is preserved and $n_1$ is the sub-root of $\m{N}''^o_1$. We see that the parities in all ancestors of $n^0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $\m{N}'^{e}$.
+If the subset $'\m{N}^e$ consists of only two odd node sub-subsets $''\m{N}^o_0, ''\m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $''\m{N}^o_0$ is preserved and $n_1$ is the sub-root of $''\m{N}^o_1$. We see that the parities in all ancestors of $n^0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $'\m{N}^{e}$.
 
-For case a), an even number of nodes of $\m{N}'^e$ is attached to $n^o$, and the ancestry in $\m{N}'^o$ hasn't changed. This means that the parities in $\m{N}'^o$ do not change per lemma \ref{lem:nodecalc_parity}, and the delays in $\m{N}'^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $\m{N}'^e$, as the ancestry path has changed, we are certain to traverse $\m{N}'^e$ from the sub-root $n^e$ to calculate the delays in this subset which is in the order of $S_{\m{N}^e}$.
+For case a), an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. This means that the parities in $'\m{N}^o$ do not change per lemma \ref{lem:nodecalc_parity}, and the delays in $'\m{N}^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $'\m{N}^e$, as the ancestry path has changed, we are certain to traverse $'\m{N}^e$ from the sub-root $n^e$ to calculate the delays in this subset which is in the order of $S_{'\m{N}^e}$.
 
-In case b), as an odd number of nodes of $\m{N}'^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $\m{N}'^{o}$ has changed, we are certain to traverse $\m{N}'^o$ from the sub-root $n^o$ to calculate the delays which is in the order of $S_{\m{N}^o}$. The node parity changes in $\m{N}'^e$ will be dependant on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $\m{N}'^e$ a value $S_e \leq S_{\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{\m{N}^o}$.
+In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the sub-root $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node parity changes in $'\m{N}^e$ will be dependant on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
 
-For $\m{N}'^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still a trivial task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{\m{N}^o} < S_{\m{N}^e}$. But as the number of subsets in $\m{N}'^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $\m{N}'^e$ entirely $S_e \rightarrow S_{\m{N}^e}$. To simplify things, we always choose case a.
+For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify things, we always choose case a.
 
 \begin{theorem}\label{the:nodejoint}
   The union of node sets $\m{N}^\alpha, \m{N}^\beta$ on nodes $n^\alpha, n^\beta$ respectively is performed with $\codefunc{Joint}(n^\alpha, n^\beta)$. If the resulting node set $\m{N}$ is odd, one of $\m{N}^\alpha$ and $ \m{N}^\beta$ is odd while the other is even, and $\codefunc{Joint}(n^\alpha, n^\beta)$ makes the node of the even set $n^e$ a child of the node of the odd set $n^o$. If the resulting node set $\m{N}$ is even, the choice is arbitrary.
@@ -244,33 +253,31 @@ For $\m{N}'^e$ consisting of two subsets, keeping track of the parity changes be
 
 \subsection{Multiple joints per bucket}
 
-Clusters with same vertex set size $S_\vset$ lie in the same bucket $b_i$ and thus are grown together per theorem \ref{the:bucket_order}. Let's call the growth of all clusters in a bucket a \emph{growth iteration}. As the state of fully grown edges are only checked after each growth iteration including possibly many clusters, there may be multiple joint events within the same growth iteration. If the node parities and delays are to be calculated on all the union events in the fusion list $\m{F}$, some node parity and delay calculations may be invalid and unnecessary. 
+Clusters with same vertex set size $S_\vset$ lie in the same bucket $b_i$ and thus are grown together per theorem \ref{the:bucket_order}. Let's call the growth of all clusters in a bucket a \emph{growth iteration}. As the state of fully grown edges are only checked after each growth iteration including possibly many clusters, there may be multiple joint events within the same growth iteration. If the node parities and delays are to be calculated on all the union events in the fusion list $\m{F}$, some node parity and delay calculations may be invalid and unnecessary.
 
-Consider the example with 5 odd clusters $C_1, ... C_5$ with node sets $\nset_1, ... \nset_5$. The union of $C_1$ and $C_2$ to $C_{12}$ is odd-odd and requires no parity-delay calculation. The union of $C_{12}$ and $C_3$ is even-odd, and we calculate the parities and delays in the $\nset_{12}$. The union of $C_{123}$ and $C_4$ is odd-odd and the union of $C_{1234}$ and $C_5$ is even odd, and we calculate the parities and delays in $\nset{1234}$. The earlier computation in $\nset_{12}$ was therefore unnecessary and possible invalid. 
+Consider an example with 5 odd clusters $C_1, ... C_5$ with node sets $\nset_1, ... \nset_5$. The union of $C_1$ and $C_2$ to $C_{12}$ is odd-odd and requires no parity-delay calculation. The union of $C_{12}$ and $C_3$ is even-odd, and we calculate the parities and delays in the $\nset_{12}$. The union of $C_{123}$ and $C_4$ is odd-odd and the union of $C_{1234}$ and $C_5$ is even odd, and we calculate the parities and delays in $\nset{1234}$. The earlier computation in $\nset_{12}$ was therefore unnecessary and possible invalid.
 
-To circumvent this even parity multiplicity, we must make sure to only apply the calculation to the largest even node set in some sequence of joint operations. To do this, we first note that some odd node set $\nset^o$ must always consist of some odd part $\nset'^o$ and an even part $\nset^e$. The even part $\nset^e$ may be subdivided into a number of odd and even subsets, as long as the sum is even. 
+To circumvent this even parity multiplicity, we must make sure to only apply the calculation to the largest even node set in some sequence of joint operations. To do this, we first note that some odd node set $\nset^o$ must always consist of some odd part $'\nset^o$ and an even part $'\nset^e$. The even part $'\nset^e$ may be subdivided into a number of odd and even sub-subsets, as long as the sum is even.
 \begin{lemma}\label{lem:oddisevenodd}
-  An odd node set $\nset$ that is the result of some joint operations must consist of an odd subset $\nset'^o$ and an even subset $\nset'^e$, where the even subset $\nset'^e$ may consist of smaller sub-subsets $\nset''$.
+  An odd node set $\nset$ that is the result of some joint operations must consist of an odd subset $'\nset^o$ and an even subset $'\nset^e$, where the even subset $'\nset^e$ may consist of smaller sub-subsets $''\nset$.
 \end{lemma}
-This even subset $\nset'^e$ is the undefined part of $\nset^o$ in which we must calculate the parities and delays. As we can only be sure that the subset $\nset'^e$ is complete after all unions of clusters are complete, we cannot apply and parity-delay calculations during the unions. We suspend these calculations as much as possible by doing them just before a cluster is grown from a bucket.  
+This even subset $'\nset^e$ is the undefined part of $\nset^o$ in which we must calculate the parities and delays. As we can only be sure that the subset $'\nset^e$ is complete after all unions of clusters are complete, we cannot apply and parity-delay calculations during the unions. We suspend these calculations as much as possible by doing them just before a cluster is grown from a bucket.
 
 \begin{lemma}\label{lem:delaywhengrown}
   Parity and delay calculations are only performed on a the undefined part of a node set when a cluster is grown, not directly after a joint operation.
 \end{lemma}
 
-The only task now is to store where the even subset $\nset'^e$ starts in the ancestry of subset $\nset^o$.  For each joint operation between odd node set $\m{N}^o$ and even node set $\m{N}^e$ on nodes $n^o, n^e$ per theorem \ref{the:nodejoint}, we store the sub-root $n^e$ of subset $\m{N}'^e$ to a list $\m{C}$ at root $r^o$ of the resulting set $\m{N}^{res}$ of cluster $C^{res}$. If cluster $C$ is selected for growth as per theorem \ref{the:bucket_order}, we first check for nodes in $\m{C}_{n^r}$ at root and apply $\codefunc{calc_parity}(n^i)$ and $\codefunc{calc_delay}(n^i)$ for all nodes $n^i \in \m{C}_{n^r}$ to calculate parities and delays in undefined parts of the set. We then call $\codefunc{GrowNode}(n^r)$ per theorem \ref{the:grownode}.
+The only task now is to store where the even subset $'\nset^e$ starts in the ancestry of subset $\nset^o$.  For each joint operation between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $n^o, n^e$ per theorem \ref{the:nodejoint}, we store the sub-root $'n^e_r$ of subset $'\m{N}^e$ to a list $\m{C}$ at the root node of the resulting set $\m{N}^{res}$ of cluster $C^{res}$. If cluster $C$ is selected for growth as per theorem \ref{the:bucket_order}, we first check for nodes in ${n^r}.\m{C}$ at root and apply $\codefunc{calc_parity}(n_i)$ and $\codefunc{calc_delay}(n_i)$ for all nodes $n^i \in {n^r}.\m{C}$ to calculate parities and delays in undefined parts of the set. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
 
 \begin{theorem}\label{the:delayonce}
-  Undefined parts of an odd node set $\nset^o$ are defined as a set $\m{C}_{\nset^o}$ of sub-roots from which all children (including sub-roots) are undefined, and is stored at root node $n^{\nset^o}_r$. If before it has grown, node set $\nset^o$ is joint with another odd node set, which then act as the even set $\pre{\uparrow}\nset^e$ in a larger joint event, the sub-root of $\pre{\uparrow}\nset^e$ is stored at $n^{\pre{\uparrow}\nset^o}_r$. Delay and parity calculations will then traverse all undefined paths only once.
+  Undefined parts of an odd node set $\nset^o$ are defined as a set $\m{C}_{\nset^o}$ of sub-roots from which all children (including sub-roots) are undefined, and is stored at root node $n^o_r$. If before it has grown, node set $\nset^o$ is joint with another odd node set, which then act as the even set $\pre{\uparrow}\nset^e$ in a larger joint event, the sub-root of $\pre{\uparrow}\nset^e$ is stored at $n^{\pre{\uparrow}\nset^o}_r$. Delay and parity calculations will then traverse all undefined paths only once.
 \end{theorem}
-
-\todo[inline]{replace root superscript r with lowerscript r}
 
 \subsection{Pseudocode}
 
 \subsection{Complexity of EVENGROW}
 
-The contribution to the time complexity of the UF-EG decoder compared to the UF-decoder can be divided into two parts. First is the contribution by \codefunc{calc_parity} and \codefunc{calc_delay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay} complexity. The second contribution will be caused by \codefunc{GrowNode}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges as compared to a single boundary list per cluster. We call this second contribution the \emph{node} complexity.
+The contribution to the time complexity of the UF-EG decoder compared to the UF-decoder can be divided into two parts. First is the contribution by \codefunc{calc_parity} and \codefunc{calc_delay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay} complexity. The second contribution will be caused by \codefunc{Grow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom} complexity.
 
 \subsubsection{Delay complexity}
 
@@ -367,13 +374,13 @@ This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Fil
 
 The node set size of set $\nset^o$ is bounded by the lattice size $N$. The worst case time complexity of the delay computation is bounded by $\m{O}(N\log_3(N))$. The real worst-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$.
 
-\subsubsection{Node complexity}
+\subsubsection{Bloom complexity}
 
-To grow a cluster represented by a node set $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the roots. Let's call the total number of times any node is traversed by \codefunc{GrowNode} over $N_{node}$. This is not equal to number of nodes $N_n$ as each node can be traversed many times during growth.
+To grow a cluster represented by a node set $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the nodes. Let's call the total number of times any node is traversed by \codefunc{Bloom} $N_{bloom}$. 
 
-Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_i$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start out with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{node}$.
+Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_i$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start out with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{bloom}$.
 \begin{equation}\label{eq:nnode}
-  N_{node} \leq \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \}
+  N_{bloom} \leq \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \}
 \end{equation}
 For a full fragmentation of $\nset$ of size $S_\nset$, the sum of all set sizes in each fragmentation set $\m{F}$ is
 \begin{equation}\label{eq:sumsetsfrag}
@@ -382,8 +389,10 @@ For a full fragmentation of $\nset$ of size $S_\nset$, the sum of all set sizes 
 By filling in $p$ we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-  \nonumber N_{node} &\leq& \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \} \\
+  \nonumber N_{bloom} &\leq& \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \} \\
   \nonumber &=& \sum_{k=1}^{\log_3(S_{\nset^o})} S_\nset \\
    &=& S_{\nset^o}\log_3(S_{\nset^o}),
 \end{eqnarray}
 which again corresponds to a worst case time complexity that is bounded by $\m{O}(N\log_3(N))$. 
+
+\subsection{Boundaries}
