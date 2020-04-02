@@ -245,6 +245,7 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
     \end{pgfonlayer}
     \node[below=.25cm of Bx-2] {(b)};
   \end{tikzpicture}
+
   \hspace{1cm}
     \begin{tikzpicture}
     \DRAWTORIC{5}
@@ -472,6 +473,8 @@ Let $\varepsilon \subset E$ be an erasure, a set of qubits on which an erasure e
 \input{tikzfigs/function_uf_lattice_styles}
 \input{tikzfigs/peeling_decoder}
 
+\todo[inline]{use capitals for sets $\Sigma$, and lowercase $\sigma$ for elements in the set}
+
 We will now describe the Peeling decoder as is presented in Algorithm \ref{algo:peel}. In step 1, we will remove all cycles present in $\varepsilon$. We construct a spanning forest $F_\varepsilon$ inside erasure $\varepsilon$, the maximal subsect of edges of $\varepsilon$ that contains no cycles and spans all vertices of $\varepsilon$. From here, we loop over all edges in $F_\varepsilon$ (step 3), starting at a leaf edge $e = \{u,v\}$, removing the leaf edge from $F_\varepsilon$ (step 4), and conditionally add the edge to the correction set $\kappa$ if the pendant vertex $u$ is in $\sigma$ (step 6). If the correction is applied immediately, we can see that the pendant vertex $u$ is removed from $\sigma$ and that the value of $v$ is flipped in $\sigma$. Edges on a branch in the forest will be added to $\kappa$ until $v \in \sigma$, or a generator will be continuously moved from $u$ to $v$ until it encounters another generator, creating a correction path between two syndrome pairs.
 
 \begin{algo}[algotitle=Peeling decoder \cite{delfosse2017linear}, label=algo:peel]
@@ -509,12 +512,15 @@ Now in the presence of Pauli errors, errors can occur on edges that are now not 
 
 \end{tikzpicture}
 
+\todo[inline]{add definition of vertex set}
 To keep track of the vertices of a cluster, it will be represented as a \emph{cluster tree}, where an arbitrary vertex of the cluster will be the root, and any other vertex will be a child of the root. Whenever an edge $(u,v)$ is fully grown, we will need to traverse the trees of the two vertices $u$ and $v$, and check wether they have the same root; whether they belong to the same cluster. If not, a merge is initiated by making the root of smaller cluster a child of the bigger cluster. These functions, \codefunc{find} and \codefunc{union} respectively, are part of the Union-Find algorithm (not to be confused with the Union-Find decoder) \cite{tarjan1975efficiency}.
 
 \begin{tikzpicture}
   \draw (2,2) circle (0.2);
   \draw (2,2) -- (0,0);)
 \end{tikzpicture}
+
+\todo[inline]{syndrome identification, syndrome validation, peeling decoder}
 
 Within the Union-Find algorithm, two features ensure that the complexity of the algorithm is not quadratic. 1). With \textbf{path compression}, as we traverse a tree from child to parent until we reach the root, we make sure that each vertex encountered that we have encountered along the way is pointed directly to the root. This doubles the cost of the \codefunc{find}, but speeds up any future call to any vertex on the traversed path. 2). With \textbf{weighted union}, we make sure to always make the smaller tree a child of the bigger tree. This ensures that the overall length of the path to the root stays minimal. In order to make this happen, we just need to store the size of the tree at the root.
 
