@@ -136,16 +136,16 @@ Not all clusters should be grown at the same time. When grown, larger clusters r
 
 The UF-decoder is in fact a heuristic for minimum-weight matching. Larger clusters are generally the result of multiple growth iterations of a given cluster. Each round of cluster growth buries the syndromes within that cluster with a layer of edges, of which a single edge or more will be part of the matching, and thus adds to the matching weight. With weighted growth, smaller clusters are grown first, such that this effect is less dominant. But the UF-decoder is surprisingly less successful at minimum-weight than the MWPM-decoder. The MWPM-decoder considers all possible matchings by constructing a fully connected graph where the edges have the distance between syndrome as weights. The UF-decoder does not look at the lattice in such a global way, but performs locally on each cluster. This should yield the same result conceptually. But the UF-decoder has a major weakness; In each round of growth, all boundary edges are grown simultaneously, and the multiple potential merges is only handled after each round, where the order of the union operations is arbitrary. This leaves us with the question: Should all boundary edges of a cluster be grown simultaneously?
 
-We suspect that the error threshold of the UF-decoder can be increased by improving the heuristic for minimum-weight matchings. In this section, we will accomplish this by sorting the order of boundary edge growth within a cluster by calculation of their potential matching weight. To keep a relatively low time complexity, we group the boundary edges by their root nodes, where the edges in each node have the same matching weight. The calculation of the growth order, or growth delay in each node is done by traversal of the \emph{node tree} of the cluster. 
+We suspect that the error threshold of the UF-decoder can be increased by improving the heuristic for minimum-weight matchings. In this section, we will accomplish this by sorting the order of boundary edge growth within a cluster by calculation of their potential matching weight. To keep a relatively low time complexity, we group the boundary edges by their root nodes, where the edges in each node have the same matching weight. The calculation of the growth order, or growth delay in each node is done by traversal of the \emph{node tree} of the cluster.
 
 
 \subsection{Potential matching weight}
 
 To show that not all boundary edges within a cluster should not be grown simultaneously, let us first consider an example. Cluster $C_e$ consists of 3 vertices $v_1, v_2, v_3$ that lie on a horizontal line, distance 1 from each other, where each vertex has grown a half-edge an iteration before. Assume that each vertex in $C_e$ is a syndrome. It therefore has odd parity and is selected for growth. As UF-decoder performs on the cluster locally, it has no knowledge about its surroundings until it actually grows its edges.
 
-Imagine some other cluster $C_o$ with parity 1 and some size $S_o > 3$ lies adjacent to cluster $C_e$, where the growth of $C_e$ will connect both clusters. The connecting edge $e$ can either be touching vertex $v_e = v_1, v_2$ or $v_3$. The resulting matching will be between $v_e$ and the syndrome vertex $v_o$ in $C_o$ on edges $e$ and some edges of length $l$ within $C_o$, and between edges $v_i \neq v_e$ in $C_e$. If $v_e = v_1$, the matchings will be $(v_1, v_o), (v_2, v_3)$ of weight $2 + l$. Similarly for $v_e = v_3$, the matchings will be $(v_3, v_o), (v_1, v_2)$ of weight $2 + l$. However if $v_e = v2$, the matchings will be $(v_2, v_o), (v_1, v_3)$, where the matching of $v_1, v_3$ has to traverse 2 edges, and has a total weight $3 + l$. 
+Imagine some other cluster $C_o$ with parity 1 and some size $S_o > 3$ lies adjacent to cluster $C_e$, where the growth of $C_e$ will connect both clusters. The connecting edge $e$ can either be touching vertex $v_e = v_1, v_2$ or $v_3$. The resulting matching will be between $v_e$ and the syndrome vertex $v_o$ in $C_o$ on edges $e$ and some edges of length $l$ within $C_o$, and between edges $v_i \neq v_e$ in $C_e$. If $v_e = v_1$, the matchings will be $(v_1, v_o), (v_2, v_3)$ of weight $2 + l$. Similarly for $v_e = v_3$, the matchings will be $(v_3, v_o), (v_1, v_2)$ of weight $2 + l$. However if $v_e = v2$, the matchings will be $(v_2, v_o), (v_1, v_3)$, where the matching of $v_1, v_3$ has to traverse 2 edges, and has a total weight $3 + l$.
 
-Let us call this calculation the \emph{potential matching weight} (PMW) of some vertex $PMW(v_i)$, and leave out $l$ as it is equal for all vertices. From the above example, we can see that even for a minimal sized odd cluster, the PMW is not equal for all vertices. It is not "fair" to grow all boundary edges simultaneously as the boundary edges connected to $v_2$ would add $+1$ to the matching weight. To grow fairly, the growth if these edges should be delayed for some iterations, which we will explore in section \ref{sec:nodedelay}. But if the PMW is to be calculated for every vertex that has boundary edges for each cluster in each growth iteration, the time complexity of the algorithm would increase dramatically. Luckily, we can reduce these calculations to be performed on a set of \emph{nodes} in each cluster. 
+Let us call this calculation the \emph{potential matching weight} (PMW) of some vertex $PMW(v_i)$, and leave out $l$ as it is equal for all vertices. From the above example, we can see that even for a minimal sized odd cluster, the PMW is not equal for all vertices. It is not "fair" to grow all boundary edges simultaneously as the boundary edges connected to $v_2$ would add $+1$ to the matching weight. To grow fairly, the growth if these edges should be delayed for some iterations, which we will explore in section \ref{sec:nodedelay}. But if the PMW is to be calculated for every vertex that has boundary edges for each cluster in each growth iteration, the time complexity of the algorithm would increase dramatically. Luckily, we can reduce these calculations to be performed on a set of \emph{nodes} in each cluster.
 
 \begin{lemma}
   The Potential Matching Weight (PMW) of a vertex $v$ is the total length of matching edges within the cluster $C_{grow}$ if the parity of the cluster $C$ is even in an union between $C_{grow}$ and $C_{other}$, where $C_{other}$ is connected to $C_{grow}$ on an edge touching $v$.
@@ -153,19 +153,23 @@ Let us call this calculation the \emph{potential matching weight} (PMW) of some 
 
 \subsection{Node representation of cluster}
 
-In the case of only Pauli errors, after syndrome identification, all identified clusters consist of a single vertex $v_i$ which is also a syndrome $\sigma_i$. Let us call this original set of cluster $\m{C}_0$. Within syndrome validation, these clusters are subjected to growth and merge events with other clusters. During growth, all vertices that are added to some cluster $C$ have a closest syndrome $\sigma$ within $C$ that is in the original set of single-vertex/single-syndrome clusters $\m{C}_0$. We say that these vertices are \emph{seeded} in $\sigma$. 
+In the case of only Pauli errors, after syndrome identification, all identified clusters consist of a single vertex $v_i$ which is also a syndrome $\sigma_i$. Let us call this original set of cluster $\m{C}_0$. Within syndrome validation, these clusters are subjected to growth and merge events with other clusters. During growth, all vertices that are added to some cluster $C$ have a closest syndrome $\sigma$ within $C$ that is in the original set of single-vertex/single-syndrome clusters $\m{C}_0$. We say that these vertices are \emph{seeded} in $\sigma$.
 
-Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous example, each vertex in $C_e$ is a syndrome in the original set $\m{C}_0$, and therefore a node. In the example, we had calculated the PMW for each vertex. It turns out that the PMW is equal for all vertices with boundary vertices seeded in some node. It is therefore sufficient to calculate the PMW for the nodes in the cluster. Consider again the cluster $C_e$, were a merge event may not happen for many growth iterations. The number of vertices in $C_e$ increases in each round of growth. However, the number of nodes remains the same at 3 nodes. Furthermore, we need only to calculate the PMW for the nodes in the cluster only once. We grow only the nodes with the smallest PMW in the cluster. We delay the growth of nodes with larger PMW until it is equal to the smallest PWM, at which point they can grow together. We can replace PWM by the \emph{delay} in each node. 
+Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous example, each vertex in $C_e$ is a syndrome in the original set $\m{C}_0$, and therefore a node. In the example, we had calculated the PMW for each vertex. It turns out that the PMW is equal for all vertices with boundary vertices seeded in some node. It is therefore sufficient to calculate the PMW for the nodes in the cluster. Consider again the cluster $C_e$, were a merge event may not happen for many growth iterations. The number of vertices in $C_e$ increases in each round of growth. However, the number of nodes remains the same at 3 nodes. Furthermore, we need only to calculate the PMW for the nodes in the cluster only once. We grow only the nodes with the smallest PMW in the cluster. We delay the growth of nodes with larger PMW until it is equal to the smallest PWM, at which point they can grow together. We can replace PWM by the \emph{delay} in each node, the number of growth iterations to wait. 
 
-The growth of the cluster in the subset of boundary edges that is seeded in $n_i$ is the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay. The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, where the edges between the nodes are the branches in our figurative flower bush. They delayed bloom of certain nodes until the delay values in the cluster is even is therefore named \emph{Balanced Bloom}.
+\subsubsection{Balanced Bloom}
+
+We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$. The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, where the edges $\epsilon$ between the nodes are the branches in our figurative flower bush. Each node-edge $\epsilon$ can have arbitrary length and consists of one or more vertex-edges $e$. They delayed bloom of certain nodes until the delay values in the cluster is even is therefore named \emph{Balanced Bloom}.
 
 \begin{lemma}
-  Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same delay, the number of iterations to wait to reach a homogenous PMW in the cluster. A cluster can be selectively grown by the bloom of a node $n$, growing the subset of boundary edges touching vertices seeded in $n$, where each node may have to wait for some iterations based on its delay.
+  Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same delay $n.d$, the number of iterations to wait to reach a homogenous PMW in the cluster. A cluster can be selectively grown by the bloom of a node $n$, growing the subset of boundary edges touching vertices seeded in $n$, where each node may have to wait for some iterations based on its delay. The size of each node is stored as $n.s$, which is the number iterations it has grown. 
 \end{lemma}
+
+\subsubsection{Junction-nodes}
 
 There is still one thing missing from this node representation of clusters. Consider our example cluster $C_e$ of 3 nodes $n_1, n_2, n_3$ again. Now we slightly alter this cluster to $C_e'$ by increasing the distance between $n_1, n_2$ and $n_2, n_3$ to two edges. This means that cluster $C_e'$ is only established after two growth iterations of the three previous separate cluster of nodes $n_1, n_2, n_3$ and has a total size of 13 vertices. Now consider the vertices $v_{12}$ and $v_{23}$ that lie between $n_1, n_2$ and $n_2, n_3$, respectively. It is not clear in which nodes these vertices are seeded, as they lie in equal distance to two nodes. To solve this, we make these kind of vertices nodes of themselves, and call them \emph{junction nodes} $j$. All nodes $j$ have the same characteristics of syndrome nodes $\sigma$, and have their own delay and boundary edges seeded in them. The union of set of junction nodes $\m{J}$ and set of syndrome nodes (syndromes) $\m{S}$ is equal to the node set $\m{N}$.
 
-To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndromes. Furthermore, all nodes are vertices, but not all vertices are nodes. The node set size $S_\nset$ is different from cluster size, which is the size of vertex set $\m{V}$, and is referred to as $S_\m{V}$ from now on. For any cluster $C$ with vertex set $\vset$ and node set $\nset$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
+To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndromes. Furthermore, all nodes are vertices, but not all vertices are nodes. The node set size $S_\nset$ is different from cluster size, which is the size of vertex set $\vset$, and is referred to as $S_\vset$ from now on. For any cluster $C$ with vertex set $\vset$ and node set $\nset$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
 
 \begin{eqnarray}\label{eq:upperboundsize}
 % \nonumber % Remove numbering (before each equation)
@@ -178,11 +182,15 @@ To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndr
 \begin{figure}
   \centering
   \begin{tikzpicture}
-    \draw (0,0) circle [x radius = 4cm, y radius= 2cm];
-    \draw (1,0) circle [x radius = 3cm, y radius= 1.3cm];
-    \draw (0.4,0) circle [radius = 0.8cm];
-    \draw (2,0) circle [radius = 0.8cm];
-    
+    \draw (0,0) circle [x radius = 4cm, y radius = 2cm];
+    \draw (1,0) circle [x radius = 2.9cm, y radius = 1.4cm];
+    \draw[dashed] (1,0) circle [x radius = 3cm, y radius = 1.5cm];
+    \draw (1,1.4) -- (1,-1.4);
+    \node at (-3, 0) {$\m{V}$};
+    \node at (-.5, 0) {$\m{S}$};
+    \node at (2.5, 0) {$\m{J}$};
+    \node at (-2.5, -1) (nnode) {$\m{N}$};
+    \draw (-2, 0) -- (nnode) ;
   \end{tikzpicture}
   \caption{Sets}\label{fig:sets}
 \end{figure}
@@ -196,6 +204,48 @@ To be able to bloom each node separately, we cannot store the boundary edges of 
 
 
 \subsection{Node parity}
+
+The calculation of the PMW for each node in a cluster is a heavy task, as for each node the entire clusters needs to be checked on which edges are part of the matching and results to a quadratic complexity. Luckily, the complexity can be reduced to linear by the calculation of the relative \emph{delay} of each node, where the tree of the node set is traversed. 
+
+\subsubsection{1D tree}
+
+To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes. 
+
+Recall that the size of the node $n.s$ is equal to the iterations it has grown, half-edge per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $n$, the weight of the matchings edges within the flower of $n$ is equal to $\floor{n.s/2}+1$ or. For a merge on $n_1$, we also add edge $\epsilon_2$ and some value $k$ corresponding to the weight of matchings in the remainder of the cluster. Let us calculate the PMW values for each of nodes $n_1, n_2, n_3$.
+\begin{eqnarray*}
+% \nonumber % Remove numbering (before each equation)
+  PMW(n_1) &=& \floor{n_1.s/2}+1 + \epsilon_2 + k \\
+  PMW(n_2) &=& \floor{n_2.s/2}+1 + \epsilon_1 + \epsilon_2 + k \\
+  PMW(n_3) &=& \floor{n_3.s/2}+1 + \epsilon_1 +k
+\end{eqnarray*}
+By taking the summed difference in PMW values in subsequent nodes, the relative delay of a node $n.d$ can be calculated with respect to the first node. In this differential, we set $n_1.d$ of the first node to zero.
+\begin{eqnarray*}
+% \nonumber % Remove numbering (before each equation)
+  n_1.d &=& 0 \\
+  n_2.d &=& PMW(n_2) - PMW(n_1) + n_1.d = 2(\floor{n_2.s/2} - \floor{n_1.s/2} + \epsilon_1) + n_1.d \\
+  n_3.d &=& PMW(n_3) - PMW(n_2) + n_2.d = 2(\floor{n_3.s/2} - \floor{n_2.s/2} - \epsilon_2) + n_2.d 
+\end{eqnarray*}
+These delay values are not entirely correct, as $n_1.s = n_2.s = 2i$ yields the same value as  $n_1.s = 2_i,  n_2.s = 2)i + 1$. We introduce growth support of a node $n.g = n.s \bmod 2$ to accommodate for this degeneracy in PMW, and add this to the delay values.
+\begin{eqnarray*}
+% \nonumber % Remove numbering (before each equation)
+  n_1.d &=& 0 \\
+  n_2.d &=& 2\big(\floor{(n_2.s+n_2.g)/2} - \floor{(n_1.s+n_2.g)/2} + \epsilon_1\big) - (n_1.g + n_2.g)\bmod 2 + n_1.d \\
+  n_3.d &=& 2\big(\floor{(n_3.s+n_3.g)/2} - \floor{(n_2.s+n_3.g)/2} - \epsilon_2\big) - (n_3.g + n_2.g)\bmod 2 + n_2.d 
+\end{eqnarray*} 
+If we were to consider some nodes $n_4, n_5...$ as well, we would find a trend in which the delay of odd node $n_{2i+1}$ would have the positive addition of $\epsilon_{2i}$ in its delay value, and the substraction of $\epsilon_{2i}$ for an even node $n_{2i}$. Thus we can generalize the delay calculation as the following:
+\begin{multline}\label{eq:1ddelay}
+n_i.d = n_{i-1}.d + 2\bigg(\floor{\frac{(n_i.s+n_i.g)}{2}} - \floor{\frac{(n_{i-1}.s+n_i.g)}{2}} + (-1)^{i+1}\epsilon_{i-1}\bigg) \\
+         - (n_{i}.g + n_{i-1}.g)\bmod 2 \hspace{.5cm} | \hspace{.5cm} n_0.d = 0.
+\end{multline}
+
+Using equation \ref{eq:1ddelay}, we can calculate all the relative delays in the 1D tree by traversing the node tree just once from left to right. The initial delay $n_0.d$ can be set at any arbitrary value, as there may be some odd node $n_i$ in the tree that has $n_i.d < n_0.d$. For each node set, we therefore need to store the \emph{minimal delay value}. This value can be stored at the cluster object $C.md$. To grow a cluster, we first calculate its node delays. Then, in each round of growth, we traverse the node tree to find nodes where $n.w = n.d - C.md$, where $n.w$ is the number of growth iterations a node has \emph{waited}. For all nodes that do not satisfy, we add 1 to its waited value. This generates the following pseudocode. 
+
+
+
+
+
+
+Consider again our example cluster $C_e$ from the previous section. For its node tree $\nset$, let us take $n_1$ as the root of the node tree, $n_2$ is its child and $n_3$ a grandchild. Take $NC_i$ to be the number of children nodes of some node $n_i$ in $\nset$, then we find $NC_1 = 2$, $NC_2 = 1$ and $NC_2 = 0$. We find that all delayed nodes are nodes that have odd parity in its children count. 
 
 \todo[inline]{explain node parities}
 
@@ -431,4 +481,4 @@ which again corresponds to a worst case time complexity that is bounded by $\m{O
 
 \subsection{Boundaries}
 
-\subsection{Erasure noise}
+\subsection{Erasure noise} 

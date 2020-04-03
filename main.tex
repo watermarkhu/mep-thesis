@@ -3,11 +3,9 @@
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
-\usepackage{amsfonts}
-\usepackage{amsmath}
+\usepackage{amsfonts, amsmath, amssymb}
 \usepackage{physics}
 \usepackage{adjustbox}
-\usepackage{amssymb}
 
 \let\oldemptyset\emptyset
 \let\emptyset\varnothing
@@ -57,6 +55,8 @@
 \newcommand{\nset}{\mathcal{N}}
 \newcommand{\vset}{\mathcal{V}}
 \newcommand{\pre}[1]{ {}^{#1} }
+\newcommand{\ceil}[1]{{\left \lceil #1 \right \rceil }}
+\newcommand{\floor}[1]{{\left \lfloor #1 \right \rfloor }}
 
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 % Set quantikz settings
