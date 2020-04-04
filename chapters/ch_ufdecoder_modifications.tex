@@ -155,19 +155,25 @@ Let us call this calculation the \emph{potential matching weight} (PMW) of some 
 
 In the case of only Pauli errors, after syndrome identification, all identified clusters consist of a single vertex $v_i$ which is also a syndrome $\sigma_i$. Let us call this original set of cluster $\m{C}_0$. Within syndrome validation, these clusters are subjected to growth and merge events with other clusters. During growth, all vertices that are added to some cluster $C$ have a closest syndrome $\sigma$ within $C$ that is in the original set of single-vertex/single-syndrome clusters $\m{C}_0$. We say that these vertices are \emph{seeded} in $\sigma$.
 
-Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous example, each vertex in $C_e$ is a syndrome in the original set $\m{C}_0$, and therefore a node. In the example, we had calculated the PMW for each vertex. It turns out that the PMW is equal for all vertices with boundary vertices seeded in some node. It is therefore sufficient to calculate the PMW for the nodes in the cluster. Consider again the cluster $C_e$, were a merge event may not happen for many growth iterations. The number of vertices in $C_e$ increases in each round of growth. However, the number of nodes remains the same at 3 nodes. Furthermore, we need only to calculate the PMW for the nodes in the cluster only once. We grow only the nodes with the smallest PMW in the cluster. We delay the growth of nodes with larger PMW until it is equal to the smallest PWM, at which point they can grow together. We can replace PWM by the \emph{delay} in each node, the number of growth iterations to wait. 
+Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous example, each vertex in $C_e$ is a syndrome in the original set $\m{C}_0$, and therefore a node. In the example, we had calculated the PMW for each vertex. It turns out that the PMW is equal for all vertices with boundary vertices seeded in some node. It is therefore sufficient to calculate the PMW for the nodes in the cluster. Consider again the cluster $C_e$, were a merge event may not happen for many growth iterations. The number of vertices in $C_e$ increases in each round of growth. However, the number of nodes remains the same at 3 nodes. Furthermore, we need only to calculate the PMW for the nodes in the cluster only once. We grow only the nodes with the smallest PMW in the cluster. We delay the growth of nodes with larger PMW until it is equal to the smallest PWM, at which point they can grow together. We can replace PWM by the \emph{delay} in each node, the number of growth iterations to wait.
 
 \subsubsection{Balanced Bloom}
 
-We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$. The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, where the edges $\epsilon$ between the nodes are the branches in our figurative flower bush. Each node-edge $\epsilon$ can have arbitrary length and consists of one or more vertex-edges $e$. They delayed bloom of certain nodes until the delay values in the cluster is even is therefore named \emph{Balanced Bloom}.
+We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$. The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, an connected and acyclic graph, where the edges $\epsilon$ between the nodes are the branches in our figurative flower bush. Each node-edge $\epsilon$ can have arbitrary length and consists of one or more vertex-edges $e$. They delayed bloom of certain nodes until the delay values in the cluster is even is therefore named \emph{Balanced Bloom}.
 
 \begin{lemma}
-  Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same delay $n.d$, the number of iterations to wait to reach a homogenous PMW in the cluster. A cluster can be selectively grown by the bloom of a node $n$, growing the subset of boundary edges touching vertices seeded in $n$, where each node may have to wait for some iterations based on its delay. The size of each node is stored as $n.s$, which is the number iterations it has grown. 
+  Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same delay $n.d$, the number of iterations to wait to reach a homogenous PMW in the cluster. A cluster can be selectively grown by the bloom of a node $n$, growing the subset of boundary edges touching vertices seeded in $n$, where each node may have to wait for some iterations based on its delay. The size of each node is stored as $n.s$, which is the number iterations it has grown.
 \end{lemma}
 
 \subsubsection{Junction-nodes}
 
-There is still one thing missing from this node representation of clusters. Consider our example cluster $C_e$ of 3 nodes $n_1, n_2, n_3$ again. Now we slightly alter this cluster to $C_e'$ by increasing the distance between $n_1, n_2$ and $n_2, n_3$ to two edges. This means that cluster $C_e'$ is only established after two growth iterations of the three previous separate cluster of nodes $n_1, n_2, n_3$ and has a total size of 13 vertices. Now consider the vertices $v_{12}$ and $v_{23}$ that lie between $n_1, n_2$ and $n_2, n_3$, respectively. It is not clear in which nodes these vertices are seeded, as they lie in equal distance to two nodes. To solve this, we make these kind of vertices nodes of themselves, and call them \emph{junction nodes} $j$. All nodes $j$ have the same characteristics of syndrome nodes $\sigma$, and have their own delay and boundary edges seeded in them. The union of set of junction nodes $\m{J}$ and set of syndrome nodes (syndromes) $\m{S}$ is equal to the node set $\m{N}$.
+There is still one thing missing from this node representation of clusters. Consider our example cluster $C_e$ of 3 nodes $n_1, n_2, n_3$ again. Now we slightly alter this cluster to $C_e'$ by increasing the distance between $n_1, n_2$ and $n_2, n_3$ to two edges. This means that cluster $C_e'$ is only established after two growth iterations of the three previous separate cluster of nodes $n_1, n_2, n_3$ and has a total size of 13 vertices. Now consider the vertices $v_{12}$ and $v_{23}$ that lie between $n_1, n_2$ and $n_2, n_3$, respectively. These are \emph{merging vertices} as they are added to the cluster during an union of two merging clusters. It is not clear in which nodes these vertices are seeded, as they lie in equal distance to two nodes.
+
+To solve this, we make these kind of vertices nodes of themselves, and call them \emph{junction nodes} $j$. All nodes $j$ have the same characteristics of syndrome nodes $\sigma$, and have their own delay and boundary edges seeded in them. The union of set of junction nodes $\m{J}$ and set of syndrome nodes (syndromes) $\m{S}$ is equal to the node set $\m{N}$.
+
+\begin{lemma}\label{lem:junctionode}
+  On a merging vertex $v$ that lie in equal distance to two syndrome nodes from two cluster merging into one, we initiate a junction node $j$ in the node set $\nset$. A junction node has the same properties as a syndrome node. 
+\end{lemma}
 
 To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndromes. Furthermore, all nodes are vertices, but not all vertices are nodes. The node set size $S_\nset$ is different from cluster size, which is the size of vertex set $\vset$, and is referred to as $S_\vset$ from now on. For any cluster $C$ with vertex set $\vset$ and node set $\nset$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
 
@@ -203,13 +209,13 @@ To be able to bloom each node separately, we cannot store the boundary edges of 
 \end{theorem}
 
 
-\subsection{Node parity}
+\subsection{Node parity and delay}\label{sec:nodedelay}
 
-The calculation of the PMW for each node in a cluster is a heavy task, as for each node the entire clusters needs to be checked on which edges are part of the matching and results to a quadratic complexity. Luckily, the complexity can be reduced to linear by the calculation of the relative \emph{delay} of each node, where the tree of the node set is traversed. 
+The calculation of the PMW for each node in a cluster is a heavy task, as for each node the entire clusters needs to be checked on which edges are part of the matching and results to a quadratic complexity. Luckily, the complexity can be reduced to linear by the calculation of the relative \emph{delay} of each node, where the tree of the node set is traversed.
 
-\subsubsection{1D tree}
+\subsubsection{1D node tree}
 
-To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes. 
+To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes.
 
 Recall that the size of the node $n.s$ is equal to the iterations it has grown, half-edge per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $n$, the weight of the matchings edges within the flower of $n$ is equal to $\floor{n.s/2}+1$ or. For a merge on $n_1$, we also add edge $\epsilon_2$ and some value $k$ corresponding to the weight of matchings in the remainder of the cluster. Let us calculate the PMW values for each of nodes $n_1, n_2, n_3$.
 \begin{eqnarray*}
@@ -223,66 +229,113 @@ By taking the summed difference in PMW values in subsequent nodes, the relative 
 % \nonumber % Remove numbering (before each equation)
   n_1.d &=& 0 \\
   n_2.d &=& PMW(n_2) - PMW(n_1) + n_1.d = 2(\floor{n_2.s/2} - \floor{n_1.s/2} + \epsilon_1) + n_1.d \\
-  n_3.d &=& PMW(n_3) - PMW(n_2) + n_2.d = 2(\floor{n_3.s/2} - \floor{n_2.s/2} - \epsilon_2) + n_2.d 
+  n_3.d &=& PMW(n_3) - PMW(n_2) + n_2.d = 2(\floor{n_3.s/2} - \floor{n_2.s/2} - \epsilon_2) + n_2.d
 \end{eqnarray*}
 These delay values are not entirely correct, as $n_1.s = n_2.s = 2i$ yields the same value as  $n_1.s = 2_i,  n_2.s = 2)i + 1$. We introduce growth support of a node $n.g = n.s \bmod 2$ to accommodate for this degeneracy in PMW, and add this to the delay values.
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
   n_1.d &=& 0 \\
   n_2.d &=& 2\big(\floor{(n_2.s+n_2.g)/2} - \floor{(n_1.s+n_2.g)/2} + \epsilon_1\big) - (n_1.g + n_2.g)\bmod 2 + n_1.d \\
-  n_3.d &=& 2\big(\floor{(n_3.s+n_3.g)/2} - \floor{(n_2.s+n_3.g)/2} - \epsilon_2\big) - (n_3.g + n_2.g)\bmod 2 + n_2.d 
-\end{eqnarray*} 
-If we were to consider some nodes $n_4, n_5...$ as well, we would find a trend in which the delay of odd node $n_{2i+1}$ would have the positive addition of $\epsilon_{2i}$ in its delay value, and the substraction of $\epsilon_{2i}$ for an even node $n_{2i}$. Thus we can generalize the delay calculation as the following:
+  n_3.d &=& 2\big(\floor{(n_3.s+n_3.g)/2} - \floor{(n_2.s+n_3.g)/2} - \epsilon_2\big) - (n_3.g + n_2.g)\bmod 2 + n_2.d
+\end{eqnarray*}
+If we were to consider some nodes $n_4, n_5...$ as well, we would find a trend in which the delay calculation is dependant on the \emph{parity} of the node number $i$. The delay of odd node $n_{2i+1}$ has the positive addition of $\epsilon_{2i}$ in its delay value, and the substraction of $\epsilon_{2i}$ for an even node $n_{2i}$. Thus we can generalize the delay calculation as the following:
 \begin{multline}\label{eq:1ddelay}
 n_i.d = n_{i-1}.d + 2\bigg(\floor{\frac{(n_i.s+n_i.g)}{2}} - \floor{\frac{(n_{i-1}.s+n_i.g)}{2}} + (-1)^{i+1}\epsilon_{i-1}\bigg) \\
          - (n_{i}.g + n_{i-1}.g)\bmod 2 \hspace{.5cm} | \hspace{.5cm} n_0.d = 0.
 \end{multline}
 
-Using equation \ref{eq:1ddelay}, we can calculate all the relative delays in the 1D tree by traversing the node tree just once from left to right. The initial delay $n_0.d$ can be set at any arbitrary value, as there may be some odd node $n_i$ in the tree that has $n_i.d < n_0.d$. For each node set, we therefore need to store the \emph{minimal delay value}. This value can be stored at the cluster object $C.md$. To grow a cluster, we first calculate its node delays. Then, in each round of growth, we traverse the node tree to find nodes where $n.w = n.d - C.md$, where $n.w$ is the number of growth iterations a node has \emph{waited}. For all nodes that do not satisfy, we add 1 to its waited value. This generates the following pseudocode. 
+Using equation \ref{eq:1ddelay}, we can calculate all the relative delays in the 1D tree by traversing the node tree just once from left to right. The initial delay $n_0.d$ can be set at any arbitrary value, as there may be some odd node $n_i$ in the tree that has $n_i.d < n_0.d$. For each node set, we therefore need to store the \emph{minimal delay value}. This value can be stored at the cluster object $C.d$. To grow a cluster, we first calculate its node delays. Then, in each round of growth, we traverse the node tree to find nodes where $n.w = n.d - C.d$, where $n.w$ is the number of growth iterations a node has \emph{waited}. For all nodes that do not satisfy, we add 1 to its waited value.
 
+\subsubsection{Node tree parity}
 
+The 1D node tree does not accurately represent node trees that occur on a real lattice. On a 2D (Pauli errors) and 3D lattice (Pauli and measurement errors), the node tree is allowed to form in the same dimensions. But as $\nset$ is an acyclic graph, the 3D variant can be considered equal to the 2D variant. The difference is that now the ancestry in the tree is not determined by some number $i$, and each node can have more than 2 connections. 
 
+The delay calculation is done comparatively with the previous node, which means that $\nset$ must be a directed tree, such that there is a clear direction to traverse the tree for the delay calculation. We can start the calculation from the root $n_r$. The node parity, previously determined by the number $i$, is now set by the number of children nodes modulo 2. To calculate this parity for each node without traversing all children nodes, we can use the following function
+\begin{equation*}
+  n_\beta.p = \big( \sum_{j} 1-n_{\gamma,j}.p \big ) \bmod 2 \hspace{.5cm} | \hspace{.5cm} n_\gamma \mbox{ child of } n_\beta ,
+\end{equation*}
+where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is a child of $n_\beta$. As this requires the parity of each child node to be know, the full node parities can be calculated by a depth-first search of the node tree, and traversing back to the root recursively and applying the above equation. 
 
-
-
-Consider again our example cluster $C_e$ from the previous section. For its node tree $\nset$, let us take $n_1$ as the root of the node tree, $n_2$ is its child and $n_3$ a grandchild. Take $NC_i$ to be the number of children nodes of some node $n_i$ in $\nset$, then we find $NC_1 = 2$, $NC_2 = 1$ and $NC_2 = 0$. We find that all delayed nodes are nodes that have odd parity in its children count. 
-
-\todo[inline]{explain node parities}
+Since our tree $\nset$ is acyclic, any node in the set can be set as the root $n_r$ of the set, and the calculation of the parity would still be valid. The node set $\nset$ is therefore a $semi$-directed tree, in which the edges are actually undirected, but an ancestry is set by the root node $n_r$. If the root node changes to $n_{r}'$, the \emph{ancestry path} within the tree changes, the node parities within the set become unknown, or \emph{undefined}, requiring a new calculation of a reversed depth-first search from $n_{r}'$.
 
 \begin{lemma}
   Any node $n_i \in \m{N}_\alpha$ is a valid root.
 \end{lemma}
 
-The \emph{ancestry} is the path along which the parent-child relationships are defined between the nodes of a given set.
-
 \begin{lemma}\label{lem:nodecalc_parity}
-  The node parity $n_i.p$ is defined as the parity of the number of children nodes of node $n_i$, and is thus dependant on which node is set as root. If the ancestry in a set changes, node parities within the set become "undefined" and need to be recalculated. If some odd number of nodes is attached to $n_j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.
+  The node parity $n_i.p$ is defined as the parity of the number of children nodes of node $n_i$, and can be calculated via a reversed depth-first search from root $n_r$. If a new node is set as root $n_r'$, the ancestry in a set changes, rendering node parities within the set to "undefined". 
 \end{lemma}
 
-\begin{lemma}\label{lem:nodecalc_junction}
-  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}.
-\end{lemma}
+\subsubsection{Node tree delay}
 
-\todo[inline]{parity calculation}
-
-\subsection{Node delay}\label{sec:nodedelay}
-
-\todo[inline]{delay calculation}
-\todo[inline]{parity inversion, bisect delays}
+The delay equation \ref{eq:1ddelay} can be altered by replacing the node number $i$ with some parent-child relationship between nodes, similarly to the parity calculation. To calculate the node delays within $\nset$, we need to traverse $\nset$ in a second depth-first search from root $n_r$ with
+\begin{multline}\label{eq:2ddelay}
+  n_\beta.d = n_\alpha.d + 2\bigg(\floor{\frac{(n_\beta.s+n_\beta.g)}{2}} - \floor{\frac{(n_\alpha.s+n_\beta.g)}{2}} + (-1)^{n_\beta.p-1+1}\epsilon_\beta\bigg) \\
+         - (n_\beta.g + n_\alpha.g)\bmod 2 \hspace{.5cm} | \hspace{.5cm} n_r.d = 0, \hspace{.2cm} n_\beta \mbox{ child of } n_\alpha,
+\end{multline}
+where $n_\beta$ is the node of interest and $n_\alpha$ is an ancestor of $n_\beta$, and the sign of the edge component is now dependant on the node parity $n.p$. As the node parities are only defined while the same node is root per lemma \ref{lem:nodecalc_parity}, the delay calculation is only valid if the depth-first search is performed from the same root $n_r$ as in the parity calculation. 
 
 \begin{lemma}\label{lem:nodecalc_ancestrypath}
  The calculation of node delays is only valid while node parities within the set are defined along the same ancestry as the node delay calculation.
 \end{lemma}
 
-\begin{lemma}\label{lem:nodecalc_undefineddelay}
-  As the delay of a certain node $n_i$ becomes undefined, the delays of all children nodes of $n_i$ also becomes undefined.
+\subsubsection{Junction node parity and delay}
+
+Up until now, we have neglected junction-nodes in our story on node parity and delays. But as junction nodes have the same properties as syndrome nodes, there are also edges seeded in junction nodes, and thus they must be included in the parity and delay calculations. 
+
+\begin{lemma}\label{lem:nodecalc_junction}
+  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}.
 \end{lemma}
 
-To calculate the parities and delays in a given node set $\m{N}$ with undefined node parities and delays, we have to traverse the entire set. We denote the node set size as $S_\m{N}$ as the total number of nodes $n_i \in \m{N}$.
+
+
+\subsubsection{Halve delay due to parity inversion }
+
+If some odd number of nodes is attached to $n_j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.
+\todo[inline]{parity inversion, bisect delays}
+
+
+\subsubsection{Parity and delay routines}
+
 
 \begin{theorem}
   To prepare a cluster with node set $\m{N}$ and node root $n_r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{calc_parity}(n_r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{calc_delay}(n_r)$.
 \end{theorem}
+
+\begin{algorithm}[h]
+\SetAlgoNoEnd
+\SetKwInOut{comp}{Complexity}
+
+\SetKwData{vertex}{Vertex}\SetKwData{cluster}{Cluster}
+\SetKwData{erloc}{ErLoc}\SetKwData{anloc}{AnLoc}
+\SetKwData{clusters}{Clusters}
+\SetKwData{graph}{Graph}
+\SetKwData{neigh}{Neighbors}
+
+\SetKwFunction{FVN}{FindVertexNeighbors}
+
+\KwData{\anloc $=$ anyon locations, \erloc $=$ erasure locations}
+\KwResult{\graph object containing all the Clusters}
+\BlankLine
+
+\nlset{n} \For{\vertex in \anloc}{
+    \If{\vertex not $\in$ \graph}{
+    add \vertex to \graph}
+    \If{\vertex $\notin$ \clusters}{
+        add new \cluster\;
+        \nlset{1} \neigh $=$ \FVN{\vertex, \cluster} (Al. \ref{al:fvn})\;
+        \nlset{+n} \While(\tcc*[h]{a maximum of n extra vertices are added on initial loop}){\neigh $\neq$ None}{
+            \For{\vertex in \neigh}{
+                \nlset{1} new \neigh $=$ \FVN{\vertex, \cluster}
+            }
+        }
+    }
+}
+\BlankLine
+\comp{O(n)}
+\caption{FindClusters}\label{al:fc}
+\end{algorithm}
+
 
 \subsection{Growing a cluster}
 

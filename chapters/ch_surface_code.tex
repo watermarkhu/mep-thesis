@@ -477,6 +477,10 @@ Let $\varepsilon \subset E$ be an erasure, a set of qubits on which an erasure e
 
 We will now describe the Peeling decoder as is presented in Algorithm \ref{algo:peel}. In step 1, we will remove all cycles present in $\varepsilon$. We construct a spanning forest $F_\varepsilon$ inside erasure $\varepsilon$, the maximal subsect of edges of $\varepsilon$ that contains no cycles and spans all vertices of $\varepsilon$. From here, we loop over all edges in $F_\varepsilon$ (step 3), starting at a leaf edge $e = \{u,v\}$, removing the leaf edge from $F_\varepsilon$ (step 4), and conditionally add the edge to the correction set $\kappa$ if the pendant vertex $u$ is in $\sigma$ (step 6). If the correction is applied immediately, we can see that the pendant vertex $u$ is removed from $\sigma$ and that the value of $v$ is flipped in $\sigma$. Edges on a branch in the forest will be added to $\kappa$ until $v \in \sigma$, or a generator will be continuously moved from $u$ to $v$ until it encounters another generator, creating a correction path between two syndrome pairs.
 
+\begin{lemma}\label{lem:forestofgraph}
+  A forest $F$ is an undirected graph in which any two vertices are connected by at most one path. A forest $F_G$ of some graph $G$ is one in which some edges is removed such that there are no cycles in the graph, which satisfies the forest requirement.
+\end{lemma}
+
 \begin{algo}[algotitle=Peeling decoder \cite{delfosse2017linear}, label=algo:peel]
 \begin{algorithm}[H]
     \SetAlgoNoEnd
