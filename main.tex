@@ -49,8 +49,10 @@
 \usepackage{todonotes}
 
 
-\NewDocumentCommand{\codeword}{v}{\texttt{\textcolor{MidnightBlue}{#1}}}
-\NewDocumentCommand{\codefunc}{v}{\texttt{\textcolor{OliveGreen}{#1}}}
+
+\newcommand{\codeword}[1]{\texttt{\textcolor{MidnightBlue}{#1}}}
+%\newcommand{\codefunc}[1]{\texttt{\textcolor{OliveGreen}{#1}}}
+\newcommand{\codefunc}[1]{\texttt{#1}}
 \newcommand{\m}[1]{\mathcal{#1}}
 \newcommand{\nset}{\mathcal{N}}
 \newcommand{\vset}{\mathcal{V}}

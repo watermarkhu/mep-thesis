@@ -483,7 +483,6 @@ We will now describe the Peeling decoder as is presented in Algorithm \ref{algo:
 
 \begin{algo}[algotitle=Peeling decoder \cite{delfosse2017linear}, label=algo:peel]
 \begin{algorithm}[H]
-    \SetAlgoNoEnd
     \KwData{A graph $G = (V,E)$, an erasure $\varepsilon \subset E$ and syndrome $\sigma \subset V$}
     \KwResult{Correction set $\kappa \subset E$}
     \BlankLine
@@ -542,7 +541,6 @@ Finally, we need to update the elements in the cluster list $\m{L}$. First, we r
 
 \begin{algo}[algotitle=Union-Find decoder \cite{delfosse2017almost}, label=algo:uf]
 \begin{algorithm}[H]
-    \SetAlgoNoEnd
     \KwData{A graph $G = (V,E)$, an erasure $\varepsilon \subset E$ and syndrome $\sigma \subset V$}
     \KwResult{A grown erasure $\varepsilon'$ such that each cluster $\gamma \subset \varepsilon$ is even}
     \BlankLine

@@ -134,14 +134,14 @@ In our application, instead of appending the entire boundary list, we just add a
 
 Not all clusters should be grown at the same time. When grown, larger clusters relatively add more "incorrect edges" to themselves than compared to a smaller cluster (lemma \ref{lem:incorrectedges}). The UF-decoder therefore applies \emph{weighted growth} of clusters, where the order of cluster growth is sorted based on the cluster sizes. We have shown a linear time implementation in the Bucket Cluster Sort in section \ref{sec:bucketclustersort}. With the addition of weighted growth, the error threshold of the UF-decoder is increased from $9.2\%$ to $9.9\%$ for a 2D toric lattice \cite{delfosse2017almost}. This approaches but still lacks in terms of the $10.3\%$ error threshold of the MWPM-decoder.
 
-The UF-decoder is in fact a heuristic for minimum-weight matching. Larger clusters are generally the result of multiple growth iterations of a given cluster. Each round of cluster growth buries the syndromes within that cluster with a layer of edges, of which a single edge or more will be part of the matching, and thus adds to the matching weight. With weighted growth, smaller clusters are grown first, such that this effect is less dominant. But the UF-decoder is surprisingly less successful at minimum-weight than the MWPM-decoder. The MWPM-decoder considers all possible matchings by constructing a fully connected graph where the edges have the distance between syndrome as weights. The UF-decoder does not look at the lattice in such a global way, but performs locally on each cluster. This should yield the same result conceptually. But the UF-decoder has a major weakness; In each round of growth, all boundary edges are grown simultaneously, and the multiple potential merges is only handled after each round, where the order of the union operations is arbitrary. This leaves us with the question: Should all boundary edges of a cluster be grown simultaneously?
+The UF-decoder is in fact a heuristic for minimum-weight matching. A large cluster is generally the result of multiple growth iterations of a given cluster. Each round of cluster growth buries the syndromes within that cluster with a layer of edges, of which a single edge or more will be part of the matching, and thus adds to the matching weight. With weighted growth, smaller clusters are grown first, such that this effect is less dominant. But the UF-decoder is unsurprisingly less successful at minimum-weight than the MWPM-decoder, which does this perfectly. The MWPM-decoder considers all possible matchings by constructing a fully connected graph where the edges have the distance between syndrome as weights. The UF-decoder does not look at the lattice in such a global way, but performs locally on each cluster. This should yield the same result conceptually, but it does not due to a major weakness; In each round of growth, all boundary edges are grown simultaneously, and the multiple potential merges is only handled after each round, where the order of the union operations is arbitrary. This leaves us with the question: Should all boundary edges of a cluster be grown simultaneously?
 
-We suspect that the error threshold of the UF-decoder can be increased by improving the heuristic for minimum-weight matchings. In this section, we will accomplish this by sorting the order of boundary edge growth within a cluster by calculation of their potential matching weight. To keep a relatively low time complexity, we group the boundary edges by their root nodes, where the edges in each node have the same matching weight. The calculation of the growth order, or growth delay in each node is done by traversal of the \emph{node tree} of the cluster.
+We suspect that the error threshold of the UF-decoder can be increased by improving the heuristic for minimum-weight matchings. In this section, we will accomplish this by sorting the order of boundary edge growth within a cluster by calculation of their potential matching weight. To keep a relatively low time complexity, we group the boundary edges by their root nodes, where the boundary edges in each node have the same matching weight. The calculation of the growth order, or growth delay in each node is done by traversal of the \emph{node tree} of the cluster.
 
 
 \subsection{Potential matching weight}
 
-To show that not all boundary edges within a cluster should not be grown simultaneously, let us first consider an example. Cluster $C_e$ consists of 3 vertices $v_1, v_2, v_3$ that lie on a horizontal line, distance 1 from each other, where each vertex has grown a half-edge an iteration before. Assume that each vertex in $C_e$ is a syndrome. It therefore has odd parity and is selected for growth. As UF-decoder performs on the cluster locally, it has no knowledge about its surroundings until it actually grows its edges.
+To show that not all boundary edges within a cluster should not be grown simultaneously, let us first consider an example. Cluster $C_e$ consists of 3 vertices $v_1, v_2, v_3$ that lie on a horizontal line, distance 1 from each other, where each vertex has grown a half-edge an iteration before. Assume that each vertex in $C_e$ is a syndrome; it therefore has odd parity and is selected for growth. As UF-decoder performs on the cluster locally, it has no knowledge about its surroundings until it actually grows its edges.
 
 Imagine some other cluster $C_o$ with parity 1 and some size $S_o > 3$ lies adjacent to cluster $C_e$, where the growth of $C_e$ will connect both clusters. The connecting edge $e$ can either be touching vertex $v_e = v_1, v_2$ or $v_3$. The resulting matching will be between $v_e$ and the syndrome vertex $v_o$ in $C_o$ on edges $e$ and some edges of length $l$ within $C_o$, and between edges $v_i \neq v_e$ in $C_e$. If $v_e = v_1$, the matchings will be $(v_1, v_o), (v_2, v_3)$ of weight $2 + l$. Similarly for $v_e = v_3$, the matchings will be $(v_3, v_o), (v_1, v_2)$ of weight $2 + l$. However if $v_e = v2$, the matchings will be $(v_2, v_o), (v_1, v_3)$, where the matching of $v_1, v_3$ has to traverse 2 edges, and has a total weight $3 + l$.
 
@@ -155,25 +155,32 @@ Let us call this calculation the \emph{potential matching weight} (PMW) of some 
 
 In the case of only Pauli errors, after syndrome identification, all identified clusters consist of a single vertex $v_i$ which is also a syndrome $\sigma_i$. Let us call this original set of cluster $\m{C}_0$. Within syndrome validation, these clusters are subjected to growth and merge events with other clusters. During growth, all vertices that are added to some cluster $C$ have a closest syndrome $\sigma$ within $C$ that is in the original set of single-vertex/single-syndrome clusters $\m{C}_0$. We say that these vertices are \emph{seeded} in $\sigma$.
 
-Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous example, each vertex in $C_e$ is a syndrome in the original set $\m{C}_0$, and therefore a node. In the example, we had calculated the PMW for each vertex. It turns out that the PMW is equal for all vertices with boundary vertices seeded in some node. It is therefore sufficient to calculate the PMW for the nodes in the cluster. Consider again the cluster $C_e$, were a merge event may not happen for many growth iterations. The number of vertices in $C_e$ increases in each round of growth. However, the number of nodes remains the same at 3 nodes. Furthermore, we need only to calculate the PMW for the nodes in the cluster only once. We grow only the nodes with the smallest PMW in the cluster. We delay the growth of nodes with larger PMW until it is equal to the smallest PWM, at which point they can grow together. We can replace PWM by the \emph{delay} in each node, the number of growth iterations to wait.
+Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous example, each vertex in $C_e$ is a syndrome in the original set $\m{C}_0$, and therefore a node. In the example, we had calculated the PMW for each vertex. It turns out that the PMW is equal for all vertices with boundary vertices seeded in the same node. It is therefore sufficient to calculate the PMW for the nodes in the cluster.
+
+Consider again the cluster $C_e$, where a merge event may not happen for many growth iterations. The number of vertices in $C_e$ increases in each round of growth. However, the number of nodes remains the same at 3 nodes. Furthermore, we need only to calculate the PMW for the nodes in the cluster only once. We grow only the nodes with the smallest PMW in the cluster, and we can delay the growth of nodes with larger PMW. We can replace PMW by the \emph{delay} in each node, the number of growth iterations to wait.
 
 \subsubsection{Balanced Bloom}
 
-We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$. The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, an connected and acyclic graph, where the edges $\epsilon$ between the nodes are the branches in our figurative flower bush. Each node-edge $\epsilon$ can have arbitrary length and consists of one or more vertex-edges $e$. They delayed bloom of certain nodes until the delay values in the cluster is even is therefore named \emph{Balanced Bloom}.
+We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$. 
+
+The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, an connected and acyclic graph, where the edges $\epsilon$ between the nodes are the branches in our figurative flower bush. Each node-edge $\epsilon$ can have arbitrary length and consists of one or more vertex-edges $e$. For any node set $\nset$, we would like to difference in $n.d$ for all nodes in the set to be minimal. If the delays in the set is equal, we say that the set has reached \emph{equal PMW}, as all boundary edges will lead to the same matching weight within the cluster. Once equal PMW is reached, the growth of a node set is the \emph{balanced bloom} of nodes.
 
 \begin{lemma}
-  Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same delay $n.d$, the number of iterations to wait to reach a homogenous PMW in the cluster. A cluster can be selectively grown by the bloom of a node $n$, growing the subset of boundary edges touching vertices seeded in $n$, where each node may have to wait for some iterations based on its delay. The size of each node is stored as $n.s$, which is the number iterations it has grown.
+  Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same delay $n.d$, the number of iterations to wait to reach a homogenous PMW in the cluster. A cluster, now defined by a node set $\nset$, can be selectively grown by the bloom of a node $n \in \nset$, growing the subset of boundary edges touching vertices seeded in $n$, where each node may have to wait for some iterations based on its delay, and the size of each node is stored as $n.s$, the number iterations it has grown.
 \end{lemma}
 
 \subsubsection{Junction-nodes}
 
 There is still one thing missing from this node representation of clusters. Consider our example cluster $C_e$ of 3 nodes $n_1, n_2, n_3$ again. Now we slightly alter this cluster to $C_e'$ by increasing the distance between $n_1, n_2$ and $n_2, n_3$ to two edges. This means that cluster $C_e'$ is only established after two growth iterations of the three previous separate cluster of nodes $n_1, n_2, n_3$ and has a total size of 13 vertices. Now consider the vertices $v_{12}$ and $v_{23}$ that lie between $n_1, n_2$ and $n_2, n_3$, respectively. These are \emph{merging vertices} as they are added to the cluster during an union of two merging clusters. It is not clear in which nodes these vertices are seeded, as they lie in equal distance to two nodes.
 
-To solve this, we make these kind of vertices nodes of themselves, and call them \emph{junction nodes} $j$. All nodes $j$ have the same characteristics of syndrome nodes $\sigma$, and have their own delay and boundary edges seeded in them. The union of set of junction nodes $\m{J}$ and set of syndrome nodes (syndromes) $\m{S}$ is equal to the node set $\m{N}$.
+To solve this, we make these kind of vertices nodes of themselves, and call them \emph{junction nodes} $j$. All nodes $j$ have the same characteristics of syndrome nodes $\sigma$, and have their own delay and boundary edges seeded in them. The union of the set of junction nodes $\m{J}$ and set of syndrome nodes (syndromes) $\m{S}$ is equal to the node set $\m{N}$.
 
 \begin{lemma}\label{lem:junctionode}
-  On a merging vertex $v$ that lie in equal distance to two syndrome nodes from two cluster merging into one, we initiate a junction node $j$ in the node set $\nset$. A junction node has the same properties as a syndrome node. 
+  On a merging vertex $v$ that lie in equal distance to two syndrome nodes from two cluster merging into one, we initiate a junction node $j$ in the node set $\nset$. A junction node has the same properties as a syndrome node.
 \end{lemma}
+
+
+\todo[inline]{limit of number of junction nodes in a node set}
 
 To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndromes. Furthermore, all nodes are vertices, but not all vertices are nodes. The node set size $S_\nset$ is different from cluster size, which is the size of vertex set $\vset$, and is referred to as $S_\vset$ from now on. For any cluster $C$ with vertex set $\vset$ and node set $\nset$, it is trivial that the node set size is upper bounded by the vertex set size, as all nodes are vertices, but not all vertices are nodes.
 
@@ -201,11 +208,10 @@ To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndr
   \caption{Sets}\label{fig:sets}
 \end{figure}
 
-
-To be able to bloom each node separately, we cannot store the boundary edges of a cluster in a single list $\m{L}$ at the cluster. In stead, we store the boundary list for each node $n_i$ separately in their own boundary lists $n_i.\m{L}$. Here we use the $object.property$ notation to indicate that the property is stored at the parent object. As we will see in the next section, the calculation of node-delays is dependant on the direction in which $\m{N}_\alpha$ is traversed, we store the root at $C_\alpha$ such that growth occurs in the same direction as the delay calculation.
+To be able to bloom each node separately, we cannot store the boundary edges of a cluster in a single list $\m{L}$ at the cluster. Instead, we store the boundary list for each node $n_i$ separately in their own boundary lists $n_i.\m{L}$. Here we use the $object.property$ notation to indicate that the property is stored at the parent object. As we will see in the next section, the calculation of node-delays is dependant on the direction in which $\m{N}_\alpha$ is traversed. We store the node set by its root $n_r$ at $C_\alpha$. 
 
 \begin{theorem}
-  The set of nodes $\m{N} = \{n_1, n_2, .... n_{\nset}\}$ of cluster $C$ is stored as a tree with root $n_r$, and exists next to the exists set of vertices $\m{V}_\alpha$. The function of $\m{N}_\alpha$ is to store the list of boundary edges at the nodes and growing each node according to the calculated node delay.
+  The set of nodes $\m{N} = \{n_1, n_2, .... n_{\nset}\}$ of cluster $C$ is a connected acyclic graph with root $n_r$, and exists next to the exists set of vertices $\m{V}_\alpha$. The function of $\m{N}_\alpha$ is to store the list of boundary edges at the nodes and growing each node according to the calculated node delay.
 \end{theorem}
 
 
@@ -215,9 +221,9 @@ The calculation of the PMW for each node in a cluster is a heavy task, as for ea
 
 \subsubsection{1D node tree}
 
-To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes.
+To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes. Note that edges of the node set are indicated by $\epsilon$, whereas edges of the vertex set are indicated by $e$. 
 
-Recall that the size of the node $n.s$ is equal to the iterations it has grown, half-edge per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $n$, the weight of the matchings edges within the flower of $n$ is equal to $\floor{n.s/2}+1$ or. For a merge on $n_1$, we also add edge $\epsilon_2$ and some value $k$ corresponding to the weight of matchings in the remainder of the cluster. Let us calculate the PMW values for each of nodes $n_1, n_2, n_3$.
+Recall that the size of the node $n.s$ is equal to the iterations it has grown, one half-edge per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $n$, the weight of the matchings edges within the flower of $n$ is equal to $\floor{n.s/2}+1$ or. For a merge on $n_1$, we also add edge $\epsilon_2$ and some value $k$ corresponding to the weight of matchings in the remainder of the cluster. Let us calculate the PMW values for each of nodes $n_1, n_2, n_3$.
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
   PMW(n_1) &=& \floor{n_1.s/2}+1 + \epsilon_2 + k \\
@@ -238,7 +244,7 @@ These delay values are not entirely correct, as $n_1.s = n_2.s = 2i$ yields the 
   n_2.d &=& 2\big(\floor{(n_2.s+n_2.g)/2} - \floor{(n_1.s+n_2.g)/2} + \epsilon_1\big) - (n_1.g + n_2.g)\bmod 2 + n_1.d \\
   n_3.d &=& 2\big(\floor{(n_3.s+n_3.g)/2} - \floor{(n_2.s+n_3.g)/2} - \epsilon_2\big) - (n_3.g + n_2.g)\bmod 2 + n_2.d
 \end{eqnarray*}
-If we were to consider some nodes $n_4, n_5...$ as well, we would find a trend in which the delay calculation is dependant on the \emph{parity} of the node number $i$. The delay of odd node $n_{2i+1}$ has the positive addition of $\epsilon_{2i}$ in its delay value, and the substraction of $\epsilon_{2i}$ for an even node $n_{2i}$. Thus we can generalize the delay calculation as the following:
+If we were to consider some nodes $n_4, n_5...$ as well, we would find a trend in which the delay calculation is dependant on the \emph{parity} of the node number $i$. The delay of odd node $n_{2i+1}$ has the positive addition of $\epsilon_{2i+1}$ in its delay value, and the substraction of $\epsilon_{2i}$ for an even node $n_{2i}$. Thus we can generalize the delay calculation as the following:
 \begin{multline}\label{eq:1ddelay}
 n_i.d = n_{i-1}.d + 2\bigg(\floor{\frac{(n_i.s+n_i.g)}{2}} - \floor{\frac{(n_{i-1}.s+n_i.g)}{2}} + (-1)^{i+1}\epsilon_{i-1}\bigg) \\
          - (n_{i}.g + n_{i-1}.g)\bmod 2 \hspace{.5cm} | \hspace{.5cm} n_0.d = 0.
@@ -248,139 +254,201 @@ Using equation \ref{eq:1ddelay}, we can calculate all the relative delays in the
 
 \subsubsection{Node tree parity}
 
-The 1D node tree does not accurately represent node trees that occur on a real lattice. On a 2D (Pauli errors) and 3D lattice (Pauli and measurement errors), the node tree is allowed to form in the same dimensions. But as $\nset$ is an acyclic graph, the 3D variant can be considered equal to the 2D variant. The difference is that now the ancestry in the tree is not determined by some number $i$, and each node can have more than 2 connections. 
+The 1D node tree does not accurately represent node trees that occur on a real lattice. On a 2D (Pauli errors) and 3D lattice (Pauli and measurement errors), the node tree is allowed to form in the same dimensions. But as $\nset$ is an acyclic graph, the 3D variant can be considered equal to the 2D variant. The difference is that now the \emph{ancestry} in the tree, the set of parent-child relations, is not determined by some number $i$, and each node can have more than 2 connections.
 
-The delay calculation is done comparatively with the previous node, which means that $\nset$ must be a directed tree, such that there is a clear direction to traverse the tree for the delay calculation. We can start the calculation from the root $n_r$. The node parity, previously determined by the number $i$, is now set by the number of children nodes modulo 2. To calculate this parity for each node without traversing all children nodes, we can use the following function
-\begin{equation*}
-  n_\beta.p = \big( \sum_{j} 1-n_{\gamma,j}.p \big ) \bmod 2 \hspace{.5cm} | \hspace{.5cm} n_\gamma \mbox{ child of } n_\beta ,
-\end{equation*}
-where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is a child of $n_\beta$. As this requires the parity of each child node to be know, the full node parities can be calculated by a depth-first search of the node tree, and traversing back to the root recursively and applying the above equation. 
+The delay calculation is done comparatively with the previous node, which means that there must be some directed path within $\nset$, such that there is a clear direction to traverse the tree for the delay calculation. We can start the calculation from the root $n_r$. The node parity, previously determined by the number $i$, is now set by the number of children nodes modulo 2. To calculate this parity for each node without traversing all children nodes, we can use the following function
+\begin{equation}\label{eq:nodeparitypart}
+  n_\beta.p =
+  \begin{cases}
+    0, & \mbox{if $n_\beta$ has no children}  \\
+    \big( \sum_{j} 1-n_{\gamma,j}.p \big ) \bmod 2 \hspace{.2cm} | \hspace{.2cm} \forall n_\gamma \mbox{ child of } n_\beta, & \mbox{otherwise},
+  \end{cases}
+\end{equation}
+where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is a child of $n_\beta$. As this requires the parity of each child node to be known, the node parities of the entire set can be calculated by a depth-first search (DFS) of the node tree, and traversing back to the root recursively and applying the above equation.
 
-Since our tree $\nset$ is acyclic, any node in the set can be set as the root $n_r$ of the set, and the calculation of the parity would still be valid. The node set $\nset$ is therefore a $semi$-directed tree, in which the edges are actually undirected, but an ancestry is set by the root node $n_r$. If the root node changes to $n_{r}'$, the \emph{ancestry path} within the tree changes, the node parities within the set become unknown, or \emph{undefined}, requiring a new calculation of a reversed depth-first search from $n_{r}'$.
+Since $\nset$ is acyclic, any node in the set can be set as the root $n_r$ of the set, and the calculation of the parity would still be valid, although not identical. The node set $\nset$ is therefore a $semi$-directed tree, in which the edges are undirected, but an ancestry is set by the root node $n_r$. If the root node changes to $n_{r}'$, the ancestry within the tree changes, and the node parities within the set become unknown, or \emph{undefined}, requiring a new calculation of a reversed DFS from $n_{r}'$.
 
-\begin{lemma}
+\begin{lemma}\label{lem:anynoderoot}
   Any node $n_i \in \m{N}_\alpha$ is a valid root.
 \end{lemma}
 
-\begin{lemma}\label{lem:nodecalc_parity}
-  The node parity $n_i.p$ is defined as the parity of the number of children nodes of node $n_i$, and can be calculated via a reversed depth-first search from root $n_r$. If a new node is set as root $n_r'$, the ancestry in a set changes, rendering node parities within the set to "undefined". 
+\begin{lemma}\label{lem:nodeCalcParity}
+  The node parity $n_i.p$ is defined as of the number of children nodes of node $n_i$ modulo 2, and can be calculated via a reversed DFS from root $n_r$. If a new node is set as root $n_r'$, the ancestry in a set changes, rendering node parities within the set to "undefined".
 \end{lemma}
 
 \subsubsection{Node tree delay}
 
-The delay equation \ref{eq:1ddelay} can be altered by replacing the node number $i$ with some parent-child relationship between nodes, similarly to the parity calculation. To calculate the node delays within $\nset$, we need to traverse $\nset$ in a second depth-first search from root $n_r$ with
+The delay equation \ref{eq:1ddelay} can be altered by replacing the node number $i$ with some parent-child relationship between nodes, similarly to the parity calculation. To calculate the node delays within $\nset$, we need to traverse $\nset$ in a second DFS from root $n_r$ with
 \begin{multline}\label{eq:2ddelay}
   n_\beta.d = n_\alpha.d + 2\bigg(\floor{\frac{(n_\beta.s+n_\beta.g)}{2}} - \floor{\frac{(n_\alpha.s+n_\beta.g)}{2}} + (-1)^{n_\beta.p-1+1}\epsilon_\beta\bigg) \\
          - (n_\beta.g + n_\alpha.g)\bmod 2 \hspace{.5cm} | \hspace{.5cm} n_r.d = 0, \hspace{.2cm} n_\beta \mbox{ child of } n_\alpha,
 \end{multline}
-where $n_\beta$ is the node of interest and $n_\alpha$ is an ancestor of $n_\beta$, and the sign of the edge component is now dependant on the node parity $n.p$. As the node parities are only defined while the same node is root per lemma \ref{lem:nodecalc_parity}, the delay calculation is only valid if the depth-first search is performed from the same root $n_r$ as in the parity calculation. 
+where $n_\beta$ is the node of interest and $n_\alpha$ is an ancestor of $n_\beta$, and the sign of the edge component is now dependant on the node parity $n.p$. As the node parities are only defined while the same node is root per lemma \ref{lem:nodeCalcParity}, the delay calculation is only valid if the DFS is performed from the same root $n_r$ as in the parity calculation.
 
 \begin{lemma}\label{lem:nodecalc_ancestrypath}
  The calculation of node delays is only valid while node parities within the set are defined along the same ancestry as the node delay calculation.
 \end{lemma}
 
+An interesting aspect of the node delays is that the relative differences in delays in neighboring nodes are the some for any node as root $n_r = n \forall n \in \nset$. The actual delay value may differ for different roots as we always set $n_r.d =0$. This is the reason that when blooming a node, we check for $n.w = n.d - C.d$, as $n.d - C.d$ for each node is the same for any node as root. This fact strengthens lemma \ref{lem:anynoderoot}. 
+
 \subsubsection{Junction node parity and delay}
 
-Up until now, we have neglected junction-nodes in our story on node parity and delays. But as junction nodes have the same properties as syndrome nodes, there are also edges seeded in junction nodes, and thus they must be included in the parity and delay calculations. 
+Up until now, we have neglected junction-nodes in our story on node parity and delays. But as junction nodes have the same properties as syndrome nodes, there also exists edges seeded in junction nodes, and thus they must be included in the parity and delay calculations. Furthermore, without junction nodes, lemma \ref{lem:anynoderoot} cannot be true for a node set $\nset$ for all nodes $n \in \nset$ for the same set of edges $\{\epsilon\}$.
+
+As a junction node is also allowed to bloom, similarly to a syndrome node, equation \ref{eq:2ddelay} still holds for junction nodes. However, the parity of a junction node is calculated differently. Consider an example node set $\nset_e$ with 5 syndrome nodes $\{\sigma_1,...,\sigma_5\}$ lined up linearly with distance 1 between them and $n_r = \sigma_1$. Let us drop the $n.s, n.g$ components of the delay in equation \ref{eq:2ddelay} as we are now only interested in the parity component $(-1)^{n_\beta.p-1+1}\epsilon_\beta$. The parity of $\sigma_4$ is odd, therefore
+\begin{equation*}
+  \sigma_4.d = \sigma_3.d + 2(\sigma_3, \sigma_4),
+\end{equation*}
+where $\epsilon = (\sigma_3, \sigma_4)$ is an edge connecting two nodes.
+
+Consider now a second example node set $\nset_e'$ with 3 syndrome nodes and 2 junction nodes $\{\sigma_1, j_2, \sigma_3, j_4, \sigma_5\}$. The PMW's for $\sigma_3$ and $j_4$ are $(\sigma_1, j_2) + (j_4, \sigma_5)$ and  $(\sigma_1, j_2) + (\sigma_3, j_4) + (j_4, \sigma_5)$, respectively, where the delay in $j_4$ is now
+\begin{equation*}
+  j_4.d = \sigma_3.d - 2(\sigma_3, j_4).
+\end{equation*}
+
+We see that the edge component of the delay calculation now has an opposite sign. This flip in sign is due to a flip in node parity for junction nodes compared to syndrome nodes. As a result, we can generalize the parity calculation of equation \ref{eq:nodeparitypart} for realistic node sets.
+\begin{equation}\label{eq:nodeparity}
+  n_\beta.p =
+  \begin{cases}
+    0, & \mbox{if $n_\beta$ has no children}  \\
+    \big( \sum_{j} 1-n_{\gamma,j}.p \big ) \bmod 2 \hspace{.2cm} | \hspace{.2cm} \forall n_\gamma \mbox{ child of } n_\beta, & n_\beta \equiv \sigma_\beta \\
+    1 - \big( \sum_{j} 1-n_{\gamma,j}.p \big ) \bmod 2 \hspace{.2cm} | \hspace{.2cm} \forall n_\gamma \mbox{ child of } n_\beta, & n_\beta \equiv j_\beta
+  \end{cases}
+\end{equation}
+
+To put this into perspective of lemma \ref{lem:nodeCalcParity}, the parity of a syndrome node is the number of children \emph{syndrome} nodes. The parity of a junction node is 1 minus the number of children syndrome nodes. From here, our definition of parity and delay calculation stays unchanged; the parities can to be calculated by a reversed DFS of the node tree from the root with equation \ref{eq:nodeparity}, and the delays by a second DFS with equation \ref{eq:2ddelay}.
 
 \begin{lemma}\label{lem:nodecalc_junction}
-  Children junction-nodes do not add to the count of the number of children of its parent node, and therefore affect the parent node differently as per lemma \ref{lem:nodecalc_parity}.
+  The node parity in a syndrome node $\sigma.p$ is the number of children syndrome nodes $\sigma_\gamma$ modulo 2. The node parity in junction node $j.p$ is 1 minus the above definition.
 \end{lemma}
 
+To perform a reverse DFS of the node tree, we can use a \emph{head recursive} function that calls itself, where the recursiveness is before the required routine. The parity calculation is then the following algorithm.
+\begin{algo}[algotitle=CalcParity, label=al:calcparity]
+\begin{algorithm}[H]
+\SetKwData{node}{node}
+\SetKwData{cluster}{cluster}
+\SetKwData{child}{child}
+\SetKwData{parity}{parity}
+\SetKwData{pary}{p}
+\SetKwFunction{cp}{CalcParity}
+\SetKwFunction{summation}{Sum}
+
+\KwData{\node}
+\KwResult{Defined parities for all children of \node}
+
+\BlankLine
+
+\parity $=$ \summation{$[1 - $ \cp{\child} $\forall$ \child of \node $]$} $\%2$\;
+\uIf{\node $\equiv \sigma$}{
+    \node.\pary $=$ \parity}
+\uElseIf{\node $\equiv j$}{
+    \node.\pary $= 1-$ \parity}
+\KwRet{\node.\pary}
+\end{algorithm}
+\end{algo}
 
 
-\subsubsection{Halve delay due to parity inversion }
+\subsubsection{Degree of delay due to parity inversion }
 
-If some odd number of nodes is attached to $n_j$, node parities for nodes $\{n_i \in \m{N} | n_i \mbox{ ancestor of } n_j\}$ are flipped.
-\todo[inline]{parity inversion, bisect delays}
+With equation \ref{eq:2ddelay}, we can calculate the appropriate delays in nodes such that if the bloom in these nodes are delayed for that many iterations, the PMW's for every node in the set is equal. We will see how to grow a node set in section \ref{sec:growingcluster}. After that, we will see how to join two node sets in the case of a merge of two clusters in section \ref{sec:jointnodesets}. But before we move on, we already see a problem arising in the parity and delay calculations.
+
+If some odd number of nodes $\nset_o$ is attached to $n^e$ of $\nset_e$ during a join operation of two node sets, node parities for nodes in subset $\nset_e'= \{n_i \in \nset_e | n_i \mbox{ ancestor of } n^e\}$ are flipped, where odd nodes become even and even become odd, which is called \emph{parity inversion}. Per lemma \ref{lem:nodecalc_ancestrypath}, the delays in $\nset_e'$ are now undefined and need to be recalculated. If before the join operation, $\nset_e$ had grown for some iterations where the odd nodes have waited (approaching equal PMW), the even nodes will have some node sizes larger than the odd node sizes $n^e_{even}.s > n^e_{odd}.s$. After the join operations, the parities for nodes in $\nset_e'$ flip, and now the previously-even odd nodes have some positive delay. As $n^e_{even}.s > n^e_{odd}.s$, these delays will increase in value per equation \ref{eq:2ddelay} compared to the previous delay calculation.
+
+As the lattice increases in size, the number of merges between clusters or join operations between node sets will also increase. The node parities for some parts of some node sets will suffer parity inversion during these merges, leading to increasingly larger delay values. The delayed bloom of nodes may therefore not be balanced at all with the current delay equation. We therefore introduce a parameter $K_{bloom} \in [0, 1]$ that determines the degree of delay of a node.
+
+\begin{multline}\label{eq:delayequation}
+  n_\beta.d = n_\alpha.d + \Bigg \lceil K_{bloom} \Bigg( 2\bigg(\floor{\frac{(n_\beta.s+n_\beta.g)}{2}} - \floor{\frac{(n_\alpha.s+n_\beta.g)}{2}} + (-1)^{n_\beta.p-1+1}\epsilon_\beta\bigg) \\
+   - (n_\beta.g + n_\alpha.g)\bmod 2 \Bigg) \Bigg \rceil \hspace{.3cm} | \hspace{.3cm} n_r.d = 0, \hspace{.2cm} n_\beta \mbox{ child of } n_\alpha,
+\end{multline}
+
+From intuition the degree of delay should be set to $K_{bloom} = 1/2$. For this value, the delays in a node set are halved, such that in the case of parity inversion, the delay values from before and after the inversion are kept at minimum. But as the inversion of parities mostly does not occur on all nodes in a set, this is not necessarily true, and other values of $K_{bloom}$ should be explored.
+
+\begin{lemma}
+  The degree of delay $K_{bloom}$ determines the part of the calculated delays that is actually assigned to the nodes. This is to minimize the node delays in new delay calculations in nodes that have suffered parity inversion after a join operation with another node set.
+\end{lemma}
+
+The delay calculation is done by a DFS of the node tree, which can be done by a \emph{tail recursive} function. Here the recursiveness is after the routine, which satisfies the DFS. The delay calculation is then the following algorithm.
+
+\begin{algo}[algotitle=CalcDelay, label=al:calcdelay]
+\begin{algorithm}[H]
+\SetKwData{node}{node}
+\SetKwData{cluster}{cluster}
+\SetKwData{child}{child}
+\SetKwData{delay}{d}
+\SetKwFunction{cdelay}{CalcDelay}
+
+\KwData{\node, \cluster}
+\KwResult{Defined parities for all children of \node}
+
+\BlankLine
+
+\If{\node has an ancestor}{
+  calculate \node.\delay with equation \ref{eq:delayequation}\;
+  \If{\node.\delay $<$ \cluster.\delay}{
+    \cluster.\delay $=$ \node.\delay
+    }
+  }
+\For{\child of \node}{
+  \cdelay{\child, \cluster}
+}
+\end{algorithm}
+\end{algo}
 
 
 \subsubsection{Parity and delay routines}
 
+With equation \ref{eq:nodeparity} and \ref{eq:delayequation}, we now finally have the tools to formulate the algorithms to calculate the node parities and delays. For a node set with root $n_r$, we can calculate the parities by calling the head recursive function \codefunc{CalcParity} on $n_r$ in algorithm \ref{al:calcparity}, where we do a reverse DFS of the node tree. The node delays are calculated by calling the tail recursive function \codefunc{CalcDelay} in algorithm \ref{al:calcdelay}, where we do a second DFS of the node tree.
 
 \begin{theorem}
-  To prepare a cluster with node set $\m{N}$ and node root $n_r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{calc_parity}(n_r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{calc_delay}(n_r)$.
+  To prepare a cluster with node set $\m{N}$ and node root $n_r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{CalcParity}(n_r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{CalcDelay}(n_r)$.
 \end{theorem}
 
-\begin{algorithm}[h]
-\SetAlgoNoEnd
-\SetKwInOut{comp}{Complexity}
 
-\SetKwData{vertex}{Vertex}\SetKwData{cluster}{Cluster}
-\SetKwData{erloc}{ErLoc}\SetKwData{anloc}{AnLoc}
-\SetKwData{clusters}{Clusters}
-\SetKwData{graph}{Graph}
-\SetKwData{neigh}{Neighbors}
+\subsection{Growing a cluster}\label{sec:growingcluster}
 
-\SetKwFunction{FVN}{FindVertexNeighbors}
-
-\KwData{\anloc $=$ anyon locations, \erloc $=$ erasure locations}
-\KwResult{\graph object containing all the Clusters}
-\BlankLine
-
-\nlset{n} \For{\vertex in \anloc}{
-    \If{\vertex not $\in$ \graph}{
-    add \vertex to \graph}
-    \If{\vertex $\notin$ \clusters}{
-        add new \cluster\;
-        \nlset{1} \neigh $=$ \FVN{\vertex, \cluster} (Al. \ref{al:fvn})\;
-        \nlset{+n} \While(\tcc*[h]{a maximum of n extra vertices are added on initial loop}){\neigh $\neq$ None}{
-            \For{\vertex in \neigh}{
-                \nlset{1} new \neigh $=$ \FVN{\vertex, \cluster}
-            }
-        }
-    }
-}
-\BlankLine
-\comp{O(n)}
-\caption{FindClusters}\label{al:fc}
-\end{algorithm}
-
-
-\subsection{Growing a cluster}
-
-The boundary list for each cluster is not stored at $C_\alpha$, but separately stored at each of the nodes $n_i$ in $\m{N}_\alpha$. To grow a cluster $\codefunc{Grow}(C_\alpha)$, we now traverse all $n_i \in \m{N}_\alpha$ from the root $n_r^\alpha$ and apply $\codefunc{Bloom}(n_i)$, which increases the support of all boundary edges in $\m{L}_{n_i}$ at node $n_i$ by 1. If this node hasn't waited enough $n_i.w - n_i.d - C_\alpha.d > 0$, we skip this node, add to the wait $n_i.w = n_i.w +1$ and apply \codefunc{Bloom} on its children. New vertices $v_{new}$ grown from node $n_i$ are added to $\m{V}_\alpha$, while storing the seed node at each new vertex $v_{new}.n = n_i$. New boundary edges are appended to the boundary list $n_i.\m{L}$ stored each seed node $n_i$. The number of nodes in $\m{N}_\alpha$ and the shape of the flower bush tree therefore does not change while no merge between clusters has happened.
+The boundary list for each cluster is not stored at $C$, but separately stored at each of the nodes $n_i$ in $\m{N}$. To grow a cluster $\codefunc{Grow}(C)$, we now traverse all $n_i \in \m{N}$ from the root $n_r$ and apply $\codefunc{Bloom}(n_i)$, which increases the support of all boundary edges in $\m{L}_{n_i}$ at node $n_i$ by 1. If this node hasn't waited enough $n_i.w - n_i.d - C.d > 0$, we skip this node, add to the wait $n_i.w = n_i.w +1$ and apply \codefunc{Bloom} on its children. New vertices $v_{new}$ grown from node $n_i$ are added to $\m{V}$, while storing the seed node at each new vertex $v_{new}.n = n_i$. New boundary edges are appended to the boundary list $n_i.\m{L}$ stored each seed node $n_i$. The number of nodes in $\m{N}$ and the shape of the flower bush tree therefore does not change while no merge between clusters has happened.
 
 \begin{theorem}\label{the:grownode}
-  A cluster $C_\alpha$ is grown by calling $\codefunc{Bloom}(n_r^\alpha)$, which first checks for the wait of the current node $n_i.w - n_i.d - C_\alpha.d> 0$ to grow its boundary edges, and then recursively applies \codefunc{Bloom} to its children.
+  A cluster $C$ is grown by calling $\codefunc{Bloom}(n_r)$, which first checks for the wait of the current node $n_i.w - n_i.d - C.d> 0$ to grow its boundary edges, and then recursively applies \codefunc{Bloom} to its children.
 \end{theorem}
 
-\subsection{Joint of node sets}
-With the addition of the node set $\m{N}$, during a union of clusters $C_\alpha$ and $C_\beta$, we have to additionally combine the node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we $\codefunc{Union}(v^\alpha, v^\beta)$, the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha=v^\alpha.v, n^\beta=v^\beta.n$ that seeds vertices $v^\alpha, v^\beta$, respectively. From now on, when we talk about the "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}^\alpha$ and $\m{V}^\beta$" or the "joint of node sets $\m{N}^{\alpha}$ and $\m{N}^\beta$", we always refer to the combination of these two routines.
+\subsection{Joint of node sets}\label{sec:jointnodesets}
+With the addition of the node set $\m{N}$, during a union of clusters $C_\alpha$ and $C_\beta$, we have to additionally combine the node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we apply $\codefunc{Union}(v^\alpha, v^\beta)$, on the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha, n^\beta$ that seeds vertices $v^\alpha, v^\beta$, respectively. From now on, when we talk about the "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}_\alpha$ and $\m{V}_\beta$" or the "joint of node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$", we always refer to the combination of these two routines.
 
-Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{calc_parity} and \codefunc{calc_delay}. As the structure of the tree is crucial in computing the parities and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$. First of all, we note that while the node set does not change, the parities and delays within the node set stay valid.
+Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{CalcParity} and \codefunc{CalcDelay}. As the structure of the tree is crucial in computing the parities and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$. First of all, we note that while the node set does not change, the parities and delays within the node set stay valid.
+
 
 \begin{lemma}\label{lem:nodesetunchanged}
   While node set $\nset$ is unchanged, the calculated parities and delays within the set are valid.
 \end{lemma}
 
-Our rules will be dependant on the parities of the joining node sets, which is the parity of the number of syndrome-node in the set. This is due to that junction-nodes do not add to the count of the number of children nodes per lemma \ref{lem:nodecalc_junction}. Note that the parity of a node set $\m{N}.p$ is therefore exactly the same as the parity of a cluster $C.p$, which also refer to the number of syndromes in the cluster.
+Our rules will be dependant on the parities of the joining node sets, which is the number of syndrome-nodes in the set modulo 2. This is due to that junction-nodes do not add to the count of the number of children nodes per lemma \ref{lem:nodecalc_junction}. Note that the parity of a node set $\m{N}.p$ is therefore exactly the same as the parity of a cluster $C.p$, which also refer to the number of syndromes in the cluster.
 
 \begin{lemma}
-  The parity of node set $\m{N}.p$ is the parity in the number of syndrome-nodes $a_i \in \m{N}$. The parity of node set $\m{N}.p$ is analogous to cluster parity $C.p$.
+  The parity of node set $\m{N}.p$ is the number of syndrome-nodes $a_i \in \m{N}$ modulo 2. The parity of node set $\m{N}.p$ is analogous to cluster parity $C.p$.
 \end{lemma}
 
 \subsubsection{Joint to even node set}
 
-Let us first consider the joint operation of two or more node sets, where the resulting node set $\m{N}^{e}$ is even. As this also means that the cluster is even, this cluster will not be grown, and naively we could say the we need not to worry about the parties and delays within $\m{N}^{e}$. If we do calculate the parities of a node set with even parity $\m{N}^e$, we will end up with an odd node $n_r.p=o$ as root of node set $\m{N}$. It therefore does not make sense to talk about node parities within an even node set. Luckily, but not coincidentally, if a node set is even, the cluster is even and therefore will not grow.
+Let us first consider the joint operation of two or more node sets, where the resulting node set $\m{N}_{e}$ is even. If we calculate the parities of a node set with even parity $\m{N}_e$, we will end up with an odd node $n_r.p=0$ as root of node set $\m{N}_e$. It therefore does not make sense to talk about node parities within an even node set. Luckily, but not coincidentally, if a node set is even, the cluster is even and therefore will not grow. We could say that we need not to worry about the parties and delays within $\m{N}_{e}$.
 
 \begin{lemma}\label{lem:nodecalc_even}
   Node parities become undefined if multiple node sets joins into a new set $\m{N}$ with even parity.
 \end{lemma}
 
-However, it is entirely possible that another cluster grows, and merges onto the cluster of $\m{N}^{e}$. In that case, we might think about recovering some of the node parities and delays that were calculated in the subsets of $\m{N}^e$, such that we don't have to traverse $\m{N}^{e}$ entirely for its parities and delays.
+However, it is entirely possible that another cluster grows, and merges onto the cluster of $\m{N}_{e}$. In that case, we might think about recovering some of the node parities and delays that were calculated in the subsets of $\m{N}_e$, such that we don't have to traverse $\m{N}_{e}$ entirely for its parities and delays.
 
 \subsubsection{Joint to odd node set}
 
-Consider the joint operation of an even $\m{N}^e$ and an odd node set $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this joining is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The joint of these two sets leaves a new odd node set $\m{N}_{new}^o$ with subsets $'\nset^e$ and $'\nset^o$, referring to the original node sets. We are provided with two choices, a) make $n^e$ child of $n^o$, or b) make $n^o$ child of $n^e$. Note that the child node $n^c$ will become the \emph{sub-root} in subset $'\m{N}^c$, where the ancestry in the subset has been reset in the new sub-root.
+Consider the joint operation of an even $\m{N}^e$ and an odd node set $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this joining is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The joint of these two sets leaves a new odd node set $\m{N}_{new}^o$ with subsets $'\nset^e$ and $'\nset^o$, referring to the original node sets. We are provided with two choices, a) make $n^e$ child of $n^o$, or b) make $n^o$ child of $n^e$. Note that the child node $n^c$ will become the \emph{sub-root} in subset $'\m{N}^c$, where the ancestry in the subset has been reset in the new sub-root, and is allowed per lemma \ref{lem:anynoderoot}.
 
-If the subset $'\m{N}^e$ consists of only two odd node sub-subsets $''\m{N}^o_0, ''\m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $''\m{N}^o_0$ is preserved and $n_1$ is the sub-root of $''\m{N}^o_1$. We see that the parities in all ancestors of $n^0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $'\m{N}^{e}$.
+If the subset $'\m{N}^e$ consists of only two odd node sub-subsets $''\m{N}^o_0, ''\m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $''\m{N}^o_0$ is preserved and $n_1$ is the sub-root of $''\m{N}^o_1$. We see that the parities in all ancestors of $n_0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $'\m{N}^{e}$.
 
-For case a), an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. This means that the parities in $'\m{N}^o$ do not change per lemma \ref{lem:nodecalc_parity}, and the delays in $'\m{N}^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $'\m{N}^e$, as the ancestry path has changed, we are certain to traverse $'\m{N}^e$ from the sub-root $n^e$ to calculate the delays in this subset which is in the order of $S_{'\m{N}^e}$.
+For case a), an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. This means that the parities in $'\m{N}^o$ do not change per lemma \ref{lem:nodeCalcParity}, and the delays in $'\m{N}^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $'\m{N}^e$, as the ancestry path has changed, we are certain to traverse $'\m{N}^e$ from the sub-root $n^e$ to calculate the delays in this subset which is in the order of $S_{'\m{N}^e}$.
 
 In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the sub-root $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node parity changes in $'\m{N}^e$ will be dependant on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
 
-For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify things, we always choose case a.
+For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify, we always choose case a.
 
 \begin{theorem}\label{the:nodejoint}
   The union of node sets $\m{N}^\alpha, \m{N}^\beta$ on nodes $n^\alpha, n^\beta$ respectively is performed with $\codefunc{Joint}(n^\alpha, n^\beta)$. If the resulting node set $\m{N}$ is odd, one of $\m{N}^\alpha$ and $ \m{N}^\beta$ is odd while the other is even, and $\codefunc{Joint}(n^\alpha, n^\beta)$ makes the node of the even set $n^e$ a child of the node of the odd set $n^o$. If the resulting node set $\m{N}$ is even, the choice is arbitrary.
@@ -392,7 +460,7 @@ For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes be
 
 Clusters with same vertex set size $S_\vset$ lie in the same bucket $b_i$ and thus are grown together per theorem \ref{the:bucket_order}. Let's call the growth of all clusters in a bucket a \emph{growth iteration}. As the state of fully grown edges are only checked after each growth iteration including possibly many clusters, there may be multiple joint events within the same growth iteration. If the node parities and delays are to be calculated on all the union events in the fusion list $\m{F}$, some node parity and delay calculations may be invalid and unnecessary.
 
-Consider an example with 5 odd clusters $C_1, ... C_5$ with node sets $\nset_1, ... \nset_5$. The union of $C_1$ and $C_2$ to $C_{12}$ is odd-odd and requires no parity-delay calculation. The union of $C_{12}$ and $C_3$ is even-odd, and we calculate the parities and delays in the $\nset_{12}$. The union of $C_{123}$ and $C_4$ is odd-odd and the union of $C_{1234}$ and $C_5$ is even odd, and we calculate the parities and delays in $\nset{1234}$. The earlier computation in $\nset_{12}$ was therefore unnecessary and possible invalid.
+Consider an example with 5 odd clusters $C_1, ... C_5$ with node sets $\nset_1, ... \nset_5$. The union of $C_1$ and $C_2$ to $C_{12}$ is odd-odd and requires no parity-delay calculation. The union of $C_{12}$ and $C_3$ is even-odd, and we calculate the parities and delays in the $\nset_{12}$. The union of $C_{123}$ and $C_4$ is odd-odd and the union of $C_{1234}$ and $C_5$ is even odd, and we calculate the parities and delays in $\nset_{1234}$. The earlier computation in $\nset_{12}$ was therefore unnecessary and possible invalid.
 
 To circumvent this even parity multiplicity, we must make sure to only apply the calculation to the largest even node set in some sequence of joint operations. To do this, we first note that some odd node set $\nset^o$ must always consist of some odd part $'\nset^o$ and an even part $'\nset^e$. The even part $'\nset^e$ may be subdivided into a number of odd and even sub-subsets, as long as the sum is even.
 \begin{lemma}\label{lem:oddisevenodd}
@@ -404,7 +472,7 @@ This even subset $'\nset^e$ is the undefined part of $\nset^o$ in which we must 
   Parity and delay calculations are only performed on a the undefined part of a node set when a cluster is grown, not directly after a joint operation.
 \end{lemma}
 
-The only task now is to store where the even subset $'\nset^e$ starts in the ancestry of subset $\nset^o$.  For each joint operation between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $n^o, n^e$ per theorem \ref{the:nodejoint}, we store the sub-root $'n^e_r$ of subset $'\m{N}^e$ to a list $\m{C}$ at the root node of the resulting set $\m{N}^{res}$ of cluster $C^{res}$. If cluster $C$ is selected for growth as per theorem \ref{the:bucket_order}, we first check for nodes in ${n^r}.\m{C}$ at root and apply $\codefunc{calc_parity}(n_i)$ and $\codefunc{calc_delay}(n_i)$ for all nodes $n^i \in {n^r}.\m{C}$ to calculate parities and delays in undefined parts of the set. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
+The only task now is to store where the even subset $'\nset^e$ starts in the ancestry of subset $\nset^o$.  For each joint operation between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $n^o, n^e$ per theorem \ref{the:nodejoint}, we store the sub-root $'n^e_r$ of subset $'\m{N}^e$ to a list $\m{C}$ at the root node of the resulting set $\m{N}^{res}$ of cluster $C^{res}$. If cluster $C$ is selected for growth as per theorem \ref{the:bucket_order}, we first check for nodes in ${n^r}.\m{C}$ at root and apply $\codefunc{CalcParity}(n_i)$ and $\codefunc{CalcDelay}(n_i)$ for all nodes $n^i \in {n^r}.\m{C}$ to calculate parities and delays in undefined parts of the set. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
 
 \begin{theorem}\label{the:delayonce}
   Undefined parts of an odd node set $\nset^o$ are defined as a set $\m{C}_{\nset^o}$ of sub-roots from which all children (including sub-roots) are undefined, and is stored at root node $n^o_r$. If before it has grown, node set $\nset^o$ is joint with another odd node set, which then act as the even set $\pre{\uparrow}\nset^e$ in a larger joint event, the sub-root of $\pre{\uparrow}\nset^e$ is stored at $n^{\pre{\uparrow}\nset^o}_r$. Delay and parity calculations will then traverse all undefined paths only once.
@@ -414,7 +482,7 @@ The only task now is to store where the even subset $'\nset^e$ starts in the anc
 
 \subsection{Complexity of Balanced Bloom}
 
-The contribution to the time complexity of the UF-EG decoder compared to the UF-decoder can be divided into two parts. First is the contribution by \codefunc{calc_parity} and \codefunc{calc_delay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay} complexity. The second contribution will be caused by \codefunc{Grow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom} complexity.
+The contribution to the time complexity of the UF-EG decoder compared to the UF-decoder can be divided into two parts. First is the contribution by \codefunc{CalcParity} and \codefunc{CalcDelay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay} complexity. The second contribution will be caused by \codefunc{Grow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom} complexity.
 
 \subsubsection{Delay complexity}
 
