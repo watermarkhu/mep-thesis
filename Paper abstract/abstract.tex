@@ -1,0 +1,103 @@
+\documentclass[11pt, a4paper, twoside, titlepage, usenames,dvipsnames]{report}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[section]{placeins}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amsmath, amssymb}
+\usepackage{physics}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{graphicx}
+
+\usepackage[format=plain, font=it]{caption}
+\usepackage[format=plain, font=it]{subcaption}
+
+\newcommand{\codeword}[1]{\texttt{\textcolor{MidnightBlue}{#1}}}
+%\newcommand{\codefunc}[1]{\texttt{\textcolor{OliveGreen}{#1}}}
+\newcommand{\codefunc}[1]{\texttt{#1}}
+\newcommand{\m}[1]{\mathcal{#1}}
+\newcommand{\nset}{\mathcal{N}}
+\newcommand{\vset}{\mathcal{V}}
+\newcommand{\pre}[1]{ {}^{#1} }
+\newcommand{\ceil}[1]{{\left \lceil #1 \right \rceil }}
+\newcommand{\floor}[1]{{\left \lfloor #1 \right \rfloor }}
+
+\begin{document}
+
+\section*{Quasilinear Time Decoding Algorithm for Topological Codes with High Error Threshold}
+
+Surface codes are one of the prominent candidates to provide fault-tolerant quantum computing. Error correction is based on the measurement of local operators on a 2-dimensional lattice of qubits. The measurement outcome, called the syndrome, is then passed to the decoding algorithm to deduct the error that has occurred and to supply a correction operator. It is crucial for a decoder to perform fast, where any speed-up of the decoder leads to a reduction of the noise strength as a decreased time between two rounds of correction induces the appearance of fewer errors, and the decoder must be able to keep pace with the clock-speed of the quantum computer. Furthermore, it is essential for a decoder to have a low time complexity. For any surface code, the resilience against errors can be increased by increasing the system size below a certain threshold physical error rate $p_{th}$, which increases the distance of the code. An advantageous decoder with low time complexity can scale with the system without arbitrary long computations.
+
+The most standard decoder for surface codes is the Minimum-Weight Perfect Matching (MWPM) decoder. The basic principle behind this approach is to identify the \emph{lowest weight} error configuration that can produce the syndrome. In general this is a good approximation as the lowest weight error configurations that dominate the result will generally be equivalent up to stabilizer operations. For a toric code that only suffers random Pauli noise, the optimal code threshold is $p_{th} = 10.9\%$, whereas the MWPM decoder has $p_{th} = 10.3\%$. The MWPM matchings are found by constructing a fully connected graph between nodes of the syndrome, which leads to a quadratic worst case time complexity of $\mathcal{O}(n^3)$.
+
+Many other decoding algorithms that run in polynomial time have been developed, but none comes near the low time complexity of the Union-Find (UF) decoder by Delfosse. The UF decoder considers each syndrome as a vertex in a non-connected graph, and grows clusters of vertices locally by adding a layer of edges and vertices to existing clusters until there exists a path between syndromes vertices, which is the correcting operator. By growing the clusters of vertices in order of their sizes, the UF-decoder is in fact a heuristic for minimum-weight matching, and has a threshold of $p_{th} = 9.9\%$ for the toric code. To keep track of the merges between clusters, the Union-Find or disjoint-set data structure is used, which has worst-cast time complexity $\mathcal{O}(n\alpha(n))$, where $\alpha$ is the inverse of Ackermann's function. For any physical feasible amount of qubits, this value is $\alpha(n) \leq 3$, leading to a "Almost-linear" time complexity.
+
+While the time complexity of the UF decoder is impressive, its decreased error threshold has prevented its rise in popularity in the realm of decoding algorithms. Even with the discrepancy of just $0.4\%$ compared to MWPM, it is the latter that most other works use for fidelity and comparison with their own works. We propose here a modification of the UF decoder that improves the heuristic for minimum-weight matchings. We show that with the \emph{Balanced Bloom UF decoder} near MWPM code threshold can be achieved while retaining a relatively low time complexity. 
+
+
+\tikzstyle{node}=[circle, draw=black, fill=white, minimum size=10pt] 
+\tikzstyle{node2}=[circle, draw=black, fill=gray, minimum size=3pt] 
+
+\subsubsection{Balanced Bloom UF decoder}
+
+
+\begin{figure}[h]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \begin{tikzpicture}
+
+           \draw[line width=1] (0, 0) -- (4,0);
+           \draw[dashed] (-1,0) -- (5,0);
+           \draw[dashed] (0,1) -- (0,-1);
+           \draw[dashed] (2,1) -- (2,-1);
+           \draw[dashed] (4,1) -- (4,-1);
+           \node[node] at (0,0) {0};
+           \node[node] at (2,0) {1};
+           \node[node] at (4,0) {2};
+         \end{tikzpicture}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \begin{tikzpicture}
+           \node[node2] (0) at (-1, 7) {};
+           \node[node2] (1) at (0,9) {};
+           \node[node2] (2) at (0,8) {};
+           \node[node2] (3) at (-1,8) {};
+           \node[node2] (4) at (-1,6) {};
+           \node[node2] (5) at (1,8) {};
+           \node[node2] (6) at (1,7) {};
+           \node[node2] (7) at (2,7) {};
+           \node[node2] (8) at (1,6) {};
+           \draw (4) -- (0) -- (3) -- (1) -- (2);
+           \draw (8) -- (6) -- (5) -- (7);
+           \draw[dashed] (1) -- (5) node[midway] (mid) {};
+           \draw (0,7) node[fill=white] {union} -- (mid);
+           \draw[->, dotted] (0.65, 8.7) -- (0.7, 6);
+           \draw[->, dotted] (0.65, 8.7) -- (2, 7.35) node[midway, above, sloped] {recalculate};
+         \end{tikzpicture}
+
+     \end{subfigure}
+\end{figure}
+
+The principle of the balanced bloom decoder is that for a cluster of vertices or a vertex set $\mathcal{V}$, a connected acyclic graph, not all vertices have an equal \emph{matching weight}. Consider the example set $\mathcal{V}_e$, if another vertex $v_{new}$ is connected to the cluster to $v_0$, and a matching is made in $\mathcal{V}_e$, which can simply done by remove some edges as the set is a connected acyclic graph, we are left with edges $(v_{new}, v_0), (v_1, v_2)$ which has weight 2. Similarly for vertex $v_2$ the weight is 2. But for $v_1$ we are left with $(v_{new}, v_1), (v_0, v_2)$ which has weight 3. This discrepancy in \emph{potential matching weight} (PMW) is present in any cluster, with increasingly larger differences as the cluster size increases.
+
+The balanced bloom algorithm reduces the vertex set $\mathcal{V}$ to a smaller node set $\mathcal{N} \subset \mathcal{V}$, for which all neighboring vertices belonging to a certain node $n$ have the same PMW. The growth of a cluster, in the context of the UF decoder, is proceeded by a calculation of the \emph{growth delay} of each node in the cluster, whereafter the delayed growth of nodes causes the PMW values in the cluster to approach equal value. As the growth of nodes with large PMW is delayed, low PMW nodes are allowed to grow and merge to other clusters with priority, such that the overall matching weight is decreased. We call the growth of a node a bloom, such that our algorithm is named \emph{balanced bloom}.
+
+The balanced bloom alteration of the UF decoder has an additional component in the complexity. Due to the merges of clusters, the PMW values in the cluster changes and needs to be recalculated if the cluster is to be grown again. Luckily, by applying some rules during these join operations of node sets, the recalculation of growth delay can be limited a part of the new joint set. We show by a maximization of the join operations that the added balanced bloom has a worst-case time complexity of $\mathcal{O}(n \log n)$, which is still quasilinear. The error threshold is $p_{th} = 10.25\%$, compared to $10.0\%$ for our implementation of the UF decoder (different from reported value due to changes in cluster sorting, fitting parameters, etc.), which is near MWPM threshold. 
+
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{eg_toric_2d_low.pdf}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{cartesius_comp_time_l_toric_2d.pdf}
+     \end{subfigure}
+\end{figure}
+
+
+\end{document}
