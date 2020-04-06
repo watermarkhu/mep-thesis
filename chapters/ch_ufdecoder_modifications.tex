@@ -161,7 +161,7 @@ Consider again the cluster $C_e$, where a merge event may not happen for many gr
 
 \subsubsection{Balanced Bloom}
 
-We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$. 
+We call the growth of the cluster in the subset of boundary edges that is seeded in $n_i$ the \emph{bloom} of node $n_i$. The flower of $n_i$ is the subset of all vertices in the cluster seeded in the node. The size of the flower $n_i.s$ is the number of growth iterations a node has grown, and is equal to the maximum weight of edges grown from this node. The combined bloom of all nodes in a cluster is equivalent to the growth of the full cluster, where some nodes are to wait for some iterations based on their delay $n_i.d$.
 
 The set of nodes $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, an connected and acyclic graph, where the edges $\epsilon$ between the nodes are the branches in our figurative flower bush. Each node-edge $\epsilon$ can have arbitrary length and consists of one or more vertex-edges $e$. For any node set $\nset$, we would like to difference in $n.d$ for all nodes in the set to be minimal. If the delays in the set is equal, we say that the set has reached \emph{equal PMW}, as all boundary edges will lead to the same matching weight within the cluster. Once equal PMW is reached, the growth of a node set is the \emph{balanced bloom} of nodes.
 
@@ -208,7 +208,7 @@ To sum up, all syndromes $\sigma_i$ are nodes $n_i$, but not all nodes are syndr
   \caption{Sets}\label{fig:sets}
 \end{figure}
 
-To be able to bloom each node separately, we cannot store the boundary edges of a cluster in a single list $\m{L}$ at the cluster. Instead, we store the boundary list for each node $n_i$ separately in their own boundary lists $n_i.\m{L}$. Here we use the $object.property$ notation to indicate that the property is stored at the parent object. As we will see in the next section, the calculation of node-delays is dependant on the direction in which $\m{N}_\alpha$ is traversed. We store the node set by its root $n_r$ at $C_\alpha$. 
+To be able to bloom each node separately, we cannot store the boundary edges of a cluster in a single list $\m{L}$ at the cluster. Instead, we store the boundary list for each node $n_i$ separately in their own boundary lists $n_i.\m{L}$. Here we use the $object.property$ notation to indicate that the property is stored at the parent object. As we will see in the next section, the calculation of node-delays is dependant on the direction in which $\m{N}_\alpha$ is traversed. We store the node set by its root $n_r$ at $C_\alpha$.
 
 \begin{theorem}
   The set of nodes $\m{N} = \{n_1, n_2, .... n_{\nset}\}$ of cluster $C$ is a connected acyclic graph with root $n_r$, and exists next to the exists set of vertices $\m{V}_\alpha$. The function of $\m{N}_\alpha$ is to store the list of boundary edges at the nodes and growing each node according to the calculated node delay.
@@ -221,7 +221,7 @@ The calculation of the PMW for each node in a cluster is a heavy task, as for ea
 
 \subsubsection{1D node tree}
 
-To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes. Note that edges of the node set are indicated by $\epsilon$, whereas edges of the vertex set are indicated by $e$. 
+To show how this calculation is performed, we first take the example of a 1D node tree $\nset_{1D}$ of size $S_\nset$, where all nodes lie on one line, but are allowed to grow in x and y directions. In our example, we only look at the first 3 nodes $n_1, n_2$, connected by edge $\epsilon_{1}$, and $n_3$, connected to $n_2$ by edge $\epsilon_{2}$. The node tree continues after $n_3$ for $S_\nset - 3$ nodes. Note that edges of the node set are indicated by $\epsilon$, whereas edges of the vertex set are indicated by $e$.
 
 Recall that the size of the node $n.s$ is equal to the iterations it has grown, one half-edge per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $n$, the weight of the matchings edges within the flower of $n$ is equal to $\floor{n.s/2}+1$ or. For a merge on $n_1$, we also add edge $\epsilon_2$ and some value $k$ corresponding to the weight of matchings in the remainder of the cluster. Let us calculate the PMW values for each of nodes $n_1, n_2, n_3$.
 \begin{eqnarray*}
@@ -289,7 +289,7 @@ where $n_\beta$ is the node of interest and $n_\alpha$ is an ancestor of $n_\bet
  The calculation of node delays is only valid while node parities within the set are defined along the same ancestry as the node delay calculation.
 \end{lemma}
 
-An interesting aspect of the node delays is that the relative differences in delays in neighboring nodes are the some for any node as root $n_r = n \forall n \in \nset$. The actual delay value may differ for different roots as we always set $n_r.d =0$. This is the reason that when blooming a node, we check for $n.w = n.d - C.d$, as $n.d - C.d$ for each node is the same for any node as root. This fact strengthens lemma \ref{lem:anynoderoot}. 
+An interesting aspect of the node delays is that the relative differences in delays in neighboring nodes are the some for any node as root $n_r = n \forall n \in \nset$. The actual delay value may differ for different roots as we always set $n_r.d =0$. This is the reason that when blooming a node, we check for $n.w = n.d - C.d$, as $n.d - C.d$ for each node is the same for any node as root. This fact strengthens lemma \ref{lem:anynoderoot}.
 
 \subsubsection{Junction node parity and delay}
 
@@ -412,6 +412,35 @@ The boundary list for each cluster is not stored at $C$, but separately stored a
   A cluster $C$ is grown by calling $\codefunc{Bloom}(n_r)$, which first checks for the wait of the current node $n_i.w - n_i.d - C.d> 0$ to grow its boundary edges, and then recursively applies \codefunc{Bloom} to its children.
 \end{theorem}
 
+\begin{algo}[algotitle=Grow, label=al:bbgrow]
+\begin{algorithm}[H]
+
+\SetKwData{node}{node}
+\SetKwData{child}{child}
+\SetKwData{cluster}{cluster}
+\SetKwData{delay}{d}\SetKwData{waited}{w}
+\SetKwData{edge}{edge}\SetKwData{support}{support}
+\SetKwFunction{grow}{Grow}
+\SetKwFunction{bloom}{Bloom}
+
+\KwData{\node}
+\KwResult{A node that has either grown or waited one iteration.}
+
+\BlankLine
+
+\eIf{\node.\waited $=$ \node.\delay $-$ \cluster.\delay}{
+  \bloom{\node}, add all edges \edge.\support $= 2$ to $\m{F}$
+}{
+  \node.\waited $+=1$
+}
+\For{\child of \node}{
+  \grow{\child}
+}
+
+\end{algorithm}
+\end{algo}
+
+
 \subsection{Joint of node sets}\label{sec:jointnodesets}
 With the addition of the node set $\m{N}$, during a union of clusters $C_\alpha$ and $C_\beta$, we have to additionally combine the node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we apply $\codefunc{Union}(v^\alpha, v^\beta)$, on the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Joint}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha, n^\beta$ that seeds vertices $v^\alpha, v^\beta$, respectively. From now on, when we talk about the "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}_\alpha$ and $\m{V}_\beta$" or the "joint of node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$", we always refer to the combination of these two routines.
 
@@ -480,9 +509,58 @@ The only task now is to store where the even subset $'\nset^e$ starts in the anc
 
 \subsection{Pseudocode}
 
+Now we have the full description of the \emph{Balanced Bloom} alteration of the UF-decoder, we can present its pseudocode in algorithm \ref{al:ufbb}. The recursive \codefunc{Grow} function of algorithm \ref{al:bbgrow} has been added fully to the pseudocode in lines 7-12, as it is a crucial part of the decoder. Note that the structure of the code is mostly identical to the BCS UF-decoder, where we sort the clusters growth in buckets, and apply the merge, in this case the combination of \codefunc{Union} and \codefunc{Joint}, after each bucket iteration.
+
+\begin{algo}[algotitle=UFBalancedBloom, label=al:ufbb]
+\begin{algorithm}[H]
+\SetKwData{bucket}{bucket}\SetKwData{buckets}{buckets}
+\SetKwData{edge}{edge}\SetKwData{support}{support}
+\SetKwData{node}{node}
+\SetKwData{cluster}{cluster}
+\SetKwData{child}{child}
+\SetKwData{delay}{d}\SetKwData{waited}{w}
+\SetKwFunction{calcdelay}{CalcDelay}
+\SetKwFunction{calcparity}{CalcParity}
+\SetKwFunction{place}{Place}
+\SetKwFunction{bloom}{Bloom}
+\SetKwFunction{joint}{Joint}
+\SetKwFunction{union}{Union}
+
+\KwData{\buckets}
+\KwResult{Set of even clusters grown according to Balanced Bloom}
+
+\BlankLine
+
+\For{\bucket in \buckets}{
+  
+  \For{\cluster in \bucket}{
+    check if \cluster belongs is current \bucket \;
+    \For{\node in \cluster.$\m{C}$}{
+      \calcparity{\node}\;
+      \calcdelay{\node, \cluster}
+    }
+    \eIf{\node.\waited $=$ \node.\delay $-$ \cluster.\delay}{
+      \bloom{\node}, add all edges \edge.\support $= 2$ to $\m{F}$
+    }{
+      \node.\waited $+=1$
+    }
+    \For{\child of \node}{
+      repeat lines 7-12 on \child
+    }
+  }
+  \For{\edge in $\m{F}$}{
+    \union{$v_1, v_2$} for \edge $= (v_1, v_2)$ \;
+    \joint{$n_1, n_2$} for $v_1, v_2$ seeded in nodes $n_1, n_2$
+  }  
+  \place{\cluster} $\forall$ odd clusters
+}
+\end{algorithm}
+\end{algo}
+
+
 \subsection{Complexity of Balanced Bloom}
 
-The contribution to the time complexity of the UF-EG decoder compared to the UF-decoder can be divided into two parts. First is the contribution by \codefunc{CalcParity} and \codefunc{CalcDelay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay} complexity. The second contribution will be caused by \codefunc{Grow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom} complexity.
+The contribution to the time complexity of the UF-EG decoder compared to the UF-decoder can be divided into two parts. First is the contribution by \codefunc{CalcParity} and \codefunc{CalcDelay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay} complexity. The second contribution will be caused by \codefunc{Grow} of algorithm \ref{al:bbgrow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom} complexity.
 
 \subsubsection{Delay complexity}
 
