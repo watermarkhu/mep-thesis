@@ -487,7 +487,7 @@ We will now describe the Peeling decoder as is presented in Algorithm \ref{algo:
     \KwResult{Correction set $\kappa \subset E$}
     \BlankLine
     construct a spanning forest $F_\varepsilon$ of $\varepsilon$\;
-    initialize $\kappa$ by $\kappa = {\O}$\;
+    initialize $\kappa$ by $\kappa = {\emptyset}$\;
     \While{$F_\varepsilon \neq \O$}{
         pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\varepsilon$ \;
         \If{$u \in \sigma$}{
@@ -505,7 +505,7 @@ The spanning forest $F_\varepsilon$ can be constructed in linear time. Also, the
 
 \subsubsection{Growing erasures}
 
-Now in the presence of Pauli errors, errors can occur on edges that are now not part of the erasure, and odd parity clusters can occur. Clusters that consists from only a single generator also exist, which are just end-points of syndromes caused by Pauli errors. We must therefore make an erasure $\varepsilon$ from the syndrome $\sigma$ that is compatible with the peeling decoder, which contains only even parity clusters. To do this, we can iteratively grow the clusters with an odd parity by an half-edge on the boundaries on the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder.
+Now in the presence of Pauli errors, errors can occur on edges that are now not part of the erasure, and odd parity clusters can occur. Clusters that consists from only a single generator also exist, which are just end-points of syndromes caused by Pauli errors. We must therefore make an erasure $\varepsilon$ from the syndrome $\sigma$ that is compatible with the peeling decoder, which contains only even parity clusters. To do this, we can attractively grow the clusters with an odd parity by an half-edge on the boundaries on the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder.
 
 \paragraph{Union-Find algorithm}
 
@@ -516,7 +516,7 @@ Now in the presence of Pauli errors, errors can occur on edges that are now not 
 \end{tikzpicture}
 
 \todo[inline]{add definition of vertex set}
-To keep track of the vertices of a cluster, it will be represented as a \emph{cluster tree}, where an arbitrary vertex of the cluster will be the root, and any other vertex will be a child of the root. Whenever an edge $(u,v)$ is fully grown, we will need to traverse the trees of the two vertices $u$ and $v$, and check wether they have the same root; whether they belong to the same cluster. If not, a merge is initiated by making the root of smaller cluster a child of the bigger cluster. These functions, \codefunc{find} and \codefunc{union} respectively, are part of the Union-Find algorithm (not to be confused with the Union-Find decoder) \cite{tarjan1975efficiency}.
+To keep track of the vertices of a cluster, it will be represented as a \emph{cluster tree}, where an arbitrary vertex of the cluster will be the root, and any other vertex will be a child of the root. Whenever an edge $(u,v)$ is fully grown, we will need to traverse the trees of the two vertices $u$ and $v$, and check whether they have the same root; whether they belong to the same cluster. If not, a merge is initiated by making the root of smaller cluster a child of the bigger cluster. These functions, \codefunc{find} and \codefunc{union} respectively, are part of the Union-Find algorithm (not to be confused with the Union-Find decoder) \cite{tarjan1975efficiency}.
 
 \begin{tikzpicture}
   \draw (2,2) circle (0.2);
