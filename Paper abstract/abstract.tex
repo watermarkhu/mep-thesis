@@ -1,4 +1,4 @@
-\documentclass[11pt, a4paper, twoside, titlepage, usenames,dvipsnames]{report}
+\documentclass[10pt, a4paper, twoside, titlepage, usenames,dvipsnames]{report}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
@@ -9,20 +9,23 @@
 \usepackage{graphicx}
 \usepackage[style=numeric]{biblatex}
 
-\usepackage[format=plain, font=it]{caption}
-\usepackage[format=plain, font=it]{subcaption}
+\usepackage[format=plain, font=footnotesize]{caption}
+\usepackage[format=plain, font=footnotesize]{subcaption}
 
 \usetikzlibrary{shapes.arrows, fadings, positioning}
 
 \addbibresource{ref.bib}
+\renewcommand*{\bibfont}{\footnotesize}
+% \pagenumbering{gobble}
 
 \begin{document}
 
 \begingroup
     \centering
-    \Large Quasilinear Time Decoding Algorithm for Topological Codes with High Error Threshold\\[.5em]
-    \large Mark Shui Hu (watermarkhu@gmail.com)\\[.5em] \par
+    \Large Quasilinear Time Decoding Algorithm for \\Topological Codes with High Error Threshold\\[.5em]
+    \large Mark Shui Hu (watermarkhu@gmail.com)\par
 \endgroup
+\vspace{2em}
 
 Surface codes \cite{dennis2002topological, kitaev2003fault} are one of the prominent candidates to provide fault-tolerant quantum computing. Error correction is based on the measurement of local operators on a 2-dimensional lattice of qubits. The measurement outcome, called the syndrome, is then passed to the decoding algorithm to deduct the error that has occurred and to supply a correction operator. It is crucial for a decoder to perform fast, where any speed-up of the decoder leads to a reduction of the noise strength as a decreased time between two rounds of correction induces the appearance of fewer errors, and the decoder must be able to keep pace with the clock-speed of the quantum computer. Furthermore, it is essential for a decoder to have a low time complexity. For any surface code, the resilience against errors can be increased by increasing the system size below a certain threshold physical error rate $p_{th}$, which increases the distance of the code. An advantageous decoder with low time complexity can scale with the system without arbitrary long computations.
 
@@ -40,10 +43,11 @@ The growth of a cluster, in the context of the UF decoder, is now proceeded by a
 
 The balanced bloom alteration of the UF decoder has an additional component in the complexity. Due to the merges of clusters, the PMW values in the cluster changes and needs to be recalculated if the cluster is to be grown again. Luckily, by applying some rules during these join operations of node sets, the recalculation of growth delay can be limited a part of the new joint set. We show by a maximization of the join operations that the added balanced bloom has a worst-case time complexity of $\mathcal{O}(n \log n)$, which is still quasilinear.
 
-The error threshold (figure \ref{fig4}) is $p_{th} = 10.25\%$ compared to $10.02\%$ for our implementation of the UF decoder, which is near $10.35\%$ MWPM threshold (thresholds dffer from reported value due to changes in cluster sorting, fitting parameters, etc.). The numeric average case time complexity (for a range of error rates in figure \ref{fig5}) is shown to only a linear factor compared to the UF decoder.
+The error threshold (figure \ref{fig4}) is $p_{th} = 10.25\%$ compared to $10.02\%$ for our implementation of the UF decoder, which is near $10.35\%$ MWPM threshold (thresholds dffer from reported value due to changes in cluster sorting, fitting parameters, etc.). The numeric average case time complexity (for a range of error rates in figure \ref{fig5}) is shown to only a linear factor compared to the UF decoder.\\
 
 With the Balanced Bloom algorithm, we would like to show that the UF decoder can be altered in such a way that the heuristic for minimum weight can be improved. Our implementation offers a trade-off in time complexity and error threshold between the UF decoder and the standard MWPM decoder. More alterations may be feasible to further increase the performance of the UF decoder while retaining a low time complexity.
 
+\vspace{2em}
 \printbibliography[heading=none]
 
 \tikzstyle{node}=[circle, draw=black, fill=white, minimum size=20pt, line width=1, inner sep= 2pt]
@@ -142,20 +146,19 @@ With the Balanced Bloom algorithm, we would like to show that the UF decoder can
            \node[text=magenta] at (2.6,2.8) {Delay};
            \node at (0,3) {$\mathcal{N}$};
          \end{tikzpicture}
-         \captionof{figure}{2 DFS's on $\mathcal{N}$ to compute node parities and delays. The parities are calculated head recursively and delays tail recursively.}\label{fig3}
+         \captionof{figure}{Two depth-first searches on $\mathcal{N}$ to compute node parities (head recursively) and delays (tail recursively).}\label{fig3}
      \end{minipage}
 \end{figure}
 
 \begin{figure}
-     \centering
-     \includegraphics[width=0.7\textwidth]{threshold.pdf}
-     \caption{Decoder success rate and threshold.}\label{fig4}
+    \centering
+    \includegraphics[width=0.55\textwidth]{threshold.pdf}
+    \caption{Decoder success rate and threshold.}\label{fig4}
 \end{figure}
-
 \begin{figure}
-     \centering
-     \includegraphics[width=0.7\textwidth]{time.pdf}
-     \caption{Decoder performance in computation time.}\label{fig5}
+    \centering
+    \includegraphics[width=0.55\textwidth]{time.pdf}
+    \caption{Decoder performance in computation time.}\label{fig5}
 \end{figure}
 
 \end{document} 
