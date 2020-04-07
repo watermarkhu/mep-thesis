@@ -18,11 +18,11 @@
 
 \begin{document}
 
-Let's cite! The Einstein's journal paper \cite{einstein} and the Dirac's
-book \cite{dirac} are physics related items.
-
-
-\section*{Quasilinear Time Decoding Algorithm for Topological Codes with High Error Threshold}
+\begingroup
+    \centering
+    \Large Quasilinear Time Decoding Algorithm for Topological Codes with High Error Threshold\\[.5em]
+    \large Mark Shui Hu (watermarkhu@gmail.com)\\[.5em] \par
+\endgroup
 
 Surface codes \cite{dennis2002topological, kitaev2003fault} are one of the prominent candidates to provide fault-tolerant quantum computing. Error correction is based on the measurement of local operators on a 2-dimensional lattice of qubits. The measurement outcome, called the syndrome, is then passed to the decoding algorithm to deduct the error that has occurred and to supply a correction operator. It is crucial for a decoder to perform fast, where any speed-up of the decoder leads to a reduction of the noise strength as a decreased time between two rounds of correction induces the appearance of fewer errors, and the decoder must be able to keep pace with the clock-speed of the quantum computer. Furthermore, it is essential for a decoder to have a low time complexity. For any surface code, the resilience against errors can be increased by increasing the system size below a certain threshold physical error rate $p_{th}$, which increases the distance of the code. An advantageous decoder with low time complexity can scale with the system without arbitrary long computations.
 
@@ -30,12 +30,9 @@ The most standard decoder for surface codes is the Minimum-Weight Perfect Matchi
 
 Many other decoding algorithms that run in polynomial time have been developed, but none comes near the low time complexity of the Union-Find (UF) decoder by Delfosse \emph{et al.} \cite{delfosse2017linear, delfosse2017almost}. The UF decoder considers each syndrome as a vertex in a non-connected graph, and grows clusters of vertices locally by adding a layer of edges and vertices to existing clusters until there exists a path between syndromes vertices, which is the correcting operator. By growing the clusters of vertices in order of their sizes, the UF-decoder is in fact a heuristic for minimum-weight matching, and has a threshold of $p_{th} = 9.9\%$ for the toric code. To keep track of the merges between clusters, the Union-Find or disjoint-set data structure is used \cite{tarjan1975efficiency}, which has worst-cast time complexity $\mathcal{O}(n\alpha(n))$, where $\alpha$ is the inverse of Ackermann's function. For any physical feasible amount of qubits, this value is $\alpha(n) \leq 3$, leading to a "Almost-linear" time complexity.
 
-While the time complexity of the UF decoder is impressive, its decreased error threshold has prevented its rise in popularity in the realm of decoding algorithms. Even with the discrepancy of just $0.4\%$ compared to MWPM, it is the latter that most other works use for fidelity and comparison with their own works. We propose here a modification of the UF decoder that improves the heuristic for minimum-weight matchings. We show that with the \emph{Balanced Bloom UF decoder} near MWPM code threshold can be achieved while retaining a relatively low time complexity.
+While the time complexity of the UF decoder is impressive, its decreased error threshold has prevented its rise in popularity in the realm of decoding algorithms. Even with the discrepancy of just $0.4\%$ compared to MWPM, it is the latter that most other works use for fidelity and comparison with their own works. We propose here a modification of the UF decoder that improves the heuristic for minimum-weight matchings. We show that with the \emph{Balanced Bloom UF decoder} near MWPM code threshold can be achieved while retaining a relatively low time complexity.\\
 
-
-\subsubsection{Balanced Bloom UF decoder}
-
-The principle of the balanced bloom decoder is that for a cluster of vertices or a vertex set $\mathcal{V}$, a connected acyclic graph, not all vertices have an equal \emph{matching weight}. Consider the example set $\mathcal{V}_e$, if another vertex $v'$ is connected to the cluster to $v_0$, and a matching is made in $\mathcal{V}_e$, which can simply done by remove some edges as the set is a connected acyclic graph, we are left with edges $(v', v_0), (v_1, v_2)$ which has weight 2. Similarly for vertex $v_2$ the weight is 2. But for $v_1$ we are left with $(v', v_1), (v_0, v_2)$ which has weight 3 (see figure \ref{fig1}). This discrepancy in \emph{potential matching weight} (PMW) is present in any cluster, with increasingly larger differences as the cluster size increases.
+The principle of the \emph{Balanced Bloom} decoder is that for a cluster of vertices or a vertex set $\mathcal{V}$, a connected acyclic graph, not all vertices have an equal \emph{matching weight}. Consider the example set $\mathcal{V}_e$, if another vertex $v'$ is connected to the cluster to $v_0$, and a matching is made in $\mathcal{V}_e$, which can simply done by remove some edges as the set is a connected acyclic graph, we are left with edges $(v', v_0), (v_1, v_2)$ which has weight 2. Similarly for vertex $v_2$ the weight is 2. But for $v_1$ we are left with $(v', v_1), (v_0, v_2)$ which has weight 3 (see figure \ref{fig1}). This discrepancy in \emph{potential matching weight} (PMW) is present in any cluster, with increasingly larger differences as the cluster size increases.
 
 The balanced bloom algorithm introduces the node set $\mathcal{N} \subset \mathcal{V}$, also a connected acyclic graph, and consists of the syndrome-node vertices $\sigma$ and a special case junction-node vertices, Each vertex $v \in \mathcal{V}$ is \emph{seeded} in a node $n\in \mathcal{N}$, and for which all vertices seeded in same node (including the node itself) is called the \emph{flower} of a node, where all boundary elements of the flower have the same PMW (see figure \ref{fig2}).
 
@@ -47,7 +44,7 @@ The error threshold (figure \ref{fig4}) is $p_{th} = 10.25\%$ compared to $10.02
 
 With the Balanced Bloom algorithm, we would like to show that the UF decoder can be altered in such a way that the heuristic for minimum weight can be improved. Our implementation offers a trade-off in time complexity and error threshold between the UF decoder and the standard MWPM decoder. More alterations may be feasible to further increase the performance of the UF decoder while retaining a low time complexity.
 
-\printbibliography
+\printbibliography[heading=none]
 
 \tikzstyle{node}=[circle, draw=black, fill=white, minimum size=20pt, line width=1, inner sep= 2pt]
 \tikzstyle{nodel}=[circle, draw=black, fill=white, minimum size=5pt, line width=1, inner sep= 0pt]
@@ -68,7 +65,7 @@ With the Balanced Bloom algorithm, we would like to show that the UF decoder can
            \draw[l1, dotted] (2,1) -- (2,-1);
            \draw[l1, dotted] (4,1) -- (4,-1);
            \node[node] at (0,0) (1) {$v_0$};
-           \node[node, draw=green, dotted] at (0,2) (2) {$v_0'$};
+           \node[node, draw=green, dashed] at (0,2) (2) {$v_0'$};
            \node[node] at (2,0) (3){$v_1$};
            \node[node, draw=cyan, dashed] at (2,2) (4) {$v_0'$};
            \node[node] at (4,0) (5) {$v_2$};
@@ -82,7 +79,7 @@ With the Balanced Bloom algorithm, we would like to show that the UF decoder can
            \draw[l1, dashed, magenta, transform canvas={yshift=2pt}] (3) -- (1);
 
          \end{tikzpicture}
-         \captionof{figure}{Unbalanced matching weight in cluster vertex set $\mathcal{V}$.}\label{fig1}
+         \captionof{figure}{Unbalanced matching weight in cluster vertex set $\mathcal{V}$. The matching edges (dashed) correspond to the position of $v'$. }\label{fig1}
      \end{minipage}
      \hfill
      \begin{minipage}[b]{0.3\textwidth}
@@ -110,7 +107,7 @@ With the Balanced Bloom algorithm, we would like to show that the UF decoder can
            \draw[l1] (d) -- (e) -- (f);
            \draw[l1, path fading=fade right] (f) -- (4.3, -2.55);
          \end{tikzpicture}
-         \captionof{figure}{A node set $\mathcal{N}$ vs. a vertex set $\mathcal{V}$, both representing the cluster.}\label{fig2}
+         \captionof{figure}{A node set $\mathcal{N}$ vs. a vertex set $\mathcal{V}$, both representing the cluster. The shaded area is the flower of a node.}\label{fig2}
      \end{minipage}
      \hfill
      \begin{minipage}[b]{0.3\textwidth}
@@ -145,19 +142,19 @@ With the Balanced Bloom algorithm, we would like to show that the UF decoder can
            \node[text=magenta] at (2.6,2.8) {Delay};
            \node at (0,3) {$\mathcal{N}$};
          \end{tikzpicture}
-         \captionof{figure}{2 DFS's on $\mathcal{N}$ are needed to compute node parities and delays.}\label{fig3}
+         \captionof{figure}{2 DFS's on $\mathcal{N}$ to compute node parities and delays. The parities are calculated head recursively and delays tail recursively.}\label{fig3}
      \end{minipage}
 \end{figure}
 
 \begin{figure}
      \centering
-     \includegraphics[width=0.55\textwidth]{threshold.pdf}
+     \includegraphics[width=0.7\textwidth]{threshold.pdf}
      \caption{Decoder success rate and threshold.}\label{fig4}
 \end{figure}
 
 \begin{figure}
      \centering
-     \includegraphics[width=0.55\textwidth]{time.pdf}
+     \includegraphics[width=0.7\textwidth]{time.pdf}
      \caption{Decoder performance in computation time.}\label{fig5}
 \end{figure}
 
