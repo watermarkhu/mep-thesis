@@ -71,6 +71,9 @@
 \tikzset{sel/.style={label position = below, yshift = 0.5cm}}
 
 
+\usepackage[style=numeric-comp, sorting=none]{biblatex}
+\addbibresource{cit.bib}
+
 \title{mep-thesis}
 \author{Shui Hu}
 \date{April 2019}
@@ -82,26 +85,27 @@
 
 \tableofcontents
 
+\input{tikzfigs/function_draw_lattices}
+
 %\include{preliminary_report}
-
-\include{chapters/ch_introduction}
-
-\include{chapters/ch_qec_basics}
-
-\include{chapters/ch_surface_code}
+% 
+% \include{chapters/ch_introduction}
+% 
+% \include{chapters/ch_qec_basics}
+% 
+% \include{chapters/ch_surface_code}
 
 \include{chapters/ch_ufdecoder_modifications}
 
-\include{chapters/ch_threshold_results}
-%\include{peeling_objects_1}
+% \include{chapters/ch_threshold_results}
+\include{peeling_objects_1}
+% 
+% \begin{appendices}
+%   \include{appendices/ap_bucket_sort}
+% \end{appendices}
 
-\begin{appendices}
-  \include{appendices/ap_bucket_sort}
-\end{appendices}
 
-
-\bibliographystyle{unsrt}
-\bibliography{cit}
+\printbibliography
 
 
 \end{document}
