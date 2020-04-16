@@ -235,7 +235,7 @@ The node set $\m{N} = \{n_1, n_2, .... n_{S_{\nset}}\}$ is stored as a tree, an 
   Every vertex $v$ that is added to a cluster is seeded in some node $n$. All vertices with boundary edges that are seeded in the same node have the same PMW value. Equal PMW in the cluster is reached by selectively blooming the nodes with the lowest PMW values, as each bloom increases the node size $n.s$ and its PMW.
 \end{theorem}
 
-Furthermore, as long as the same nodes span the cluster, which is the case while no unions between clusters occur, we only need to calculate the PMW in the cluster once. The difference in PMW of a node with the minimal PMW in the cluster can be stored in memory at the node, and its bloom queued for some iterations based on its value. 
+Furthermore, as long as the same nodes span the cluster, which is the case while no unions between clusters occur, we only need to calculate the PMW in the cluster once. The difference in PMW of a node with the minimal PMW in the cluster can be stored in memory at the node, and its bloom queued for some iterations based on its value.
 
 \begin{lemma}\label{lem:calconce}
   Between union events, the PMW's of nodes in a clusters need only to be calculated once, where the bloom of a node is queued based on the difference of its PMW and the minimal PMW in the cluster.
@@ -394,7 +394,7 @@ Here, the constant $K$ is equal to the lowest PMW in the cluster. Recall from th
 \end{equation}
 we can define a \emph{Potential Normalized Weight} (PNW) that is normalized in $K$,
 \begin{equation}\label{eq:pnw}
-  PNW(n_i) = n_i.d - C.d - n.w. 
+  PNW(n_i) = n_i.d - C.d - n.w.
 \end{equation}
 Balanced Bloom in a cluster is now achieved by blooming the nodes that has $PNW(n) = 0$
 
@@ -432,7 +432,7 @@ where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is
     \draw[l1] (0) -- (1) -- (2) -- (3);
     \draw[l1] (1) -- (4); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
     \draw[l1] (0) -- (6) -- (7);
-    
+
     \begin{scope}[shift={(5,0)}]
       \node at (1,-1) {\emph{b)} $n_r = n_1$};
       \node[even] (1) at (1,3) {$n_1$};
@@ -447,7 +447,7 @@ where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is
       \draw[l1] (3) -- (2) -- (1) -- (0) -- (6) -- (7);
       \draw[l1] (4) -- (1); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
     \end{scope}
-    
+
     \begin{scope}[shift={(10,0)}]
       \node at (1,-1) {\emph{c)} $n_r = n_4$};
       \node[even] (4) at (1, 3) {$n_4$};
@@ -505,7 +505,7 @@ Up until now, we have neglected junction-nodes in our story on node parity and d
     \node[odd] at (0,2) (3) {$\sigma_3$};
     \node[even] at (0,1) (4) {$\sigma_4$};
     \draw[l1] (0) -- (1) -- (2) -- (3) -- (4);
-    \node[left=1 of 0] {$\nset_e$}; 
+    \node[left=1 of 0] {$\nset_e$};
       \begin{scope}[shift={(6,0)}]
         \node[even] at (0,5) (0) {$\sigma_0$};
         \node[odd,junction] at (0,4) (1) {$j_1$};
@@ -513,7 +513,7 @@ Up until now, we have neglected junction-nodes in our story on node parity and d
         \node[even,junction] at (0,2) (3) {$j_3$};
         \node[even] at (0,1) (4) {$\sigma_4$};
         \draw[l1] (0) -- (1) -- (2) -- (3) -- (4);
-        \node[left=1 of 0] {$\nset_e'$}; 
+        \node[left=1 of 0] {$\nset_e'$};
       \end{scope}
   \end{tikzpicture}
   \caption{Two example node sets $\nset_e$ and $\nset_e'$ each containing 5 nodes, where syndrome nodes $\sigma_i$ are circles and junction nodes $j_i$ are diamonds. Their appropriate parities are calculated where an even parity correspond to continuous and odd to dashed lines. }\label{fig:junctionparity}
@@ -830,49 +830,68 @@ Consider an odd cluster represented by node set $\pre{k+1}\nset^o$ with set size
 
 \begin{figure}
   \centering
-  \begin{tikzpicture}[node distance=0.5mm]
+  \begin{tikzpicture}[node distance=1cm, on grid]
+  
+    \node (a) at (0,0) {};
+    \node (b) [right = 4cm of a] {};
+    \node (c) [right = 5cm of b] {};
     
-    \path[fill=black!10!white, rounded corners=0.5cm] (-2, -1) rectangle (5,4);
-    \node at (1.5,3.5) {generation $k$};
-    \path[fill=black!10!white, rounded corners=0.5cm] (6, -1) rectangle (10,4);
-    \node at (8,3.5) {generation $k+1$};
-    \draw[l1, ->, dashed] (7.5,-.5) .. controls +(225:0.5cm) and +(315:0.5cm) .. (3.5,-.5);
-    \draw[l1, ->, dashed] (8,-.7) .. controls +(210:1cm) and +(330:1cm) .. (0,-.7);
-    \node at (4,-1.5) {$f_2$};
-    \node at (5.5,-.4) {$f_1$};
+    \node (b1l) [below left = 1cm and 2cm of a] {};
+    \node (b1r) [above right = 3.5cm and 2cm of b] {};
+    \path[fill=black!10!white, rounded corners=0.5cm] (b1l) rectangle (b1r);
+    \node (b1t) at ($(a)!0.5!(b)$) {}; \node [above=3cm of b1t] {generation $k$};
+    \node (b2l) [below left = 1cm and 2cm of c] {};
+    \node (b2r) [above right = 3.5cm and 2cm of c] {};
+    \path[fill=black!10!white, rounded corners=0.5cm] (b2l) rectangle (b2r);
+    \node [above=3cm of c] {generation $k+1$};
     
     \foreach \i in {0,1,2}{
-        \node (\i) at (0,\i) {$\pre{k}\nset^o_\i$};
-        \draw[l1] (\i) circle[radius=.45cm];
+        \node (a\i) [above = \i cm of a] {$\pre{k}\nset^o_\i$};
+        \draw[l1] (a\i) circle[radius=.45cm];
     }
-    \begin{scope}[shift={(3,0)}]
-      \foreach \i in {0,1}{
-        \node at (0,\i) (M\i) {};
-        \draw[l1,opacity=0.3,dotted] (M\i) circle[radius=.4cm];
-      }
-      \draw[l1] (0.5, 0) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
-      \node at (0,2) (M2) {$\pre{k}\nset^o_0$};
-      \draw[l1] (M2) circle[radius=0.45cm];
-      \node at ($(M1)!0.5!(M0)$) {$\pre{k}\nset^e$};
-    \end{scope}
     
-    \begin{scope}[shift={(8,0)}]
-      \foreach \i in {0,1,2}{
-        \node at (0,\i) (N\i) {};
-        \draw[l1,dotted, opacity=0.2] (N\i) circle[radius=.4cm];
-      }
-      \draw[l1, opacity=0.3, dotted] (0.5, 0) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
-      \draw[l1] (0.6, 0) -- +(0, 2) arc (0:180:0.6) -- +(0, -2) arc (180:360:0.6) -- cycle;
-      \node at (0,1) {$\pre{k+1}\nset^o$};
-    \end{scope}
+    \foreach \i in {0,1,2}{
+        \node (b\i) [above = \i cm of b] {};
+    }
+    \node at (b2) {$\pre{k}\nset^o_0$};  
+    \node at ($(b0)!0.5!(b1)$) {$\pre{k}\nset^e$};
+    \draw[l1] (b2) circle[radius=0.45cm];
+    \draw[l1,opacity=0.3,dotted] (b1) circle[radius=.4cm];
+    \draw[l1,opacity=0.3,dotted] (b0) circle[radius=.4cm];
+    \node[right = 0.5cm of b] (bc) {};
+    \draw[l1] (bc) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
     
-    \draw[l1, ->] (1,0.5) -- (2,0.5) node[midway,above] {union};
-    \draw[l1, ->] (4,1) -- (7,1) node[midway,above] {union};
-  
-  
+    \foreach \i in {0,1,2}{
+      \node (c\i) [above =\i cm of c] {};
+      \draw[l1,opacity=0.3,dotted] (c\i) circle[radius=.4cm];
+    }
+    \node[right = 0.5cm of c] (cc1) {}; \node[right = 0.6cm of c] (cc2) {};
+    \draw[l1, opacity=0.3, dotted] (cc1) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
+    \draw[l1] (cc2) -- +(0, 2) arc (0:180:0.6) -- +(0, -2) arc (180:360:0.6) -- cycle;
+    \node at (c1) {$\pre{k+1}\nset^o$};
+    
+    \node (f1a) [below left = 0.4cm and 0.4cm of c] {}; \node (f1b) [below right = 0.4cm and 0.4cm of b] {};
+    \node (f2a) [below left = 0.4cm and 0.4cm of b] {}; \node (f2b) [below right = 0.4cm and 0.4cm of a] {};
+    \node (fa) [below = 0.6cm of c] {}; \node (fb) [below = 0.6cm of a] {};
+    \draw[l1, ->, dashed] (f1a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f1b);
+    \draw[l1, ->, dashed] (f2a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f2b);
+    \draw[l1, ->, dashed] (fa)  .. controls +(210:1cm) and +(330:1cm) .. (fb);
+    
+    \node (ca) at ($(c)!0.5!(a)$) {}; \node [below = 1.5cm of ca] {$f$};
+    \node (cb) at ($(c)!0.5!(b)$) {}; \node [below = 0.4cm of cb] {$f_1$};
+    \node [below = 0.4cm of b1t] {$f_2$};
+    
+    \node (u1lt) at ($(a0)!0.5!(a1)$) {}; \node(u1l) [right=1cm of u1lt] {};
+    \node (u1rt) at ($(b0)!0.5!(b1)$) {}; \node(u1r) [left=1cm of u1rt] {};
+    \node (u2lt) at ($(b1)!0.5!(b2)$) {}; \node(u2l) [right=1cm of u2lt] {};
+    \node (u2rt) at ($(c1)!0.5!(c2)$) {}; \node(u2r) [left=1cm of u2rt] {};
+    \draw[l1, ->] (u1l) -- (u1r) node[midway,above] {union};
+    \draw[l1, ->] (u2l) -- (u2r) node[midway,above] {union};
+
   \end{tikzpicture}
   \caption{In the fragmentation of cluster $\pre{k+1}\nset^o$ that belongs to generation $k+1$, we find the clusters $\pre{k}\nset_i$ of which the union created cluster $\pre{k+1}\nset^o$. Any odd cluster can be fragmented into an odd and even cluster.}\label{fig:generation}
 \end{figure}
+
 \paragraph{Fragmentation of a node set}
 
 Let us call this division of odd set into smaller odd and even subsets the \emph{partial fragmentation} $f_1$ of $\pre{k-1}\nset^o$. We can apply another partial fragmentation $f_2$ of $\pre{k}\nset^e$ into 2 odd subsets $\m{F}'_k=\{\pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$, and call the 2 fragmentations $f_1, f_2$ of $\pre{k}\nset^o$ into a set of node sets $\m{F}_k = \{\pre{1}\nset^o_0, \pre{1}\nset^{o}_1, \pre{1}\nset^{o}_2\}$ a \emph{fragmentation step} $f$. Each odd subset $\pre{k}\nset^o_i$ of $\m{F}_k$ can continue to be partially fragmented by $f_1$ into $\pre{k+1}\nset^{o,o}_{i, 0}$ and $\pre{k+1}\nset^{o,e}_i$ the same way. Note that a node set $\nset^o$ can only be fragmented if $S_{\nset^o} \geq 3$, in which case the resulting subsets have size 1.
