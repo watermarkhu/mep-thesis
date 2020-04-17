@@ -463,7 +463,7 @@ where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is
       \draw[l1] (4) -- (1); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
     \end{scope}
   \end{tikzpicture}
-  \caption{The nodes in a node set can have even (continuous) or odd (dashed) parities. The node parities are dependant on which node is set as root $n_r$. Here the same node tree $\nset$ is illustrated with different roots.}\label{fig:parities}
+  \caption{The nodes in a node set can have even (solid) or odd (dashed) parities. The node parities are dependant on which node is set as root $n_r$. Here the same node tree $\nset$ is illustrated with different roots.}\label{fig:parities}
 \end{figure}
 
 Since $\nset$ is acyclic, any node in the set can be set as the root $n_r$ of the set, and the calculation of the parity would still be valid, although not identical. The node set $\nset$ is therefore a $semi$-directed tree, in which the edges are undirected, but an ancestry is set by the root node $n_r$ (see figure \ref{fig:parities}). If the root node changes to $n_{r}'$, the ancestry within the tree changes, and the node parities within the set become unknown, or \emph{undefined}, requiring a new calculation of a reversed DFS from $n_{r}'$.
