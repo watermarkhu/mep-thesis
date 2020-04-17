@@ -825,17 +825,19 @@ Now we have the full description of the \emph{Balanced Bloom} alteration of the 
 The contribution to the time complexity of the UF-EG decoder compared to the UF decoder can be divided into two parts. First is the contribution by \codefunc{CalcParity} and \codefunc{CalcDelay}. As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{delay complexity}. The second contribution will be caused by \codefunc{Grow} of algorithm \ref{al:bbgrow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom complexity}.
 
 \subsubsection{Delay complexity}
+As per lemma \ref{lem:nodecalc_ancestrypath} and \ref{lem:nodecalc_even}, the total cost of the calculation of node parities and delays is increased when the ancestries within subtrees changes due to join operations, and node parities and delays have to be recalculated by traversal of the subtree. We can limit these recalculations to even subtrees per lemma \ref{lem:delaywhengrown}. The size of the even subtrees, multiplied by the number of join operations thus estimates the count of these calculations. We will take a top-down approach to find these estimates, where we retrace the ancestor node sets that join to some larger set $\nset$ in what we call the \emph{fragmentation} of $\nset$.
 
-Consider an odd cluster represented by node set $\pre{k+1}\nset^o$ with set size $S_{\pre{k+1}\m{N}^o}$ that is selected for growth. We thus need to know the node parities and delays within $\pre{k+1}\nset^o$. This cluster is the result of union between a number of clusters with node subsets $\pre{k}\nset_i$. Here $k$ indicates a \emph{generation}, where smaller $k$ indicates a more distance ancestor generation of smaller clusters. Per lemma \ref{lem:oddisevenodd}, $\pre{k+1}\nset^o$ is bound to consist of an odd subset $\pre{k}\nset^o_0$ where the node parities and delays are preserved (theorem \ref{the:delayonce}), and an even subset $\pre{k}\nset^e$ on which we are to (re)calculate the parities and delays (see figure \ref{fig:generation}).
+\paragraph{Fragmentation of a node set}
+Consider an odd cluster represented by node set $\pre{k-1}\nset^o$ with set size $S_{\pre{k-1}\m{N}^o}$. To grow this cluster, the node parities and delays within $\pre{k-1}\nset^o$ must be known. This cluster is the result of union between a number of clusters with node subsets $\pre{k}\nset_i$. Here $k$ indicates a \emph{generation}, where larger $k$ indicates a more distance ancestor generation of smaller clusters. Per lemma \ref{lem:oddisevenodd}, $\pre{k-1}\nset^o$ is bound to consist of an odd subset $\pre{k}\nset^o_0$ where the node parities and delays are preserved (theorem \ref{the:delayonce}), and an even subset $\pre{k}\nset^e$ on which we are to (re)calculate the parities and delays before $\pre{k-1}\nset^o$ is grown (see figure \ref{fig:generation}).
 
 \begin{figure}
   \centering
   \begin{tikzpicture}[node distance=1cm, on grid]
-  
+
     \node (a) at (0,0) {};
     \node (b) [right = 4cm of a] {};
     \node (c) [right = 5cm of b] {};
-    
+
     \node (b1l) [below left = 1cm and 2cm of a] {};
     \node (b1r) [above right = 3.5cm and 2cm of b] {};
     \path[fill=black!10!white, rounded corners=0.5cm] (b1l) rectangle (b1r);
@@ -843,24 +845,24 @@ Consider an odd cluster represented by node set $\pre{k+1}\nset^o$ with set size
     \node (b2l) [below left = 1cm and 2cm of c] {};
     \node (b2r) [above right = 3.5cm and 2cm of c] {};
     \path[fill=black!10!white, rounded corners=0.5cm] (b2l) rectangle (b2r);
-    \node [above=3cm of c] {generation $k+1$};
-    
+    \node [above=3cm of c] {generation $k-1$};
+
     \foreach \i in {0,1,2}{
         \node (a\i) [above = \i cm of a] {$\pre{k}\nset^o_\i$};
         \draw[l1] (a\i) circle[radius=.45cm];
     }
-    
+
     \foreach \i in {0,1,2}{
         \node (b\i) [above = \i cm of b] {};
     }
-    \node at (b2) {$\pre{k}\nset^o_0$};  
+    \node at (b2) {$\pre{k}\nset^o_0$};
     \node at ($(b0)!0.5!(b1)$) {$\pre{k}\nset^e$};
     \draw[l1] (b2) circle[radius=0.45cm];
     \draw[l1,opacity=0.3,dotted] (b1) circle[radius=.4cm];
     \draw[l1,opacity=0.3,dotted] (b0) circle[radius=.4cm];
     \node[right = 0.5cm of b] (bc) {};
     \draw[l1] (bc) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
-    
+
     \foreach \i in {0,1,2}{
       \node (c\i) [above =\i cm of c] {};
       \draw[l1,opacity=0.3,dotted] (c\i) circle[radius=.4cm];
@@ -868,19 +870,19 @@ Consider an odd cluster represented by node set $\pre{k+1}\nset^o$ with set size
     \node[right = 0.5cm of c] (cc1) {}; \node[right = 0.6cm of c] (cc2) {};
     \draw[l1, opacity=0.3, dotted] (cc1) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
     \draw[l1] (cc2) -- +(0, 2) arc (0:180:0.6) -- +(0, -2) arc (180:360:0.6) -- cycle;
-    \node at (c1) {$\pre{k+1}\nset^o$};
-    
+    \node at (c1) {$\pre{k-1}\nset^o$};
+
     \node (f1a) [below left = 0.4cm and 0.4cm of c] {}; \node (f1b) [below right = 0.4cm and 0.4cm of b] {};
     \node (f2a) [below left = 0.4cm and 0.4cm of b] {}; \node (f2b) [below right = 0.4cm and 0.4cm of a] {};
     \node (fa) [below = 0.6cm of c] {}; \node (fb) [below = 0.6cm of a] {};
     \draw[l1, ->, dashed] (f1a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f1b);
     \draw[l1, ->, dashed] (f2a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f2b);
     \draw[l1, ->, dashed] (fa)  .. controls +(210:1cm) and +(330:1cm) .. (fb);
-    
+
     \node (ca) at ($(c)!0.5!(a)$) {}; \node [below = 1.5cm of ca] {$f$};
-    \node (cb) at ($(c)!0.5!(b)$) {}; \node [below = 0.4cm of cb] {$f_1$};
-    \node [below = 0.4cm of b1t] {$f_2$};
-    
+    \node (cb) at ($(c)!0.5!(b)$) {}; \node [below = 0.4cm of cb] {$f_e$};
+    \node [below = 0.4cm of b1t] {$f_o$};
+
     \node (u1lt) at ($(a0)!0.5!(a1)$) {}; \node(u1l) [right=1cm of u1lt] {};
     \node (u1rt) at ($(b0)!0.5!(b1)$) {}; \node(u1r) [left=1cm of u1rt] {};
     \node (u2lt) at ($(b1)!0.5!(b2)$) {}; \node(u2l) [right=1cm of u2lt] {};
@@ -891,53 +893,129 @@ Consider an odd cluster represented by node set $\pre{k+1}\nset^o$ with set size
   \end{tikzpicture}
   \caption{In the fragmentation of cluster $\pre{k+1}\nset^o$ that belongs to generation $k+1$, we find the clusters $\pre{k}\nset_i$ of which the union created cluster $\pre{k+1}\nset^o$. Any odd cluster can be fragmented into an odd and even cluster.}\label{fig:generation}
 \end{figure}
-
-\paragraph{Fragmentation of a node set}
-
-Let us call this division of odd set into smaller odd and even subsets the \emph{partial fragmentation} $f_1$ of $\pre{k-1}\nset^o$. We can apply another partial fragmentation $f_2$ of $\pre{k}\nset^e$ into 2 odd subsets $\m{F}'_k=\{\pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$, and call the 2 fragmentations $f_1, f_2$ of $\pre{k}\nset^o$ into a set of node sets $\m{F}_k = \{\pre{1}\nset^o_0, \pre{1}\nset^{o}_1, \pre{1}\nset^{o}_2\}$ a \emph{fragmentation step} $f$. Each odd subset $\pre{k}\nset^o_i$ of $\m{F}_k$ can continue to be partially fragmented by $f_1$ into $\pre{k+1}\nset^{o,o}_{i, 0}$ and $\pre{k+1}\nset^{o,e}_i$ the same way. Note that a node set $\nset^o$ can only be fragmented if $S_{\nset^o} \geq 3$, in which case the resulting subsets have size 1.
+Let us call this division of odd set into its subsidiary two sets of odd and even parity the \emph{partial fragmentation} $f_e$, where $f_e(\pre{k-1}\nset^o) = \m{F}^e_k = \{\pre{k}\nset^o_0, \pre{k}\nset^e\}$. We can apply another partial fragmentation $f_o$ of $\pre{k}\nset^e$ into 2 odd subsets $\m{F}^o_k=\{\pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$, and call the 2 fragmentations $f_e, f_o$ of $\pre{k}\nset^o$ into a set of node sets $\m{F}_k = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$ a \emph{fragmentation step} $f$. Note that a node set $\nset^o$ can only be fragmented if $S_{\nset^o} \geq 3$, in which case the resulting subsets have size 1.
+\begin{eqnarray}
+% \nonumber % Remove numbering (before each equation)
+  f_e(\pre{k-1}\nset^o) &= \m{F}^e_k =& \{\pre{k}\nset^o_0, \pre{k}\nset^e\} \\
+  f_o(\pre{k}\nset^e) &= \m{F}^o_k =& \{\pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\} \\
+  f(\pre{k-1}\nset^o) &= \m{F}_k =& f_o(f_e(\pre{k-1}\nset^o)) = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\} \hspace{.3cm} | \hspace{.3cm} S_{\pre{k}\nset^o_i} \geq 3 \label{eq:partialfrag},
+\end{eqnarray}
 
 \begin{lemma}\label{lem:partialfrag}
-  Let the separation of an odd node set $\pre{k-1}\nset^o$ into subsets $\m{F}_k'=\{\pre{k}\nset^o_0, \pre{k}\nset^e\}$ be the partial fragmentation $f_1$ and subsequently into subsets $\m{F}_k= \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\}$ be $f_2$ of $\nset$. The combination of the two is a fragmentation step $f$.
-  \begin{equation}\label{eq:partialfrag}
-    \m{F}_k = f(\pre{k-1}\nset^o) = f_2(f_1(\pre{k-1}\nset^o)) = f_2(\{\pre{k}\nset^o_0, \pre{k}\nset^e\}) = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\} \hspace{.3cm} | \hspace{.3cm} S_{\pre{k}\nset^o_i} \geq 3
-  \end{equation}
+  Let the separation of an odd node set $\pre{k-1}\nset^o$ into subsets $\m{F}_k^o=\{\pre{k}\nset^o_0, \pre{k}\nset^e\}$ be the partial fragmentation $f_e$ and subsequently $\pre{k}\nset^e$ into  $\m{F}_k^o=\{\pre{k}\nset^o_1, \pre{k}\nset^o_2\}$ be $f_o$. The combination of the two is a fragmentation step $f$.
 \end{lemma}
 
-Each odd node set of $\m{F}_k$ can undergo the same fragmentation step into odd subsets, leaving us again with a set of node subsets $\m{F}_{k+1}$. We can do this some $p$ times until our resulting set of node sets $\m{F}_{p}$ consists only of smallest possible node subsets $\nset^o$ where $S_{\nset^o}=1$. To find the worst case complexity, we want to maximize the delay complexity within $\pre{k-1}\nset^o$; we are to find the sequence of joint operations that maximizes the sum of even node sets sizes $S_{\nset^e}$ in all partial fragmentations in the \emph{full fragmentation} $F$ of $\nset^o$.
+Each odd node set of $\m{F}_k$ can undergo the same fragmentation step into odd subsets, leaving us again with a set of node subsets $\m{F}_{k+1}$. If partial fragmentation function $f_e$ is called on a set of node sets $f_e(\{\nset^o, \nset^e, ...\})$, it fragments all odd node sets in the set, and $f_o$ fragments all even node sets. We can do this some $p$ times on $\pre{0}\nset^o$, where we have set $k-1=0$, until our resulting set of node sets $\m{F}_{p}$ consists only of smallest possible node subsets $\pre{p}\nset^o$ where $S_{\pre{p}\nset^o}=1$. Let us call the series of all $p$ fragmentation steps on $\pre{0}\nset^o$ the \emph{full fragmentation} $F$, with
 
-Looking at the fragmentation from the other way, we have a set of size 1 node sets that undergo joint operations in each partial fragmentation. In $f_2$, two odd node sets join, and we do not add to the count of $N_delay$. In $f_1$, an odd and an even note sets join, and we have to calculate the delays in the even node set before moving on to the next joint operation.
+\begin{equation}\label{eq:fullfrag}
+    F(\pre{0}\nset^o) = \underbrace{f(f(...f(\pre{0}\nset^o)))}_\text{p times} = \{\pre{p}\nset^{o}_1, \pre{p}\nset^{o}_2,...,\pre{p}\nset^{o}_{N_\sigma} \} \hspace{.3cm} | \hspace{.3cm} S_{\pre{p}\nset^{o}_i} = 1.
+  \end{equation}
 
-\begin{lemma}
-  Let the full fragmentation of $\nset$ be
-  \begin{equation}\label{eq:fullfrag}
-    F(\nset^o) = \underbrace{f(f(...f(\nset)))}_\text{p times} = \{\pre{p}\nset^{o}_1, \pre{p}\nset^{o}_1, \pre{p}\nset^{o}_2, ... ,\pre{p}\nset^{o}_{N_\sigma} \} \hspace{.3cm} | \hspace{.3cm} S_{\pre{p}\nset^{o}_i} = 1,
-  \end{equation}
-  where along each fragmentation step $k$ a partial fragmentation set $\m{F}'_k$ is produced, the number of delay calculations is
-  \begin{equation}\label{eq:maxdelay}
-    N_{delay} = \sum_{k=1}^{p} \sum \{ S_{\pre{k}\nset^e} | \forall \mbox{ even } \pre{k}\nset^e \in \m{F}'_k \}.
-  \end{equation}
-\end{lemma}
+To find the worst case complexity, we want to maximize the number of delay computations $N_{delay}$ during the construction of all the final clusters on the lattice. Let us assume that the final clusters are a single odd cluster $\pre{0}\nset^o$ of size $N/2-1$, which is the largest odd cluster that can be grown. As the delay computation is only executed on the even subsets, the sequence of join operations that maximizes the sum of even node sets sizes $S_{\pre{k}\nset^e}$, in the partial fragmentations $\m{F}^e_{k}$ in all fragmentation steps $k=[1,...,p]$ in $F(\pre{0}\nset^o)$, maximizes $N_{delay}$.
+\begin{equation}\label{eq:maxdelay}
+  N_{delay} = \sum_{k=1}^{p} \sum_i \{ S_{\pre{k}\nset_i^e} | \pre{k}\nset_i^e \in \m{F}^e_k \}.
+\end{equation}
+
+\begin{proposition}
+  The worst-case delay complexity is computed by maximizing $N_{delay}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
+\end{proposition}
 
 \paragraph{Partial fragmentation number}
-Note that here we ignore the fact that the partial fragmentations of some node set may not result in two but many subsets. Let us call the number of odd subsets the \emph{fragmentation number} $N_f$. For partial fragmentation $f_1$, the separation of the odd node set $\pre{k-1}\nset^o$ must be in 1 odd and 1 even subset per lemma \ref{lem:oddisevenodd}, thus $N_{f_1} = 2$. For partial fragmentation $f_2$, the separation of even set $\pre{k}\nset^e$ can be in $2n_o$ odd and $n_e$ even subsets. But any even subset will be subjected to the same partial fragmentation $f_2$ in the full fragmentation, reducing the fragmentation number to $N_{f_2} = 2n_o$.
+We ignore the fact that the partial fragmentation $f_e$ or $f_o$ of some node set may not result in two but many subsets. Let us call the number of odd subsets the \emph{fragmentation number} $N_f$. For partial fragmentation $f_e$, the separation of the odd node set $\pre{k-1}\nset^o$ must be in 1 odd and 1 even subset per lemma \ref{lem:oddisevenodd}, thus $N_{f_e} = 2$. For partial fragmentation $f_o$ with fragmentation number $N_{f_o}$, the separation of even set $\pre{k}\nset^e$ can be in $2n_o$ odd and $n_e$ even subsets, where $n_o\geq 1$ and $n_e \geq 0$. But any even subset will be subjected to the same partial fragmentation $f_o$ in the full fragmentation. Thus we can set $n_e=0$, and $N_{f_o} = 2n_o$.
 
-To find $N_{f_2} $, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node set $\nset^e$ is fragmented with $\pre{k}N_{f_2}=2$, a fragmentation step of $f_2, f_1$ will be
+To find $n_o$, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node set $\pre{k-1}\nset^e$ is fragmented with $N_{f_o}=2$, a fragmentation step $f(\pre{k-1}\nset^e)=f_e(f_o(\pre{k-1}\nset^e))$ produces the following partial fragmentation sets:
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
-  \m{F}^e_k &=& \{ \pre{k} \nset^{o}_1, \pre{k} \nset^{o}_2\},  \\
-  \m{F}'^e_{k+1} &=& \{\pre{k+1}\nset^{o,o}_{1,0}, \pre{k+1}\nset^{o,e}_1, \pre{k+1}\nset^{o,o}_{2,0}, \pre{k+1}\nset^{o,e}_2 \}.
+  \m{F}^o_{k-1} &=& \{ \pre{k-1} \nset^{o}_1, \pre{k-1} \nset^{o}_2\},  \\
+  \m{F}^e_{k} &=& \{\pre{k}\nset^{o,o}_{1,0}, \pre{k}\nset^{o,e}_1, \pre{k}\nset^{o,o}_{2,0}, \pre{k}\nset^{o,e}_2 \}.
 \end{eqnarray*}
-For $N_{f_2} = 4$, a fragmentation step will be
+For $N_{f_2} = 4$, the partial fragmentation sets are
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
-  \m{F}^e_k &=& \{ \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2\,  \pre{k}\nset^{o}_3\, \pre{k}\nset^{o}_4\},  \\
-  \m{F}'^e_{k+1} &=& \{\pre{k+1}\nset^{o,o}_{1,0}, \pre{k+1}\nset^{o,e}_1,  \pre{k+1}\nset^{o,o}_{2,0}, \pre{k+1}\nset^{o,e}_2,  \pre{k+1}\nset^{o,o}_{3,0}, \pre{k+1}\nset^{o,e}_3, \pre{k+1}\nset^{o,o}_{4,0}, \pre{k+1}\nset^{o,e}_4 \}.
+  \m{F}^e_{k-1} &=& \{ \pre{k-1}\nset^{o}_1, \pre{k-1}\nset^{o}_2,  \pre{k-1}\nset^{o}_3, \pre{k-1}\nset^{o}_4\},  \\
+  \m{F}'^e_{k} &=& \{\pre{k}\nset^{o,o}_{1,0}, \pre{k}\nset^{o,e}_1,  \pre{k}\nset^{o,o}_{2,0}, \pre{k}\nset^{o,e}_2,  \pre{k}\nset^{o,o}_{3,0}, \pre{k}\nset^{o,e}_3, \pre{k}\nset^{o,o}_{4,0}, \pre{k}\nset^{o,e}_4 \}.
 \end{eqnarray*}
 
-If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node set size decreases faster towards the minimum size of 3 as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $N_{f_2}$ will decrease the number of fragmentation steps and thus the number of delay calculations $N_{delay}$ per equation \ref{eq:maxdelay}. Thus our decision of $N_{f_2}=2$ in lemma \ref{lem:partialfrag} is correct.
+If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node set size decreases faster towards the minimum size of 3 as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $n_o$ will decrease the number of fragmentation steps and thus the number of delay calculations $N_{delay}$ per equation \ref{eq:maxdelay}. Thus $N_{delay}$ is maximized for minimal $n_o = 1$, and our decision of $N_{f_o}=2$ in lemma \ref{lem:partialfrag} is correct.
+
+\newcommand\Square[1]{+(-#1,-#1) rectangle +(#1,#1)}
+\begin{tikzpicture}[scale=0.4]
+  \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+  }}
+  \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
+
+  \begin{scope}[shift={(5,0)}]
+  \foreach \x in {0,...,2}{
+    \foreach \y in {0,...,5}{
+      \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+    \foreach \y in {6,...,8}{
+      \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+
+  \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
+  \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+  \end{scope}
+
+  \begin{scope}[shift={(10,0)}]
+    \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+  }}
+  \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,3);
+  \draw[l1] (0,3) ++(-.5,-.5) rectangle +(3,3);
+  \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+  \end{scope}
+
+  \begin{scope}[shift={(15,0)}]
+  \foreach \x in {0,...,2}{
+   \foreach \y in {0,1,3,4,6,7}{
+   \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+   \foreach \y in {2,5,8}{
+   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+
+  \foreach \y in {0,3,6}{
+   \draw[l1] (0,\y) ++(-.5,1.5) rectangle + (3,1);
+   \draw[l1, dashed] (0,\y) ++(-.5,-.5) -- +(0,2) (3,\y) ++(-.5,-.5) -- +(0,2);}
+  \draw[l1, dashed] (0,0) ++(-.5,-.5) -- +(3,0);
+  \end{scope}
+
+  \begin{scope}[shift={(20,0)}]
+    \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+  }}
+  \foreach \y in {0,...,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
+  \end{scope}
+
+  \begin{scope}[shift={(25,0)}]
+   \foreach \y in {0,...,8}{\foreach \x in {1,2}{
+   \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+   \path[fill=white!80!black] (0,\y) \Square{0.46cm};
+   \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+
+   \foreach \y in {0,...,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
+   \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,9);
+  \end{scope}
+
+  \begin{scope}[shift={(30,0)}]
+    \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+   \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
+  }}
+  \end{scope}
+\end{tikzpicture}
+
+% \begin{tikzpicture}[scale=0.4]
+%   \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+%    \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+%   }}
+%   \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
+%
+%   \begin{scope}[shift={(5,0)}]
+%
+%   \end{scope}
+% \end{tikzpicture}
 
 \paragraph{Partial fragmentation ratio}
-To complete the fragmentation description, we will need to find the fragmentation ratios $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node set sizes of the subsets in $\m{F}_{k-1}$ with respect to the size of $\pre{k}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of subset $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd subset from $f_1$, and $R_1, R_2$ to the odd subsets in $f_2$.
+To complete the fragmentation description, we will need to find the \emph{fragmentation ratios} $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node set sizes of the subsets in $\m{F}_{k}$ with respect to the size of $\pre{k-1}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of subset $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd subset from $f_e$, and $R_1, R_2$ to the odd subsets in $f_o$.
 
 \begin{lemma}\label{lem:fragratio}
   Let the fragmentation ratios $R_0, R_2, R_2$ be the relative set sizes of the odd subsets in the fragmentation set $\m{F}_{k} = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2 \}$ with respect to set $\pre{k-1}\nset^o$, where
@@ -946,59 +1024,54 @@ To complete the fragmentation description, we will need to find the fragmentatio
   \end{equation}
 \end{lemma}
 
-Recall lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this grow process, some $n_v$ vertices are added to the cluster, and some union or joint operations can occur. If no joint operations occur, the node set stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:nodesetunchanged}. We want to minimize $n_v$, as each added vertex here is not a node that can possibly count towards $N_{delay}$, and it is therefore preferable that some joint operations do occur during growth.
+Recall lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this grow process, some $n_v$ vertices are added to the cluster, and some join operations can occur. If no join operations occur, the node set stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:nodesetunchanged}. We want to minimize $n_v$, as each added vertex here is not a node that can possibly count towards $N_{delay}$. Thus in each growth iteration of a cluster, some join operation must occur for the maximization of $N_{delay}$.
 
-Take the first fragmentation sets $\m{F}'_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of some cluster defined by node set $\pre{k-1}\nset^o$. These partial fragmentation correspond to 2 joint operations, between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_2$, and between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_1$.
-
-If we want to minimize $n_v$ in $f_2$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node set sizes. For $f_1$, the joint event is caused by growth of $\nset^o_0$ in either some bucket $b_j > b_i$ where $ S_{\vset_0} > S_{\vset_1} $, or growth in the same bucket $b_i$ where $S_{\vset_0} = S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$.
-
-To maximize $N_{delay}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_1$. Recall from equation \ref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node set size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
+Take the first fragmentation sets $\m{F}e_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of cluster $\pre{k-1}\nset^o$. These partial fragmentations correspond to 2 join operations, between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_o$, and between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_e$. If we want to minimize $n_v$ in $f_o$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node set sizes. For $f_e$, the merge event is caused by growth of $\nset^o_0$ in either some larger or equal bucket $b_j \geq b_i$ where $ S_{\vset_0} \geq S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$. To maximize $N_{delay}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_e$. Recall from equation \ref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node set size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
 
 \begin{lemma}\label{lem:thirdratio}
-  A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the values $R_j = \frac{1}{3}$.
+  A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the value $R = \frac{1}{3}$.
 \end{lemma}
 
 \paragraph{Time complexity}
 
-To find the time complexity cased by the delay calculations, we are left with a single variable $p$, the number of fragmentation steps that can be taken. If we assume that in each growth step not a single non-node vertex is added $n_v = 0$, the full fragmentation of some node set $\nset^o$ is just the continuous division of the set in 3 parts per lemma \ref{lem:thirdratio}, which can be calculated easily.
+The last unknown parameter for the delay calculation is $p$, the number of fragmentation steps. If we assume that in each growth step not a single non-node vertex is added $n_v = 0$, the full fragmentation of some node set $\nset^o$ is just the continuous division of the set in 3 parts per lemma \ref{lem:thirdratio}, which can be calculated easily.
 \begin{equation}\label{eq:numfrag}
   p = \log_3(S_{\nset^o})
 \end{equation}
-In each fragmentation step $\m{F}'_k$, $f_1$ is equivalent to the joint of odd node sets with even node sets where the sum of odd sets sizes is
+In each fragmentation step $\m{F}^e_k$, $f_e$ is equivalent to the join operation of odd node sets with even node sets where the sum of odd sets sizes is
 \begin{equation}\label{eq:sumoddsetsize}
-  \sum \{ S_{\pre{k}\nset^o} | \forall \mbox{ odd } \pre{k}\nset^o \in \m{F}'_k \} = \frac{1}{3}S_{\nset^o},
+  \sum_i \{ S_{\pre{k}\nset_i^o} | \pre{k}\nset_i^o \in \m{F}^e_k \} = \frac{1}{3}S_{\nset^o},
 \end{equation}
 and the sum of even node set of sizes is
 \begin{equation}\label{eq:sumevensetsize}
-  \sum \{ S_{\pre{k}\nset^e} | \forall \mbox{ even } \pre{k}\nset^e \in \m{F}'_k \} = \frac{2}{3}S_{\nset^o}.
+  \sum_i \{ S_{\pre{k}\nset_i^e} | \pre{k}\nset_i^e \in \m{F}^e_k \} = \frac{2}{3}S_{\nset^o}.
 \end{equation}
 This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Filling in equation \ref{eq:numfrag} and \ref{eq:sumevensetsize} in \ref{eq:maxdelay}, we find that
-
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-\nonumber  N_{delay} &\leq& \sum_{k=1}^{p} \sum \{ S_{\pre{k}\nset^e} | \forall \mbox{ even } \pre{k}\nset^e \in \m{F}'_k \}. \\
+\nonumber  N_{delay} &\leq& \sum_{k=1}^{p} \sum_i \{ S_{\pre{k}\nset_i^e} | \pre{k}\nset_i^e \in \m{F}^e_k \}. \\
 \nonumber   &=& \sum_{k=1}^{\log_3(S_{\nset^o})} \frac{2}{3}S_{\nset^o} \\
    &=& \frac{2}{3}S_{\nset^o}\log_3(S_{\nset^o})
 \end{eqnarray}
 
-The node set size of set $\nset^o$ is bounded by the lattice size $N$. The worst case time complexity of the delay computation is bounded by $\m{O}(N\log_3(N))$. The real worst-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$.
+The node set size of set is bounded by the lattice size $\nset^o \leq N$. The worst case time complexity of the delay computation is thus bounded by $\m{O}(N\log_3(N))$. The average-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$.
 
 \subsubsection{Bloom complexity}
 
 To grow a cluster represented by a node set $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the nodes. Let's call the total number of times any node is traversed by \codefunc{Bloom} $N_{bloom}$.
 
-Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_i$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start out with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{bloom}$.
+Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_i$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{bloom}$.
 \begin{equation}\label{eq:nnode}
-  N_{bloom} \leq \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \}
+  N_{bloom} \leq \sum^{p}_{k=1}\sum_i \{ S_{\pre{k}\nset_i} | \pre{k}\nset_i \in \m{F}_k \}
 \end{equation}
 For a full fragmentation of $\nset$ of size $S_\nset$, the sum of all set sizes in each fragmentation set $\m{F}$ is
 \begin{equation}\label{eq:sumsetsfrag}
-  \sum \{S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \} = S_\nset.
+  \sum_i \{S_{\pre{k}\nset_i} | \pre{k}\nset_i \in \m{F}_k \} = S_\nset.
 \end{equation}
 By filling in $p$ we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-  \nonumber N_{bloom} &\leq& \sum_{p}^{k=1}\sum \{ S_{\pre{k}\nset} | \pre{k}\nset \in \m{F}_k \} \\
+  \nonumber N_{bloom} &\leq& \sum^{p}_{k=1}\sum_i \{ S_{\pre{k}\nset_i} | \pre{k}\nset_i \in \m{F}_k \} \\
   \nonumber &=& \sum_{k=1}^{\log_3(S_{\nset^o})} S_\nset \\
    &=& S_{\nset^o}\log_3(S_{\nset^o}),
 \end{eqnarray}
