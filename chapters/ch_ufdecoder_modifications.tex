@@ -920,6 +920,79 @@ To find the worst case complexity, we want to maximize the number of delay compu
   The worst-case delay complexity is computed by maximizing $N_{delay}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
 \end{proposition}
 
+\newcommand\Square[1]{+(-#1,-#1) rectangle +(#1,#1)}
+\begin{figure}
+  \centering
+    \begin{tikzpicture}[scale=0.4, on grid]
+      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
+
+      \begin{scope}[shift={(5,0)}]
+      \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,5}{
+          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+        \foreach \y in {6,...,8}{
+          \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+
+      \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
+      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+      \end{scope}
+
+      \begin{scope}[shift={(10,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,3);
+      \draw[l1] (0,3) ++(-.5,-.5) rectangle +(3,3);
+      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+      \end{scope}
+
+      \begin{scope}[shift={(15,0)}]
+      \foreach \x in {0,...,2}{
+       \foreach \y in {0,1,3,4,6,7}{
+       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+       \foreach \y in {2,5,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+
+      \foreach \y in {0,3,6}{
+       \draw[l1] (0,\y) ++(-.5,1.5) rectangle + (3,1);
+       \draw[l1, dashed] (0,\y) ++(-.5,-.5) -- +(0,2) (3,\y) ++(-.5,-.5) -- +(0,2);}
+      \draw[l1, dashed] (0,0) ++(-.5,-.5) -- +(3,0);
+      \end{scope}
+
+      \begin{scope}[shift={(20,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \foreach \y in {0,...,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
+      \end{scope}
+
+      \begin{scope}[shift={(25,0)}]
+       \foreach \y in {0,...,8}{\foreach \x in {1,2}{
+       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
+       \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+
+       \foreach \y in {0,...,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
+       \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,9);
+      \end{scope}
+
+      \begin{scope}[shift={(30,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+       \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
+      }}
+      \end{scope}
+
+      \foreach \x in {3,13,23}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_e$};}
+      \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
+      \node at (1,4) {$\nset^o$};
+    \end{tikzpicture}
+  \caption{The full fragmentation of $\nset^o$ per equation \ref{eq:fullfrag}. Each odd node set in the fragmentation is a rectangle with continuous lines, and even node set has dashed lines. Each square is equivalent to a node, where the sum of all dark shaded squares is $N_{delay}$. Here, $N_{delay}$ is maximized as $N_{f_e} = N_{f_o} = 2$ and $R_i = \frac{1}{2}$. }\label{fig:fragcorrect}
+\end{figure}
+
 \paragraph{Partial fragmentation number}
 We ignore the fact that the partial fragmentation $f_e$ or $f_o$ of some node set may not result in two but many subsets. Let us call the number of odd subsets the \emph{fragmentation number} $N_f$. For partial fragmentation $f_e$, the separation of the odd node set $\pre{k-1}\nset^o$ must be in 1 odd and 1 even subset per lemma \ref{lem:oddisevenodd}, thus $N_{f_e} = 2$. For partial fragmentation $f_o$ with fragmentation number $N_{f_o}$, the separation of even set $\pre{k}\nset^e$ can be in $2n_o$ odd and $n_e$ even subsets, where $n_o\geq 1$ and $n_e \geq 0$. But any even subset will be subjected to the same partial fragmentation $f_o$ in the full fragmentation. Thus we can set $n_e=0$, and $N_{f_o} = 2n_o$.
 
@@ -938,81 +1011,83 @@ For $N_{f_2} = 4$, the partial fragmentation sets are
 
 If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node set size decreases faster towards the minimum size of 3 as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $n_o$ will decrease the number of fragmentation steps and thus the number of delay calculations $N_{delay}$ per equation \ref{eq:maxdelay}. Thus $N_{delay}$ is maximized for minimal $n_o = 1$, and our decision of $N_{f_o}=2$ in lemma \ref{lem:partialfrag} is correct.
 
-\newcommand\Square[1]{+(-#1,-#1) rectangle +(#1,#1)}
-\begin{tikzpicture}[scale=0.4]
-  \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-  }}
-  \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
+\begin{figure}
+  \centering
+    \begin{tikzpicture}[scale=0.4]
+      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
 
-  \begin{scope}[shift={(5,0)}]
-  \foreach \x in {0,...,2}{
-    \foreach \y in {0,...,5}{
-      \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-    \foreach \y in {6,...,8}{
-      \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+      \begin{scope}[shift={(5,0)}]
+      \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,5}{
+          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+        \foreach \y in {6,...,8}{
+          \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
 
-  \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
-  \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
-  \end{scope}
+      \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
+      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+      \end{scope}
 
-  \begin{scope}[shift={(10,0)}]
-    \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-  }}
-  \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,3);
-  \draw[l1] (0,3) ++(-.5,-.5) rectangle +(3,3);
-  \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
-  \end{scope}
+      \begin{scope}[shift={(10,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \foreach \y in {0,...,5}{\draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
+      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+      \end{scope}
 
-  \begin{scope}[shift={(15,0)}]
-  \foreach \x in {0,...,2}{
-   \foreach \y in {0,1,3,4,6,7}{
-   \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-   \foreach \y in {2,5,8}{
-   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+      \begin{scope}[shift={(15,0)}]
+      \foreach \y in {0,...,5}{
+       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
+       \foreach \x in {1,2}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
+      \foreach \x in {0,1,2}{
+       \path[fill=white!50!black] (\x,6) \Square{0.46cm};
+       \path[fill=white!50!black] (\x,7) \Square{0.46cm};
+       \path[fill=white!80!black] (\x,8) \Square{0.46cm};}
+      \foreach \y in {0,...,5}{\draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
+      \foreach \y in {0,...,6}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
+      \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,8) (0,6) ++(-.5,-.5) -- +(0,2);
+      \end{scope}
 
-  \foreach \y in {0,3,6}{
-   \draw[l1] (0,\y) ++(-.5,1.5) rectangle + (3,1);
-   \draw[l1, dashed] (0,\y) ++(-.5,-.5) -- +(0,2) (3,\y) ++(-.5,-.5) -- +(0,2);}
-  \draw[l1, dashed] (0,0) ++(-.5,-.5) -- +(3,0);
-  \end{scope}
+      \begin{scope}[shift={(20,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \foreach \y in {6,7,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
+      \foreach \y in {0,...,5}{
+       \draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);
+       \foreach \x in {0,1,2}{\draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);}}
+      \end{scope}
 
-  \begin{scope}[shift={(20,0)}]
-    \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-  }}
-  \foreach \y in {0,...,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
-  \end{scope}
+      \begin{scope}[shift={(25,0)}]
+       \foreach \y in {6,7,8}{\foreach \x in {1,2}{
+       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
+       \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+       \foreach \y in {7,8,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
+       \draw[l1,dashed] (3,6) ++(-.5,-.5) -- +(0,3);
 
-  \begin{scope}[shift={(25,0)}]
-   \foreach \y in {0,...,8}{\foreach \x in {1,2}{
-   \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-   \path[fill=white!80!black] (0,\y) \Square{0.46cm};
-   \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+       \foreach \y in {0,...,5}{\foreach \x in {0,1,2}{
+        \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+        \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);}}
+      \end{scope}
 
-   \foreach \y in {0,...,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
-   \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,9);
-  \end{scope}
+      \begin{scope}[shift={(30,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+       \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
+      }}
+      \end{scope}
 
-  \begin{scope}[shift={(30,0)}]
-    \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-   \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-   \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
-  }}
-  \end{scope}
-\end{tikzpicture}
-
-% \begin{tikzpicture}[scale=0.4]
-%   \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-%    \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-%   }}
-%   \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
-%
-%   \begin{scope}[shift={(5,0)}]
-%
-%   \end{scope}
-% \end{tikzpicture}
+      \foreach \x in {3,13,23}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_e$};}
+      \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
+      \node at (1,4) {$\nset^o$};
+    \end{tikzpicture}
+  \caption{A full fragmentation of $\nset^o$ where in the first $f_0$, the fragmentation number is increased to $N_{f_o} = 6$. The number of dark shaded squares or $N_{delay}$ has decreased from the fragmentation with optimal settings (figure \ref{fig:fragcorrect}). }\label{fig:fragfnumber}
+\end{figure}
 
 \paragraph{Partial fragmentation ratio}
 To complete the fragmentation description, we will need to find the \emph{fragmentation ratios} $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node set sizes of the subsets in $\m{F}_{k}$ with respect to the size of $\pre{k-1}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of subset $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd subset from $f_e$, and $R_1, R_2$ to the odd subsets in $f_o$.
@@ -1020,7 +1095,7 @@ To complete the fragmentation description, we will need to find the \emph{fragme
 \begin{lemma}\label{lem:fragratio}
   Let the fragmentation ratios $R_0, R_2, R_2$ be the relative set sizes of the odd subsets in the fragmentation set $\m{F}_{k} = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2 \}$ with respect to set $\pre{k-1}\nset^o$, where
   \begin{equation}\label{eq:fragratio}
-    R_j = \frac{S_{\pre{k}\nset^o_j}}{S_{\pre{k-1}\nset^o}}
+    R_i = \frac{S_{\pre{k}\nset^o_i}}{S_{\pre{k-1}\nset^o}}
   \end{equation}
 \end{lemma}
 
@@ -1032,8 +1107,54 @@ Take the first fragmentation sets $\m{F}e_{k} = \{\nset^o_0, \nset^{e} \}$ and $
   A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the value $R = \frac{1}{3}$.
 \end{lemma}
 
-\paragraph{Time complexity}
+\begin{figure}
+  \centering
+    \begin{tikzpicture}[scale=0.4]
+      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
 
+      \begin{scope}[shift={(5,0)}]
+      \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,7}{
+          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+        \path[fill=white!80!black] (\x,8) \Square{0.46cm};}
+
+      \draw[l1,dashed] (-.5,-.5) ++(0,8) -- ++(0,-8) -- ++(3,0) -- +(0,8);
+      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
+      \end{scope}
+
+      \begin{scope}[shift={(10,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
+      \draw[l1] (0,4) ++(-.5,-.5) rectangle +(3,4);
+      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
+
+      \draw[l1, decorate, decoration={brace, amplitude=5}] (3,9) ++(0,-.5) -- +(0,-5);
+      \draw[l1, ->] (4,4.5) -- +(5,0) node [midway, above, text width = 5cm, align=center] {\codefunc{Grow} top, \\union};
+      \draw[l1, decorate, decoration={brace, amplitude=5}] (3,0) ++(0,-1) -- +(-4,0) node[midway, below=4pt] {$\m{F}_k$};
+      \end{scope}
+
+      \begin{scope}[shift={(20,0)}]
+        \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,3}{\path[fill=white!80!black] (\x,\y) \Square{0.46cm};}
+        \foreach \y in {4,...,8}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
+      \draw[l1, dashed] (0,4) ++(-.5,-.5) -- ++(0,5) -- ++(3,0) -- +(0,-5);
+
+      \end{scope}
+
+      \draw[l1, ->] (3,4) -- +(1,0) node[midway, above] {$f_e$};
+      \draw[l1, ->] (8,4) -- +(1,0) node[midway, above] {$f_o$};
+      \node at (1,4) {$\nset^o$};
+    \end{tikzpicture}
+  \caption{A fragmentation step $f$ of $\nset^o$, where the fragmentation ratios are not optimal $R_i \neq \frac{1}{3}$. This fragmentation is not possible, as the clusters in $\m{F}_k$ will grow and join in a different path according to the rules of weighted growth.}\label{fig:fragfratio}
+\end{figure}
+
+\paragraph{Time complexity}
 The last unknown parameter for the delay calculation is $p$, the number of fragmentation steps. If we assume that in each growth step not a single non-node vertex is added $n_v = 0$, the full fragmentation of some node set $\nset^o$ is just the continuous division of the set in 3 parts per lemma \ref{lem:thirdratio}, which can be calculated easily.
 \begin{equation}\label{eq:numfrag}
   p = \log_3(S_{\nset^o})
@@ -1078,7 +1199,6 @@ By filling in $p$ we find that
 which again corresponds to a worst case time complexity that is bounded by $\m{O}(N\log_3(N))$.
 
 \subsection{Boundaries}
-
 For the UF decoder on surfaces with boundaries, we introduced the concept of \emph{boundary vertices} that in contrast to normal vertices are not equivalent to stabilizers generators, measurements or ancillary qubits. During formation of the spanning forest $F_C$ of a cluster, we must make sure that $F_C$ does not contain more than 1 element of the set of boundary vertices $\delta\vset$, as multiple elements of $\delta\vset$ is equivalent to a cycle.
 
 The addition of boundaries requires a new type of node element, the \emph{boundary node} $\beta$, that is exclusive to boundary vertices of $\delta\vset$, and are initiated on a boundary vertex if a cluster grows into the boundary. For a cluster, it is already defined in the vanilla UF decoder that there can be only 1 boundary vertex in $\vset$, and therefore only one boundary node in $\nset$. As a result, a boundary node will always be a trailing node in $\nset$ with no children, and will never be the root node. However, the always-trailing boundary node  always has parity 1, as a matching with the boundary is equally valid as a matching with another syndrome. The addition of boundary nodes just requires a small alteration to algorithm \ref{al:calcparity}.
