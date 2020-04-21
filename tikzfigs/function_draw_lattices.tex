@@ -173,3 +173,46 @@
     \draw[vert] (\x*\s - \s/2, \y*\s) -- (\x*\s + \s/2, \y*\s);
   \end{pgfonlayer}
 }
+
+
+
+\newcommand\DSPECTRUM[3]{
+  \tikzmath{
+    \size = #1;
+    \X = #2;
+    \Y = #3;
+    \y = #3-0.1;
+  }
+  \ifnumequal{\X}{0}{}{
+    \path[fill=white!50!black, rounded corners=1pt] (0, 0.1) rectangle (\X,\y);
+  }
+  \draw[line width =0.5] (0,\Y) -- (0,0) -- (\size,0) -- (\size,\Y);
+
+  \foreach \xx in {0,...,\size}{
+    \draw[line width=0.5, font=\footnotesize] (\xx,0) -- +(0,-0.1) node[below] {\xx};
+  }
+}
+
+\newcommand\DSPECTRA[6]{
+  \tikzmath{
+    \M = #1;
+    \I = #2;
+    \x = #3;
+    \y = #4;
+    \h = #5;
+    \w = #6;
+    \X = \x + \M;
+  }
+  \begin{scope}[shift={(\x, 0)}]
+  \begin{scope}[xscale=\w]
+  
+  \ifnumequal{\I}{0}{}{
+    \draw[line width=0, fill=white!50!black, rounded corners=2pt] (0,\y) rectangle +(\I,\h);
+  }
+  \draw[thin, rounded corners = 2pt] (0,\y) rectangle +(\M,\h);
+  \foreach [count=\i] \xx in {0,...,\M}{
+    \draw[font=\tiny] (\xx,\y) node[below] {\xx};
+  }
+  \end{scope}
+  \end{scope}
+}

@@ -395,7 +395,10 @@ we can define a \emph{Potential Normalized Weight} (PNW) that is normalized in $
 \begin{equation}\label{eq:pnw}
   PNW(n_i) = n_i.d - C.d - n.w.
 \end{equation}
-Balanced Bloom in a cluster is now achieved by blooming the nodes that has $PNW(n) = 0$
+Balanced Bloom in a cluster is now achieved by blooming the nodes that has $PNW(n) = 0$. Additional, we can define an absolute delay (AD) of a node that is equal to the actual number of iterations for a node to wait:
+\begin{equation}\label{eq:ad}
+  AD(n_i) = n_i.d - C.d.
+\end{equation}
 
 
 \subsubsection{Node tree parity}
@@ -489,7 +492,7 @@ where $n_\beta$ is the node of interest and $n_\alpha$ is an ancestor of $n_\bet
  The calculation of node delays is only valid while node parities within the set are defined along the same ancestry as the node delay calculation.
 \end{lemma}
 
-An interesting aspect of the node delays is that the relative delays $\delta(n.d)$ are indifferent for which node is set as root $n_r = n$. The actual delay value $n.d$ however may differ for different roots as de delay value for the root node is arbitrary. But as we subtract by $C.d$, the minimal delay value, the root dependance of node PMW and node PNW is accounted for. This fact strengthens lemma \ref{lem:anynoderoot}.
+An interesting aspect of the node delays is that the relative delays $\delta(n.d)$ are indifferent for which node is set as root $n_r = n$. The actual delay value $n.d$ however may differ for different roots as de delay value for the root node is arbitrary. But as we subtract by the minimal delay $C.d$ to find the absolute delay, the root dependance of node PMW and node PNW is accounted for. This fact strengthens lemma \ref{lem:anynoderoot}.
 
 \subsubsection{Junction node parity and delay}
 
@@ -529,7 +532,7 @@ Consider now a second example node set $\nset_e'$ with 3 syndrome-nodes and 2 ju
   j_4.d = \sigma_3.d - 2(\sigma_3, j_4).
 \end{equation*}
 
-We see that the edge component of the delay calculation now has an opposite sign. This flip in sign is due to a flip in node parity for junction nodes compared to syndrome-nodes. As a result, we can generalize the parity calculation of equation \ref{eq:nodeparitypart} for realistic node sets.
+The edge component of the delay calculation now has an opposite sign. This flip in sign is due to a flip in node parity for junction nodes compared to syndrome-nodes. As a result, we can generalize the parity calculation of equation \ref{eq:nodeparitypart} for realistic node sets.
 \begin{equation}\label{eq:nodeparity}
   n_\beta.p =
   \begin{cases}
@@ -539,13 +542,16 @@ We see that the edge component of the delay calculation now has an opposite sign
   \end{cases}
 \end{equation}
 
-To put this into perspective of lemma \ref{lem:nodeCalcParity}, the parity of a syndrome-node is the number of children \emph{syndrome} nodes. The parity of a junction node is 1 minus the number of children syndrome-nodes. From here, our definition of parity and delay calculation stays unchanged; the parities can to be calculated by a reversed DFS of the node tree from the root with equation \ref{eq:nodeparity}, and the delays by a second DFS with equation \ref{eq:2ddelay}.
+To put this into perspective of lemma \ref{lem:nodeCalcParity}, the parity of a syndrome-node is the number of children \emph{syndrome} nodes. The parity of a junction node is 1 minus the number of children syndrome-nodes. From here, our definitions of parity and delay calculation stay unchanged; the parities can to be calculated by a reversed DFS of the node tree from the root with equation \ref{eq:nodeparity}, and the delays by a second DFS with equation \ref{eq:2ddelay}.
 
 \begin{lemma}\label{lem:nodecalc_junction}
   The node parity in a syndrome-node $\sigma.p$ is the number of children syndrome-nodes $\sigma_\gamma$ modulo 2. The node parity in junction node $j.p$ is 1 minus the above definition.
 \end{lemma}
 
-To perform a reverse DFS of the node tree, we can use a \emph{head recursive} function that calls itself, where the recursiveness is before the required routine. The parity calculation is then the following algorithm.
+\subsubsection{Parity and delay calculations}
+
+With equation \ref{eq:nodeparity} and \ref{eq:delayequation}, we now finally have the tools to formulate the algorithms to calculate the node parities and delays. For a node set with root $n_r$, we can calculate the parities by calling the \emph{head recursive} function \codefunc{CalcParity} on $n_r$ in algorithm \ref{al:calcparity}, where we do a reverse DFS of the node tree. The node delays are calculated by calling the \emph{tail recursive} function \codefunc{CalcDelay} in algorithm \ref{al:calcdelay}, where we do a second DFS of the node tree. These Parity and Delay Calculation will from this point be referred to as the PDC. Note that in the \codefunc{CalcDelay} algorithm, we have replaced the delay equation \ref{eq:2ddelay} with equation \ref{eq:delayequation}, which we will cover in the next section.
+
 \begin{algo}[algotitle=CalcParity, label=al:calcparity]
 \begin{algorithm}[H]
 \SetKwData{node}{node}
@@ -569,70 +575,6 @@ To perform a reverse DFS of the node tree, we can use a \emph{head recursive} fu
 \KwRet{\node.\pary}
 \end{algorithm}
 \end{algo}
-
-
-\subsubsection{Degree of delay due to parity inversion }
-
-With equation \ref{eq:2ddelay}, we can calculate the appropriate delays in nodes such that if the bloom in these nodes are delayed for that many iterations, the PMW's for every node in the set is equal. We will see how to grow a node set in section \ref{sec:growingcluster}. After that, we will see how to join two node sets in the case of a merge of two clusters in section \ref{sec:jointnodesets}. But before we move on, we already see a problem arising in the parity and delay calculations.
-
-If some odd number of nodes $\nset^o$ is attached to $n^e$ of $\nset^e$ during a join operation of two node sets, node parities for nodes in subset $'\nset_e= \{n_i \in \nset^e | n_i \mbox{ ancestor of } n^e\}$ are flipped, where odd nodes become even and even become odd, which is called \emph{parity inversion}. Per lemma \ref{lem:nodecalc_ancestrypath}, the delays in $'\nset^e$ are now undefined and need to be recalculated. If before the join operation, $\nset^e$ had grown for some iterations where the odd nodes have waited (approaching equal PMW), the even nodes will have some node sizes larger than the odd node sizes $n^e_{even}.s > n^e_{odd}.s$. After the join operations, the parities for nodes in $'\nset^e$ flip, and now the previously-even odd nodes have some positive delay. As $n^e_{even}.s > n^e_{odd}.s$, these delays will increase in value per equation \ref{eq:2ddelay} compared to the previous delay calculation.
-
-\tikzstyle{edge}=[above,midway,font=\tiny]
-
-\begin{figure}
-\centering
-    \begin{tikzpicture}[on grid]
-
-      \path[fill=white!80!black, rounded corners=2pt] (-0.5, -.9) rectangle (8.5, -.5);
-      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (a\x) {1} ++(0,-.7) node {0};}
-      \foreach \x in {1,4,7}{      \draw (\x,0) node [odd]  (a\x) {1} ++(0,-.7) node {2};}
-      \draw[l1] (a0) -- (a1) node[edge]{1} -- (a2) node[edge]{1} (a3) -- (a4) node[edge]{1} -- (a5) node[edge]{1} (a6) -- (a7) node[edge]{1} -- (a8) node[edge]{1};
-
-      \begin{scope}[shift={(0,-2)}]
-      \path[fill=white!80!black, rounded corners=2pt] (-0.5, -.9) rectangle (8.5, -.5);
-      \foreach \x in {0,2,6,8}{\draw (\x,0) node [even] (b\x) {2} ++(0,-.7) node {0};}
-      \foreach \x in {1,7}{    \draw (\x,0) node [odd]  (b\x) {1} ++(0,-.7) node {1};}
-      \foreach \x in {3,5}{    \draw (\x,0) node [odd]  (b\x) {2} ++(0,-.7) node {4};}
-                               \draw (4,0)  node [even] (b4)  {1} ++(0,-.7) node {1};
-      \draw[l1] (b0) -- (b1) node[edge]{1} -- (b2) node[edge]{1} -- (b3) node[edge]{2} -- (b4) node[edge]{1} -- (b5) node[edge]{1} -- (b6) node[edge]{2} -- (b7) node[edge]{1} -- (b8) node[edge]{1};
-      \end{scope}
-
-      \draw[l1, ->] (a8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \ref{eq:2ddelay}};
-
-      \begin{scope}[shift={(0,-5)}]
-      \path[fill=white!80!black, rounded corners=2pt] (-0.5, -.9) rectangle (8.5, -.5);
-      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (c\x) {1} ++(0,-.7) node {0};}
-      \foreach \x in {1,4,7}{      \draw (\x,0) node [odd]  (c\x) {1} ++(0,-.7) node {1};}
-      \draw[l1] (c0) -- (c1) node[edge]{1} -- (c2) node[edge]{1} (c3) -- (c4) node[edge]{1} -- (c5) node[edge]{1} (c6) -- (c7) node[edge]{1} -- (c8) node[edge]{1};
-      \end{scope}
-
-      \begin{scope}[shift={(0,-7)}]
-      \path[fill=white!80!black, rounded corners=2pt] (-0.5, -.9) rectangle (8.5, -.5);
-      \foreach \x in {0,2,6,8}{\draw (\x,0) node [even] (d\x) {2} ++(0,-.7) node {0};}
-      \foreach \x in {1,7}{    \draw (\x,0) node [odd]  (d\x) {1} ++(0,-.7) node {0};}
-      \foreach \x in {3,5}{    \draw (\x,0) node [odd]  (d\x) {2} ++(0,-.7) node {2};}
-                               \draw (4,0)  node [even] (d4)  {1} ++(0,-.7) node {0};
-      \draw[l1] (d0) -- (d1) node[edge]{1} -- (d2) node[edge]{1} -- (d3) node[edge]{2} -- (d4) node[edge]{1} -- (d5) node[edge]{1} -- (d6) node[edge]{2} -- (d7) node[edge]{1} -- (d8) node[edge]{1};
-      \end{scope}
-
-      \draw[l1, ->] (c8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \ref{eq:delayequation},\\ $K_{bloom} = 0.5$};
-    \end{tikzpicture}
-    \caption{The delay values (below nodes in shaded area) for 3 odd clusters of 3 nodes that grow and join into a size-9 cluster. The node sizes are indicated in the nodes and the edges length above the edges. Here we show the delay values for this growth using equation \ref{eq:2ddelay} (top) and equation \ref{eq:delayequation} (bottom), where the top calculation acquires larger delay values in the cluster. }\label{fig:kbloom}
-\end{figure}
-As the lattice increases in size, the number of merges between clusters or join operations between node sets will also increase. The node parities for some parts of some node sets will suffer parity inversion during these merges, leading to increasingly larger delay values. The delayed bloom of nodes may therefore not be balanced at all with the current delay equation. We therefore introduce a parameter $K_{bloom} \in [0, 1]$ that determines the degree of delay of a node.
-
-\begin{multline}\label{eq:delayequation}
-  n_\beta.d = n_\alpha.d + \Bigg \lceil K_{bloom} \Bigg( 2\bigg(\floor{\frac{(n_\beta.s+n_\beta.g)}{2}} - \floor{\frac{(n_\alpha.s+n_\beta.g)}{2}} + (-1)^{n_\beta.p-1+1}\epsilon_\beta\bigg)
-   \Bigg) \\ - (n_\beta.g + n_\alpha.g)\bmod 2 \Bigg \rceil \hspace{.3cm} | \hspace{.3cm} n_r.d = 0, \hspace{.2cm} n_\beta \mbox{ child of } n_\alpha,
-\end{multline}
-
-From intuition the degree of delay should be set to $K_{bloom} = 1/2$. For this value, the delays in a node set are halved, such that in the case of parity inversion, the delay values from before and after the inversion are kept at minimum. But as the inversion of parities mostly does not occur on all nodes in a set, this is not necessarily true, and other values of $K_{bloom}$ should be explored.
-
-\begin{lemma}
-  The degree of delay $K_{bloom}$ determines the part of the calculated delays that is actually assigned to the nodes. This is to minimize the node delays in new delay calculations in nodes that have suffered parity inversion after a join operation with another node set.
-\end{lemma}
-
-The delay calculation is done by a DFS of the node tree, which can be done by a \emph{tail recursive} function. Here the recursiveness is after the routine, which satisfies the DFS. The delay calculation is then the following algorithm.
 
 \begin{algo}[algotitle=CalcDelay, label=al:calcdelay]
 \begin{algorithm}[H]
@@ -659,11 +601,6 @@ The delay calculation is done by a DFS of the node tree, which can be done by a 
 \end{algorithm}
 \end{algo}
 
-
-\subsubsection{Parity and delay routines}
-
-With equation \ref{eq:nodeparity} and \ref{eq:delayequation}, we now finally have the tools to formulate the algorithms to calculate the node parities and delays. For a node set with root $n_r$, we can calculate the parities by calling the head recursive function \codefunc{CalcParity} on $n_r$ in algorithm \ref{al:calcparity}, where we do a reverse DFS of the node tree. The node delays are calculated by calling the tail recursive function \codefunc{CalcDelay} in algorithm \ref{al:calcdelay}, where we do a second DFS of the node tree.
-
 \begin{theorem}
   To prepare a cluster with node set $\m{N}$ and node root $n_r$ with undefined node parities and delays, we calculate node parities in $\m{N}$ by calling the head recursive function $\codefunc{CalcParity}(n_r)$, and sequentially calculate node delays in $\m{N}$ by calling the tail recursive function $\codefunc{CalcDelay}(n_r)$.
 \end{theorem}
@@ -671,7 +608,7 @@ With equation \ref{eq:nodeparity} and \ref{eq:delayequation}, we now finally hav
 \begin{figure}
   \centering
   \begin{tikzpicture}[x=2cm,y=2cm]
-    \node[node1] (a) at (1, 3) {};
+    \node[node1] (a) at (1, 3) {$n_r$};
     \node[node1,odd] (b) at (1, 2) {};
     \node[node1,odd] (c) at (1, 1) {};
     \node[node1] (d) at (1, 0) {};
@@ -700,9 +637,138 @@ With equation \ref{eq:nodeparity} and \ref{eq:delayequation}, we now finally hav
     \node[text=magenta] at (2.6,2.8) {Delay};
     \node at (0,3) {$\mathcal{N}$};
   \end{tikzpicture}
-  \caption{Two depth-first searches on $\mathcal{N}$ to compute node parities (head recursively) and delays (tail recursively).}\label{fig:2dfs}
+  \caption{The parity and delay calculation (PDC) performed on a the root node $n_r$, which is equivalent to two depth-first searches on $\mathcal{N}$ to compute node parities (head recursively) and delays (tail recursively).}\label{fig:2dfs}
 \end{figure}
 
+
+\subsection{BB-state optimization}
+
+In this section, we alter the delay equation \ref{eq:2ddelay} with an extra parameter $f_{bloom}$ to optimize a trade-off in the Balanced Bloom algorithm. In the PDC, the appropriate delays in nodes are calculated such that, if the bloom in these nodes are delayed for that many iterations, the PNW for every node in the set is equal. We will see how to grow a node set and how to join node sets in the following sections. But before we move on, there is one final problem with the delay calculation.
+
+If some odd number of nodes $\nset^o$ is attached to $n^e$ of $\nset^e$ during an union of two node sets, node parities for nodes in subset $'\nset^e= \{n_i \in \nset^e | n_i \mbox{ ancestor of } n^e\}$ are flipped, where odd nodes become even and even become odd, which is called \emph{parity inversion}. Per lemma \ref{lem:nodeCalcParity} and \ref{lem:nodecalc_ancestrypath}, the delays in $'\nset^e$ are now undefined and need to be recalculated. Before the union, the cluster of $'\nset^e$ is grown according to Balanced Bloom, where the odd nodes are delayed and consequently the even nodes will have some node sizes larger than the odd node sizes $n^e_{even}.s > n^e_{odd}.s$.
+After the union, the parities for nodes in $'\nset^e$ flip, and the pre-union even nodes are now odd and have some positive delay. As $n^e_{even}.s > n^e_{odd}.s$, the absolute delays (equation \ref{eq:ad}) of these nodes are larger than the absolute delays of the pre-union odd nodes per equation \ref{eq:2ddelay}. Subsequent parity inversions further increases the absolute delays in the post-union odd nodes.
+\begin{figure}[]
+  \centering
+    \begin{tikzpicture}
+      \DSPECTRUM{4}{2}{1}
+      \draw (-.5,.5) node {U} ++(\size,0) +(1,0) node {B};
+    \end{tikzpicture}
+  \caption{Visual representation of the BB-state $(4:2)$. The size of the full spectrum is $M=4$ and the length of the bar is $I=2$. The left side of the spectrum is equivalent to the unbalanced BB-state, and the right the balanced state.}\label{fig:bbstate}
+\end{figure}
+To better illustrate this problem, we introduce the concept of the \emph{BB-state} $(M:I)$ of a cluster, where $M$ is equal to the maximum absolute delay in the cluster, and $I\leq M$ is the number of iterations grown while zero PNW in the cluster has not been reached. For example, a cluster with $M=4$ requires 4 growth iterations to reach zero PNW in all nodes in the cluster. The BB-state thus gives us an indication of the how near Balanced Bloom a cluster performs. Let the fraction $f=I/M$ be the \emph{balance factor}, then $f \to 1$ is equivalent to a larger degree of balanced PNW's and thus improves the heuristic for minimum-weight.
+\begin{lemma}\label{lem:bbstate}
+  The BB-state $(M:I)$ describes the degree of difference in PMW in the cluster, where the balance factor $f=I/M=1$ is equivalent to equal PMW. 
+\end{lemma}
+In the context of the BB-state, the delayed bloom of odd nodes in cluster growth is equivalent to increasing the value of $I$. Once $f=1$ is reached after $I=B$ iterations, all nodes have zero PNW and none are delayed during further growth. As $f\to1$ increases the difference between even and odd node sizes, the balance factor at the moment of union $f_u$ is proportional to the increase in the value of $M$ after union or the fraction of the after-union $M_{AC}$ and before-union $M_{BC}$:
+\begin{equation}\label{eq:bbpropto}
+  f_u \propto \frac{M_{AU}}{M_{BU}} \geq 1.
+\end{equation}
+Subsequent parity inversions cause a gradual but certain increase in $M$ of the BB-state, depending on $f_u$ during the parity inversion at the union, requiring a growing number of growth iterations $I$ to reach the balanced BB-state $(M:M)$. Furthermore, as the lattice size is increased, the total number of unions of a cluster with other clusters also increases, leading to a growing number of parity inversions. Thus increasing the lattice size has the consequence that more growth iterations $I$ are needed to reach a balanced BB-state.
+
+This is a trade-off in the effectiveness of Balanced Bloom. On the one hand, it is preferred that $f\to1$ to reach a balanced BB-state, but on the other, $f$ is also proportional to the number of iterations needed to actually reach $f=1$ in the case of parity inversions. To this end, we introduce the balance constant $f_{bloom}$ to equation \ref{eq:2ddelay}.
+\begin{multline}\label{eq:delayequation}
+  n_\beta.d = n_\alpha.d + \Bigg \lceil f_{bloom} \Bigg( 2\bigg(\floor{\frac{(n_\beta.s+n_\beta.g)}{2}} - \floor{\frac{(n_\alpha.s+n_\beta.g)}{2}} + (-1)^{n_\beta.p-1+1}\epsilon_\beta\bigg)
+   \Bigg) \\ - (n_\beta.g + n_\alpha.g)\bmod 2 \Bigg \rceil \hspace{.3cm} | \hspace{.3cm} n_r.d = 0, \hspace{.2cm} n_\beta \mbox{ child of } n_\alpha, \hspace{.2cm} f_{bloom} \in [0, 1]
+\end{multline}
+\begin{lemma}\label{lem:tradeoff}
+  The balance factor $f$ is the cause of a trade-off of Balanced Bloom, where $f\to1$ during growth improves the heuristic for minimum-weight, but also increases the number of growth iterations needed to reach $f=1$. 
+\end{lemma}
+
+\tikzstyle{edge}=[above,midway,font=\tiny]
+\newcommand\DLINE[4]{
+  \draw (#1, #2) ++ (-.3,-.9) node[inner sep=0] (lb) {} ++(#3,0) ++(.6,0) node[inner sep=0] (rb) {} ++(0,0.4) node[inner sep=0] (rt) {};;
+  \path[fill=white!80!black, rounded corners=2pt] (lb) rectangle (rt);
+  \ifnumequal{#4}{1}{\draw[thin] (lb) -- (rb);}{}
+}
+\begin{figure}
+\centering
+    \begin{tikzpicture}[on grid, scale=1]
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{1}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (a\x) {1} ++(0,-.7) node (ad\x) {0};}
+      \foreach[count=\i] \x in {1,4,7}{      \draw (\x,0) node [odd]  (a\x) {1} ++(0,-.7) node (ad\x) {2};
+                                             \node at (\x,0.7) {$\nset_\i$};}
+      \foreach \x in {0.5,3.5,6.5}{\DSPECTRA{2}{0}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (a0) -- (a1) node[edge]{1} -- (a2) node[edge]{1} (a3) -- (a4) node[edge]{1} -- (a5) node[edge]{1} (a6) -- (a7) node[edge]{1} -- (a8) node[edge]{1};
+
+      \begin{scope}[shift={(0,-3)}]
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{0}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (e\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,4,7}{      \draw (\x,0) node [odd]  (e\x) {1} ++(0,-.7) node {1};}
+      \foreach \x in {0.5,3.5,6.5}{\DSPECTRA{2}{1}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (e0) -- (e1) node[edge]{1} -- (e2) node[edge]{1} (e3) -- (e4) node[edge]{1} -- (e5) node[edge]{1} (e6) -- (e7) node[edge]{1} -- (e8) node[edge]{1};
+      \draw[l1, dashed] (e2) -- (e3) (e5) -- (e6);
+      \end{scope}
+
+      \begin{scope}[shift={(0,-6)}]
+      \DLINE{0}{0}{8}{1}
+      \foreach \x in {0,2,6,8}{\draw (\x,0) node [even] (b\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,7}{    \draw (\x,0) node [odd]  (b\x) {1} ++(0,-.7) node {1};}
+      \foreach \x in {3,5}{    \draw (\x,0) node [odd]  (b\x) {2} ++(0,-.7) node {4};}
+                               \draw (4,0)  node [even] (b4)  {1} ++(0,-.7) node {1};
+      \DSPECTRA{4}{0}{3}{-1.5}{0.3}{0.5}
+      \draw[l1] (b0) -- (b1) node[edge]{1} -- (b2) node[edge]{1} -- (b3) node[edge]{2} -- (b4) node[edge]{1} -- (b5) node[edge]{1} -- (b6) node[edge]{2} -- (b7) node[edge]{1} -- (b8) node[edge]{1};
+      \end{scope}
+
+      \node at (-2,0) {$n_i.s$};
+      \node at (-2,-0.75) {$n_i.d$};
+      \node at (-2,-1.5) {$(M:I)$};
+      \draw[semithick, ->] (9,-.75) to [out=-60, in=60] ++(0,-2.5);
+      \draw[semithick, ->] (9,-3.75) to [out=-60, in=60] ++(0,-2.5);
+      \node at (10, -2) [align=right, text width = 3cm] {\underline{PDC}, \codefunc{Grow}};
+      \node at (10, -5) [align=right, text width = 3cm] {\codefunc{Join}, \underline{PDC}};
+
+%       \draw[l1, ->] (a8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \ref{eq:2ddelay}};
+%       \draw[l1, ->] (c8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \ref{eq:delayequation},\\ $K_{bloom} = 0.5$};
+    \end{tikzpicture}
+    \caption{The delay values $n_i.d$ and the BB-states $(M:I)$ for 3 odd clusters $\{\nset_1, \nset_2, \nset_3\}$ of 3 nodes that grow and join into a size-9 cluster. Initially (top), PDC's are performed with delay equation \ref{eq:2ddelay} on each odd cluster which have BB-states $(2:0)$, with delay $2$ in the middle node. The clusters are grown (middle), where the middle node is delayed, such that it's delay value decreases to $1$, and the clusters have B-states $(2:1)$. The clusters join (bottom) to a single odd cluster, which is selected for growth. Hence PDC is performed again, and the BB-state is $(4:0)$, thus requiring 4 growth iterations before zero PNW is reached in all nodes.}\label{fig:kbloom}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{1}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (c\x) {1} ++(0,-.7) node {0};}
+      \foreach[count=\i] \x in {1,4,7}{      \draw (\x,0) node [odd]  (c\x) {1} ++(0,-.7) node (cd\x) {2};
+                                             \node at (\x,0.7) {$\nset_\i$};}
+      \foreach \x in {.75,3.75,6.75}{\DSPECTRA{1}{0}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (c0) -- (c1) node[edge]{1} -- (c2) node[edge]{1} (c3) -- (c4) node[edge]{1} -- (c5) node[edge]{1} (c6) -- (c7) node[edge]{1} -- (c8) node[edge]{1};
+
+      \begin{scope}[shift={(0,-3)}]
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{0}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (c\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,4,7}{      \draw (\x,0) node [odd]  (c\x) {1} ++(0,-.7) node {0};}
+      \foreach \x in {.75,3.75,6.75}{\DSPECTRA{1}{1}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (c0) -- (c1) node[edge]{1} -- (c2) node[edge]{1} (c3) -- (c4) node[edge]{1} -- (c5) node[edge]{1} (c6) -- (c7) node[edge]{1} -- (c8) node[edge]{1};
+      \draw[l1, dashed] (e2) -- (e3) (e5) -- (e6);
+      \end{scope}
+
+      \begin{scope}[shift={(0,-6)}]
+      \DLINE{0}{0}{8}{1}
+      \foreach \x in {0,2,6,8}{\draw (\x,0) node [even] (d\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,7}{    \draw (\x,0) node [odd]  (d\x) {1} ++(0,-.7) node {0};}
+      \foreach \x in {3,5}{    \draw (\x,0) node [odd]  (d\x) {2} ++(0,-.7) node {2};}
+                               \draw (4,0)  node [even] (d4)  {1} ++(0,-.7) node {0};
+      \draw[l1] (d0) -- (d1) node[edge]{1} -- (d2) node[edge]{1} -- (d3) node[edge]{2} -- (d4) node[edge]{1} -- (d5) node[edge]{1} -- (d6) node[edge]{2} -- (d7) node[edge]{1} -- (d8) node[edge]{1};
+      \DSPECTRA{2}{0}{3.5}{-1.5}{0.3}{0.5}
+      \end{scope}
+
+      \node at (-2,0) {$n_i.s$};
+      \node at (-2,-0.75) {$n_i.d$};
+      \node at (-2,-1.5) {$(M:I)$};
+      \draw[semithick, ->] (9,-.75) to [out=-60, in=60] ++(0,-2.5);
+      \draw[semithick, ->] (9,-3.75) to [out=-60, in=60] ++(0,-2.5);
+      \node at (10, -2) [align=right, text width = 3cm] {\underline{PDC}, \codefunc{Grow}};
+      \node at (10, -5) [align=right, text width = 3cm] {\codefunc{Join}, \underline{PDC}};
+
+  \end{tikzpicture}
+  \caption{The same clusters, growths and joins as in figure \ref{fig:kbloom}, but now with delay equation \ref{eq:delayequation} for $f_{bloom} = 1/2$. With the redefined BB-state $(f_{bloom}M:I)$, $f=1$ can be reached in fewer growth iterations; e.g. after 1 round (middle), $(1:1)$ is reached. Also after join to a single cluster (bottom), fewer iterations are needed (2 compared to 4 in figure \ref{fig:kbloom}).}\label{fig:kbloom2}
+\end{figure}
+For any $f_{bloom} < 1$, a cluster will never actually reach the balanced BB-state, but only $(M:f_{bloom}I)$. Consequently, in the case of parity inversion, the difference in node sizes between even and odd nodes is decreased, such $f\to f_{bloom}$ can be reached in a lower number of growth iterations. Alternatively, the BB-state can be redefined as $(f_{bloom}M:I)$, where $f=1$ can now be reached in fewer growth iterations if $f_{bloom} <1$.  From intuition the balance constant should be around $f_{bloom} = 1/2$, which we will use in this thesis. For this value, the absolute delays in a node set are halved, such that both before and after the parity inversion, the lower halve of the BB-state spectrum of delays is occupied.
+\begin{theorem}
+  The degree of delay $f_{bloom} \in [0, 1]$ determines the factor of the calculated delays between the even and odd nodes. For any $f_{bloom} < 1$, a cluster will never reach equal PMW in the delay spectrum, but decreases the total size of the delay spectrum after parity inversion.
+\end{theorem}
+
+The optimal value of $f_{bloom}$ is dependant on the number of parity inversions, and consequently the lattice size, such that the spectrum of delays after the last parity inversion of a cluster is maximally occupied. We do not provide an analytical approach to estimate the optimal value of $f_{bloom}(L)$ here, but note that other values than $f_{bloom} = 1/2$ should be explored. \\
 
 \subsection{Growing a cluster}\label{sec:growingcluster}
 
@@ -780,7 +846,7 @@ For option A, an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and th
 %
 % For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify, we always choose case a.
 
-The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\beta)$. For O-joins between an even and an odd node set $\nset^e, \nset^o$ in the nodes $n^e, n^o$, always make the even node set a child of the even node set, where $n^e$ is now the sub-root of the subset $'\nset^e$. For E-joins between two even or two odd node sets, the parent and child sets can be picked at random. 
+The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\beta)$. For O-joins between an even and an odd node set $\nset^e, \nset^o$ in the nodes $n^e, n^o$, always make the even node set a child of the even node set, where $n^e$ is now the sub-root of the subset $'\nset^e$. For E-joins between two even or two odd node sets, the parent and child sets can be picked at random.
 
 \begin{theorem}\label{the:nodejoint}
   The union of node sets $\m{N}^\alpha, \m{N}^\beta$ on nodes $n^\alpha, n^\beta$ respectively is performed with $\codefunc{Join}(n^\alpha, n^\beta)$. If the join is between an even and an odd node set $\nset^e, \nset^o$ in the nodes $n^e, n^o$, $\codefunc{Join}(n^e, n^o)$ makes the node of the even set $n^e$ a child of the node of the odd set $n^o$. If the join is between two even or two odd node sets, the choice is arbitrary.
@@ -794,10 +860,10 @@ The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\be
   \node (o3) [even] at (2, 0) {$n_3$};
   \node (e4) [undef] at (3.5,1) {$n_4$};
   \node (e5) [undef] at (3.5,0) {$n_5$};
-  \draw[l1] (o2) -- (o1) -- (o3) (e4) -- (e5); 
+  \draw[l1] (o2) -- (o1) -- (o3) (e4) -- (e5);
   \draw[l1, dashed] (o3) -- (e5) node[midway,below] (a) {};
   \draw[l1, <-] (a) -- ++(0,-.5) node[below] {$\codefunc{Join}(n_3, n_5)$};
-  
+
   \begin{scope}[shift={(5,1)}]
   \node (o1) [even] at (1.5, 1) {$n_1$};
   \node (o2) [even] at (1, 0) {$n_2$};
@@ -808,7 +874,7 @@ The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\be
   \draw[l1, ->, dashed, color=cyan] (e4) ++(-.7,0) -- + (0,1);
   \draw[l1, ->, color=magenta] (o3) ++(.7,-.5) -- +(0,-1.5);
   \end{scope}
-  
+
   \begin{scope}[shift={(10,1.5)}]
   \node (o1) [even] at (1, -2) {$n_1$};
   \node (o2) [even] at (1, -3) {$n_2$};
@@ -821,7 +887,7 @@ The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\be
   \draw[l1, ->, color=magenta] (e4) ++(.7,0) -- +(0,-1);
   \draw[l1, ->, color=magenta](e5) ++(.7,-.5) -- + (0,-2.5);
   \end{scope}
-  
+
   \node at (5,2) {A)};
   \node at (9.5,2) {B)};
 \end{tikzpicture}
@@ -841,7 +907,7 @@ The final rule for joins between clusters introduces a data structure to store u
   \node (n1) [onset] at (0,0) {$\nset_1$};
   \node (n2) [onset] at (0,-1) {$\nset_2$};
   \draw[l1, dashed] (n1) -- (n2);
-  
+
   \begin{scope}[shift={(3,-.5)}]
   \node (n3) [onset] at (0,1) {$\nset_3$};
   \node (n1) [onset] at (0,0) {$\nset_1$};
@@ -850,7 +916,7 @@ The final rule for joins between clusters introduces a data structure to store u
   \draw[l1, ->, dashed, color=cyan] (n2) ++(-.7,0) -- +(0,1);
   \draw[l1, ->, color=magenta] (n1) ++(.7,0) -- +(0,-1);
   \end{scope}
-  
+
   \begin{scope}[shift={(6.5,-.5)}]
   \node (n3) [onset] at (0,1) {$\nset_3$};
   \node (n1) [onset] at (0,0) {$\nset_1$};
@@ -858,7 +924,7 @@ The final rule for joins between clusters introduces a data structure to store u
   \node (n4) [onset] at (.5,-1) {$\nset_4$};
   \draw[l1, dashed] (n1) -- (n4); \draw[l1] (n3) -- (n1) -- (n2);
   \end{scope}
-  
+
   \begin{scope}[shift={(10,-1)}]
   \node (n5) [onset] at (0,2) {$\nset_5$};
   \node (n3) [onset] at (0,1) {$\nset_3$};
@@ -869,7 +935,7 @@ The final rule for joins between clusters introduces a data structure to store u
   \draw[l1, ->, dashed, color=cyan] (n2) ++(-.7,0) -- +(0,2);
   \draw[l1, ->, color=magenta] (n3) ++(1.2,0) -- +(0,-2);
   \end{scope}
-  
+
   \node at (-1, 1) {a)};
   \node at (2, 1) {b)};
   \node at (5.5, 1) {c)};
@@ -889,7 +955,7 @@ To circumvent the PDC multiplicity, the calculation is suspended as much as poss
 
 The only task now is to store where the even subset $'\nset^e$ of the FO-join starts in the ancestry of subset $\nset^o$, as the sub-root of $'\nset^e$ is the starting point of the DFS's of the PDC. For each join between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $'n^o, 'n^e$, we additionally store the sub-root $'n^e_r$ of subset $'\m{N}^e$ at the root node of the resulting set $\m{N}^{o}$ as $n^{o}_r.u$, the \emph{undefined} sub-root. If $\m{N}^{o}$ is selected for growth as per theorem \ref{the:bucket_order}, we apply $\codefunc{CalcParity}(n^{o}_r.u)$ and $\codefunc{CalcDelay}(n^{o}_r.u)$ calculate parities and delays in undefined parts of the set, if it exists. The recursiveness of these function will make sure that the PDC are performed on all children nodes of (and including) $n^{o}_r.u$. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
 
-This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any TO-join, we don't know yet whether another O-join will occur, thus each TO-join to cluster $''\nset^o$ is treated as a FO-join. For a TO-join, we thus also store the undefined sub-root $u_1$ at the root $r_1=''n_r^o$. If $''\nset^o*$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and finally the "real" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined sub-root $u_2='n_r^e$ at the new root of $r_2='n_r^o$. Due to theorem \ref{the:nodejoint}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions. 
+This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any TO-join, we don't know yet whether another O-join will occur, thus each TO-join to cluster $''\nset^o$ is treated as a FO-join. For a TO-join, we thus also store the undefined sub-root $u_1$ at the root $r_1=''n_r^o$. If $''\nset^o$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and finally the "real" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined sub-root $u_2='n_r^e$ at the new root of $r_2='n_r^o$. Due to theorem \ref{the:nodejoint}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions.
 
 \begin{theorem}\label{the:delayonce}
   Undefined region of an odd cluster $\nset^o$ is defined as the sub-root $u$ for which all children nodes including $u$ have undefined parities and delays, and is stored at root node $n^o_r$. PDC is performed for $n^o_r.u$ and its children before cluster $\nset^o$ is grown.
