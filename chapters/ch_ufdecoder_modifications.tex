@@ -202,7 +202,7 @@ Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous
  \begin{tikzpicture}
  
    \path[pattern=dots, pattern color=green] (0,3) arc (90:225:1) arc (45:-135:.4142) arc (45:315:1) arc (135:-45:.4142) arc (135:405:1) arc (225:135:.4142) arc (-45:45:1) arc (225:135:.4142) arc (-45:90:1) -- cycle;
-   \path[pattern=north east lines , pattern color=cyan] (2,1) arc (90:450:1);
+   \path[pattern=grid , pattern color=cyan] (2,1) arc (90:450:1);
    \node[node, fill=white!70!green] at (0,0) (0) {$v_1$};
    \node[node, fill=white!70!cyan] at (2,0) (1) {$v_2$};
    \node[node, fill=white!70!black, path fading=fade right] at (4,0) (5) {$v_3$};
@@ -218,8 +218,8 @@ Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous
    \node at (-2, 2.5) {$\mathcal{V}_e$};
    \node at (7, 2.5) {$\mathcal{N}_e$};
 
-   \node[node, fill=white!70!green] at (7,0) (d) {$\sigma_1$};
-   \node[node, fill=white!70!cyan] at (9,0) (e) {$\sigma_2$};
+   \node[node, pattern=dots, pattern color=green] at (7,0) (d) {$\sigma_1$};
+   \node[node, pattern=grid , pattern color=cyan] at (9,0) (e) {$\sigma_2$};
    \node[node, fill=white!70!black, path fading=fade right] at (11,0) (f) {$\sigma_3$};
    \draw[l1] (d) -- (e) -- (f);
   \end{tikzpicture}
@@ -252,18 +252,24 @@ Syndrome-nodes $\sigma$ are not the only type of nodes in the node set. Consider
   \centering
   \begin{tikzpicture}
     \node at (-1,1) {$\vset_e'$};
+    
+    \node at (0,0) (0) {}; \node at (2,0) (1) {}; \node at (4,0) (2) {};
+    
+    \path[pattern=horizontal lines, pattern color=green, rounded corners=10pt, rotate around={45:(0)}] (-1,-1) rectangle (1,1);
+    \path[pattern=vertical lines, pattern color=cyan, rounded corners=10pt, rotate around={45:(1)}] (1,-1) rectangle (3,1);
+    \path[pattern=horizontal lines, pattern color=magenta, rounded corners=10pt, rotate around={45:(2)}] (3,-1) rectangle (5,1);
 
-    \node[nodel, fill=white!70!green] at (0,0) (v0) {\footnotesize$v_1$};
+    \node[nodel, fill=white!70!green] at (0) (v0) {\footnotesize$v_1$};
     \node[nodel] at (-1,0) (v0l) {};
     \node[nodel] at (0,1) (v0u) {};
     \node[nodel] at (0,-1) (v0d) {};
 
-    \node[nodel, fill=white!70!cyan] at (2,0) (v1) {\footnotesize$v_2$};
+    \node[nodel, fill=white!70!cyan] at (1) (v1) {\footnotesize$v_2$};
     \node[nodel] at (1,0) (v1l) {\footnotesize$v_{12}$};
     \node[nodel] at (2,1) (v1u) {};
     \node[nodel] at (2,-1) (v1d) {};
 
-    \node[nodel, fill=white!70!magenta] at (4,0) (v2) {\footnotesize$v_3$};
+    \node[nodel, fill=white!70!magenta] at (2) (v2) {\footnotesize$v_3$};
     \node[nodel] at (3,0) (v2l) {\footnotesize$v_{23}$};
     \node[nodel] at (5,0) (v2r) {};
     \node[nodel] at (4,1) (v2u) {};
@@ -274,16 +280,12 @@ Syndrome-nodes $\sigma$ are not the only type of nodes in the node set. Consider
     \draw[l1] (v1u) -- (v1) -- (v1d);
     \draw[l1] (v2u) -- (v2) -- (v2d);
 
-    \path[fill=green!50!white, opacity=0.3, rounded corners=10pt, rotate around={45:(v0)}] (-1,-1) rectangle (1,1);
-    \path[fill=cyan!50!white, opacity=0.3, rounded corners=10pt, rotate around={45:(v1)}] (1,-1) rectangle (3,1);
-    \path[fill=magenta!50!white, opacity=0.3, rounded corners=10pt, rotate around={45:(v2)}] (3,-1) rectangle (5,1);
-
     \node at (7,1) {$\nset_e'$};
-    \node[nodel, fill=white!70!green] at (7,0) (n0) {\footnotesize$\sigma_1$};
-    \node[nodel, fill=white!70!teal, diamond] at (8,0) (j01) {\footnotesize$j_{12}$};
-    \node[nodel, fill=white!70!cyan] at (9,0) (n1) {\footnotesize$\sigma_2$};
-    \node[nodel, fill=white!70!violet, diamond] at (10,0) (j12) {\footnotesize$j_{23}$};
-    \node[nodel, fill=white!70!magenta] at (11,0) (n2) {\footnotesize$\sigma_3$};
+    \node[nodel, pattern=horizontal lines, pattern color=green!25!white] at (7,0) (n0) {\footnotesize$\sigma_1$};
+    \node[nodel, pattern=grid, pattern color=teal!25!white, diamond] at (8,0) (j01) {\footnotesize$j_{12}$};
+    \node[nodel, pattern=vertical lines, pattern color=cyan] at (9,0) (n1) {\footnotesize$\sigma_2$};
+    \node[nodel, pattern=grid, pattern color=violet!25!white, diamond] at (10,0) (j12) {\footnotesize$j_{23}$};
+    \node[nodel, pattern=horizontal lines, pattern color=magenta!25!white] at (11,0) (n2) {\footnotesize$\sigma_3$};
     \draw[l1] (n0) -- (j01) -- (n1) -- (j12) -- (n2);
 
   \end{tikzpicture}
@@ -329,12 +331,19 @@ To show how this calculation is performed, we first take the example of a 1D nod
 
 \begin{figure}[h]
   \centering
-  \tikzstyle{nodea}=[node, minimum size=20]
-  \tikzstyle{nodeb}=[nodel, solid, fill=white!70!black]
+  \tikzstyle{nodea}=[node, minimum size=20, pattern=dots, pattern color=black!25!white]
+  \tikzstyle{nodeb}=[nodel, solid, pattern=dots, pattern color=black!25!white]
   \begin{tikzpicture}
     \node at (-1,1) {$\nset_{1D}$};
-    \draw[l1] (0,0) node[nodea] (n1) {$n_0$} -- ++(2,0) node[nodea] (n2) {$n_1$} -- ++(2,0) node[nodea] (n3) {$n_2$} -- ++(2,0) node[nodeb] (n4) {};
-    \draw[l1, dotted] (n4) -- ++(1,0) node[nodeb] (n5) {} -- ++(1,0) node[nodeb] (n6) {} -- ++(1,0) node[nodeb] (n7) {};
+    \node[nodea] at (0,0) (n1) {$n_0$};
+    \node[nodea] at (2,0) (n2) {$n_1$};
+    \node[nodea] at (4,0) (n3) {$n_2$};
+    \node[nodeb] at (6,0) (n4) {};
+    \node[nodeb] at (7,0) (n5) {};
+    \node[nodeb] at (8,0) (n6) {};
+    \node[nodeb] at (9,0) (n7) {};
+    \draw[l1]  (n1) -- (n2) -- (n3) -- (n4);
+    \draw[l1, dotted] (n4) -- (n5) -- (n6) -- (n7);
     \draw[l1, decorate, decoration={brace, amplitude=5}] (n4.west) ++(0,-.4) node[inner sep=0] (r1) {} (n7.east) ++(0,-.4) -- (r1) node[midway, below=4pt] {$S_{nset} -3$};
     \draw[l1, decorate, decoration={brace, amplitude=5}] (n7.west) ++ (0,.4) node[inner sep=0] (r2) {} (n4.east) ++ (0.,.4) -- (r2) node[midway, above=4pt] {$k$};
   \end{tikzpicture}
@@ -403,10 +412,9 @@ The delay calculation is done comparatively with the previous node, which means 
 \end{equation}
 where $n_\beta$ is the node of interest, and each of the nodes $n_{\gamma,j}$ is a child of $n_\beta$. As this requires the parity of each child node to be known, the node parities of the entire set can be calculated by a depth-first search (DFS) of the node tree, and traversing back to the root recursively and applying the above equation.
 
-\tikzstyle{odd}=[node1, dashed]
-\tikzstyle{even}=[node1]
-\tikzstyle{undef}=[node1, dotted]
-
+\tikzstyle{odd}=[node1, dashed, pattern=dots, pattern color=black!25!white]
+\tikzstyle{even}=[node1, pattern=dots, pattern color=black!25!white]
+\tikzstyle{undef}=[node1, dotted, pattern=dots, pattern color=black!25!white]
 \begin{figure}
   \centering
   \begin{tikzpicture}
@@ -592,15 +600,15 @@ With equation \ref{eq:nodeparity} and \ref{eq:delayequation}, we now finally hav
 \begin{figure}
   \centering
   \begin{tikzpicture}[x=1.5cm,y=1.5cm]
-    \node[node1] (a) at (1, 3) {$n_r$};
-    \node[node1,odd] (b) at (1, 2) {};
-    \node[node1,odd] (c) at (1, 1) {};
-    \node[node1] (d) at (1, 0) {};
-    \node[node1] (e) at (0, 1) {};
-    \node[node1] (f) at (0, 0) {};
-    \node[node1,odd] (g) at (2, 2) {};
-    \node[node1] (h) at (2, 1) {};
-    \node[node1] (i) at (2, 0) {};
+    \node[node1,even] (a) at (1, 3) {$n_r$};
+    \node[node1,odd]  (b) at (1, 2) {};
+    \node[node1,odd]  (c) at (1, 1) {};
+    \node[node1,even] (d) at (1, 0) {};
+    \node[node1,even] (e) at (0, 1) {};
+    \node[node1,even] (f) at (0, 0) {};
+    \node[node1,odd]  (g) at (2, 2) {};
+    \node[node1,even] (h) at (2, 1) {};
+    \node[node1,even] (i) at (2, 0) {};
     \draw[l1] (a) -- (b) -- (c) -- (d);
     \draw[l1] (b) -- (e);
     \draw[l1] (c) -- (f);
@@ -751,13 +759,12 @@ For any $f_{bloom} < 1$, a cluster will never actually reach the balanced BB-sta
   The degree of delay $f_{bloom} \in [0, 1]$ determines the factor of the calculated delays between the even and odd nodes. For any $f_{bloom} < 1$, a cluster will never reach zero PNW in the cluster, but only $f=I/M=f_{bloom}$, which also decreases the number of growth iterations needed to reach $f=f_{bloom}$ again after parity inversion.
 \end{theorem}
 
-The optimal value of $f_{bloom}$ is dependant on the number of parity inversions, and consequently the lattice size, such that the spectrum of delays after the last parity inversion of a cluster is maximally occupied. We do not provide an analytical approach to estimate the optimal value of $f_{bloom}(L)$ here, but note that other values than $f_{bloom} = 1/2$ should be explored. \\
+The optimal value of $f_{bloom}$ is dependant on the number of parity inversions, and consequently the lattice size , bucket number $i$, and the cluster sizes $S_\nset, S_\vset$, such that $f\to1$ after the last parity inversion of a cluster is maximally occupied. We do not provide an analytical approach to estimate the optimal value of $f_{bloom}(L, i, S_\nset, S_\vset)$ here, but note that other values than $f_{bloom} = 1/2$ should be explored. \\
 
 \subsection{Growing a cluster}\label{sec:growingcluster}
+With the knowledge of previous section, we now have the equations and algorithms available to describe the steps to grow a cluster in the context of Balanced Bloom. In the node data structure, the growth of a cluster is equivalent to a DFS of the node set. The boundary list for each cluster is not stored at $C$, but separately stored at each of the nodes $n_i$ in $\m{N}$. We traverse all $n_i \in \m{N}$ from the root $n_r$ and apply $\codefunc{Bloom}(n_i)$, which increases the support of all boundary edges in $n_i.m{L}$ by 1.
 
-With the node data structure, the growth of a cluster is equivalent to a DFS of the node set. The boundary list for each cluster is not stored at $C$, but separately stored at each of the nodes $n_i$ in $\m{N}$. We traverse all $n_i \in \m{N}$ from the root $n_r$ and apply $\codefunc{Bloom}(n_i)$, which increases the support of all boundary edges in $\m{L}_{n_i}$ at node $n_i$ by 1.
-
-Recall from theorem \ref{th:balancedbloom} that with Balanced Bloom, we need to conditionally bloom the nodes with minimal PMW, or zero PNW. Also, from lemma \ref{lem:calconce}, the delays are not recalculated after each growth iteration (in the absence of unions) but stored in memory at the nodes, and the PNW is updated via $n.w$ (equation \ref{eq:pnw}), the number of growths a node has waited. Thus, we can define a function $\codefunc{Grow}(n_i)$ where $\codefunc{Bloom}(n_i)$ is only applied if $n_i.d - C.d - n_i.w = 0$ is satisfied. If not, node $n_i$ is skipped, the wait is increased $n_i.w = n_i.w +1$ and \codefunc{Bloom} is recursively applied on its children.
+Recall from theorem \ref{th:balancedbloom} that with Balanced Bloom, we need to conditionally bloom the nodes with minimal PMW, or zero PNW. Also, from lemma \ref{lem:calconce}, the delays are not recalculated after each growth iteration (in the absence of unions) but stored in memory at the nodes, and the PNW is updated via $n.w$ (equation \ref{eq:pnw}), the number of growths a node has waited. Thus, we can define a function $\codefunc{Grow}(n_i)$ where $\codefunc{Bloom}(n_i)$ is only applied if $PNW(n_i) = n_i.d - C.d - n_i.w = 0$ is satisfied. If not, node $n_i$ is skipped, the wait is increased $n_i.w = n_i.w +1$ and \codefunc{Bloom} is recursively applied on its children.
 
 New vertices $v_{new}$ grown from node $n_i$ are added to $\m{V}$, while storing the seed node at each new vertex $v_{new}.n = n_i$. New boundary edges are appended to the boundary list $n_i.\m{L}$ stored each seed node $n_i$. The number of nodes in $\m{N}$ and the shape of the flower bush tree therefore does not change while no merge between clusters has happened.
 
@@ -795,21 +802,21 @@ New vertices $v_{new}$ grown from node $n_i$ are added to $\m{V}$, while storing
 
 
 \subsection{Joining node sets}\label{sec:jointnodesets}
-With the addition of the node set $\m{N}$, during a union of clusters $C_\alpha$ and $C_\beta$, we have to additionally combine the node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$ that requires its own set of rules that we will explain in this section. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we apply $\codefunc{Union}(v^\alpha, v^\beta)$, on the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Join}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha, n^\beta$ that seed vertices $v^\alpha, v^\beta$, respectively. During a merge of two clusters, these routines are both applied on their respective sets. From this point, when either one of the expressions "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}_\alpha$ and $\m{V}_\beta$" or the "join of node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$" is mentioned, it is always implied that both routines are executed.
+With the extension of the node set data structure, during a union of clusters $C_\alpha$ and $C_\beta$, we have to additionally combine the node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$ that requires its own set of rules that we will explain in this section. Let us first make a clear distinction between the various routines. On the vertex set $\m{V}$ we apply $\codefunc{Union}(v^\alpha, v^\beta)$, on the two vertices spanning the edge connecting two clusters. On node set $\m{N}$, we introduce here $\codefunc{Join}(n^\alpha, n^\beta)$, which is called on the two nodes $n^\alpha, n^\beta$ that seed vertices $v^\alpha, v^\beta$, respectively. During a merge of two clusters, these routines are both applied on their respective sets. From this point, when either one of the expressions "merge clusters $C^\alpha$ and $C^\beta$", "the union of vertex sets $\m{V}_\alpha$ and $\m{V}_\beta$" or the "join of node sets $\m{N}_{\alpha}$ and $\m{N}_\beta$" is mentioned, it is always implied that both routines are executed.
 
-Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{CalcParity} and \codefunc{CalcDelay}, which we will refer to as parity-delay calculation(s), or PDC in short. As the structure of the tree is crucial in computing the parity of the nodes and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$, that changes the ancestry dynamically by path compression. Join rules will be dependant on the parities of the joining node sets $\m{N}.p$, which is the number of syndrome-nodes in the set modulo 2. The parity of a node set $\m{N}.p$ is equivalent to the parity of a cluster $C.p$, which also refer to the number of syndromes in the cluster.
+Within the vertex set $\m{V}$, we apply \emph{path compression} and \emph{weighted union} to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node set $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{CalcParity} and \codefunc{CalcDelay}, which are the parity and delay calculation(s) (PDC). As the structure of the tree is crucial in computing the parity of the nodes and relative delays between the nodes, these rules will be quite different than in vertex set $\m{V}$ that changes the ancestry dynamically by path compression. Join rules will be dependant on the parities of the joining node sets $\m{N}.p$, which is the number of syndrome-nodes in the set modulo 2. The parity of a node set $\m{N}.p$ is equivalent to the parity of a cluster $C.p$, which also refer to the number of syndromes in the cluster.
 \begin{lemma}
   The parity of node set $\m{N}.p$ is the number of syndrome-nodes $a_i \in \m{N}$ modulo 2. The parity of node set $\m{N}.p$ is analogous to cluster parity $C.p$.
 \end{lemma}
 
-Only odd clusters with odd parity node sets are grown in the UF-decoder. It may thus be tempting to conclude that a join must include at least one odd node set. This is however not true as within the same growth iteration, there may be many joins, where some odd cluster $\nset_1^o$ first joins with odd cluster $\nset_2^o$, but also joins with even cluster $\nset_3^e$. The second join is effectively between even clusters. There are thus 3 types of joins: 1) odd-odd, 2) even-odd and 3) even-even, where even-odd is equivalent to odd-even. These joins can be put into 2 \emph{classes}, dependant on the parity of the resulting cluster. Both odd-odd and even-even joins to an even cluster and thus belongs to the even class join (E-join), whereas even-odd (and odd-even) joins to an odd cluster in the odd class join (O-join).
+Only odd clusters with odd parity node sets are grown in the UF-decoder. It may thus be tempting to conclude that a join must include at least one odd node set. This is however not true as within the same growth iteration, there may be many joins, where some odd cluster $\nset_1^o$ first joins with odd cluster $\nset_2^o$, but also joins with even cluster $\nset_3^e$. The second join is effectively between even clusters. Hence there are 3 types of joins: 1) odd-odd, 2) even-odd and 3) even-even, where even-odd is equivalent to odd-even. These joins can be put into 2 \emph{classes}, dependant on the parity of the resulting cluster. Both odd-odd and even-even joins to an even cluster and thus belongs to the even class join (E-join), whereas even-odd (and odd-even) joins to an odd cluster in the odd class join (O-join).
 
 
 \subsubsection{E-joins}
 
-For E-joins, the joint even cluster $\nset^e$ will not be selected for growth by the UF-decoder. One could naively conclude that no PDC will be performed and no PDC minimization can be made. This is of course not true as it is entirely possible that another cluster grows, and merges onto the cluster of $\m{N}^{e}$ in a O-join. In that case, we might think about "reusing" some of the node parities and delays that were already calculated in the subsets of $\m{N}^e$, such that we don't have to traverse $\m{N}^{e}$ entirely for its parities and delays.
+For E-joins, the joined even cluster $\nset^e$ will not be selected for growth by the UF-decoder. One could naively conclude that no PDC will be performed and no PDC minimization can be made. This is of course not true as it is entirely possible that another cluster grows, and merges with the cluster of $\m{N}^{e}$ in a O-join. In that case, we might think about "reusing" some of the node parities and delays that were already calculated in the subsets of $\m{N}^e$, such that $\m{N}^{e}$ doesn't have to be traversed entirely for its parities and delays. In this case, a \emph{partial PDC} is performed over the undefined part.
 
-To reuse prior calculated parities and delays, we need to traverse $\nset^e$ to find which sections are still valid, and which sections are not. This is no trivial task and often requires us to traverse the entire set $\nset^e$, especially when the clusters in the E-join are the results of joins within the same growth iteration.  Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the PDC over the subset $\nset^e$. We therefore define that the node parities and delays in the joint set after an E-join are \emph{undefined}.
+To reuse prior calculated parities and delays, we need to traverse $\nset^e$ to find which sections are still valid, and which sections are not. This is no trivial task and often requires us to traverse the entire set $\nset^e$, especially when the clusters in the E-join are the results of joins within the same growth iteration.  Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the PDC over the subset $\nset^e$. Hence the node parities and delays in the joined set after an E-join are \emph{undefined}.
 
 \begin{lemma}\label{lem:nodecalc_even}
   Node parities and delays become undefined if multiple node sets joins into a new set $\m{N}$ with even parity.
@@ -819,7 +826,7 @@ To reuse prior calculated parities and delays, we need to traverse $\nset^e$ to 
 
 Consider now an O-join between an even node set $\m{N}^e$ and an odd node set $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this join is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The join of these two sets produces a new odd node set $\m{N}_{new}^o$ with subsets $'\nset^e$ and $'\nset^o$, referring to the original node sets. We are provided with two choices, A) make $n^e$ child of $n^o$, or B) make $n^o$ child of $n^e$. The ancestry in the parent node set stays unchanged, but the ancestry in the child subset is changed by setting the joining node in the child set $n^c$ as the sub-root of the child subset $'\m{N}^c$. This is allowed per lemma \ref{lem:anynoderoot}, but removes any calculated parities or delays per lemma \ref{lem:nodeCalcParity} and \ref{lem:nodecalc_ancestrypath}.
 
-For option A, an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. The parities and delays in $'\m{N}^o$ stay valid and can be reused. From $n^e$, which is now the sub-root of  $'\m{N}^e$, we need to redo the PDC, where the relative delay of $n^e$ is calculated with respect to its parent $n^o$. This is efficient as the parities and delays in $'\m{N}^e$ are already undefined per lemma \ref{lem:nodecalc_even}. For option B, we need to redo the PDC in both $'\m{N}^o$ and $'\m{N}^e$, as $'\m{N}^o$ has a changed ancestry and  $'\m{N}^e$ is even. The PDC is thus minimized if option A is always chosen. \\
+For option A, an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. The parities and delays in $'\m{N}^o$ stay valid and can be reused. From $n^e$, which is now the sub-root of  $'\m{N}^e$, a partial PDC is applied, where the relative delay of $n^e$ is calculated with respect to its parent $n^o$ (figure \ref{fig:joinrules}A). This is efficient as the parities and delays in $'\m{N}^e$ are already undefined per lemma \ref{lem:nodecalc_even}. For option B, we need to redo the PDC in both $'\m{N}^o$ and $'\m{N}^e$ (figure \ref{fig:joinrules}B), as $'\m{N}^o$ has a changed ancestry and  $'\m{N}^e$ is even. The PDC is thus minimized if option A is always chosen. \\
 
 % If the subset $'\m{N}^e$ consists of only two odd node sub-subsets $''\m{N}^o_0, ''\m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $''\m{N}^o_0$ is preserved and $n_1$ is the sub-root of $''\m{N}^o_1$. We see that the parities in all ancestors of $n_0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $'\m{N}^{e}$.
 %
@@ -828,7 +835,7 @@ For option A, an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and th
 % In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the sub-root $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node parity changes in $'\m{N}^e$ will be dependant on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
 %
 % For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify, we always choose case a.
-The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\beta)$. For O-joins between an even and an odd node set $\nset^e, \nset^o$ in the nodes $n^e, n^o$, always make the even node set a child of the even node set, where $n^e$ is now the sub-root of the subset $'\nset^e$. For E-joins between two even or two odd node sets, the parent and child sets can be picked at random.
+The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\beta)$. For O-joins between an even and an odd node set $\nset^e, \nset^o$ in the nodes $n^e, n^o$, always make the even node set a child of the even node set, where $n^e$ is now the sub-root of the subset $'\nset^e$. For E-joins between two even or two odd node sets, the parent and child sets can be picked at random. Finally, we note the concept of a $partial$ PDC is rather redundant, as a PDC is always applied partially on the undefined part of a set for any set with $S_\nset>1$.
 
 \begin{theorem}\label{the:nodejoint}
   The union of node sets $\m{N}^\alpha, \m{N}^\beta$ on nodes $n^\alpha, n^\beta$ respectively is performed with $\codefunc{Join}(n^\alpha, n^\beta)$. If the join is between an even and an odd node set $\nset^e, \nset^o$ in the nodes $n^e, n^o$, $\codefunc{Join}(n^e, n^o)$ makes the node of the even set $n^e$ a child of the node of the odd set $n^o$. If the join is between two even or two odd node sets, the choice is arbitrary.
@@ -877,7 +884,9 @@ The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\be
 \end{figure}
 
 \subsection{Prevention of redundant PDC's}\label{sec:multiplejoint}
-The final rule for joins between clusters introduces a data structure to store undefined parts of a cluster, such that multiple PDC's over a subset is prevented. If there are many O-joins (and E-joins) within the same growth iteration $i$, that at the end of $i$ results to one single cluster $\nset$, every O-join will require the PDC over the even subset. There may be subsets were multiple PDC's are redone before $\nset$ has formed. Thus if the PDC is done directly after an O-join, the calculated values may be redundant. Consider an example with 5 odd clusters $\nset_1, ...,  \nset_5$ (figure \ref{fig:redundantpdc}). The join of $\nset_1$ and $\nset_2$ to $\nset_{12}$ is an E-join and requires no PDC. The join of $\nset_{12}$ and $\nset_3$ is an O-join, and we apply PDC in $\nset_{12}$. The join of $\nset_{123}$ and $\nset_4$ is an E-join and the join of $\nset_{1234}$ and $\nset_5$ is an O-join, with PDC executed in $\nset_{1234}$. The earlier computation in $\nset_{12}$ was therefore unnecessary and possibly invalid.
+The final rule for joins between clusters introduces a data structure to store undefined parts of a cluster, such that multiple PDC's over a subset is prevented. If there are many O-joins (and E-joins) within the same growth iteration $i$, that at the end of $i$ results to one single cluster $\nset$, every O-join will require the PDC over the even subset. There may be subsets where multiple PDC's are performed before the final cluster $\nset$ is constructed. If the PDC is done directly after an O-join, the calculated values may thus be redundant.
+
+Consider an example with 5 odd clusters $\nset_1, ...,  \nset_5$ (figure \ref{fig:redundantpdc}). The join of $\nset_1$ and $\nset_2$ to $\nset_{12}$ is an E-join and requires no PDC. The join of $\nset_{12}$ and $\nset_3$ is an O-join, and we apply PDC in $\nset_{12}$. The join of $\nset_{123}$ and $\nset_4$ is an E-join and the join of $\nset_{1234}$ and $\nset_5$ is an O-join, with PDC executed in $\nset_{1234}$. The earlier computation in $\nset_{12}$ was therefore unnecessary and possibly invalid.
 
 \tikzstyle{enset}=[node1, thick, double, font=\footnotesize]
 \tikzstyle{onset}=[node1, thick, densely dashed, double, font=\footnotesize]
@@ -925,7 +934,7 @@ The final rule for joins between clusters introduces a data structure to store u
 \caption{If the PDC is directly performed on the even subset in an O-join, there may be redundant PDC's in a series of O-joins and E-joins within the same growth iteration. Here we picture a series of join events between odd node sets (double lined circles, dashed for odd parity), where the O-join in b) initiates a redundant PDC.}\label{fig:redundantpdc}
 \end{figure}
 
-Note that some odd node set $\nset^o$ must always consist of some odd part $'\nset^o$ and an even part $'\nset^e$. The even part $'\nset^e$ may be subdivided into a number of odd and even sub-subsets $''\nset$, as long as the sum is even. Let us call the final O-join between $'\nset^e$ and $'\nset^o$ in a series of joins between clusters within the same growth iteration a \emph{FO-join}, and all others O-joins that play a role in constructing $'\nset^e$ intermediate O-joins or \emph{IO-joins}. The PDC needs only to be executed on the even subset in the FO-join $'\nset^e$.
+Note that some odd node set $\nset^o$ must always consist of some odd part $'\nset^o$ and an even part $'\nset^e$. The even part $'\nset^e$ may be subdivided into a number of odd and even sub-subsets $''\nset$, as long as the sum of their parities is even. Let us call the \emph{final O-join} between $'\nset^e$ and $'\nset^o$ in a series of joins between clusters within the same growth iteration a \emph{FO-join}, and all others O-joins that play a role in constructing $'\nset^e$ \emph{intermediate O-joins} or \emph{IO-joins}. The PDC needs only to be executed on the even subset in the FO-join $'\nset^e$.
 \begin{lemma}\label{lem:oddisevenodd}
   An odd node set $\nset$ that is the result of some joins must consist of an odd subset $'\nset^o$ and an even subset $'\nset^e$, where the even subset $'\nset^e$ may consist of smaller sub-subsets $''\nset$.
 \end{lemma}
@@ -936,16 +945,16 @@ To circumvent the PDC multiplicity, the calculation is suspended as much as poss
 
 The only task now is to store where the even subset $'\nset^e$ of the FO-join starts in the ancestry of subset $\nset^o$, as the sub-root of $'\nset^e$ is the starting point of the DFS's of the PDC. For each join between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $'n^o, 'n^e$, we additionally store the sub-root $'n^e_r$ of subset $'\m{N}^e$ at the root node of the resulting set $\m{N}^{o}$ as $n^{o}_r.u$, the \emph{undefined} sub-root. If $\m{N}^{o}$ is selected for growth as per theorem \ref{the:bucket_order}, we apply $\codefunc{CalcParity}(n^{o}_r.u)$ and $\codefunc{CalcDelay}(n^{o}_r.u)$ calculate parities and delays in undefined parts of the set, if it exists. The recursiveness of these function will make sure that the PDC are performed on all children nodes of (and including) $n^{o}_r.u$. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
 
-This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any IO-join, we don't know yet whether another O-join will occur, thus each IO-join to cluster $''\nset^o$ is treated as a FO-join. For a IO-join, we thus also store the undefined sub-root $u_1$ at the root $r_1=''n_r^o$. If $''\nset^o$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and finally the "real" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined sub-root $u_2='n_r^e$ at the new root of $r_2='n_r^o$. Due to theorem \ref{the:nodejoint}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions.
+This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any IO-join, we don't know yet whether another O-join will occur, thus each IO-join to cluster $''\nset^o$ is treated as a FO-join. For a IO-join, we thus also store the undefined sub-root $u_1$ at the root $r_1=''n_r^o$. If $''\nset^o$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and lastly the "real final" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined sub-root $u_2='n_r^e$ at the new root of $r_2='n_r^o$. Due to theorem \ref{the:nodejoint}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions of the set.
 
 \begin{theorem}\label{the:delayonce}
   Undefined region of an odd cluster $\nset^o$ is defined as the sub-root $u$ for which all children nodes including $u$ have undefined parities and delays, and is stored at root node $n^o_r$. PDC is performed for $n^o_r.u$ and its children before cluster $\nset^o$ is grown.
 \end{theorem}
 
 \subsection{Pseudocode}
-Now we have the full description of the \emph{Balanced Bloom} alteration of the UF decoder, which we dub the \emph{Union-Find Balanced Bloom} decoder. We present its pseudocode in algorithm \ref{al:ufbb}. The recursive \codefunc{Grow} function of algorithm \ref{al:bbgrow} has been added fully to the pseudocode in lines 7-12, as it is a crucial part of the decoder. Note that the structure of the code is mostly identical to the BCS UF decoder, where we sort the clusters growth in buckets, and apply the merge, in this case the combination of \codefunc{Union} and \codefunc{Join}, after each bucket iteration.
+Now we have the full description of the \emph{Balanced Bloom} alteration of the UF decoder, which we dub the \emph{Union-Find Balanced Bloom} (UFBB) decoder. We present its pseudocode in algorithm \ref{al:ufbb}. The recursive \codefunc{Grow} function of algorithm \ref{al:bbgrow} has been added fully to the pseudocode in lines 7-12, as it is a crucial part of the decoder. Note that the structure of the code is mostly identical to the BCS UF decoder, where we sort the clusters growth in buckets, and apply the merge, in this case the combination of \codefunc{Union} and \codefunc{Join}, after each bucket iteration.
 
-\begin{algo}[algotitle=Union-Find Balanced Bloom, label=al:ufbb]
+\begin{algo}[algotitle=Union-Find Balanced Bloom (UFBB), label=al:ufbb]
 \begin{algorithm}[H]
 \SetKwData{bucket}{bucket}\SetKwData{buckets}{buckets}
 \SetKwData{edge}{edge}\SetKwData{support}{support}
@@ -994,10 +1003,10 @@ Now we have the full description of the \emph{Balanced Bloom} alteration of the 
 
 \subsection{Complexity of Balanced Bloom}\label{sec:ufbbcomplexity}
 
-The contribution to the time complexity of the UF-EG decoder compared to the UF decoder can be divided into two parts. First is the contribution by \codefunc{CalcParity} and \codefunc{CalcDelay}, the parity-delay calculations (PDC). As these two functions are always called together per theorem \ref{the:delayonce}, we can just introspect the number of calls to one of them, and call this contribution the \emph{PDC complexity}. The second contribution will be caused by \codefunc{Grow} of algorithm \ref{al:bbgrow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom complexity}.
+The contribution to the time complexity of the UF-EG decoder compared to the UF decoder can be divided into two parts. First is the contribution by \codefunc{CalcParity} and \codefunc{CalcDelay}, the parity and delay calculations (PDC), which is called \emph{PDC complexity}. The second contribution will be caused by \codefunc{Grow} of algorithm \ref{al:bbgrow}, as now we have to additionally traverse the node set tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom complexity}.
 
 \subsubsection{PDC complexity}
-As per lemma \ref{lem:nodecalc_ancestrypath} and \ref{lem:nodecalc_even}, the total cost of the PDC is increased when the ancestries within subtrees change due to join operations, and node parities and delays have to be recalculated by traversal of the subtree. Per theorem \ref{the:nodejoint} and \ref{the:delayonce}, these calculations can be limited to the even subtrees in FEO type join events. The size of the even subtrees in FEO join events, multiplied by the number of join operations thus estimates the count of these calculations. We will take a top-down approach to find these estimates, where we retrace the ancestor node sets in their join operations in what we call the \emph{fragmentation} of $\nset$.
+As per lemma \ref{lem:nodecalc_ancestrypath} and \ref{lem:nodecalc_even}, the total cost of the PDC is increased when the ancestries within subtrees change due to join operations, and node parities and delays have to be recalculated by traversal of the subtree. Per theorem \ref{the:nodejoint} and \ref{the:delayonce}, these calculations can be limited to the even subtrees in FO-joins. The size of the even subtrees in FO-joins, multiplied by the number of join operations thus estimates the count of these calculations. We will take a top-down approach to find these estimates, where we retrace the ancestor node sets in their join operations in what we call the \emph{fragmentation} of $\nset$.
 
 \paragraph{Fragmentation of a node set}
 
@@ -1065,7 +1074,7 @@ As per lemma \ref{lem:nodecalc_ancestrypath} and \ref{lem:nodecalc_even}, the to
   \caption{In the fragmentation of cluster $\pre{k+1}\nset^o$ that belongs to ancestral generation $k-1$, we find the clusters $\pre{k}\nset_j$ of which the joins constructed cluster $\pre{k+1}\nset^o$. Any odd cluster can be fragmented into an odd (double dashed) and even (double continuous) cluster.}\label{fig:generation}
 \end{figure}
 
-For each odd node set $\nset^o$ that is grown, it may have constructed by many joins of smaller ancestral node sets in some previous growth iteration. Before $\nset^o$ is grown, PDC is performed on the even subset $'\nset^e$ in the FO-join of its ancestral node sets, where its size is proportional to the parity-delay calculations. Subset $'\nset^e$ may itself be the result of many IO-joins and E-joins in some previous growth iteration $i$. But as these joins do not count towards the parity-delay calculations, it is not crucial to know which joins have occurred. What matters to the PDC count is to know the entire set of odd subsets $''\nset^o$ that spans $'\nset^e$, as each of $''\nset^o$ is subjected to PDC the first time it is grown.
+For each odd node set $\nset^o$ that is grown, it may have constructed by many joins of smaller ancestral node sets in some previous growth iteration. Before $\nset^o$ is grown, PDC is performed on the even subset $'\nset^e$ of the FO-join of its ancestral node sets, where its size is proportional to the \emph{PDC count} $N_{PDC}$, the number of calculations performed during PDC. Subset $'\nset^e$ may itself be the result of many IO-joins and E-joins in some previous growth iteration $i$. But as these joins do not add towards the PDC count, it is not crucial to know which joins have occurred. What matters to the PDC count is to know the entire set of odd subsets $''\nset^o$ that spans $'\nset^e$, as each of $''\nset^o$ is subjected to PDC the first time it is grown.
 
 We introduce a function that is called the \emph{fragmentation} of a node set $\pre{k-1}\nset^o$, that splits $\pre{k-1}\nset^o$ into its ancestral node sets $\{\pre{k}\nset_j\}$, and resembles the inverse of a join operation. Here the prefix $k$ indicates the \emph{ancestral generation}, where a larger $k$ is equivalent to a more distant ancestor set of smaller subsets. As the size of the even node set in the FO-join is crucial for the PDC count, we make the distinction of \emph{partial fragmentations} $f_e$ and $f_o$. Partial fragmentation $f_e$ is equivalent to the inverse of the FO-join to $\pre{k-1}\nset^o$, where
 \begin{equation}\label{eq:pfe}
@@ -1082,24 +1091,22 @@ with the \emph{partial fragmentation number} $N_f$ indicating the total number o
 
 
 \begin{lemma}\label{lem:partialfrag}
-  Let the separation of an odd node set $\pre{k-1}\nset^o$ into subsets $\m{F}_k^o=\{\pre{k}\nset^o_0, \pre{k}\nset^e\}$ be the partial fragmentation $f_e$ and subsequently $\pre{k}\nset^e$ into  $\m{F}_k^o=\{\pre{k}\nset^o_1, \pre{k}\nset^o_2\}$ be $f_o$. The combination of the two is a fragmentation step $f$.
+  Let the separation of an odd node set $\pre{k-1}\nset^o$ into subsets $\m{F}_k^o=\{\pre{k}\nset^o_0, \pre{k}\nset^e\}$ be the partial fragmentation $f_e$ and subsequently $\pre{k}\nset^e$ into  $\m{F}_k^o=\{\pre{k}\nset^{o}_1,...,\pre{k}\nset^o_{N_f}\}$ be $f_o$. The combination of the two is a fragmentation step $f$.
 \end{lemma}
 
-
-
-If partial fragmentation function $f_e$ is called on a set of node sets $f_e(\{\nset^o, \nset^e, ...\})$, it fragments all odd node sets in the set, and $f_o$ fragments all even node sets. Each odd node set of $\m{F}_k$ can thus undergo the same fragmentation step into odd subsets, resulting in a second set of node subsets $\m{F}_{k+1}$. We can do this some $p$ times on $\pre{0}\nset^o$, where we have set $k-1=0$, until our resulting set of node sets $\m{F}_{p}$ consists only of smallest possible node subsets $\pre{p}\nset^o$ where $S_{\pre{p}\nset^o}=1$. Let us call the series of all $p$ fragmentation steps on $\pre{0}\nset^o$ the \emph{full fragmentation} $F$, with
+If partial fragmentation function $f_e$ is called on a set of node sets $f_e(\{\nset^o, \nset^e, ...\})$, it fragments all odd node sets in the set, and $f_o$ fragments all even node sets. Accordingly, the entire set of odd node sets $\m{F}_k$ can undergo the same fragmentation step into odd subsets, resulting in a second set of node subsets $\m{F}_{k+1}$. We can do this some $p$ times on $\pre{0}\nset^o$, where we have set $k-1=0$, until our resulting set of node sets $\m{F}_{p}$ consists only of smallest possible node subsets $\pre{p}\nset^o$ where $S_{\pre{p}\nset^o}=1$. Let us call the series of all $p$ fragmentation steps on $\pre{0}\nset^o$ the \emph{full fragmentation} $F$, with
 
 \begin{equation}\label{eq:fullfrag}
     F(\pre{0}\nset^o) = \underbrace{f(f(...f(\pre{0}\nset^o)))}_\text{p times} = \{\pre{p}\nset^{o}_1, \pre{p}\nset^{o}_2,...,\pre{p}\nset^{o}_{N_\sigma} \} \hspace{.3cm} | \hspace{.3cm} S_{\pre{p}\nset^{o}_i} = 1.
   \end{equation}
 
-To find the worst case complexity, we want to maximize the number of delay computations $N_{delay}$ during the construction of all the final clusters on the lattice. Let us assume that the final clusters are a single odd cluster $\pre{0}\nset^o$ of size $N/2-1$, which is the largest odd cluster that can be grown. As the delay computation is only executed on the even subsets, the sequence of join operations that maximizes the sum of even node sets sizes $S_{\pre{k}\nset^e}$, in the partial fragmentations $\m{F}^e_{k}$ in all fragmentation steps $k=[1,...,p]$ in $F(\pre{0}\nset^o)$, maximizes $N_{delay}$.
+To find the worst case complexity, we want to maximize $N_{PDC}$ during the construction of all the final clusters on the lattice. Let us assume that the final clusters are a single odd cluster $\pre{0}\nset^o$ of size $N/2-1$, which is the largest odd cluster that can be grown. As the PDC is only executed on the even subsets, the sequence of join operations that maximizes the sum of even node sets sizes $S_{\pre{k}\nset^e}$, in the partial fragmentations $\m{F}^e_{k}$ in all fragmentation steps $k=[1,...,p]$ in $F(\pre{0}\nset^o)$, maximizes $N_{PDC}$.
 \begin{equation}\label{eq:maxdelay}
-  N_{delay} = \sum_{k=1}^{p} \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \}.
+  N_{PDC} = \sum_{k=1}^{p} \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \}.
 \end{equation}
 
 \begin{proposition}
-  The worst-case delay complexity is computed by maximizing $N_{delay}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
+  The worst-case delay complexity is computed by maximizing $N_{PDC}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
 \end{proposition}
 
 \newcommand\Square[1]{+(-#1,-#1) rectangle +(#1,#1)}
@@ -1172,26 +1179,24 @@ To find the worst case complexity, we want to maximize the number of delay compu
       \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
       \node at (1,4) {$\nset^o$};
     \end{tikzpicture}
-  \caption{The full fragmentation of $\nset^o$ per equation \ref{eq:fullfrag}. Each odd node set in the fragmentation is a rectangle with continuous lines, and even node set has dashed lines. Each square is equivalent to a node, where the sum of all dark shaded squares is $N_{delay}$. Here, $N_{delay}$ is maximized as $N_{f_e} = N_{f_o} = 2$ and $R_j = \frac{1}{2}$. }\label{fig:fragcorrect}
+  \caption{The full fragmentation of $\nset^o$ per equation \ref{eq:fullfrag}. Each odd node set in the fragmentation is a rectangle with continuous lines, and even node set has dashed lines. Each square is equivalent to a node, where the sum of all dark shaded squares is $N_{PDC}$. Here, $N_{PDC}$ is maximized as $N_{f_e} = N_{f} = 2$ and $R_j = \frac{1}{2}$. }\label{fig:fragcorrect}
 \end{figure}
 
 \paragraph{Partial fragmentation number}
-We ignore the fact that the partial fragmentation $f_e$ or $f_o$ of some node set may not result in two but many subsets. Let us call the number of odd subsets the \emph{fragmentation number} $N_f$. For partial fragmentation $f_e$, the separation of the odd node set $\pre{k-1}\nset^o$ must be in 1 odd and 1 even subset per lemma \ref{lem:oddisevenodd}, thus $N_{f_e} = 2$. For partial fragmentation $f_o$ with fragmentation number $N_{f_o}$, the separation of even set $\pre{k}\nset^e$ can be in $2n_o$ odd and $n_e$ even subsets, where $n_o\geq 1$ and $n_e \geq 0$. But any even subset will be subjected to the same partial fragmentation $f_o$ in the full fragmentation. Thus we can set $n_e=0$, and $N_{f_o} = 2n_o$.
-
-To find $n_o$, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node set $\pre{k-1}\nset^e$ is fragmented with $N_{f_o}=2$, a fragmentation step $f(\pre{k-1}\nset^e)=f_e(f_o(\pre{k-1}\nset^e))$ produces the following partial fragmentation sets:
+For the partial fragmentation $f_o$, an even set $\pre{k}\nset^e$ can be separated in $2n_o$ odd and $n_e$ even subsets, where $n_o\geq 1$ and $n_e \geq 0$. The fragmentation number is thus $N_f = 2n_o + n_e$. But any even subset will be subjected to the same partial fragmentation $f_o$ in the full fragmentation. Thus we can set $n_e=0$. To find $n_o$, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node set $\pre{k-1}\nset^e$ is fragmented with $N_{f}=2$, a fragmentation step $f(\pre{k-1}\nset^e)=f_e(f_o(\pre{k-1}\nset^e))$ produces the following partial fragmentation sets:
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
   \m{F}^o_{k-1} &=& \{ \pre{k-1} \nset^{o}_1, \pre{k-1} \nset^{o}_2\},  \\
   \m{F}^e_{k} &=& \{\pre{k}\nset^{o,o}_{1,0}, \pre{k}\nset^{o,e}_1, \pre{k}\nset^{o,o}_{2,0}, \pre{k}\nset^{o,e}_2 \}.
 \end{eqnarray*}
-For $N_{f_2} = 4$, the partial fragmentation sets are
+For $N_{f} = 4$, the partial fragmentation sets are
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
   \m{F}^e_{k-1} &=& \{ \pre{k-1}\nset^{o}_1, \pre{k-1}\nset^{o}_2,  \pre{k-1}\nset^{o}_3, \pre{k-1}\nset^{o}_4\},  \\
   \m{F}'^e_{k} &=& \{\pre{k}\nset^{o,o}_{1,0}, \pre{k}\nset^{o,e}_1,  \pre{k}\nset^{o,o}_{2,0}, \pre{k}\nset^{o,e}_2,  \pre{k}\nset^{o,o}_{3,0}, \pre{k}\nset^{o,e}_3, \pre{k}\nset^{o,o}_{4,0}, \pre{k}\nset^{o,e}_4 \}.
 \end{eqnarray*}
 
-If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node set size decreases faster towards the minimum size of 3 as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $n_o$ will decrease the number of fragmentation steps and thus the number of delay calculations $N_{delay}$ per equation \ref{eq:maxdelay}. Thus $N_{delay}$ is maximized for minimal $n_o = 1$, and our decision of $N_{f_o}=2$ in lemma \ref{lem:partialfrag} is correct.
+If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node set sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node set size decreases faster towards the minimum size of 3 nodes as more fragmentation steps are applied. As the sum of even node set sizes in each fragmentation step is the same, increasing $n_o$ will decrease the number of fragmentation steps and consequently the PDC count $N_{PDC}$ per equation \ref{eq:maxdelay}. Hence $N_{PDC}$ is maximized for minimal $n_o = 1$, and we find that $N_f=2$.
 
 \begin{figure}
   \centering
@@ -1268,11 +1273,11 @@ If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio 
       \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
       \node at (1,4) {$\nset^o$};
     \end{tikzpicture}
-  \caption{A full fragmentation of $\nset^o$ where in the first $f_0$, the fragmentation number is increased to $N_{f_o} = 6$. The number of dark shaded squares or $N_{delay}$ has decreased from the fragmentation with optimal settings (figure \ref{fig:fragcorrect}). }\label{fig:fragfnumber}
+  \caption{A full fragmentation of $\nset^o$ where in the first $f_0$, the fragmentation number is increased to $N_{f_o} = 6$. The number of dark shaded squares or $N_{PDC}$ has decreased from the fragmentation with optimal settings (figure \ref{fig:fragcorrect}). }\label{fig:fragfnumber}
 \end{figure}
 
 \paragraph{Partial fragmentation ratio}
-To complete the fragmentation description, we will need to find the \emph{fragmentation ratios} $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node set sizes of the subsets in $\m{F}_{k}$ with respect to the size of $\pre{k-1}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of subset $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd subset from $f_e$, and $R_1, R_2$ to the odd subsets in $f_o$.
+To complete the fragmentation formalism, we will need to find the \emph{fragmentation ratios} $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node set sizes of the subsets in $\m{F}_{k}$ with respect to the size of $\pre{k-1}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of subset $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd subset from $f_e$, and $R_1, R_2$ to the odd subsets in $f_o$.
 
 \begin{lemma}\label{lem:fragratio}
   Let the fragmentation ratios $R_0, R_2, R_2$ be the relative set sizes of the odd subsets in the fragmentation set $\m{F}_{k} = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2 \}$ with respect to set $\pre{k-1}\nset^o$, where
@@ -1281,9 +1286,9 @@ To complete the fragmentation description, we will need to find the \emph{fragme
   \end{equation}
 \end{lemma}
 
-Recall lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this grow process, some $n_v$ vertices are added to the cluster, and some join operations can occur. If no join operations occur, the node set stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:calconce}. We want to minimize $n_v$, as each added vertex here is not a node that can possibly count towards $N_{delay}$. Thus in each growth iteration of a cluster, some join operation must occur for the maximization of $N_{delay}$.
+Recall lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this grow process, some $n_v$ vertices are added to the cluster, and some join operations can occur. If no join operations occur, the node set stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:calconce}. We want to minimize $n_v$, as each added vertex here is not a node that can possibly count towards $N_{PDC}$. Thus in each growth iteration of a cluster, some join operation must occur for the maximization of $N_{PDC}$.
 
-Take the first fragmentation sets $\m{F}e_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of cluster $\pre{k-1}\nset^o$. These partial fragmentations correspond to 2 join operations, between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_o$, and between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_e$. If we want to minimize $n_v$ in $f_o$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node set sizes. For $f_e$, the merge event is caused by growth of $\nset^o_0$ in either some larger or equal bucket $b_j \geq b_i$ where $ S_{\vset_0} \geq S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$. To maximize $N_{delay}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_e$. Recall from equation \ref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node set size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
+Take the first fragmentation sets $\m{F}^e_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of cluster $\pre{k-1}\nset^o$. These partial fragmentations correspond to 2 join operations, the E-join between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_o$, and the FO-join between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_e$. If we want to minimize $n_v$ in $f_o$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node set sizes. For $f_e$, the merge event is caused by growth of $\nset^o_0$ in either some larger or equal bucket $b_j \geq b_i$ where $ S_{\vset_0} \geq S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$. To maximize $N_{PDC}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_e$. Recall from equation \ref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node set size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
 
 \begin{lemma}\label{lem:thirdratio}
   A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the value $R = \frac{1}{3}$.
@@ -1343,16 +1348,16 @@ The last unknown parameter for the delay calculation is $p$, the number of fragm
 \end{equation}
 In each fragmentation step $\m{F}^e_k$, $f_e$ is equivalent to the join operation of odd node sets with even node sets where the sum of odd sets sizes is
 \begin{equation}\label{eq:sumoddsetsize}
-  \sum_i \{ S_{\pre{k}\nset_i^o} | \pre{k}\nset_i^o \in \m{F}^e_k \} = \frac{1}{3}S_{\nset^o},
+  \sum_j \{ S_{\pre{k}\nset_j^o} | \pre{k}\nset_j^o \in \m{F}^e_k \} = \frac{1}{3}S_{\nset^o},
 \end{equation}
 and the sum of even node set of sizes is
 \begin{equation}\label{eq:sumevensetsize}
-  \sum_i \{ S_{\pre{k}\nset_i^e} | \pre{k}\nset_i^e \in \m{F}^e_k \} = \frac{2}{3}S_{\nset^o}.
+  \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \} = \frac{2}{3}S_{\nset^o}.
 \end{equation}
 This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Filling in equation \ref{eq:numfrag} and \ref{eq:sumevensetsize} in \ref{eq:maxdelay}, we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-\nonumber  N_{delay} &\leq& \sum_{k=1}^{p} \sum_i \{ S_{\pre{k}\nset_i^e} | \pre{k}\nset_i^e \in \m{F}^e_k \}. \\
+\nonumber  N_{PDC} &\leq& \sum_{k=1}^{p} \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \}. \\
 \nonumber   &=& \sum_{k=1}^{\log_3(S_{\nset^o})} \frac{2}{3}S_{\nset^o} \\
    &=& \frac{2}{3}S_{\nset^o}\log_3(S_{\nset^o})
 \end{eqnarray}
@@ -1363,18 +1368,18 @@ The node set size of set is bounded by the lattice size $\nset^o \leq N$. The wo
 
 To grow a cluster represented by a node set $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the nodes. Let's call the total number of times any node is traversed by \codefunc{Bloom} $N_{bloom}$.
 
-Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_i$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{bloom}$.
+Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node set $\pre{k}N^o_j$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{bloom}$.
 \begin{equation}\label{eq:nnode}
-  N_{bloom} \leq \sum^{p}_{k=1}\sum_i \{ S_{\pre{k}\nset_i} | \pre{k}\nset_i \in \m{F}_k \}
+  N_{bloom} \leq \sum^{p}_{k=1}\sum_j \{ S_{\pre{k}\nset_j} | \pre{k}\nset_j \in \m{F}_k \}
 \end{equation}
 For a full fragmentation of $\nset$ of size $S_\nset$, the sum of all set sizes in each fragmentation set $\m{F}$ is
 \begin{equation}\label{eq:sumsetsfrag}
-  \sum_i \{S_{\pre{k}\nset_i} | \pre{k}\nset_i \in \m{F}_k \} = S_\nset.
+  \sum_j \{S_{\pre{k}\nset_j} | \pre{k}\nset_j \in \m{F}_k \} = S_\nset.
 \end{equation}
 By filling in $p$ we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-  \nonumber N_{bloom} &\leq& \sum^{p}_{k=1}\sum_i \{ S_{\pre{k}\nset_i} | \pre{k}\nset_i \in \m{F}_k \} \\
+  \nonumber N_{bloom} &\leq& \sum^{p}_{k=1}\sum_j \{ S_{\pre{k}\nset_j} | \pre{k}\nset_j \in \m{F}_k \} \\
   \nonumber &=& \sum_{k=1}^{\log_3(S_{\nset^o})} S_\nset \\
    &=& S_{\nset^o}\log_3(S_{\nset^o}),
 \end{eqnarray}
