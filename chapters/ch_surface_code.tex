@@ -289,7 +289,7 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
 
 An error $E$ can be corrected by applying it again to the lattice. The error operator $E$ is however unknown. We must therefore try to identify the correct operator given the measured syndrome. As mentioned in the previous chapter, this relationship between error does not always map one-to-one, which it is not in the surface code. An error $E$ can be multiplied with some operator $L$ that commutes with the stabilizer and they will result in the same syndrome.
 
-If $L$ is in the stabilizer $\m{S}$, the product of the identified correction operator $C=E'$ with the real error operator $E$ will leave the code invariant. The resulting operator $CE=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $E$, $E\bar{Z}_1$, $E\bar{Z}_2$, $E\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorised into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
+If $L$ is in the stabilizer $\m{S}$, the product of the identified correction operator $C=E'$ with the real error operator $E$ will leave the code invariant. The resulting operator $CE=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $E$, $E\bar{Z}_1$, $E\bar{Z}_2$, $E\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
 
 \subsection{Quasiparticle picture}
 
@@ -456,56 +456,59 @@ A second key difference is that now not all errors will cause two stabilizer vio
 \paragraph{Logical qubits}
 Furthermore, we can inspect that a planar surface of dimension $L$ has $N = 2L^2-2L+1$ physical qubits. We can also find that there are $2L^2-2L$ stabilizer generators. As the boundary is now non-periodic, all generators are now independent, and therefore the number independent generators is $N_S = 2L^2-2L$. This means that the planar code encodes $N_L = N-N_S = 1$ a single logical qubit. The logical $\bar{X}$ and $\bar{Z}$ operators are pictured in Figure \ref{sf:fig_planar}e-f.\\
 
-Other properties of the planar code are very similar to the toric code. The \emph{dual lattice} also exists for the planar code, for example. But the dual lattice exists at a 90 angle compared to the primary lattice. Also, as the bulk of the lattice still consists of 4-Pauli operator stabilizers, the decoding algorithms for the planar code is very similar to the toric code. It is due to the boundary that some slight alterations are needed, as we will see in the next section.
-
+Other properties of the planar code are very similar to the toric code. The \emph{dual lattice} also exists for the planar code, for example. But the dual lattice exists at a 90 angle compared to the primary lattice. Also, as the bulk of the lattice still consists of 4-Pauli operator stabilizers, the decoding algorithms for the planar code is very similar to the toric code. It is due to the boundary that some slight alterations are needed, as we will see in the next section.z
+z
 \section{Decoders}\label{sec:surface_decoders}
 \subsection{The optimal decoder}\label{sec:optimal_decoder}
 \subsection{Minimum Weight Perfect Matching}\label{sec:MWPMdecoder}
 \subsection{The Union-Find decoder}\label{sec:UFdecoder}
 
-Even the fastest MWPM algorithms still have a quadratic time complexity of $\m{O}(n^2\sqrt{n})$, where $n$ is the number of qubits. In order to realistically utilize a decoder with increasing decoding success rates using increasing lattice size, we would need to have a better time complexity. Luckily, an alternative algorithm called the Peeling Decoder has been developed which can solve errors over the erasure channel with a linear time complexity $\m{O}(n)$ \cite{delfosse2017linear}. The Union-Find Decoder builds on top of the Peeling Decoder to solve for Pauli errors with a time complexity of $\m{O}(n\alpha(n))$, where $\alpha$ is an inverse Ackermann function, which is smaller than 3 for any practical input size \cite{delfosse2017almost}. However, these algorithms have a tradeoff in the form of a decrease in the error threshold, and has the reported value of $p_{UF} = 9.2\%$.
+The Union-Find decoder is a new fast decoding algorithm for topological codes to correct for Pauli errors, erasure errors, and the combination of both errors. The worst-case complexity of the algorithm is $\m{O}(n\alpha(n))$, where $n$ is the number of physical qubits and $\alpha$ is the inverse of Ackermann's function, which is very slowly growing, and is proven that $a(n)\leq 3$ for any practical amount of qubits.
 
-A topic of interest will be weighted growth function for the Union-find decoder. This function of the algorithm will increase the error threshold to $p_{UF} = 9.9\%$, but has not been fully described in its publication.  In this section, we will describe the original Peeling decoder and the Union-Find decoder.   \\
+Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. 
+
+To this end, a new decoding algorithm has been developed that can solve errors over the erasure channel with a linear time complexity. This decoder has been dubbed them \emph{Peeling decoder}, by the nature of its behavior of iteratively \emph{peeling} from some tree of qubit-edges until the correction operator is left. The \emph{Union-Find decoder} is an extension of the Peeling decoder that additionally solves for Pauli errors. It utilizes the \emph{Union-Find} data structure to keep track of a set of subsets in a series of union events. We will first inspect the Peeling decoder, then the Union-Find decoder, and perform a short analysis of the complexity of both algorithms. 
 
 \subsubsection{The Peeling decoder}
-Let $\varepsilon \subset E$ be an erasure, a set of qubits on which an erasure error occurs, and let $\sigma \subset S$ be the measured error syndrome, the subset of stabilizer generators which anticommute with the erasure errors. In the absence of Pauli errors, all errors $P$ must lie inside the erasure. Therefore, for any pair of stabilizer generators in $\sigma$, the path of errors must also be in the erasure, which can be denoted by $P\subset \varepsilon$. Furthermore, due to the fact that errors $P$ are randomly distributed, any coset of errors and stabilizers $P\cdot S$ that solves the error syndrome $\sigma$ is the most likely coset. These features of an erasures forms the basis of the Peeling decoder. In order to find a coset of $P \cdot S$, the decoder reduces the size of the erasure by peeling edges from the erasure, while keeping the syndromes at the new boundary of the erasure. Elements of the syndrome can be moved by applying an correction on the adjacent qubit. At the end, the entire erasure is peeled or removed, and all corrections will have removed the errors up to a stabilizer.
+Let $\m{E}\subset E$ be an erasure, a set of qubits on which an erasure error occurs, and let $\sigma \subset \m{S}$ be the measured error syndrome, the subset of the stabilizer generator group $\m{S}$, that anticommute with the erasure errors. In the absence of Pauli errors, all errors $P$ must lie inside the erasure. Therefore, for any measured syndrome, the path of errors must also be in the erasure, which can be denoted by $P\subset \m{E}$. Furthermore, due to the fact that errors $P$ are uniformly distributed, any error $\tilde{P}\subset\m{E}$ that produces the syndrome $\sigma$ is the most likely coset. 
+\begin{lemma}
+  For an erasure $\m{E} \subset E$ of a surface code and a measured syndrome $\sigma$, any error $\tilde{P}\subset \m{E}$ that produces $\sigma$ is the most likely set of errors. 
+\end{lemma}
+Consequently, if the error set $\tilde{P}$ is applied as the correction operator $C=\tilde{P}$, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $C=\tilde{P} \subset \m{E}$, we now do not try to find paths within $m{E}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made. 
 
+The first step in this is to produce a \emph{spanning forest} $F_\m{E}$ inside $\m{E}$, a maximal subset of edges of $\m{E}$ that contains no cycles and spans all vertices of $\m{E}$, and thus also all the syndromes $\sigma$. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is connected \emph{acyclic} graph. Such a forest can be found in linear time by either a depth-first search or breadth-first search of the $\m{E}$. 
+
+Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $C$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a\emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u\in\sigma$, remove $u$ from $\sigma$, and $e$ is added to $C$ and the vertex $v$ is \emph{flipped}, such that $v$ is added to $sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $C$ until it encounters another syndrome vertex, creating a correction path between two syndrome pairs. 
 \input{tikzfigs/function_uf_lattice_styles}
 \input{tikzfigs/peeling_decoder}
-
-\todo[inline]{use capitals for sets $\Sigma$, and lowercase $\sigma$ for elements in the set}
-
-We will now describe the Peeling decoder as is presented in Algorithm \ref{algo:peel}. In step 1, we will remove all cycles present in $\varepsilon$. We construct a spanning forest $F_\varepsilon$ inside erasure $\varepsilon$, the maximal subsect of edges of $\varepsilon$ that contains no cycles and spans all vertices of $\varepsilon$. From here, we loop over all edges in $F_\varepsilon$ (step 3), starting at a leaf edge $e = \{u,v\}$, removing the leaf edge from $F_\varepsilon$ (step 4), and conditionally add the edge to the correction set $\kappa$ if the pendant vertex $u$ is in $\sigma$ (step 6). If the correction is applied immediately, we can see that the pendant vertex $u$ is removed from $\sigma$ and that the value of $v$ is flipped in $\sigma$. Edges on a branch in the forest will be added to $\kappa$ until $v \in \sigma$, or a generator will be continuously moved from $u$ to $v$ until it encounters another generator, creating a correction path between two syndrome pairs.
-
-\begin{lemma}\label{lem:forestofgraph}
-  A forest $F$ is an undirected graph in which any two vertices are connected by at most one path. A forest $F_G$ of some graph $G$ is one in which some edges is removed such that there are no cycles in the graph, which satisfies the forest requirement.
-\end{lemma}
-
 \begin{algo}[algotitle=Peeling decoder \cite{delfosse2017linear}, label=algo:peel]
   \begin{algorithm}[H]
-    \KwData{A graph $G = (V,E)$, an erasure $\varepsilon \subset E$ and syndrome $\sigma \subset V$}
-    \KwResult{Correction set $\kappa \subset E$}
+    \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subset E$ and syndrome $\sigma \subset V$}
+    \KwResult{Correction set $C \subset E$}
     \BlankLine
-    construct a spanning forest $F_\varepsilon$ of $\varepsilon$\;
-    initialize $\kappa$ by $\kappa = {\emptyset}$\;
-    \While{$F_\varepsilon \neq \emptyset$}{
-    pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\varepsilon$ \;
+    construct a spanning forest $F_\m{E}$ of $\m{E}$\;
+    initialize $C$ by $C = {\emptyset}$\;
+    \While{$F_\m{E} \neq \emptyset$}{
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\m{E}$ \;
     \If{$u \in \sigma$}{
-      add $e$ to $\kappa$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
+      add $e$ to $C$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
     \Else{do nothing}
     }
-    \KwRet{$\kappa$}
+    \KwRet{$C$}
   \end{algorithm}
 \end{algo}
+Note that due the flipping of both $u$ and $v$ in $\sigma$, the parity of the number of syndrome vertices in $\sigma$ is always preserved. The peeling decoder can therefore always solve erasures with an even parity, as the size of $\sigma$ will drop during peeling until at the end the syndrome set will be empty $\sigma = \emptyset$. Now, this is always the case when erasure errors are the only type of errors on the lattice, as all syndrome vertices in $\sigma$ caused by some error $P\subset\m{E}$ must lie in $\m{E}$ as well. 
+\begin{theorem}
+  For any connected graph, if the parity of the number syndrome vertices within the graph is even, applying algorithm \ref{algo:peel} will produce a matching between pairs of syndrome vertices within the graph. 
+\end{theorem}
 
-\noindent Note that due the flipping of both $u$ and $v$ in $\sigma$, the parity of the number of generators in $\sigma$ is always preserved. The peeling decoder can therefore always solve erasures with an even parity, as the size of $\sigma$ will drop until at the end the syndrome will be empty $\sigma = \emptyset$, and call errors are corrected up to a stabilizer. This is always the case in the absence of measurement and Pauli errors, as all errors within the erasure either add or remove an even number of generators to or from $\sigma$.
+\todo[inline]{Theorem 1 from delfosse2017linear with proof}
 
 \paragraph{Time complexity of the Peeling decoder}
-The spanning forest $F_\varepsilon$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\varepsilon})$ and therefore also in the number of qubits $\m{O}(n)$.
+The spanning forest $F_\m{E}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{E}})$ and therefore also in the number of qubits $\m{O}(n)$.
 
 \subsubsection{Growing erasures}
-
-Now in the presence of Pauli errors, errors can occur on edges that are now not part of the erasure, and odd parity clusters can occur. Clusters that consists from only a single generator also exist, which are just end-points of syndromes caused by Pauli errors. We must therefore make an erasure $\varepsilon$ from the syndrome $\sigma$ that is compatible with the peeling decoder, which contains only even parity clusters. To do this, we can attractively grow the clusters with an odd parity by an half-edge on the boundaries on the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder.
+Now in the presence of Pauli errors, errors can occur on edges that are now not part of the erasure, and odd parity clusters can occur. Clusters that consists from only a single generator also exist, which are just end-points of syndromes caused by Pauli errors. We must therefore make an erasure $\m{E}$ from the syndrome $\sigma$ that is compatible with the peeling decoder, which contains only even parity clusters. To do this, we can attractively grow the clusters with an odd parity by an half-edge on the boundaries on the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder.
 
 \paragraph{Union-Find algorithm}
 
@@ -541,8 +544,8 @@ Finally, we need to update the elements in the cluster list $\m{L}$. First, we r
 
 \begin{algo}[algotitle=Union-Find decoder \cite{delfosse2017almost}, label=algo:uf]
   \begin{algorithm}[H]
-    \KwData{A graph $G = (V,E)$, an erasure $\varepsilon \subset E$ and syndrome $\sigma \subset V$}
-    \KwResult{A grown erasure $\varepsilon'$ such that each cluster $\gamma \subset \varepsilon$ is even}
+    \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subset E$ and syndrome $\sigma \subset V$}
+    \KwResult{A grown erasure $\m{E}'$ such that each cluster $\gamma \subset \m{E}$ is even}
     \BlankLine
     initialize cluster-trees, support and boundary lists for all clusters \;
     initialize list of odd cluster roots $\m{L}$\;
@@ -554,7 +557,7 @@ Finally, we need to update the elements in the cluster list $\m{L}$. First, we r
     for all $u \in \m{L}$, update the boundary list\;
     remove even clusters from $\m{L}$\;
     }
-    run peeling decoder with grown erasure $\varepsilon'$
+    run peeling decoder with grown erasure $\m{E}'$
   \end{algorithm}
 \end{algo}
 
