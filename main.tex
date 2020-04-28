@@ -1,4 +1,4 @@
-\documentclass[11pt, a4paper, twoside, titlepage, usenames,dvipsnames]{report}
+\documentclass[11pt, a4paper, twoside, titlepage, dvipsnames]{report}
 \usepackage[page, title, titletoc]{appendix}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[section]{placeins}
@@ -87,22 +87,22 @@
 
 \input{tikzfigs/function_draw_lattices}
 
-%\include{preliminary_report}
-%
-% \include{chapters/ch_introduction}
-%
-% \include{chapters/ch_qec_basics}
-%
-% \include{chapters/ch_surface_code}
+% \include{preliminary_report}
+
+\include{chapters/ch_introduction}
+
+\include{chapters/ch_qec_basics}
+
+\include{chapters/ch_surface_code}
 
 \include{chapters/ch_ufdecoder_modifications}
 
 % \include{chapters/ch_threshold_results}
 \include{peeling_objects_1}
 %
-% \begin{appendices}
-%   \include{appendices/ap_bucket_sort}
-% \end{appendices}
+\begin{appendices}
+  \include{appendices/ap_bucket_sort}
+\end{appendices}
 
 
 \printbibliography

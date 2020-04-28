@@ -247,7 +247,7 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
   \end{tikzpicture}
 
   \hspace{1cm}
-    \begin{tikzpicture}
+  \begin{tikzpicture}
     \DRAWTORIC{5}
     \DRAWERROR{1}{2}{1}{z}
     \DRAWERROR{1}{1}{1}{z}
@@ -263,7 +263,7 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
     \node[below=.25cm of Bx-2] {(c)};
   \end{tikzpicture}
   \hspace{1cm}
-    \begin{tikzpicture}
+  \begin{tikzpicture}
     \DRAWTORIC{5}
     \DRAWERROR{0}{2}{0}{z}
     \DRAWERROR{4}{2}{0}{z}
@@ -482,23 +482,23 @@ We will now describe the Peeling decoder as is presented in Algorithm \ref{algo:
 \end{lemma}
 
 \begin{algo}[algotitle=Peeling decoder \cite{delfosse2017linear}, label=algo:peel]
-\begin{algorithm}[H]
+  \begin{algorithm}[H]
     \KwData{A graph $G = (V,E)$, an erasure $\varepsilon \subset E$ and syndrome $\sigma \subset V$}
     \KwResult{Correction set $\kappa \subset E$}
     \BlankLine
     construct a spanning forest $F_\varepsilon$ of $\varepsilon$\;
     initialize $\kappa$ by $\kappa = {\emptyset}$\;
-    \While{$F_\varepsilon \neq \O$}{
-        pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\varepsilon$ \;
-        \If{$u \in \sigma$}{
-            add $e$ to $\kappa$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
-        \Else{do nothing}
+    \While{$F_\varepsilon \neq \emptyset$}{
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\varepsilon$ \;
+    \If{$u \in \sigma$}{
+      add $e$ to $\kappa$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
+    \Else{do nothing}
     }
     \KwRet{$\kappa$}
-\end{algorithm}
+  \end{algorithm}
 \end{algo}
 
-\noindent Note that due the flipping of both $u$ and $v$ in $\sigma$, the parity of the number of generators in $\sigma$ is always preserved. The peeling decoder can therefore always solve erasures with an even parity, as the size of $\sigma$ will drop until at the end the syndrome will be empty $\sigma = \O$, and call errors are corrected up to a stabilizer. This is always the case in the absence of measurement and Pauli errors, as all errors within the erasure either add or remove an even number of generators to or from $\sigma$.
+\noindent Note that due the flipping of both $u$ and $v$ in $\sigma$, the parity of the number of generators in $\sigma$ is always preserved. The peeling decoder can therefore always solve erasures with an even parity, as the size of $\sigma$ will drop until at the end the syndrome will be empty $\sigma = \emptyset$, and call errors are corrected up to a stabilizer. This is always the case in the absence of measurement and Pauli errors, as all errors within the erasure either add or remove an even number of generators to or from $\sigma$.
 
 \paragraph{Time complexity of the Peeling decoder}
 The spanning forest $F_\varepsilon$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\varepsilon})$ and therefore also in the number of qubits $\m{O}(n)$.
@@ -540,22 +540,22 @@ For each edge $(u,v)$ in $\m{F}$, we need to check whether the neighboring verti
 Finally, we need to update the elements in the cluster list $\m{L}$. First, we replace each element $u$ with its potential new cluster root \codefunc{find(u)} in line 7. We can avoid creating duplicate elements by maintaining an extra look-up table that keeps track of the elements $\m{L}$ at the beginning of each round of growth. In line 8, we update the \codeword{boundary} lists of all the clusters in $\m{L}$, and in line 9, even clusters are removed from the list, preparing it for the next round of growth.
 
 \begin{algo}[algotitle=Union-Find decoder \cite{delfosse2017almost}, label=algo:uf]
-\begin{algorithm}[H]
+  \begin{algorithm}[H]
     \KwData{A graph $G = (V,E)$, an erasure $\varepsilon \subset E$ and syndrome $\sigma \subset V$}
     \KwResult{A grown erasure $\varepsilon'$ such that each cluster $\gamma \subset \varepsilon$ is even}
     \BlankLine
     initialize cluster-trees, support and boundary lists for all clusters \;
     initialize list of odd cluster roots $\m{L}$\;
     \While{$\m{L} \neq \emptyset$}{
-      initialize fusion list $\m{F}$ \;
-      for all $u \in \m{L}$, grow all edges in the boundary list of cluster $C_u$ by a half-edge in support. If the edge is fully grow, add to fusion list $\m{F}$ \;
-      for all $e={u,v} \in \m{F}$, if \emph{find($u$)} $\neq$ \emph{find($v$)}, then apply \emph{union($u,v$)}, append boundary list\;
-      for all $u \in \m{L}$, replace $u$ with \emph{find($u$)} without creating duplicate elements\;
-      for all $u \in \m{L}$, update the boundary list\;
-      remove even clusters from $\m{L}$\;
+    initialize fusion list $\m{F}$ \;
+    for all $u \in \m{L}$, grow all edges in the boundary list of cluster $C_u$ by a half-edge in support. If the edge is fully grow, add to fusion list $\m{F}$ \;
+    for all $e={u,v} \in \m{F}$, if \emph{find($u$)} $\neq$ \emph{find($v$)}, then apply \emph{union($u,v$)}, append boundary list\;
+    for all $u \in \m{L}$, replace $u$ with \emph{find($u$)} without creating duplicate elements\;
+    for all $u \in \m{L}$, update the boundary list\;
+    remove even clusters from $\m{L}$\;
     }
     run peeling decoder with grown erasure $\varepsilon'$
-\end{algorithm}
+  \end{algorithm}
 \end{algo}
 
 \subsubsection{Time complexity of the Union-Find decoder}
