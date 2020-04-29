@@ -1,90 +1,80 @@
+\tikzset{
+  anyon/.style={circle, fill=OrangeRed, minimum size=.2cm, inner sep=0},
+  erasure/.style={NavyBlue, very thick},
+  correction/.style={Green, very thick},
+  description/.style={align=#1, text width=4cm},
+  description/.default={left},
+  error/.style={text=black, pos=0.5}
+  }
+
 \begin{figure}
   \centering
-  \begin{tikzpicture}
-
+  \begin{tikzpicture}[on grid, scale=0.8]
+    \node at (0,4) {a)};
     \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-    \draw[erasure] (1,1) -- (2,1) node[error]{$X$} -- (3,1) -- (3,2) -- (2,2) -- (1,2) -- (1,1) node[error]{$X$};
+    \draw[erasure] (1,1) -- (2,1) node[error]{$X$} -- (3,1) -- (3,2) -- (2,2) -- (1,2) -- cycle node[error]{$X$};
     \draw[erasure] (1,2) -- (1,3) -- (2,3) node[error]{$X$} -- (2,2);
-    \node[description={center}] at (0, -.5) {initial state};
+    \node[description={center}] at (2, -.5) {initial state};
 
-    \begin{scope}[shift={(5,0)}]
+    \begin{scope}[shift={(6,0)}]
+      \node at (0,4) {b)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \draw[erasure] (1,1) -- (2,1) -- (3,1) -- (3,2) -- (2,2) -- (1,2) -- (1,1);
-      \draw[erasure] (1,2) -- (1,3) -- (2,3) -- (2,2);
-      \node[anyon] at (1,2) {};
-      \node[anyon] at (2,1) {};
-      \node[anyon] at (1,3) {};
-      \node[anyon] at (2,3) {};
-      \node[description={center}] at (0, -.5) {indentify syndrome};
+      \draw[erasure] (1,1) -- (2,1) node[anyon]{} -- (3,1) -- (3,2) -- (2,2) -- (1,2) node[anyon] (a) {} -- cycle;
+      \draw[erasure] (a) -- (1,3) node[anyon]{} -- (2,3) node[anyon]{}-- (2,2);
+      \node[description={center}] at (2, -.5) {identify syndrome};
     \end{scope}
 
-    \begin{scope}[shift={(10,1)}]
-      \draw[thin] (0,2) -- (.5,2) ;
-      \node[description] at (1, 2) {unerased edge};
-      \draw[thin] (0,1.5) -- (.5,1.5)  node[error]{$X$};
-      \node[description] at (1, 1.5) {edge with Pauli error};
-      \draw[erasure] (0, 1) -- (.5, 1);
-      \node[description] at (1, 1) {erased edge};
-      \node[anyon] at (0.25, .5) {};
-      \node[description] at (1, .5) {syndrome};
-      \draw[correction] (0,0) -- (.5,0);
-      \node[description] at (1, 0) {correction edge};
+    \begin{scope}[shift={(12,-.5)}]
+      \draw[thin] (0,4) -- ++(.5,0) ++(.5,0) node[anchor=west]{normal edge};
+      \draw[thin] (0,3) -- ++(.5,0) node[error]{$X$} ++(.5,0) node[anchor=west]{Pauli error};
+      \draw[erasure] (0,2) -- ++(.5,0) ++(.5,0) node[anchor=west, text=black]{erased edge};
+      \draw[thin] (0,1) -- ++(.5,0) node[anyon,pos=.5]{} ++(.5,0) node[anchor=west]{syndrome};
+      \draw[correction] (0,0)   -- ++(.5,0) ++(.5,0) node[anchor=west,text=black]{correction edge};
     \end{scope}
 
-    \begin{scope}[shift={(0,-5.5)}]
+    \begin{scope}[shift={(0,-6)}]
+      \node at (0,4) {c)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \draw[erasure] (1,3) -- (2,3) --  (2,2) -- (1,2) -- (1,1) -- (2,1) -- (3,1) -- (3,2);
-      \node[description={center}] at (0, -.5) {construct $F_{\varepsilon}$};
-      \node[anyon] at (1,2) {};
-      \node[anyon] at (2,1) {};
-      \node[anyon] at (1,3) {};
-      \node[anyon] at (2,3) {};
+      \draw[erasure] (1,3) node[anyon]{} -- (2,3) node[anyon]{} -- (2,2) -- (1,2) node[anyon]{} -- (1,1) -- (2,1) node[anyon]{} -- (3,1) -- (3,2);
+      \node[description={center}] at (2, -.5) {construct $F_{\varepsilon}$};
     \end{scope}
 
-    \begin{scope}[shift={(5,-5.5)}]
+    \begin{scope}[shift={(6,-6)}]
+      \node at (0,4) {d)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \draw[erasure] (1,3) -- (2,3)  --  (2,2) -- (1,2) -- (1,1) -- (2,1);
-      \draw[erasure, dashed] (2,1) -- (3,1) node[pos=0, below, text=black]{$v$} node[pos=0.5, above]{$e$} node[pos=1, below, text=black]{$u$};
-      \node[description={center}] at (0, -.5) {peel $e=\{u,v\}, u \notin \sigma$};
-      \node[anyon] at (1,2) {};
-      \node[anyon] at (2,1) {};
-      \node[anyon] at (1,3) {};
-      \node[anyon] at (2,3) {};
+      \draw[erasure] (1,3) node[anyon]{} -- (2,3) node[anyon]{} -- (2,2) -- (1,2) node[anyon]{} -- (1,1) -- (2,1) node[anyon](a){};
+      \draw[erasure, dashed] (a) -- (3,1) node[pos=0, below, text=black]{$v$} node[pos=0.5, above]{$e$} node[pos=1, below, text=black]{$u$};
+      \node[description={center}] at (2, -.5) {peel $e=(u,v), u \notin \sigma$};
     \end{scope}
 
-    \begin{scope}[shift={(10,-5.5)}]
+    \begin{scope}[shift={(12,-6)}]
+      \node at (0,4) {e)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \draw[erasure] (1,3) -- (2,3)  --  (2,2) -- (1,2) -- (1,1);
-      \draw[erasure, dashed] (1,1) -- (2,1) node[pos=0, below, text=black]{$v$} node[pos=0.5, above]{$e$} node[pos=1, below, text=black]{$u$};
-      \node[description={center}] at (0, -.5) {peel $e=\{u,v\}, u \in \sigma$};
-      \node[anyon] at (1,2) {};
-      \node[anyon] at (2,1) {};
-      \node[anyon] at (1,3) {};
-      \node[anyon] at (2,3) {};
+      \draw[erasure] (1,3) node[anyon]{} -- (2,3) node[anyon]{} -- (2,2) -- (1,2) node[anyon]{} -- (1,1);
+      \draw[erasure, dashed] (1,1) node[below, text=black]{$v$} -- (2,1) node[anyon]{} node[pos=0.5, above]{$e$} node[below, text=black]{$u$};
+      \node[description={center}] at (2, -.5) {peel $e=(u,v), u \in \sigma$};
     \end{scope}
 
-    \begin{scope}[shift={(0,-11)}]
+    \begin{scope}[shift={(0,-12)}]
+      \node at (0,4) {f)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \draw[erasure] (1,3) -- (2,3)  --  (2,2) -- (1,2) -- (1,1);
-      \draw[correction] (1,1) -- (2,1) node[pos=0, below, text=black]{$v$} node[pos=0.5, above]{$\kappa$} node[pos=1, below, text=black]{$u$};
-      \node[description={center}] at (0, -.5) {flip $v$, add $e$ to $\kappa$};
-      \node[anyon] at (1,2) {};
-      \node[anyon] at (2,1) {};
-      \node[anyon] at (1,3) {};
-      \node[anyon] at (2,3) {};
+      \draw[erasure] (1,3) node[anyon]{} -- (2,3) node[anyon]{} --  (2,2) -- (1,2) node[anyon]{} -- (1,1) node[anyon](a){};
+      \draw[correction] (a) node[below, text=black]{$v$} -- (2,1) node[pos=0.5, above]{$e$} node[below, text=black]{$u$};
+      \node[description={center}] at (2, -.5) {flip $u,v$, add $e$ to $C$};
     \end{scope}
 
-    \begin{scope}[shift={(5,-11)}]
+    \begin{scope}[shift={(6,-12)}]
+      \node at (0,4) {g)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \draw[correction] (1,3) -- (2,3) node[error]{$X$};
-      \draw[correction] (2,1) -- (1,1) node[error]{$X$} -- (1,2) node[error]{$X$};
-      \node[description={center}] at (0, -.5) {apply correction set $\kappa$};
+      \draw[correction] (1,3) -- (2,3) node[error]{$X$} (2,1) -- (1,1) node[error]{$X$} -- (1,2) node[error]{$X$};
+      \node[description={center}] at (2, -.5) {apply correction set $C$};
     \end{scope}
 
-    \begin{scope}[shift={(10,-11)}]
+    \begin{scope}[shift={(12,-12)}]
+      \node at (0,4) {h)};
       \draw[step=1cm,gray,thin] (0.1,0.1) grid (3.9,3.9);
-      \node[description={center}] at (0, -.5) {end state};
+      \node[description={center}] at (2, -.5) {end state};
     \end{scope}
   \end{tikzpicture}
-  \caption{Schematic representation of the Peeling decoder.}
+  \caption{Schematic representation of the Peeling decoder. On an erasure $\m{E}\subset E$ (a), there may be some Pauli errors $P\subset \m{E}$ that anticommutes with some stabilizer measurements (b) that is identified as the syndrome $\sigma$. The first step is to construct a spanning forest $F_\m{E}\subset \m{E}$, a fully connected acyclic graph. Next the decoder sequentially removes leaf edges $e=(u,v)$ from the forest that connect to the forest via only one vertex $v$. If $u\in\sigma$ (e), remove $u$ from $\sigma$, flip $v$ in $\sigma$ and the edge $e$ is added to the correction set $C$ (f). If $u \notin \sigma$, move on the the next leaf. After applying the correction set $C$, all errors on the lattice commutes with the stabilizers, potentially solving the error (h).}
 \end{figure}
