@@ -3,6 +3,7 @@
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{physics}
 \usepackage{adjustbox}
@@ -43,12 +44,7 @@
     boxed title style={boxrule=-1pt},
     fonttitle=\bfseries, coltitle=black, algotitle={}, #1}
 
-\usepackage{xcolor}
-\usepackage{listings}
-\usepackage{xparse}
-\usepackage{todonotes}
-
-
+\usepackage{xcolor, listings, xparse, todonotes}
 
 \newcommand{\codeword}[1]{\texttt{\textcolor{MidnightBlue}{#1}}}
 %\newcommand{\codefunc}[1]{\texttt{\textcolor{OliveGreen}{#1}}}
@@ -71,6 +67,18 @@
 \tikzset{sel/.style={label position = below, yshift = 0.5cm}}
 
 
+\usepackage[symbols,nomain,nogroupskip,automake]{glossaries-extra}
+\makeglossaries
+\glsxtrnewsymbol[description={Pauli group}]{pauligroup}{\ensuremath{\m{P}}}
+\glsxtrnewsymbol[description={Pauli X operator}]{X}{\ensuremath{X}}
+\glsxtrnewsymbol[description={Pauli Y operator}]{Y}{\ensuremath{Y}}
+\glsxtrnewsymbol[description={Pauli Z operator}]{Z}{\ensuremath{Z}}
+\glsxtrnewsymbol[description={Identity operator}]{I}{\ensuremath{I}}
+\glsxtrnewsymbol[description={Logical X operator}]{Xlogical}{\ensuremath{\bar{X}}}
+\glsxtrnewsymbol[description={Logical Z operator}]{Zlogical}{\ensuremath{\bar{Z}}}
+\glsxtrnewsymbol[description={Stabilizer group}]{stabilizergroup}{\ensuremath{\m{S}}}
+\glsxtrnewsymbol[description={Stabilizer, element of $\m{S}$}]{stabilizer}{\ensuremath{S}}
+\glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{stabilizergenerator}{\ensuremath{s}}
 \usepackage[style=numeric-comp, sorting=none]{biblatex}
 \addbibresource{cit.bib}
 
@@ -82,30 +90,23 @@
 \begin{document}
 
 \include{_titlepage}
-
 \tableofcontents
+\printglossary[type=symbols,style=long]
 
 \input{tikzfigs/function_draw_lattices}
 
 % \include{preliminary_report}
-
 % \include{chapters/ch_introduction}
 
 \include{chapters/ch_qec_basics}
-
 \include{chapters/ch_surface_code}
-
 \include{chapters/ch_ufdecoder_modifications}
-
 % \include{chapters/ch_threshold_results}
 \include{peeling_objects_1}
-%
+
 \begin{appendices}
   \include{appendices/ap_bucket_sort}
 \end{appendices}
 
-
 \printbibliography
-
-
 \end{document}
