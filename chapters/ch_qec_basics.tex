@@ -106,11 +106,11 @@ A quantum error correcting code that can be described using the stabilizer forma
 \begin{align}
   & \gls{stabilizer}\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \m{S}. &
 \end{align}
-The elements of the of the stabilizer group $S\in\m{S}$ are most simply referred to as \emph{stabilizers}. Any stabilizer $S$ can be written as a product of elements from a set of stabilizer generators $\{s_1,...,s_{N_s}\}$.  
+The elements of the of the stabilizer group $S\in\m{S}$ are most simply referred to as \emph{stabilizers}. Any stabilizer $S$ can be written as a product of elements from a set of stabilizer generators $\mathfrak{s}=\{s_1,...,s_{N_s}\}$.  
 \begin{align}
  & S = \prod_{j=1}^{N_s}s_j^{a_j}, && a_j \in {0, 1} &
 \end{align}
-The set of stabilizer generators $\{s_1,...,s_{N_s}\}$ is \emph{independent} if no generator can be written as a product of other generators. This implies that any stabilizer can be written in terms of the bitstring $a_1, a_2, ...a_{N_s}$ and that the stabilizer group takes up $N_s$ degrees of freedom of the Hilbert space of $N$ qubits. The remaining $N-N_s = N_l$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $N_l$ logical qubits are to be encoded by $N$ qubits, we require a total of $N_s = N-N_l$ independent stabilizer generators.
+The set of stabilizer generators $\mathfrak{s}$ is \emph{independent} if no generator can be written as a product of other generators. This implies that any stabilizer can be written in terms of the bitstring $a_1, a_2, ...a_{N_s}$ and that the stabilizer group takes up $N_s$ degrees of freedom of the Hilbert space of $N$ qubits. The remaining $N-N_s = N_l$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $N_l$ logical qubits are to be encoded by $N$ qubits, we require a total of $N_s = N-N_l$ independent stabilizer generators.
 
 
 \subsection{Encoded logical operators}
@@ -131,7 +131,7 @@ which means that the post-error state is a +1 eigenstate of $S_j$. If $O$ and ge
 \begin{equation}\label{qec:eq:stabmeas}
   sO\ket{\psi} = -Os\ket{\psi} = -O\ket{\psi}
 \end{equation}
-and the post-error state is a -1 eigenstate of $s$. Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns a series of eigenvalue outcomes that is called the \emph{syndrome}. However, it is not necessary to measure all operators in the stabilizer group $\m{S}$. Measuring the set of independent stabilizer generators $\{s_1,...,s_{N_s}\}$ suffices as any other stabilizer is just a combination of already measured states.
+and the post-error state is a -1 eigenstate of $s$. Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns a series of eigenvalue outcomes that is called the \emph{syndrome}. However, it is not necessary to measure all operators in the stabilizer group $\m{S}$. Measuring the set of independent stabilizer generators $\mathfrak{s}=\{s_1,...,s_{N_s}\}$ suffices as any other stabilizer is just a combination of already measured states.
 
 \subsection{Error models}\label{qec:sec_errormodels}
 
@@ -151,9 +151,9 @@ The bit-flip and phase-flip errors can be considered together as the \emph{indep
 
 \paragraph{The depolarizing noise model}
 In the \emph{depolarizing} noise model, the afflicted quantum state is replaced by a complete mixed state with probability $p_D$. Let the completely mixed state be written as
-\begin{equation*}\label{qec:eq:mixstate}
+\begin{equation}\label{qec:eq:mixstate}
   \frac{1}{2}I = \frac{1}{4}(\rho + X\rho X + Y\rho Y + Z\rho Z),
-\end{equation*}
+\end{equation}
 then the depolarizing channel is described as
 \begin{align}\label{qec:eq:depolarizing}
   \nonumber \Phi_D(\rho) &= (1-p_D)\rho + p_D\left(\frac{1}{2}I\right) \\

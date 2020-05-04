@@ -4,9 +4,10 @@
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
 \usepackage[hidelinks]{hyperref}
-\usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{physics}
 \usepackage{adjustbox}
+\usepackage{amsfonts, amsmath, amssymb, amsthm}
+\usepackage[mathscr]{euscript}
 
 \let\oldemptyset\emptyset
 \let\emptyset\varnothing
@@ -79,6 +80,26 @@
 \glsxtrnewsymbol[description={Stabilizer group}]{stabilizergroup}{\ensuremath{\m{S}}}
 \glsxtrnewsymbol[description={Stabilizer, element of $\m{S}$}]{stabilizer}{\ensuremath{S}}
 \glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{stabilizergenerator}{\ensuremath{s}}
+\glsxtrnewsymbol[description={Plaquette operator}]{plaquette}{\ensuremath{P_f}}
+\glsxtrnewsymbol[description={Star operator}]{star}{\ensuremath{S_v}}
+\glsxtrnewsymbol[description={Graph of vertices, edges (and faces)}]{graph}{\ensuremath{G}}
+\glsxtrnewsymbol[description={Vertex set}]{vertices}{\ensuremath{V}}
+\glsxtrnewsymbol[description={vertex, elemet of $V$}]{vertex}{\ensuremath{v}}
+\glsxtrnewsymbol[description={Edge set}]{edges}{\ensuremath{E}}
+\glsxtrnewsymbol[description={edge, element of $E$}]{edge}{\ensuremath{e}}
+\glsxtrnewsymbol[description={Face set}]{faces}{\ensuremath{F}}
+\glsxtrnewsymbol[description={Face, element of $F$}]{face}{\ensuremath{f}}
+\glsxtrnewsymbol[description={Probability of succesfull error correction}]{pcorrect}{\ensuremath{p_C}}
+\glsxtrnewsymbol[description={Threshold probability}]{pthres}{\ensuremath{p_{th}}}
+\glsxtrnewsymbol[description={Error operator, product of Pauli operators}]{error}{\ensuremath{P}}
+\glsxtrnewsymbol[description={Correction operator, product of Pauli operators}]{correction}{\ensuremath{C}}
+\glsxtrnewsymbol[description={Erasure, subset of $E$}]{erasure}{\ensuremath{\m{E}}}
+\glsxtrnewsymbol[description={Forest of erasure $\m{E}$}]{forest}{\ensuremath{F_\m{E}}}
+\glsxtrnewsymbol[description={Pauli product of set of edges}]{pauliproduct}{\ensuremath{\mathscr{P}}}
+\glsxtrnewsymbol[description={Correction set, subset of $E$}]{correctionset}{\ensuremath{\m{C}}}
+
+
+
 \usepackage[style=numeric-comp, sorting=none]{biblatex}
 \addbibresource{cit.bib}
 

@@ -73,15 +73,14 @@ To define a stabilizer code, we need to specify the $m$ independent stabilizer g
 \paragraph{Plaquette operators}
 For every face $f$ on our lattice, we define a plaquette operator $P_f$, consisting of tensor product of Pauli Z operators on qubits on these edges (see Figure \ref{sf:fig_toriclattice}a),
 \begin{equation}\label{eq:sf_plaquette}
-  P_f = \bigotimes_{i\in Q(f)} Z_i
+  \gls{plaquette} = \prod_{i\in Q(f)} Z_i
 \end{equation}
 where $Q(f)$ is the set of qubits touching face $f$. On a $L\times L$ grid there are $L^2$ plaquettes.
 
 \paragraph{Star operators}
-
 Similarly, for every vertex $v$ on our lattice, we define a star operator $S_v$, consisting of tensor product of Pauli X operators on qubits neighboring the vertex (see Figure \ref{sf:fig_toriclattice}b),
 \begin{equation}\label{eq:sf_star}
-  S_v = \bigotimes_{i\in Q(v)} X_i
+  \gls{star} = \prod_{i\in Q(v)} X_i
 \end{equation}
 where $Q(v)$ is the set of qubits neighboring vertex $v$. On a $L\times L$ grid there are $L^2$ plaquettes.
 
@@ -278,105 +277,24 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
     \end{pgfonlayer}
     \node[below=.25cm of Bx-2] {(d)};
   \end{tikzpicture}
-  \caption{(a) Stabilizer generators that anticommute with the error will measure -1, which are (i) the neighboring star operators for a Z error, (ii) the neighboring plaquette operators for an X error, and (iii) both star and plaquette operators for a Y error. In the case of a string of errors (iv), only the stabilizer generators at the end of these strings will anticommute with the error. Due to code degeneracy, the single Z error in (a.i) $E$ has the syndrome as (b) $E\bar{Z}_1$, (c) $E\bar{Z}_2$ and (d) $E\bar{Z}_1\bar{Z}_2$. (Figure inspired by \cite{browne})}\label{sf:fig_degenerate}
+  \caption{(a) Stabilizer generators that anticommute with the error will measure -1, which are (i) the neighboring star operators for a Z error, (ii) the neighboring plaquette operators for an X error, and (iii) both star and plaquette operators for a Y error. In the case of a string of errors (iv), only the stabilizer generators at the end of these strings will anticommute with the error. Due to code degeneracy, the single Z error in (a.i) $P$ has the syndrome as (b) $P\bar{Z}_1$, (c) $P\bar{Z}_2$ and (d) $P\bar{Z}_1\bar{Z}_2$. (Figure inspired by \cite{browne})}\label{sf:fig_degenerate}
 \end{figure}
 
 \subsection{Error correction}
+An error $\gls{error}$ can be corrected by applying it again to the lattice. The error operator $P$ is however unknown. We must therefore try to identify the correct operator given the measured syndrome. As mentioned in the previous chapter, this relationship between error does not always map one-to-one, which it is not in the surface code. An error $E$ can be multiplied with some operator $L$ that commutes with the stabilizer and they will result in the same syndrome.
 
-An error $E$ can be corrected by applying it again to the lattice. The error operator $E$ is however unknown. We must therefore try to identify the correct operator given the measured syndrome. As mentioned in the previous chapter, this relationship between error does not always map one-to-one, which it is not in the surface code. An error $E$ can be multiplied with some operator $L$ that commutes with the stabilizer and they will result in the same syndrome.
+If $L$ is in the stabilizer $\m{S}$, the product of the identified correction operator $\gls{correction}=P'$ with the real error operator $P$ will leave the code invariant. The resulting operator $CP=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $P$, $P\bar{Z}_1$, $P\bar{Z}_2$, $P\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
 
-If $L$ is in the stabilizer $\m{S}$, the product of the identified correction operator $C=E'$ with the real error operator $E$ will leave the code invariant. The resulting operator $CE=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $E$, $E\bar{Z}_1$, $E\bar{Z}_2$, $E\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
+\subsection{Graph picture}\label{sec:toricgraph}
+Since it is the combinatorial structure of the lattice that defines the surface code, such a surface by be also denoted by a graph $\gls{graph}$. The graph is constructed by $G=(\gls{vertices}, \gls{edges}, \gls{faces})$ by a vertex set $V$, edge set $E$ and face set $F$. Each edge $\gls{edge}\in E$ is defined by a pair of distinct vertices $e=\{v_i, v_j\}$ where $\gls{vertex}\in V$. Each face is a region that has the homology of a disk and is defined by the set of edges on its boundary. 
 
-\subsection{Quasiparticle picture}
+With respect to the toric code, each vertex is equivalent to the star operator type stabilizer generator $v\equiv S_v$, and each face $\gls{face}\in F$ is equivalent to the plaquette operator $f\equiv P_f$. The edges are thus the qubits, with two edges per qubit, one spanned by neighboring vertices and another by neighboring faces. Due to the duality of the lattice, the equivalence of vertices with stars and faces with plaquettes can naturally be switched. Also due to this, the graph $G$ can be split into two separate graphs $G_v = (V, E_v)$ and $G_f = (F, E_f)$, corresponding to the primal and dual lattices, where the faces $F$ are the vertices of the graph $G_f$. Each qubit is now represented by a single edge in both graphs and $E_v\cup E_f=E$. If we mention a graph spanned by only vertices and edges $G=(V,E)$, we refer to the graph $G_v$ of the primal lattice. 
 
-The processes of error detection and correction can alternatively be presented in the \emph{quasiparticle picture}, where the anticommuting stabilizer measurements act like excitations on the lattice, which behave like the quasiparticles \emph{anyons}. A single error creates a pair of anyons, and a chain of errors causes movement of the anyon on the lattice. A pair of anyons can also annihilate each other when two error chains merge. The correction of errors can thus be viewed of movement of the correction chains until all anyons are annihilated. The quasiparticle picture removes the distracting underlying lattice from the problem, and decoding becomes simply identifying the right pairing between anyons to minimize the chance of a logical error.
-
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-    \draw (0,0) rectangle (4,4);
-    \node[circle, fill=red!50, minimum size=4] (N1) at (0.5,0.4) {};
-    \node[circle, fill=red!50, minimum size=4] (N2) at (2,0.7) {};
-    \node[circle, fill=red!50, minimum size=4] (N3) at (2.5,1.2) {};
-    \node[circle, fill=red!50, minimum size=4] (N4) at (3.6,1) {};
-    \node[circle, fill=red!50, minimum size=4] (N5) at (0.75,2.1) {};
-    \node[circle, fill=red!50, minimum size=4] (N6) at (1.95,1.8) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N7) at (1.6, 3.4) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N8) at (2.7, 3.5) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N9) at (3.2, 1.5) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N10) at (3.1, 0.6) {};
-    \draw[cyan!50, line width = 2] (N1) to[in=170, out=20] (N2);
-    \draw[cyan!50, line width = 2] (N3) to[in=180, out=-10] (N4);
-    \draw[cyan!50, line width = 2] (N5) to[in=170, out=-20] (N6);
-    \draw[red!50, line width = 2] (N7) to[in=160, out=15] (N8);
-    \draw[red!50, line width = 2] (N9) to[in=90, out=250] (N10);
-    \node at (2, -.5) {(a)};
-  \end{tikzpicture}
-  \hspace{1cm}
-  \begin{tikzpicture}
-    \draw (0,0) rectangle (4,4);
-    \node[circle, fill=red!50, minimum size=4] (N1) at (0.5,0.4) {};
-    \node[circle, fill=red!50, minimum size=4] (N2) at (2,0.7) {};
-    \node[circle, fill=red!50, minimum size=4] (N3) at (2.5,1.2) {};
-    \node[circle, fill=red!50, minimum size=4] (N4) at (3.6,1) {};
-    \node[circle, fill=red!50, minimum size=4] (N5) at (0.75,2.1) {};
-    \node[circle, fill=red!50, minimum size=4] (N6) at (1.95,1.8) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N7) at (1.6, 3.4) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N8) at (2.7, 3.5) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N9) at (3.2, 1.5) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N10) at (3.1, 0.6) {};
-    \draw[cyan!50, line width=2] (N1) to[in=170, out=20] (N2);
-    \draw[cyan!50, line width=2] (N3) to[in=180, out=-10] (N4);
-    \draw[cyan!50, line width=2] (N5) to[in=170, out=-20] (N6);
-    \draw[red!50, line width=2] (N7) to[in=160, out=15] (N8);
-    \draw[red!50, line width=2] (N9) to[in=90, out=250] (N10);
-    \draw[cyan!50, dashed, line width=2] (N1) to[out=90, in=270] (N5);
-    \draw[cyan!50, dashed, line width=2] (N2) to[out=80, in=275] (N6);
-    \draw[cyan!50, dashed, line width=2] (N3) to[out=10, in=160] (N4);
-    \draw[red!50, dashed, line width=2] (N7) to[out=-20, in=195] (N8);
-    \draw[red!50, dashed, line width=2] (N9) to[out=290, in=75] (N10);
-    \node at (2, -.5) {(b)};
-  \end{tikzpicture}
-  \hspace{1cm}
-  \begin{tikzpicture}
-    \draw (0,0) rectangle (4,4);
-    \node[circle, fill=red!50, minimum size=4] (N1) at (0.5,0.4) {};
-    \node[circle, fill=red!50, minimum size=4] (N2) at (2,0.7) {};
-    \node[circle, fill=red!50, minimum size=4] (N3) at (2.5,1.2) {};
-    \node[circle, fill=red!50, minimum size=4] (N4) at (3.6,1) {};
-    \node[circle, fill=red!50, minimum size=4] (N5) at (0.75,2.1) {};
-    \node[circle, fill=red!50, minimum size=4] (N6) at (1.95,1.8) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N7) at (1.6, 3.4) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N8) at (2.7, 3.5) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N9) at (3.2, 1.5) {};
-    \node[circle, fill=cyan!50, minimum size=4] (N10) at (3.1, 0.6) {};
-    \draw[yellow, line width=6, opacity=.3] (N3) to[in=180, out=-10] (N4);
-    \draw[yellow, line width=6, opacity=.3] (N5) to[in=170, out=-20] (N6);
-    \draw[yellow, line width=6, opacity=.3] (N3) to[out=120, in=-30] (N6);
-    \draw[yellow, line width=6, opacity=.3] (N5) to[out=200, in=45] (0, 1.75);
-    \draw[yellow, line width=6, opacity=.3] (N4) to[out=80, in=225] (4, 1.75);
-    \draw[cyan!50, line width=2] (N1) to[in=170, out=20] (N2);
-    \draw[cyan!50, line width=2] (N3) to[in=180, out=-10] (N4);
-    \draw[cyan!50, line width=2] (N5) to[in=170, out=-20] (N6);
-    \draw[red!50, line width=2] (N7) to[in=160, out=15] (N8);
-    \draw[red!50, line width=2] (N9) to[in=90, out=250] (N10);
-    \draw[cyan!50, dashed, line width=2] (N1) to[out=0, in=200] (N2);
-    \draw[cyan!50, dashed, line width=2] (N3) to[out=120, in=-30] (N6);
-    \draw[cyan!50, dashed, line width=2] (N5) to[out=200, in=45] (0, 1.75);
-    \draw[cyan!50, dashed, line width=2] (N4) to[out=80, in=225] (4, 1.75);
-    \draw[red!50, dashed, line width=2] (N7) to[out=-20, in=195] (N8);
-    \draw[red!50, dashed, line width=2] (N9) to[out=290, in=75] (N10);
-    \node at (2, -.5) {(c)};
-  \end{tikzpicture}
-  \caption{The quasiparticle picture of stabilizer measurements. Anticommuting stabilizers behave as anyons (circles), where a chain of errors (lines) creates a pair of anyons. Figure (b) shows a successful decoding of (a). Figure (c) shows a pairing that resulted in a correction operator that is in a different class as the error operator, which acquires a logical error. (Figure inspired by \cite{naomi})}\label{fig:quasiparticle}
-\end{figure}
-
-Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the errors suffered in Figure \ref{sf:fig_degenerate}a, which has suffered Z (blue lines) and X errors (red lines). The corresponding anyons can either be of the star type (red circle) or plaquette type (blue circle). Figure \ref{fig:quasiparticle}b shows a successful decoding. Note that here not all pairs are correctly identified, but the resulting loop still is in the same class of operators. In figure \ref{fig:quasiparticle}c the correction has failed as the resulting loop in the correction is in a difference class compared to the error. As the loop still commutes with the stabilizer, no error can be detected, but the encoded qubit has acquired a logical error.
 
 \subsection{Code threshold}
 Since the distance $d$ of the toric code on a $L\times L$ is $L$, we would expect that we can improve the robustness of the code by increasing the lattice size $L$. However, this also increases the total number of errors in the lattice, that adds an increased level of complexity in choosing the correct correction operator.
 
-In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $p_C$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $p_C$. The point of transition in the error rate is called the \emph{code threshold} $p_{th}$.
+In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $\gls{pcorrect}$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $p_C$. The point of transition in the error rate is called the \emph{code threshold} $\gls{pthres}$.
 
 The code threshold is not the only parameter that determines the potential of a certain code for practical use. The behavior for error rates far below the threshold is also important, as is the number of physical qubits needed to achieve the sought after level of error suppression. Nevertheless, the code threshold provides us with a very easy and useful tool to benchmark different codes and different decoding algorithms, and to compare them with each other. Therefore, in this thesis we will heavily rely on the value of the code threshold. The value of the threshold is heavily dependent on the chosen error model and the physical conditions of the stabilizer measurements. To compare different decoding algorithms, we therefore will use independent and identically distributed errors (i.i.d. noise), which is the \emph{independent noise model} from section \ref{qec:sec_errormodels}.
 
@@ -387,8 +305,6 @@ Luckily, there exists other decoding algorithms that can find a solution much fa
 \section{The planar code}\label{sec:surface_planar}
 
 Another variant of the surface code is the \emph{planar code}, which disposes the periodic boundary conditions of the torus. This allows the qubits to be placed onto a flat 2D surface. For real systems in which the qubits physically interact with each other, this is a huge benefit. Therefore, in this thesis, we will consider both toric and planar variants of the surface code.
-
-
 
 \def\QS{15}
 \def\s{1.5}
@@ -437,93 +353,136 @@ Another variant of the surface code is the \emph{planar code}, which disposes th
     \node[above=.25cm of N-4-5-0] {(f)};
     \node[left=.25cm of N-0-1-0] {(e)};
   \end{tikzpicture}
-  \caption{The planar code with lattice size $L=4$, which includes $N = 2L^2-2L+1$ qubits and $N_S = 2L^2-2L$ independent stabilizers. The boundary is defined by the (a) EDGE-plaquette and (b) EDGE-star operators, which exist next to the known (c) plaquette and (d) star operators, similar to the toric code. The planar codes encodes 1 logical qubit, which is represented by the logical (e) $\bar{Z}$ and (f) $\bar{X}$ operators. (Figure inspired by \cite{browne})}\label{sf:fig_planar}
+  \caption{The planar code with lattice size $L=4$, which includes $N = 2L^2-2L+1$ qubits and $N_S = 2L^2-2L$ independent stabilizers. The boundary is defined by the (a) $\delta$-plaquette and (b) $\delta$-star operators, which exist next to the known (c) plaquette and (d) star operators, similar to the toric code. The planar codes encodes 1 logical qubit, which is represented by the logical (e) $\bar{Z}$ and (f) $\bar{X}$ operators. (Figure inspired by \cite{browne})}\label{sf:fig_planar}
 \end{figure}
 
 \paragraph{Stabilizer generators}
-There are a few key differences between the planar and toric codes. First of all, a new type of stabilizer generators define the non-periodic boundary of the lattice, which are referred to as \emph{EDGE operators}. These EDGE operators have only 3 neighboring qubits and are therefore the tensor product of 3 Pauli operators. The EDGE-plaquette operators lie at the east and west boundaries of the lattice (Figure \ref{sf:fig_planar}a) and the EDGE-star $S_{vE}$ operators lie at the north and south boundaries of the lattice (Figure \ref{sf:fig_planar}b). In the middle of the lattice, the bulk of the stabilizer generators still consist of 4 Pauli operators, identical to the ones in the toric code (Figure \ref{sf:fig_planar}c-d). Note that the stabilizer generators are still defined by equation \ref{eq:sf_plaquette} and \ref{eq:sf_star}, but now the relevant faces and vertices contain three neighboring qubits.
+There are a few key differences between the planar and toric codes. First of all, a new type of stabilizer generators define the non-periodic boundary of the lattice, which are referred to as \emph{$\delta$ operators}. These $\delta$ operators have only 3 neighboring qubits and are therefore the tensor product of 3 Pauli operators. The $\delta$-plaquette operators lie at the east and west boundaries of the lattice (Figure \ref{sf:fig_planar}a) and the $\delta$-star operators lie at the north and south boundaries of the lattice (Figure \ref{sf:fig_planar}b). In the middle of the lattice, the bulk of the stabilizer generators still consist of 4 Pauli operators, identical to the ones in the toric code (Figure \ref{sf:fig_planar}c-d). Note that the stabilizer generators are still defined by equation \ref{eq:sf_plaquette} and \ref{eq:sf_star}, but now the relevant faces and vertices contain three neighboring qubits.
 
 \paragraph{Stabilizer violoations}
 A second key difference is that now not all errors will cause two stabilizer violations. In the bulk of the qubits on the lattice, a single error will still cause two neighboring stabilizers to measure -1, or create two anyons. At the boundary however, it now may be the case that an error is only included in one plaquette or star operator. This will also mean the decoding in the quasiparticle picture requires a slightly different approach.
 
-\paragraph{Logical qubits}
-Furthermore, we can inspect that a planar surface of dimension $L$ has $N = 2L^2-2L+1$ physical qubits. We can also find that there are $2L^2-2L$ stabilizer generators. As the boundary is now non-periodic, all generators are now independent, and therefore the number independent generators is $N_S = 2L^2-2L$. This means that the planar code encodes $N_L = N-N_S = 1$ a single logical qubit. The logical $\bar{X}$ and $\bar{Z}$ operators are pictured in Figure \ref{sf:fig_planar}e-f.\\
+\paragraph{Encoded qubits}
+Furthermore, we can inspect that a planar surface of dimension $L$ has $N = 2L^2-2L+1$ physical qubits. We can also find that there are $2L^2-2L$ stabilizer generators. As the boundary is now non-periodic, all generators are now independent, and therefore the number independent generators is $N_S = 2L^2-2L$. This means that the planar code encodes $N_L = N-N_S = 1$ a single logical qubit. The logical $\bar{X}$ and $\bar{Z}$ operators are pictured in Figure \ref{sf:fig_planar}e-f.
 
-Other properties of the planar code are very similar to the toric code. The \emph{dual lattice} also exists for the planar code, for example. But the dual lattice exists at a 90 angle compared to the primary lattice. Also, as the bulk of the lattice still consists of 4-Pauli operator stabilizers, the decoding algorithms for the planar code is very similar to the toric code. It is due to the boundary that some slight alterations are needed, as we will see in the next section.z
-z
+\paragraph{Dual lattice and graph picture}
+Other properties of the planar code are very similar to the toric code. The \emph{dual lattice} also exists for the planar code, for example. But the dual lattice exists at a 90 angle compared to the primal lattice to account for the location of the boundary. The graphs for the primal and dual lattices are now denoted by $G = (V_\iota\cup V_{\delta} \cup V_{\omega}, E_\iota \cup E_{\delta})$. The union of the internal vertex set $V_\iota$, consisting 4 Pauli operator stabilizers, and the edge vertex set $V_{\delta}$, consisting 3 Pauli operator stabilizer, make up the set of stabilizer generators $V_\iota \cup V_{\delta}=\mathscr{s}$. Elements of the open vertex set $V_\delta$ are the \emph{open} vertices that span edges on the boundary $E_{\delta}$, connected to a single stabilizer vertex.\\
+
+The bulk of the planar code is similar to the toric code, where the stabilizer generators consists of 4 Pauli operators. This is especially true as the system size $N$ increases, as the internal elements scale with $N$ and the boundary elements scale with $\sqrt{N}$. Hence, the decoding algorithms for the planar code is very similar to the toric code, albeit some slight alterations will be needed. 
 \section{Decoders}\label{sec:surface_decoders}
 \subsection{The optimal decoder}\label{sec:optimal_decoder}
 \subsection{Minimum Weight Perfect Matching}\label{sec:MWPMdecoder}
+
+\subsubsection{Quasiparticle picture}
+The processes of error detection and correction can alternatively be presented in the \emph{quasiparticle picture}, where the anticommuting stabilizer measurements act like excitations on the lattice, which behave like the quasiparticles \emph{anyons}. A single error creates a pair of anyons, and a chain of errors causes movement of the anyon on the lattice. A pair of anyons can also annihilate each other when two error chains merge. The correction of errors can thus be viewed of movement of the correction chains until all anyons are annihilated. The quasiparticle picture removes the distracting underlying lattice from the problem, and decoding becomes simply identifying the right pairing between anyons to minimize the chance of a logical error.
+\input{tikzfigs/quasiparticle_picture}
+Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the errors suffered in Figure \ref{sf:fig_degenerate}a, which has suffered Z (blue lines) and X errors (red lines). The corresponding anyons can either be of the star type (red circle) or plaquette type (blue circle). Figure \ref{fig:quasiparticle}b shows a successful decoding. Note that here not all pairs are correctly identified, but the resulting loop still is in the same class of operators. In figure \ref{fig:quasiparticle}c the correction has failed as the resulting loop in the correction is in a difference class compared to the error. As the loop still commutes with the stabilizer, no error can be detected, but the encoded qubit has acquired a logical error.
+
+
 \subsection{The Union-Find decoder}\label{sec:UFdecoder}
 
 The Union-Find decoder is a new fast decoding algorithm for topological codes to correct for Pauli errors, erasure errors, and the combination of both errors. The worst-case complexity of the algorithm is $\m{O}(n\alpha(n))$, where $n$ is the number of physical qubits and $\alpha$ is the inverse of Ackermann's function, which is very slowly growing, and is proven that $a(n)\leq 3$ for any practical amount of qubits.
 
-Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithm in the coming sections and perform analyses on their complexity. 
+Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in the coming sections and perform analyses on their complexities. 
 
 \subsubsection{The Peeling decoder}
-he Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left. However, in its original publication \cite{delfosse2017linear}, it was originally named the \emph{Linear-Time Maximum Likelihood} decoder.
+he Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \ref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \ref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $I$, $X$, $Y$ or $Z$ chosen uniformly at random. Due to this uniform distribution, the primal and dual lattices of the surface code can be decoded separately from each other. The erased edges of graph $G_v(V,E_v)$ and $G_f(V,E_f)$ (see section \ref{sec:toricgraph}) suffer uniformly distributed $\{I,X\}$ and $\{I,Z\}$, respectively. We will consider $G_v(V,E_v)$ and simplify its notation to $G(V,E)$. 
+
+We describe the decoding process of the primal lattice $G(V,E)$ and denote the set of lost qubits by $\gls{erasure}\subset E$. The set of Pauli errors within the erasure is $P_\m{E} = \{X_1,...X_m\}$. Error detection is performed in the same way as Pauli errors; by measuring the set of star operators or vertices $V$, which returns a set of nontrivial syndrome measurements $\sigma \subset V$. The decoder of an erasure error is thus provided with the extra information $\m{E}$, the subset of erased qubit locations, next to $\sigma$. 
+
 \begin{lemma}\label{lem:peelinguni}
-  For an erasure $\m{E} \subset E$ with uniformly distributed Pauli errors on a surface code, and a measured syndrome $\sigma$, any error $\tilde{P}\subset \m{E}$ that produces $\sigma$ is the most likely set of errors. 
+  For an erasure $\m{E} \subset E$ with uniformly distributed Pauli errors $P_\m{E}$ on a surface code, and a measured syndrome $\sigma$, any error  $\tilde{P}_\m{E}$ that produces $\sigma$ in a measurement is the most likely set of errors. 
 \end{lemma}
 \begin{proof}
-  Let $\m{E}\subset E$ be an erasure, a set of qubits on which an erasure error occurs, and let $\sigma \subset \m{S}$ be the measured error syndrome, the subset of the stabilizer generator group $\m{S}$, that anticommute with the erasure errors. In the absence of Pauli errors, all errors $P$ must lie inside the erasure. Therefore, for any measured syndrome, the path of errors must also be in the erasure, which can be denoted by $P\subset \m{E}$. As a result of this, in the case that the Pauli errors within the erasure are uniformly distributed, any error $\tilde{P}\subset\m{E}$ that produces the syndrome $\sigma$ is the most likely coset. 
+  For the coset $\tilde{P}_\m{E}\cdot S$, where $\tilde{P}_\m{E}$ is some Pauli error caused by an erasure and $S$ is a set of stabilizers that act trivially on the codespace, the most likely configuration is the one that maximizes probability $\mathbb{P}(\tilde{P}_\m{E}\cdot S|\m{E},\sigma)$, where $\m{E}$ and $\sigma$ are known. This probability is proportional to $|\tilde{P}_\m{E}\cdot S \cap\m{E}|$. But since all qubits in $\m{E}$ suffer a Pauli error and this error is uniformly distributed, all configurations of $\tilde{P}_\m{E}$ have equal probability. 
+  % Let $\m{E}\subset E$ be an erasure, a set of qubits on which an erasure error occurs, and let $\sigma \subset \m{S}$ be the measured error syndrome, the subset of the stabilizer generator group $\m{S}$, that anticommute with the erasure errors. In the absence of Pauli errors, all errors $P$ must lie inside the erasure.Therefore, for any measured syndrome, the path of errors must also be in the erasure, which can be denoted by $P\subset \m{E}$. As a result of this, in the case that the Pauli errors within the erasure are uniformly distributed, any error $\tilde{P}\subset\m{E}$ that produces the syndrome $\sigma$ is the most likely coset. 
 \end{proof}
 
-Consequently, if the error set $\tilde{P}$ is applied as the correction operator $C=\tilde{P}$, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $C=\tilde{P} \subset \m{E}$, we now do not try to find paths within $m{E}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made. 
+Consequently, if the error set $\tilde{P}_\m{E}$ is applied as the correction operator $C=\tilde{P}_\m{E}$, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $C$, we now do not try to find paths within $\m{E}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made. 
 
-The first step in this is to produce a \emph{spanning forest} $F_\m{E}$ inside $\m{E}$, a maximal subset of edges of $\m{E}$ that contains no cycles and spans all vertices of $\m{E}$, and thus also all the syndromes $\sigma$. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is connected \emph{acyclic} graph. Such a forest can be found in linear time by either a depth-first search or breadth-first search of the $\m{E}$. 
-
-Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $C$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u\in\sigma$, remove $u$ from $\sigma$, and $e$ is added to $C$ and the vertex $v$ is \emph{flipped}, such that $v$ is added to $sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $C$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. 
-\begin{algo}[algotitle=Peeling decoder \cite{delfosse2017linear}, label=algo:peel]
+The first step in this is to produce a \emph{spanning forest} $\gls{forest}$ inside $\m{E}$, a maximal subset of edges of $\m{E}$ that contains no cycles and spans all vertices of $\m{E}$, and thus also all the syndromes $\sigma$. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is connected \emph{acyclic} graph. Such a forest can be found in linear time by either a depth-first search (DFS) or breadth-first search of the $\m{E}$. Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{correctionset}$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u\in\sigma$, remove $u$ from $\sigma$, and $e$ is added to $\m{C}$ and the vertex $v$ is \emph{flipped}, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The dual lattice can be decoded in a similar way.
+\begin{algo}[algotitle=Peeling decoder (adapted from \cite{delfosse2017linear}), label=algo:peel]
   \begin{algorithm}[H]
     \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subset E$ and syndrome $\sigma \subset V$}
-    \KwResult{Correction set $C \subset E$}
+    \KwResult{Correction $C$}
     \BlankLine
-    construct a spanning forest $F_\m{E}$ of $\m{E}$\;
-    initialize $C$ by $C = {\emptyset}$\;
+    construct a spanning forest $F_\m{E} \subset\m{E}$\;
+    initialize $\m{C}$ by $\m{C} = {\emptyset}$\;
     \While{$F_\m{E} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\m{E}$ \;
     \If{$u \in \sigma$}{
-      add $e$ to $C$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
+      add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
     \Else{do nothing}
     }
-    \KwRet{$C$}
+    \KwRet{$C = \prod_{e\in \m{C}} X_e$}
   \end{algorithm}
 \end{algo}
 
-The spanning forest $F_\m{E}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{E}})$ and therefore also in the number of qubits $\m{O}(n)$. Now, the structure of the forest $F_\m{E}$ is very dependant on from which vertex the DFS is started, and proof is required that any forest of $\m{E}$ is valid.
+The spanning forest $F_\m{E}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{E}})$ and therefore also in the number of qubits $\m{O}(n)$. Now, the structure of the forest $F_\m{E}$ is very dependant on from which vertex the DFS is started, and proof is required that any forest of $\m{E}$ is valid. Also, we show that for each forest, the peeling process returns the same correction.
+\begin{definition}
+  The \emph{Pauli product} of a set of edges $T$ is the defined as the product of Pauli operators on each of the edges in the set
+  \begin{equation}
+    \gls{pauliproduct}(T) = \prod_{e\in T} P^*_e,
+  \end{equation}
+  where the Pauli operator $P^*$ corresponds to $X$ if $T\subset E_v$ and $Z$ if $T\subset E_f$. 
+\end{definition}
 \begin{lemma}\label{lem:anyforest}
-  For any choice of $F_\m{E}$, there exists a subset $C\subset\m{E}$ that corrects the syndrome set $\sigma$.
+  For any choice of $F_\m{E}$, there exists a subset $\m{C}\subset F_\m{E}$ such that $\mathscr{P}(\m{C})$ corrects the syndrome set $\sigma$.
 \end{lemma}
 \begin{proof}
-  There exists a subset $P = \{e_1,...,e_m\} \subset F_\m{E}\subset \m{E}$ that has a syndrome $\sigma$. By the definition of the forest $F_\m{E}$, adding another edge $e' \in F_\m{E} \vartriangle \m{E}$ creates a cycle $\gamma' \subset F_\m{E} \cup \{e_i\}$, where $\vartriangle$ denotes the symmetric difference between two sets. Now $P$ can be replaced by $P'=P\vartriangle\gamma'$ that has the same syndrome $\sigma$, as $\vartriangle$ augments the matching path between syndromes within $\gamma'$. Now, any edge $e_r\in \gamma' \notin P'$ can be removed from to create a new forest $F_\m{E}'=F_\m{E} \cup \{e_i\}\setminus e_r|e_r \neq e'$. For any cycle that exists from larger than 3 elements, $e_r$ must exist. Thus the subset $P' \subset F_\m{E}'\subset \m{E}$ is also a valid error with syndrome $\sigma$, and any $P'=C$. 
+  There exists a subset of edges $P = \{e_1,...,e_m\} \subset F_\m{E}$ such that $\mathscr{P}(P)$ has a syndrome $\sigma$. By the definition of the forest $F_\m{E}$, adding another edge $e' \in F_\m{E} \vartriangle \m{E}$ creates a cycle $\gamma' \subset F_\m{E} \cup \{e_i\}$, where $\vartriangle$ denotes the symmetric difference between two sets. Now $P$ can be replaced by $P'=P\vartriangle\gamma'$ whose Pauli product $\mathscr{P}(P')$ has the same syndrome $\sigma$, as $\vartriangle$ augments the matching path between syndromes within $\gamma'$. Now, any edge $e_r\in \gamma' \notin P'$ can be removed from to create a new forest $F_\m{E}'=F_\m{E} \cup \{e_i\}\setminus e_r|e_r \neq e'$. For any cycle that exists from larger than 3 elements, $e_r$ must exist. Thus the Pauli product of subset $P' \subset F_\m{E}'\subset \m{E}$ is also a valid error with syndrome $\sigma$, and $\mathscr{P}(P')$ corrects $\sigma$. This can be done any number of times, thus every $F_\m{E}$ is valid.   
 \end{proof}
 \begin{lemma}\label{lem:peelingfe}
-  The output correction set $C\subset\m{E}$ from the Peeling decoder is only dependant on spanning tree $F_\m{E}\subset\m{E}$, and not on the peeling process. 
+  The output correction set $m{C}$ from the Peeling decoder is only dependant on spanning tree $F_\m{E}\subset\m{E}$, and not on the peeling process. 
 \end{lemma}
 \begin{proof}
-   For each $F_\m{E}$, the outcome $C$ after peeling is unique and independent from the order of peeling. If there exists two subsets $C$ and $C'$, applying both $CC'$ yields the empty syndrome set $\sigma=\emptyset$, which means that either $CC'$ is a cycle or $C=C'$. Since $F_\m{E}$ has no cycles it means that $C$ must be unique within $F_\m{E}$.
+   For each $F_\m{E}$, the outcome $\m{C}$ after peeling is unique and independent from the order of peeling. If there exists two subsets $\m{C}$ and $\m{C}'$, applying both $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ yields the empty syndrome set $\sigma=\emptyset$, which means that either $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ is a cycle or $\m{C}=\m{C}'$. Since $F_\m{E}$ has no cycles it means that $m{C}$ must be unique within $F_\m{E}$.
 \end{proof}
 
 \input{tikzfigs/peeling_decoder}
 
-\begin{theorem}
-  For any connected graph that suffered some erasure $\m{E}\subset E$ with pauli error $P\subset \m{E}$, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm \ref{algo:peel}) will produce a correction $C\subset \m{E}$ such that $PC$ commutes with the stabilizer.
+The peeling decoder will always output some correction $C$ such that $CP_\m{E}$ commutes with the stabilizer, given a set of nontrivial stabilizer measurements $\sigma$, proven by the previous lemmas. Finally, we will prove that this is true for any erasure $\m{E}\subset E$. 
+\begin{theorem}\label{eq:anyevenparity}
+  For any connected graph that suffered some erasure $\m{E}\subset E$ with pauli error $P_\m{E}$, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm \ref{algo:peel}) will produce a correction $\m{C}\subset \m{E}$ such that $P_\m{E}\mathscr{P}(\m{C})$ commutes with the stabilizer.
 \end{theorem}
 \begin{proof}
   Consider a spanning forest $F_\m{E}$ containing $n_\sigma$ syndrome vertices. The forest is being stripped by the Peeling decoder on the leaf edge $e = (u,v)$, where the vertex $v$ is the pendant vertex. If $u\notin\sigma$, $e$ is simply removed from $F_\m{E}$ and $n_\sigma$ is unaltered. If $u\in\sigma$, $u$ is removed from $\sigma$ such that $n_\sigma'= n_\sigma -1$. Vertex $v$ is now flipped in $\sigma$, meaning that if $v\in\sigma$, it is removed and $n_\sigma'= n_\sigma -2$, or if  $v\notin\sigma$, it is added and $n_\sigma'= n_\sigma$. After peeling it must be that $n_\sigma=0$, from which follows that all erasures with \emph{even} parity can be solved. 
 \end{proof}
-For only erasure noise, all erasures must have even parity as all errors $P\subset\m{E}$ and thus all syndromes $\sigma$ lie in $\m{E}$, which is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later. 
+For only erasure noise, all erasures must have even parity as all errors $P_\m{E}$ and thus all syndromes $\sigma$ lie in $\m{E}$, which is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later. 
 
-On account of lemmas \ref{lem:peelinguni}, \ref{lem:anyforest} and \ref{lem:peelingfe}, any correction $C\subset F_\m{E}$ is the most likely correction.  Hence, the Peeling decoder is thus a linear-time maximum likelihood decoder in the case of uniformly distributed errors. For non-uniformly distributed errors however, the formation of the tree that encapsulates the most likely correction may not be so straight forward. 
+On account of lemmas \ref{lem:peelinguni}, \ref{lem:anyforest} and \ref{lem:peelingfe}, any correction set $\m{C}\subset F_\m{E}$ is the most likely correction.  Hence, the Peeling decoder is a linear-time maximum likelihood decoder in the case of uniformly distributed errors. For non-uniformly distributed errors however, the formation of the tree that encapsulates the most likely correction may not be so straight forward. 
 \begin{theorem}
   The Peeling decoder (algorithm \ref{algo:peel}) is a linear-time maximum likelihood decoder for uniformly distributed errors on surface codes. 
 \end{theorem}
 
 \paragraph{Bounded surfaces}
-\todo[inline]{boundaries}
+For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Let us again only consider the primal lattice which is now denoted by $G = (V_\iota\cup V_{\delta} \cup V_{\omega}, E_\iota \cup E_{\delta})$. Syndrome measurements on such a graph are only supported by $\sigma \subset V_\iota\cup V_\delta$, as $V_\delta$ are \emph{open} vertices that only exist to support boundary edges $E_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $V_\delta$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin V_\delta$. Furthermore, the construction of the forest $F_\m{E}$ requires an additional alteration.
+\begin{lemma}
+  Two vertices $u,v$ within a forest $F_\m{E}$ that satisfy $u\in V_\delta, v \in V_\delta$ is equivalent to a cycle in $F_\m{E}$. 
+\end{lemma}
+\begin{proof}
+  If there are an even number of vertices in a forest $F_\m{E}$ that are supported by $V_\delta$, it means that there are a number of unique paths within $F_\m{E}$ that lead from a element of $V_\delta$ to another element of $V_\delta$. Such a path is equivalent to some $\delta$-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
+\end{proof}
+Due to this, we must ensure that each forest $F_\m{E}$ can only support a maximum of 1 element of $V_\delta$. To do this, the forest are grown starting from vertices of the set $V_\delta$, and are completed by a DFS as before with the added requirement. 
+\begin{algo}[algotitle=Peeling decoder for bounded surfaces (adapted from \cite{delfosse2017linear}), label=algo:peelbound]
+  \begin{algorithm}[H]
+    \KwData{A graph $G = (V\cup V_\delta,E)$, an erasure $\m{E} \subset E$ and syndrome $\sigma \subset V$}
+    \KwResult{Correction $C$}
+    \BlankLine
+    construct a spanning forest $F_\m{E}\subset\m{E}$ with seed $V_\delta$\;
+    initialize $\m{C}$ by $\m{C} = {\emptyset}$\;
+    \While{$F_\m{E} \neq \emptyset$}{
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin V_\delta$, remove $e$ from $F_\m{E}$ \;
+    \If{$u \in \sigma$}{
+      add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
+    \Else{do nothing}
+    }
+    \KwRet{$C = \prod_{e\in \m{C}} X_e$}
+  \end{algorithm}
+\end{algo}
+\input{tikzfigs/peeling_bound.tex}
 
-\subsubsection{Growing erasures}
+\subsubsection{Union-Find for Pauli errors}
 Now in the presence of Pauli errors, errors can occur on edges that are now not part of the erasure, and odd parity clusters can occur. Clusters that consists from only a single generator also exist, which are just end-points of syndromes caused by Pauli errors. We must therefore make an erasure $\m{E}$ from the syndrome $\sigma$ that is compatible with the peeling decoder, which contains only even parity clusters. To do this, we can attractively grow the clusters with an odd parity by an half-edge on the boundaries on the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder.
 
 \paragraph{Union-Find algorithm}
