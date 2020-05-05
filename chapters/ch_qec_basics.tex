@@ -123,13 +123,13 @@ The minimum weight of the logical operator determines the distance $d$ of the er
 
 As the stabilizers are a set of Pauli operators, they correspond to blip-flip or phase-flip errors that may have happened on any of our $n$ qubits. Furthermore, as any stabilizer leaves all states  $\ket{\psi}_i$ invariant, measuring the stabilizers does not disrupt the encoded information. If no error has occurred, all stabilizer measurements will return a '+1' eigenvalue, while any '-1' outcome points to the presence of errors, which we will call a \emph{stabilizer violation}.
 
-This outcome is dependent on whether an error caused by the error operator $O$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $E$ and generator $s$ commute then,
+This outcome is dependent on whether an error caused by the error operator $\gls{perror}$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $P$ and generator $s$ commute then,
 \begin{equation}
-  sO\ket{\psi} = Os\ket{\psi} = O\ket{\psi}
+  sP\ket{\psi} = Ps\ket{\psi} = P\ket{\psi}
 \end{equation}
 which means that the post-error state is a +1 eigenstate of $S_j$. If $O$ and generator $S_j$ anticommute then,
 \begin{equation}\label{qec:eq:stabmeas}
-  sO\ket{\psi} = -Os\ket{\psi} = -O\ket{\psi}
+  sP\ket{\psi} = -Ps\ket{\psi} = -P\ket{\psi}
 \end{equation}
 and the post-error state is a -1 eigenstate of $s$. Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns a series of eigenvalue outcomes that is called the \emph{syndrome}. However, it is not necessary to measure all operators in the stabilizer group $\m{S}$. Measuring the set of independent stabilizer generators $\mathfrak{s}=\{s_1,...,s_{N_s}\}$ suffices as any other stabilizer is just a combination of already measured states.
 
