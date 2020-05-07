@@ -2,7 +2,7 @@
 \begin{tabular}{|r|c|c|}
   \hline
   % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
-  & scales with $n$ & scales with (dependant on) $p$ \\
+  & scales with $n$ & scales with (dependent on) $p$ \\
   \hline
   \hline
   number of clusters & \checkmark & increases for small $p$ \\ \hline
@@ -106,12 +106,12 @@
             }
         }
         \BlankLine
-        \nlset{n} \For(\tcc*[h]{dependant on number of merges}){\bound in \remlist}{
+        \nlset{n} \For(\tcc*[h]{dependent on number of merges}){\bound in \remlist}{
             \tcc{these boundaries are excluded from second growth-step}
             remove \bound from \cluster
         }
         \BlankLine
-        \nlset{1} \For(\tcc*[h]{dependant on cluster size}){\vertex in \nblist}{
+        \nlset{1} \For(\tcc*[h]{dependent on cluster size}){\vertex in \nblist}{
             \tcc{vertices lie on far end of completely grown edge, this is the new boundary}
             find new \bound with \fvn (Al. \ref{al:fvn})
         }
@@ -156,7 +156,7 @@
     mark \vertex as traversed\;
     \newn $\leftarrow$ \vertex\;
     \nlset{$\downarrow$} \While(){\newn $\neq$ None}{
-        \nlset{1} \For(\tcc*[h]{dependant on cluster size}){\vertex in \newn}{
+        \nlset{1} \For(\tcc*[h]{dependent on cluster size}){\vertex in \newn}{
             get \neigh (edges, vertices) of \vertex $\in$ \cluster\;
             \For{neighbor \vertex, \edge) in \neigh}{
                 \eIf{neighbor \vertex is traversed}{
@@ -198,7 +198,7 @@
 
 \nlset{n} \For{\cluster in \graph}{
     \nlset{$\downarrow$} \For{\vertex in \cluster}{
-        \nlset{1} \While(\tcc*[h]{dependant on cluster size}){$\#$ connected \edge $=$ 1}{
+        \nlset{1} \While(\tcc*[h]{dependent on cluster size}){$\#$ connected \edge $=$ 1}{
             remove \edge from \cluster\;
             \If{\vertex $=$ anyon}{
                 matching $\leftarrow$ \edge\;
