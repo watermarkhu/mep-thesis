@@ -1,0 +1,62 @@
+\chapter{Ackermann's function}\label{ap.ackermann}
+
+When computing the complexity of the Union-Find data structure \cite{tarjan1975efficiency} with the \emph{union by rank} and \emph{path compression} rules, the Ackermann's function was used. In chapter, we will show that this function is very fast growing, and its inverse thus very slowly growing. After the initial publication by Ackermann \cite{ackermann1928hilbertschen}, many authors have modified the function to suit to their own purposes. For example, the Ackermann's function used for the Union-Find data structure by Tarjan \cite{tarjan1975efficiency} is defined by the following relations:
+\begin{align*}
+    A'(0,x) &= 2x, \\
+    A'(k,0) &= 0 \text{ for } k \geq 1, \\
+    A'(k,1) &= 2 \text{ for } k \geq 1, \\
+    A'(k,x) &= A'(k-1, A'(k, x-1)) \text{ for } k \geq 1, x \geq 2,
+\end{align*}
+with the inverse defined as
+\begin{equation*}
+    \alpha'(n) = \min \{k | A'(k,4) \geq \log_2(n)\}, 
+\end{equation*}
+while the original function had three nonnegative integer arguments. Tarjan himself used a different definition in a later publication \cite{tarjan1984worst}. In this thesis, we will take the definition by Kozen \cite{kozen1992design} in his simplified proof of the Union-Find complexity, with $k\geq 0$ and $x\geq 0$:
+\begin{align}
+    \nonumber A(0,x) &= x + 1\\
+    A(k+1,x) &= A^x(k,x)
+\end{align}
+where $A^i(k,x)$ is the $i$-fold composition of $A(k,x)$ with itself on the second argument:
+\begin{align}
+    \nonumber  A^0(k,x) &= 1 \\
+    A^x(k,x) &= \underbrace{A(k, A(k, ..., A(k,x)))}_{x \text{ times}}.
+\end{align}
+In other words, to compute $A(k+1,x)$, we start with $x$ and apply $x=A(k,x)$ recursively for $x$ times, where $A(k,x)$ itself may be the composition of many functions of $A(k-1,x)$. It clear the the function is strictly rising, and that for any $x$, $x\leq A(k,x)$. 
+
+For low values of $x$, we find that $A(k,x)$ stays constant:
+\begin{align*}
+    A(k,0) &= 1 \\
+    A(k,1) &= 2
+\end{align*}
+But for $x\geq 2$, as the value for $k$ increases, the Ackermann's function grows extremely fast,
+\begin{align*}
+    A(0,x) &= x+1 \\
+    A(1,x) &= A^x(0,x) = 2x  \\
+    A(2,x) &= A^x(1,x) = x2^x \geq 2 \uparrow (x+1)\\
+    A(3,x) &= A^x(2,x) \geq  \underbrace{2^{2^{2^{.^{.^2}}}}}_{x+1} = 2\uparrow ^2 (x+1) \\
+    A(4,x) &= A^x(3,x) \geq 2\uparrow^2(2\uparrow^2(x+1)) = 2\uparrow ^3 (x+1)\\
+    &\vdots
+\end{align*}
+where $\uparrow^i$ is the Knuth up-arrow notation for very large integers \cite{knuth1976mathematics}, denoted by the recursive relations
+\begin{equation}
+    a\uparrow^i b = \begin{cases}
+        a^b &\text{if }i=1,\\
+        1   &\text{if }i>1 \text{ and } b=0,\\
+        a\uparrow^{i-1}(a \uparrow^i(b-1)) &\text{otherwise.}
+    \end{cases}
+\end{equation}
+
+For the case of $x=2$, the Ackermann's function as a function of $k$ already grows at such speed, such that for $k=4$ the value $A(4,2)$ is already so incomprehensible large such it exceeds the number of atoms in  the known, observable universe. 
+\begin{align*}
+    A(0,2) &= 3 \\
+    A(1,2) &= 4  \\
+    A(2,2) &= 8\\
+    A(3,2) &= 2\cdot 2^{2(1+2^2)} = 2^11 = 2048\\
+    A(4,2) &\geq 2\uparrow^2 2048 = \underbrace{2^{2^{2^{.^{.^2}}}}}_{2048}
+\end{align*}
+We define t inverse Ackermann's function $a(n)$ that focusses on this $k=2$:
+\begin{equation}
+    \alpha(n) = \min\{k | A(k,2) \geq n \}.
+\end{equation}
+
+For any system of physical size $n$, the inverse of Ackermann's function thus satisfies $\alpha(n) \leq 4$. This Ackermann's function grows at roughly the same rate as in \cite{tarjan1975efficiency}, and thus its inverse is also similar.
