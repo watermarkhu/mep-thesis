@@ -2,14 +2,14 @@
 \begin{figure}
     \centering
     \begin{tikzpicture}[on grid, scale=0.8]
-      \node at (-.5,4) {a)};
+      \node at (-.5,4) {\emph{(a)}};
       \draw[step=1cm,gray,thin] (0.1,0) grid (3.9,4);
       \draw[erasure] (0.1,1) -- (1,1)  -- (2,1)  node[error]{$X$} -- (2,2) -- (2,3) -- (1,3)  -- (1,2) node[error]{$X$}  -- (0.1,2)  node[error]{$X$} (1,1) -- (1,2) -- (2,2);
       \draw[erasure] (3.9,4) -- (3,4)  node[error]{$X$} -- (3,3)  -- (3,2)  node[error]{$X$}  -- (3.9,2) (2,3) -- (3,3) -- (3.9,3);
       \node[description={center}] at (2, -.5) {initial state};
   
       \begin{scope}[shift={(6,0)}]
-        \node at (-.5,4) {b)};
+        \node at (-.5,4) {\emph{(b)}};
         \draw[step=1cm,gray,thin] (0.1,0) grid (3.9,4);
         \draw[erasure] (0.1,1) -- (1,1) node[anyon]{} -- (2,1) node[anyon]{} -- (2,2) -- (2,3) -- (1,3) node[anyon]{} -- (1,2)  -- (0.1,2) (1,1) -- (1,2) -- (2,2);
         \draw[erasure] (3.9,4) -- (3,4) node[anyon]{} -- (3,3) node[anyon]{} -- (3,2) node[anyon]{}  -- (3.9,2) (2,3) -- (3,3) -- (3.9,3);
@@ -25,7 +25,7 @@
       \end{scope}
 
       \begin{scope}[shift={(0,-6)}]
-        \node at (-.5,4) {c)};
+        \node at (-.5,4) {\emph{(c)}};
         \draw[step=1cm,gray,thin] (0.1,0) grid (3.9,4);
         \draw[erasure] (0.1, 2) -- (1,2) -- (1,1) node[anyon]{} -- (2,1) node[anyon]{} -- (2,2) -- (2,3) -- (1,3) node[anyon]{};
         \draw[erasure] (3.9,4) -- (3,4) node[anyon]{} -- (3,3) node[anyon]{} -- (3,2) node[anyon]{};
@@ -33,7 +33,7 @@
       \end{scope}
 
       \begin{scope}[shift={(6,-6)}]
-        \node at (-.5,4) {d)};
+        \node at (-.5,4) {\emph{(d)}};
         \draw[step=1cm,gray,thin] (0.1,0) grid (3.9,4);
         \draw[correction] (0.1, 2) -- (1,2) node[error]{$X$} -- (1,1) node[error]{$X$} (2,1)  -- (2,2) node[error]{$X$} -- (2,3) node[error]{$X$} -- (1,3) node[error]{$X$};
         \draw[correction] (3.9,4) -- (3,4) node[error]{$X$} (3,3) -- (3,2) node[error]{$X$};
@@ -41,7 +41,7 @@
       \end{scope}
 
       \begin{scope}[shift={(12,-6)}]
-        \node at (-.5,4) {e)};
+        \node at (-.5,4) {\emph{(e)}};
         \draw[step=1cm,gray,thin] (0.1,0) grid (3.9,4);
         \path (1,1) -- (2,1) node[error]{$X$} -- (2,2) node[error]{$X$} -- (2,3) node[error]{$X$} -- (1,3) node[error]{$X$} -- (1,2) node[error]{$X$} -- (1,1) node[error]{$X$};
         \node[description={center}] at (2, -.5) {end state};

@@ -1,0 +1,329 @@
+\chapter{Union-Find data structure}\label{ap:unionfind}
+The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, is the data structure that is crucial for the near linear complexity of the Union-Find decoder. In this section, we describe the data structure and analyse its complexity. 
+
+The disjoint-set data structure consists of two types of instructions for manipulating a set of elements partitioned into a number of disjoint subsets, which are non-overlapping. These instructions provide near-constant-time operations to determine whether elements are in the same set, and to merge sets if that is not the case. 
+\begin{itemize}
+  \item $\codefunc{Find}(x)$ computes the unique set containing the element $x$
+  \item $\codefunc{Union}(A,B)$ combines sets $A$ and $B$ into a new combined set
+\end{itemize}
+We first show that a very simple implementation runs in $\m{O}(n^2)$ time. Applying the \emph{union by weight} rule, this is reduced to $\m{O}(n \log n)$. Combined with the \emph{Path compression} rule, the overall complexity is $\m{O}(n \alpha (n))$, where $\alpha$ is the inverse of Ackermann's function. The original proof \cite{tarjan1975efficiency} was further reinforced by subsequent publications \cite{tarjan1979class,tarjan1984worst} and was proven to be optimal \cite{fredman1989cell}. In this thesis, we will follow a simplified approach, where the \emph{union by weight} rule is replaced by a different by similar \emph{union by rank} rule \cite{kozen1992design}. Later Tarjan and also other sources used this to cast this analysis in terms of potential functions \cite{tarjan1999handout, harfst2000potential, cormen2009introduction}. Another approach is provided by \cite{seidel2005top}, where the upper bound is computed via a top-down method. 
+
+
+\subsection{Simple implementation}
+A simple implementation of the instructions would be to store for each set $X$ a list $l_X$ of all the elements it contains, and a pointer to $l_X$ at all elements $x\in l_X$, which is called the \emph{linked-list} representation. The function $\codefunc{find}(x)$ simply returns the list $l_X$, which represents the set. After a call to $\codefunc{Union}(X, Y)$, all elements of $l_Y$ are appended to $l_X$, and the pointers of all elements $y\in Y$ are updated. This takes $\m{O}(m)$ operations, where $m=|l_Y|$ the number of elements. In a system of $n$ elements, there may be a maximum of $n-1$ calls to \codefunc{Union}. As the $i$\textsuperscript{th} call involves sets $|l_X|=1$ and $|l_Y|=i$, the number of updates is 
+\begin{equation}
+  \sum_{i=1}^{n-1} i = \m{O}(n^2),
+\end{equation}
+where each \codefunc{Union} operation has on average $\m{O}(n)$ updates. 
+
+\subsection{Union by weight}
+In the above case, we assume in each \codefunc{Union} the worst case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule to always append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(n \log n)$. 
+
+\begin{theorem}
+  A sequence of \codefunc{Union} and \codefunc{Find} operations on $n$ initial single element disjoint sets using the weighted union rule takes $\m{O}(n \log n)$ time. 
+\end{theorem}
+\begin{proof}
+  Consider a set $X$ with list $l_X$ that undergoes a sequence of \codefunc{Union} and \codefunc{Find} operations. The first time all pointers in $l_X$ are updated, the resulting set must have at least 2 elements. Similarly, the next time all pointers are updated, the resulting set must have at least 4 elements due to the weighted union rule. With system size $n$, any initial set $X$ can be updated at most $\log n$ times, where the update size is proportional to $n$. Hence the sequence takes $\m{O}(n \log n)$ time. 
+\end{proof}
+
+\subsection{Disjoint-set trees}
+The pointer update in each set during a \codefunc{Union} can be minimized by a different representation of the Union-Find data structure, where each set is represented by a \emph{rooted tree}. Each member has a pointer to its parent, and the root of the tree points to itself, and is the representative element of the cluster. Function \codefunc{Find} is now performed by following the parent pointers until the root of the tree, and $\codefunc{Union}$ points one root towards another, such that there is only one single root that is the representative element. Each call to $\codefunc{Union}(r_x,r_y)$ is preceded by calls to $r_x=\codefunc{Find}(x)$ and $r_y=\codefunc{Find}(y)$ to find their respective roots and to link their trees if $r_x \neq r_y$. 
+
+\tikzstyle{lw1}=[line width=1]
+\tikzstyle{fnode}=[draw, circle, minimum size=0.55cm, inner sep=0, lw1]
+
+\begin{figure}[]
+  \centering
+  \begin{tikzpicture}[on grid]
+    \node at (1.5,-1) {\emph{(a)}};
+    \node[fnode] at (0,0)(a){a};
+    \node[fnode] at (0,1)(b){b};
+    \node[fnode] at (0.75,2)(c){c};
+    \node[fnode] at (1.5,1)(d){d};
+    \node[fnode] at (3,0)(e){e};
+    \node[fnode] at (3,1)(f){f};
+    \node[fnode] at (3,2)(g){g};
+    \draw[lw1, -latex] (a) -- (b);
+    \draw[lw1, -latex] (b) -- (c);
+    \draw[lw1, -latex] (d) -- (c);
+    \draw[lw1, -latex] (e) -- (f);
+    \draw[lw1, -latex] (f) -- (g);
+    \draw[lw1, -latex] (c) .. controls +(0.75,1) and +(-0.6,1) .. (c);
+
+    \begin{scope}[shift={(6,-1)}]
+      \node at (1.5,0) {\emph{(b)}};
+      \node[fnode] at (0,0)(a2){a};
+      \node[fnode] at (0,1)(b2){b};
+      \node[fnode] at (0.75,2)(c2){c};
+      \node[fnode] at (1.5,1)(d2){d};
+      \node[fnode] at (2.75,1)(e2){e};
+      \node[fnode] at (2.75,2)(f2){f};
+      \node[fnode] at (1.75,3)(g2){g};
+      \draw[lw1, -latex] (a2) -- (b2);
+      \draw[lw1, -latex] (b2) -- (c2);
+      \draw[lw1, -latex] (d2) -- (c2);
+      \draw[lw1, -latex] (e2) -- (f2);
+      \draw[lw1, -latex] (f2) -- (g2);
+      \draw[lw1, -latex] (c2) -- (g2);
+      \draw[lw1, -latex] (g2) .. controls +(0.75,1) and +(-0.6,1) .. (g2);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{The disjoint-set tree implementation of the Union-Find data structure. Each set is represented by a rooted tree, and each element in the set has a pointer to its parent. The root of the tree is the representative element, and points to itself. Twee sets are pictured in (a). In (b), these two sets are merged by pointing the root of one (element c) to the root of another (element g).}
+  \label{fig:parentpointers}
+\end{figure}
+
+\subsection{Union by rank}
+The \emph{union by weight} rule from the previous section can be implemented without any alteration. However, in the disjoint-set tree structure, a slightly different rule, \emph{union by rank}, can be implemented behaves similarly, but allows for a easier analysis of the complexity when combined with the \emph{path compression} rule, which is introduced in the next section. 
+
+\begin{definition}
+  The rank of a element $x$ is the maximum height of a subtree rooted in $x$. Let $R_t(x)$ denote the rank of element $x$ at time $t$. 
+\end{definition}
+
+The union by rank rule is then as follows: to apply $\codefunc{Union}(r_x,r_y)$, make the smaller-ranked root $R(r_y) < R(r_x)$ point to the larger; in case of a tie, also increase the rank of the new root by one. As long as a element $y$ has no parent, its rank can increase as other trees as pointed to itself. But as $y$ becomes a child of element $x$, the subtree rooted at $y$ becomes fixed and so does its rank. Any descendent $y$ of ancestor $x$ must thus always comply to $R(y)<R(x)$. The following lemmas give the intuition that the union by rank rule supports disjoint-set trees that are relatively balanced.
+
+\begin{lemma}\label{lem:rank}
+  Let $T_t(x)$ be the subtree rooted in element $x$ at time $t$, and let $|T_t(x)|$ denote the number of elements in the subtree, then if the weight by rank rule is implemented, it must be true that 
+  \begin{equation}\label{eq:rankeq}
+    \abs{T_t(x)} \geq 2^{R_t(x)}
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus equality \ref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is is either the case that the tree is unchanged, or some other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$, hence $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
+  
+  If $R_{t+1}(x) = R_t(x) + 1$, then at time $t$ an union occurred that merged $T_t(x)$ and $T_t(y)$ by pointing $y$ to $x$, where
+  \begin{equation*}
+    R_t(y) = R_t(x) = R_{t+1}(y) = R_{t+1}(x) - 1.
+  \end{equation*}
+  Therefore
+  \begin{align*}
+    \abs{T_{t+1}(x)} &= \abs{T_t(y)} + \abs{T_t(x)} \\
+      &\geq 2^{R_t(y)} + 2^{R_t(x)} \text{ by induction equality \ref{eq:rankeq}} \\
+      &= 2^{R_t(y)} + 2^{R_t(y)} \\
+      &= 2^{R_t(y)+1} \\
+      &= 2^{R_{t+1}(x)},
+  \end{align*}
+  and the equality must hold for all $t$ and $x$. 
+\end{proof}
+\begin{lemma}\label{lem:maxrank}
+    The maximum rank in all disjoint-set trees after a sequence calls to \codefunc{Find} and \codefunc{Union} in a system of $n$ elements is at most $\lfloor \log n \rfloor$, where $\lfloor \rfloor$ denotes the floor function. 
+\end{lemma}
+\begin{proof}
+    By the previous lemma \ref{lem:rank}, 
+    \begin{equation*}
+        n \geq \abs{T(x)} \geq 2^{R(x)}, 
+    \end{equation*}
+    Which leads to 
+    \begin{equation*}
+        \lfloor \log n \rfloor \geq R(x).
+    \end{equation*}
+\end{proof}
+We see that as the rank of the trees are bounded by $\m{O}(\log n)$, this results to an overall complexity of $\m{O}(n\log n)$ with $n-1$ unions. This is the same complexity achieved with the \emph{union by weight} rule. We will introduce one more lemma that further improves the intuition of balanced trees. 
+
+\begin{lemma}\label{lem:noderank}
+  The total number of elements with the same rank $r$ is limited by 
+  \begin{equation}
+      \abs{\{x | R(u)=r \}} \leq \frac{n}{2^r}.
+  \end{equation}
+\end{lemma}
+\begin{proof}
+    \begin{align*}
+        n &\geq \Bigg| \underset{R(x)=r}{\bigcup} T(x) \Bigg| \\
+        &= \sum_{R(x)=r} \abs{T(x)} \\
+        &\geq \sum_{R(x)=r} 2^r \text{ by lemma \ref{lem:rank}}\\
+        &= \abs{\{x | R(u)=r\}}\cdot 2^r
+    \end{align*}
+\end{proof}
+
+\subsection{Path compression}
+The \emph{path compression} rule for the \codefunc{Find} function is also very simple but highly effective. It operates by pointing all elements during a traversal of parent pointers until the root towards the root. Path compression thus partially decreases the height of the tree every time it is operated on a element in the tree. Note that path compression does not update the ranks of elements in the tree. For this reason, it is possible for a tree with root $r$ to have $R(r) > \max \text{ height } T(r)$. It still holds that for any element $x$ that once it has a parent $x_p$, its rank $R(x)$ is set. 
+
+\newcommand\DRAWTREE[3]{
+  \node[fnode] at (#1,#2) (#3) {$#3$};
+  \draw[lw1, fill=white!80!black] (#3.south) -- +(0.3,-1) -- +(-0.3,-1) -- cycle;
+}
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    \DRAWTREE{0}{0}{e}
+    \DRAWTREE{1}{.5}{d}
+    \DRAWTREE{2}{1}{c}
+    \DRAWTREE{3}{1.5}{b}
+    \DRAWTREE{4}{2}{a}
+    \draw[lw1] (a) -- (b) -- (c) -- (d) -- (e);
+
+    \draw[lw1, -latex] (5,0) -- +(2,0) node[midway, above] {\codefunc{Find}$(e)$};
+    \begin{scope}[shift={(8,0)}]
+      \DRAWTREE{0}{0}{e}
+      \DRAWTREE{1}{0}{d}
+      \DRAWTREE{2}{0}{c}
+      \DRAWTREE{3}{0}{b}
+      \DRAWTREE{4}{2}{a}
+      \draw[lw1] (a) -- (e) (b) -- (a) (c) -- (a) (d) -- (a);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{The effect of path compression. Take a disjoint-set tree with root $a$ and 4 subsequent children $b,c,d,e$. The height of each element indicate the generation of elements. Each element $a-e$ can have an arbitrary subtree attached to it, represented by the shared triangle. When \codefunc{Find}$(e)=a$ is called, all elements along the path from $e$ to root $a$ are pointed to $a$. (Figure inspired by \cite{tarjan1975efficiency})}
+  \label{fig:pathcompression}
+\end{figure}
+
+To find the complexity of a sequence of \codefunc{Union} and \codefunc{Find} operations when path compression is applied, we use a version of Ackermann's function $\akker(k,l)$ \cite{ackermann1928hilbertschen, kozen1992design}, which is very fast growing, and its inverse slow-growing $\alpha(n)$. For any system of practical size $n$, the inverse Ackermann's function satisfies $\alpha(n)\leq 4$ (see appendix \ref{ap:ackermann} for the full definition). 
+\begin{align}
+  \nonumber \akker(0,l) &= l + 1\\
+  \akker(k+1,l) &= A^l(k,l) \\
+  \nonumber \alpha(n) &= \min\big\{k | A(k,2) \geq n \big\}
+\end{align}
+
+Let $x.p$ denote the parent of an element $x$. With path compression, the parent $x.p$ can change over time. Nevertheless, it must still always be the case that $R(x)<R(x.p)$, as path compression does not switch children with parents, but only points elements $x_i$ along the path from to the root $r_x$, where $R(x_i)<R(r_x)$. The value $R(x.p) - R(x)$ can hence only increase over time. Especially, we consider the conditions for every $k$ the equality:
+\begin{equation}\label{eq:rankakker}
+  R(x.p)\geq \akker(k,R(x)+2)-2
+\end{equation}
+\begin{definition}
+  The level of an element $K(x)$ is the largest value of $k$ for which equality \ref{eq:rankakker} holds: 
+  \begin{equation}
+    K(x) = \max \big\{ k |  R(x_p)\geq \akker(k,R(x)+2)-2\big\}.
+  \end{equation}
+\end{definition}
+The level of an element $K(x)$ is time-dependant and can only increase in time due to path compression and the consequent increase in difference between ranks of $x$ and $x.p$. Furthermore, for minimal difference in ranks with $R(x) = 0$ and $R(x.p)=1$ the equality \ref{eq:rankakker} holds:
+\begin{eqnarray*}
+  R(x.p) \geq R(x) + 1 = 1 = \akker(0,R(x) + 2)-2
+\end{eqnarray*}
+where $\akker(0,2)=3$ (see appendix \ref{ap:ackermann}) and the level is thus al least $k(x)=0$. 
+
+\subsection{Disjoint-set tree complexity}
+Using the disjoint-set tree data structure, each \codefunc{Union} is preceded by two \codefunc{Find}'s to traverse the paths of each of the merging elements to their respective roots, while applying path compression. If the roots are different, the \codefunc{Union} operation takes constant time by making one root point to another, while applying union by rank. If the roots are the same, the trees will not be merged, but the \codefunc{Find} operations that preceded it were not in vain. Path compression decreases the length of the paths to roots such that any future calls to \codefunc{Find} in the same trees take less time.
+
+Each \codefunc{Union} operation thus requires constant time, and $m\leq n-1$ unions runs in $\m{O}(n)$ time. For the cost of the \codefunc{Find} function, we introduce here the concept of \emph{charge assignment}. The cost of each \codefunc{Find} function is equivalent to the number of elements along the path of the root, where each element $x$ takes one time unit. This time unit is then charged as follows:
+\begin{itemize}
+  \item If $x$ has only one ancestor which is the root of the tree, \codefunc{Find}$(x)$ is trivial and no time unit is charged. 
+  \item If $x$ has an ancestor $a$ on the path to root $r\neq a$ such that $K(x)=K(a)$, the charge of $x$' time unit is assigned to element $x$ itself.
+  \item If $x$ has no such ancestor, the charge of $x$'s time unit is assigned to the \codefunc{Find} function.
+\end{itemize}
+Using this charge assignment method, we can (a) sum over all charged vertices and available levels and (b) sum over all charged \codefunc{Find} operations that satisfy the condition to find the total number of charge time units. First, we find a upper bound for level $K(x)$. 
+
+\begin{lemma}\label{lem:maxakker}
+  When path compression and union by rank is applied, for a system of size $n\geq 5$, the level of a node is upper bounded $K(x) \leq \alpha(n) -1$, where $\alpha(n)$ is the inverse of Ackermann's function. 
+\end{lemma}
+\begin{proof}
+  For $n\geq 5$, we find the following inequalities:
+  \begin{align*}
+    n &> \lfloor \log n \rfloor + 2 \\
+    &\geq R(x.p) + 2 \text{ by lemma \ref{lem:maxrank}}\\
+    &\geq \akker(k,R(x)+2) \text{ by equation \ref{eq:rankakker}}\\
+    &\geq \akker(k,2),
+  \end{align*}
+  where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns $\alpha(n) > k$, which gives us the upper bound of $K(x)$. 
+\end{proof}
+
+First, we find find the time units assigned to charged \codefunc{Find} functions. Since no charge is assigned to \codefunc{Find}$(x)$ if $x$'s parent is the root, which is the case after path compression, the total number of charged \codefunc{Find}s is proportional to $m\leq n-1$ \codefunc{Union}s. For each \codefunc{Find}$(x)$, on the path from $x$ to the root $r$ there may be at most $\alpha(n)$ cases in which an ancestor $a$ satisfies $K(a)\neq K(x)$ per lemma \ref{lem:maxakker}. Hence, the total number of time units charges assigned to the \codefunc{Find} function is $\m{O}(n\alpha(n))$. 
+
+Next, we count the charges to a particular element $x$ over the entire sequence of operations. 
+\begin{lemma}\label{lem:xcharge}
+  Any element $x$ of rank $R(x) = r$ can be charged $r$ times before the charge is assigned to the \codefunc{Find} function.
+\end{lemma}
+\begin{proof}
+  For a charged time unit to be assigned to $x$ at time $t$, $x$ must have some ancestor $a$ such that $K(x) = K(a) = k$ for some value of $k$ (see figure \ref{fig:xcharge}a). Hence per equality \ref{eq:rankakker}
+  \begin{align*}
+    R_{t}(x.p) & \geq A(k,R_{t}(x))\\
+    R_{t}(a.p) & \geq A(k,R_{t}(a)),
+  \end{align*}
+  where $A(k,l)$ is a modified Ackermann's function with 
+  \begin{equation*}
+    A(k,l) = \akker(k,l+2)-2.
+  \end{equation*}
+  Let $r$ be the root of $x$, which is the last element on the path, then at some time $t_a$,
+  \begin{align*}
+    R_{t}(r) &\geq R_{t}(a.p) \\
+    &\geq A(k,R_{t}(a)) \\
+    &\geq A(k,R_{t}(x.p)) \\
+    &\geq A(k, A(k, R_{t}(x))) = A^2(k, R_{t}(x)),
+  \end{align*}
+  where $A^i(k,l)$ denotes the $i$-fold composition of $A(k,l)$ on the second argument. After applying \codefunc{Find}$(x)$ at time $t$, $r$ is the new parent of $x$ at time $t+1$, and 
+  \begin{equation*}
+    R_{t+1}(r) = R_{t+1}(x.p) \geq A^2(k, R_{t+1}(x)).
+  \end{equation*}
+  At this point $x.p$ is the root of the tree, and and calls to \codefunc{Find}$(x)$ will not result in a charge assignment. Suppose now that at some time $t' = t + \Delta t$ the subtree at $T(r)$ has a new root $r'$ due to some union operations, and $x$ has new ancestor $a'$ on the path to $r'$ that satisfies $K(x) = K(a')$ (see figure \ref{fig:xcharge}b). The same steps as before can be repeated. 
+  \begin{align*}
+    R_{t'}(r') &\geq R_{t}(a'.p) \\
+    &\geq A(k,R_{t'}(a')) \\
+    &\geq A(k,R_{t'}(x.p)) \\
+    &\geq A(k, A^2(k, R_{t'}(x))) = A^3(k, R_{t'}(x)),
+  \end{align*}
+  At time step $t'+1$, $r'$ becomes $x$'s parent and
+  \begin{equation*}
+    R_{t'+1}(r') = R_{t'+1}(x.p) \geq A^3(k, R_{t'+1}(x)).
+  \end{equation*}
+  This can be repeated at most $R(x)$ times before
+  \begin{align*}
+    R(x.p) &\geq A^{R(x)}(k,R(x)) \\
+    &= A(k+1, R(x)),
+  \end{align*}
+  at which point the level $K(x)\geq k+1$, for which the time unit is charged to the \codefunc{Find} function. 
+\end{proof}
+
+\newcommand\DOTTEDLINE[3]{
+  \draw[lw1] (#1) -- ($(#1)!#3!(#2)$) (#2) -- ($(#2)!#3!(#1)$);
+  \draw[lw1, dotted] ($(#1)!#3!(#2)$) -- ($(#2)!#3!(#1)$);
+}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[scale=0.95]
+    \DRAWTREE{0}{0}{x}
+    \DRAWTREE{1}{1}{a}
+    \DRAWTREE{2}{2}{r}
+    \DOTTEDLINE{x}{a}{.35}
+    \DOTTEDLINE{a}{r}{.35}
+    \node[anchor=west] at (0,2) {$t$};
+
+    \begin{scope}[shift={(6,0)}]
+      \DRAWTREE{0}{0}{x}
+      \DRAWTREE{2}{1}{r}
+      \DRAWTREE{1}{0}{a}
+      \draw[lw1] (x) -- (r) (a) -- (r);
+      \node[anchor=west] at (0,2) {$t+1$};
+    \end{scope}
+
+    \draw[lw1, -latex] (3,0) -- +(2,0) node[midway, above] {\codefunc{Find}$(x)$};
+    \node at (4,-2) {\emph{(a)}};
+    \begin{scope}[shift={(0,-5)}]
+      \draw[lw1, -latex] (3,0) -- +(2,0) node[midway, above] {\codefunc{Find}$(x)$};
+      \node at (4,-3) {\emph{(b)}};
+    \end{scope}
+
+    \begin{scope}[shift={(-2,-6)}]
+      \DRAWTREE{0}{0}{x}
+      \DRAWTREE{1}{0}{a}
+      \DRAWTREE{2}{1}{r}
+      \DRAWTREE{3}{2}{a'}
+      \DRAWTREE{4}{3}{r'}
+      \draw[lw1] (x) -- (r) -- (a);
+      \DOTTEDLINE{r}{a'}{.35}
+      \DOTTEDLINE{r'}{a'}{.35}
+      \node[anchor=west] at (-.5,2) {$t'$};
+    \end{scope}
+
+    \begin{scope}[shift={(6,-6)}]
+      \DRAWTREE{3}{1}{x}
+      \DRAWTREE{2}{1}{a'}
+      \DRAWTREE{1}{1}{r}
+      \DRAWTREE{4}{3}{r'}
+      \DRAWTREE{0}{0}{a}
+      \draw[lw1] (x) -- (r') -- (r) -- (a) (r') -- (a');
+      \node[anchor=west] at (0,2) {$t'+1$};
+    \end{scope}
+  \end{tikzpicture}
+  \caption{Visualization of the proof of lemma \ref{lem:xcharge}. (a) Suppose that at time $t$ element $x$ has an ancestor $a$ such that $K(x)=K(a)=k$, then root $r$ satisfies $R_t(r)\geq A^2(k, R_{t}(x))$. Path compression points $x$ to $r$, thus at time $t+1$ it must be true that $R_{t+1}(x.p) \geq A^2(k, R_{t+1}(x))$. (b) At some time $t'$, some unions now caused element $x$ to have new ancestor $a'$ and new root $r'$ on which the same steps can be applied, such that $ R_{t'+1}(x.p) \geq A^3(k, R_{t'+1}(x))$.}
+  \label{fig:xcharge}
+\end{figure}
+
+The above lemmas provide us with the necessary information to proof the overall complexity of the disjoint-set tree data structure. 
+\begin{theorem}\label{the:ufcomplexity}
+  The Union-Find data structure of a sequence of \codefunc{Union} and \codefunc{Find} operations runs in $\m{O}(n\alpha(n))$ time, where $\alpha(n$) is the inverse of Ackermann's function.
+\end{theorem}
+\begin{proof}
+  All charges assigned to the \codefunc{Find} function account to $\m{O}(n\alpha(n))$ time units. For charges assigned to elements of the disjoint-set trees, we bring together lemmas \ref{lem:maxrank}, \ref{lem:maxakker}, \ref{lem:noderank} and \ref{lem:xcharge} to find 
+  \begin{align*}
+    \text{Charge} &= \text{ ranks } \cdot \text{ levels } \cdot \text{ elements per rank } \cdot \text{charge per element per level per rank}\\
+    &= \sum_{r=0}^{\lfloor \log n \rfloor} (\alpha(n)-1)\cdot \frac{n}{2^r}\cdot r\\
+    &= n\cdot (\alpha(n)-1)\sum_{r=0}^{\lfloor \log n \rfloor}\frac{r}{2^r} \\
+    &= \m{O}(n\alpha(n)).
+  \end{align*}
+\end{proof}

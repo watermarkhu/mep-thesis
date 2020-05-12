@@ -1,4 +1,3 @@
-
 \chapter{Decoders}\label{sec:surface_decoders}
 \section{The optimal decoder}\label{sec:optimal_decoder}
 \section{Minimum Weight Perfect Matching}\label{sec:MWPMdecoder}
@@ -129,201 +128,12 @@ Due to this, we ensure that each forest $F_\m{E}$ can only support a maximum of 
 \input{tikzfigs/peeling_bound.tex}
 
 
-
-
-\subsection{Union-Find data structure}
-The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, is the data structure that is crucial for the near linear complexity of the Union-Find decoder. In this section, we describe the data structure and analyse its complexity. 
-
-The disjoint-set data structure consists of two types of instructions for manipulating a set of elements partitioned into a number of disjoint subsets, which are non-overlapping. These instructions provide near-constant-time operations to determine whether elements are in the same set, and to merge sets if that is not the case. 
-\begin{itemize}
-  \item $\codefunc{Find}(x)$ computes the unique set containing the element $x$
-  \item $\codefunc{Union}(A,B)$ combines sets $A$ and $B$ into a new combined set
-\end{itemize}
-We first show that a very simple implementation runs in $\m{O}(n^2)$ time. Applying the \emph{union by weight} rule, this is reduced to $\m{O}(n \log n)$. Combined with the \emph{Path compression} rule, the overall complexity is $\m{O}(n \alpha (n))$, where $\alpha$ is the inverse of Ackermann's function. The original proof \cite{tarjan1975efficiency} was further reinforced by subsequent publications \cite{tarjan1979class,tarjan1984worst} and was proven to be optimal \cite{fredman1989cell}. In this thesis, we will follow a simplified approach, where the \emph{union by weight} rule is replaced by a different by similar \emph{union by rank} rule \cite{kozen1992design}. Later Tarjan and also other sources used this to cast this analysis in terms of potential functions \cite{tarjan1999handout, harfst2000potential, cormen2009introduction}. Another approach is provided by \cite{seidel2005top}, where the upper bound is computed via a top-down method. 
-
-
-\subsubsection{Simple implementation}
-A simple implementation of the instructions would be to store for each set $X$ a list $l_X$ of all the elements it contains, and a pointer to $l_X$ at all elements $x\in l_X$, which is called the \emph{linked-list} representation. The function $\codefunc{find}(x)$ simply returns the list $l_X$, which represents the set. After a call to $\codefunc{Union}(X, Y)$, all elements of $l_Y$ are appended to $l_X$, and the pointers of all elements $y\in Y$ are updated. This takes $\m{O}(m)$ operations, where $m=|l_Y|$ the number of elements. In a system of $n$ elements, there may be a maximum of $n-1$ calls to \codefunc{Union}. As the $i$\textsuperscript{th} call involves sets $|l_X|=1$ and $|l_Y|=i$, the number of updates is 
-\begin{equation}
-  \sum_{i=1}^{n-1} i = \m{O}(n^2),
-\end{equation}
-where each \codefunc{Union} operation has on average $\m{O}(n)$ updates. 
-
-\subsubsection{Union by weight}
-In the above case, we assume in each \codefunc{Union} the worst case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule to always append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(n \log n)$. 
-
-\begin{theorem}
-  A sequence of \codefunc{Union} and \codefunc{Find} operations on $n$ initial single element disjoint sets using the weighted union rule takes $\m{O}(n \log n)$ time. 
-\end{theorem}
-\begin{proof}
-  Consider a set $X$ with list $l_X$ that undergoes a sequence of \codefunc{Union} and \codefunc{Find} operations. The first time all pointers in $l_X$ are updated, the resulting set must have at least 2 elements. Similarly, the next time all pointers are updated, the resulting set must have at least 4 elements due to the weighted union rule. With system size $n$, any initial set $X$ can be updated at most $\log n$ times, where the update size is proportional to $n$. Hence the sequence takes $\m{O}(n \log n)$ time. 
-\end{proof}
-
-\subsubsection{Disjoint-set trees}
-The pointer update in each set during a \codefunc{Union} can be minimized by a different representation of the Union-Find data structure, where each set is represented by a \emph{rooted tree}. Each member has a pointer to its parent, and the root of the tree points to itself, and is the representative element of the cluster. Function \codefunc{Find} is now performed by following the parent pointers until the root of the tree, and $\codefunc{Union}$ points one root towards another, such that there is only one single root that is the representative element. Each call to $\codefunc{Union}(r_x,r_y)$ is preceded by calls to $r_x=\codefunc{Find}(x)$ and $r_y=\codefunc{Find}(y)$ to find their respective roots and to link their trees if $r_x \neq r_y$. 
-
-\tikzstyle{lw1}=[line width=1]
-\tikzstyle{fnode}=[draw, circle, minimum size=0.65cm, inner sep=0, lw1]
-
-\begin{figure}[]
-  \centering
-  \begin{tikzpicture}[on grid]
-    \node[fnode] at (0,0)(a){a};
-    \node[fnode] at (0,1)(b){b};
-    \node[fnode] at (0.75,2)(c){c};
-    \node[fnode] at (1.5,1)(d){d};
-    \node[fnode] at (3,0)(e){e};
-    \node[fnode] at (3,1)(f){f};
-    \node[fnode] at (3,2)(g){g};
-    \draw[lw1, -latex] (a) -- (b);
-    \draw[lw1, -latex] (b) -- (c);
-    \draw[lw1, -latex] (d) -- (c);
-    \draw[lw1, -latex] (e) -- (f);
-    \draw[lw1, -latex] (f) -- (g);
-    \draw[lw1, -latex] (c) .. controls +(0.75,1) and +(-0.75,1) .. (c);
-    \node at (1.5,-1) {(a)};
-
-    \begin{scope}[shift={(6,-1)}]
-      \node at (1.5,0) {(b)};
-      \node[fnode] at (0,0)(a2){a};
-      \node[fnode] at (0,1)(b2){b};
-      \node[fnode] at (0.75,2)(c2){c};
-      \node[fnode] at (1.5,1)(d2){d};
-      \node[fnode] at (2.75,1)(e2){e};
-      \node[fnode] at (2.75,2)(f2){f};
-      \node[fnode] at (1.75,3)(g2){g};
-      \draw[lw1, -latex] (a2) -- (b2);
-      \draw[lw1, -latex] (b2) -- (c2);
-      \draw[lw1, -latex] (d2) -- (c2);
-      \draw[lw1, -latex] (e2) -- (f2);
-      \draw[lw1, -latex] (f2) -- (g2);
-      \draw[lw1, -latex] (c2) -- (g2);
-      \draw[lw1, -latex] (g2) .. controls +(0.75,1) and +(-0.75,1) .. (g2);
-    \end{scope}
-  \end{tikzpicture}
-  \caption{<caption>}
-  \label{<label>}
-\end{figure}
-
-\subsubsection{Union by rank}
-
-The \emph{union by weight} rule from the previous section can be implemented without any alteration. However, in the disjoint-set tree structure, a slightly different rule, \emph{union by rank}, can be implemented behaves similarly, but allows for a easier analysis of the complexity when combined with the \emph{path compression} rule, which is introduced in the next section. 
-
-\begin{definition}
-  The rank of a element $x$ is the maximum height of a subtree rooted in $x$. Let $R_t(x)$ denote the rank of element $x$ at time $t$. 
-\end{definition}
-
-The union by rank rule is then as follows: to apply $\codefunc{Union}(r_x,r_y)$, make the smaller-ranked root $R(r_y) < R(r_x)$ point to the larger; in case of a tie, also increase the rank of the new root by one. As long as a element $y$ has no parent, its rank can increase as other trees as pointed to itself. But as $y$ becomes a child of element $x$, the subtree rooted at $y$ becomes fixed and so does its rank. Any descendent $y$ of ancestor $x$ must thus always comply to $R(y)<R(x)$. The following lemmas give the intuition that the union by rank rule supports disjoint-set trees that are relatively balanced.
-
-\begin{lemma}\label{lem:rank}
-  Let $T_t(x)$ be the subtree rooted in element $x$ at time $t$, and let $|T_t(x)|$ denote the number of elements in the subtree, then if the weight by rank rule is implemented, it must be true that 
-  \begin{equation}\label{eq:rankeq}
-    \abs{T_t(x)} \geq 2^{R_t(x)}
-  \end{equation}
-\end{lemma}
-\begin{proof}
-  Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus equality \ref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is is either the case that the tree is unchanged, or some other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$, hence $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
-  
-  If $R_{t+1}(x) = R_t(x) + 1$, then at time $t$ an union occurred that merged $T_t(x)$ and $T_t(y)$ by pointing $y$ to $x$, where
-  \begin{equation*}
-    R_t(y) = R_t(x) = R_{t+1}(y) = R_{t+1}(x) - 1.
-  \end{equation*}
-  Therefore
-  \begin{align*}
-    \abs{T_{t+1}(x)} &= \abs{T_t(y)} + \abs{T_t(x)} \\
-      &\geq 2^{R_t(y)} + 2^{R_t(x)} \text{ by induction equality \ref{eq:rankeq}} \\
-      &= 2^{R_t(y)} + 2^{R_t(y)} \\
-      &= 2^{R_t(y)+1} \\
-      &= 2^{R_{t+1}(x)},
-  \end{align*}
-  and the equality must hold for all $t$ and $x$. 
-\end{proof}
-\begin{lemma}\label{lem:maxrank}
-    The maximum rank in all disjoint-set trees after a sequence calls to \codefunc{Find} and \codefunc{Union} in a system of $n$ elements is at most $\lfloor \log n \rfloor$, where $\lfloor \rfloor$ denotes the floor function. 
-\end{lemma}
-\begin{proof}
-    By the previous lemma \ref{lem:rank}, 
-    \begin{equation*}
-        n \geq \abs{T(x)} \geq 2^{R(x)}, 
-    \end{equation*}
-    Which leads to 
-    \begin{equation*}
-        \lfloor \log n \rfloor \geq R(x).
-    \end{equation*}
-\end{proof}
-We see that as the rank of the trees are bounded by $\m{O}(\log n)$, this results to an overall complexity of $\m{O}(n\log n)$ with $n-1$ unions. This is the same complexity achieved with the \emph{union by weight} rule. We will introduce one more lemma that further improves the intuition of balanced trees. 
-
-\begin{lemma}\label{lem:noderank}
-  The total number of elements with the same rank $r$ is limited by 
-  \begin{equation}
-      \abs{\{x | R(u)=r \}} \leq \frac{n}{2^r}.
-  \end{equation}
-\end{lemma}
-\begin{proof}
-    \begin{align*}
-        n &\geq \Bigg| \underset{R(x)=r}{\bigcup} T(x) \Bigg| \\
-        &= \sum_{R(x)=r} \abs{T(x)} \\
-        &\geq \sum_{R(x)=r} 2^r \text{ by lemma \ref{lem:rank}}\\
-        &= \abs{\{x | R(u)=r\}}\cdot 2^r
-    \end{align*}
-\end{proof}
-
-\subsubsection{Path compression}
-The \emph{path compression} rule for the \codefunc{Find} function is also very simple but highly effective. It operates by pointing all elements during a traversal of parent pointers until the root towards the root. Path compression thus partially decreases the height of the tree every time it is operated on a element in the tree. Note that path compression does not update the ranks of elements in the tree. For this reason, it is possible for a tree with root $r$ to have $R(r) > \max \text{ height } T(r)$. It still holds that for any element $x$ that once it has a parent $x_p$, its rank $R(x)$ is set. 
-
-To find the complexity of a sequence of \codefunc{Union} and \codefunc{Find} operators with both rules applied, we use a version of Ackermann's function $A(k,x)$ \cite{ackermann1928hilbertschen, kozen1992design}, which is very fast growing, and its inverse slow-growing $a(n)$. 
-\begin{align}
-  \nonumber A(0,x) &= x + 1\\
-  A(k+1,x) &= A^x(k,x) \\
-  \nonumber \alpha(n) &= \min\{k | A(k,2) \geq n \}
-\end{align}
-For any system of practical size $n$, the inverse Ackermann's function satisfies $a(n)\leq 4$ (see appendix \ref{ap.ackermann} for the full definition). 
-
-With path compression, the parent of some node $x_p$ can change over time. Nevertheless, it must still always be the case that $R(x)<R(x_p)$, as path compression does not switch children with parents, but only points nodes $x_i$ along the path from to the root $r_x$, where $R(x_i)<R(r_x)$. The value $R(x_p) - R(x)$ can hence only increase over time. Especially, we consider the conditions for every $k$ the equality:
-\begin{equation}\label{eq:rankakker}
-  R(x_p)\geq A(k,R(x)+2)-2
-\end{equation}
-\begin{definition}
-  The level of a node $k(x)$ is the largest value of $k$ for which equality \ref{eq:rankakker} holds: 
-  \begin{equation}
-    k(x) = \max \{ k |  R(x_p)\geq A(k,R(x)+2)-2\}.
-  \end{equation}
-\end{definition}
-The level of a node $k(x)$ is time-dependant and can only increase in time due to path compression and the consequent increase in difference between ranks of $x$ and $x_p$. Furthermore, for minimal difference in ranks with $R(x) = 0$ and $R(x_p)=1$ the equality \ref{eq:rankakker}holds:
-\begin{eqnarray*}
-  R(x_p) \geq R(x) + 1 = 1 = A(0,R(x) + 2)-2
-\end{eqnarray*}
-for level $k(x) = 0$, where $A(0,2)=3$ (see appendix \ref{ap.ackermann}).
-\begin{lemma}
-  When path compression and union by rank is applied, for a system of size $n\geq 5$, the level of a node is upper bounded $k(x) \leq \alpha(n) -1$, where $\alpha(n)$ is the inverse of Ackermann's function. 
-\end{lemma}
-\begin{proof}
-  For $n\geq 5$, we find the following inequalities:
-  \begin{align*}
-    n &> \lfloor \log n \rfloor + 2 \\
-    &\geq R(x_p) + 2 \text{ by lemma \ref{lem:maxrank}}\\
-    &\geq A(k,R(x)+2) \text{ by equation \ref{eq:rankakker}}\\
-    &\geq A(k,2),
-  \end{align*}
-  where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns $\alpha(n) > k$, which gives us the upper bound of $k(x)$. 
-\end{proof}
-
-
-
-
-
-
 % To keep track of the vertices of a cluster, it will be represented as a \emph{cluster tree}, where an arbitrary vertex of the cluster will be the root, and any other vertex will be a child of the root. Whenever an edge $(u,v)$ is fully grown, we will need to traverse the trees of the two vertices $u$ and $v$, and check whether they have the same root; whether they belong to the same cluster. If not, a merge is initiated by making the root of smaller cluster a child of the bigger cluster. These functions, \codefunc{find} and \codefunc{union} respectively, are part of the Union-Find algorithm (not to be confused with the Union-Find decoder) \cite{tarjan1975efficiency}.
 
 % Within the Union-Find algorithm, two features ensure that the complexity of the algorithm is not quadratic. 1). With \textbf{path compression}, as we traverse a tree from child to parent until we reach the root, we make sure that each vertex encountered that we have encountered along the way is pointed directly to the root. This doubles the cost of the \codefunc{find}, but speeds up any future call to any vertex on the traversed path. 2). With \textbf{weighted union}, we make sure to always make the smaller tree a child of the bigger tree. This ensures that the overall length of the path to the root stays minimal. In order to make this happen, we just need to store the size of the tree at the root.
 
-
-
 \subsection{Union-Find decoder}
-
-In the context of the surface code, the vertices $v\in V$ are the elements and each disjoint set is the set over vertices that support a cluster $\mathscr{B}(C)$ (definitions \ref{def:boundaryofedges}, \ref{def:cluster}). It is redundant to additionally store the sets $C$ for edges, as it lemma \ref{lem:singlecluster} implies that if a vertex $v\in \mathscr{B}(C)$, that all edges support by $v$ satisfy $e \in C$. 
-
-Note that while the nodes in the tree are equivalent to vertices $v \in V$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in E$. The edge set $E$ with its erasure subset $\m{E}\subseteq E$ and subsequently cluster $C\subseteq \m{E}$ and forest $F_C\subseteq C$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $\bound(C)$ exists to point towards the representative element at the root.
+The Union-Find decoder \cite{delfosse2017almost} is a modification of the Peeling decoder that utilizes the Union-Find data structure \cite{tarjan1975efficiency} to additionally solve for Pauli errors, on top of erasure errors. In this section, we will first describe why a modification is needed, how the Union-Find data structure is applied, then move on the the algorithm itself and analyze its complexity. 
 
 The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or other types of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \ref{qec:eq:bitflip} and \ref{qec:eq:phaseflip}, which means that again we can consider the primal and dual lattices separately. These noise channels introduce extra Pauli errors $P_p$ such that not all Pauli errors are in the erasures $P\not\subseteq \m{E}$, where $P = P_p\triangle P_\m{E}$. This means also that not all syndromes are in the boundary of the erasure $\sigma \not\subseteq \mathscr{B}(\m{E})$ (definition \ref{def:boundaryofedges}), and odd parity clusters can occur. Per theorem \ref{eq:anyevenparity}, the Peeling decoder cannot solve for these errors, and needs some alteration.
 
@@ -331,7 +141,7 @@ To this end, an altered erasure $\bar{\m{E}}$ that contains only even-parity clu
 \begin{proposition}
   The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{E}$, such that theorem \ref{eq:anyevenparity} is satisfied, after which the Peeling decoder can proceed as before. 
 \end{proposition}
-\begin{figure}[]
+\begin{figure}[h]
   \centering
   \begin{tikzpicture}
     \node[draw, circle, OrangeRed, fill=OrangeRed!50!white, line width=1, text=black] (s1) at (0,1.5) {$\sigma$};
@@ -356,7 +166,16 @@ To this end, an altered erasure $\bar{\m{E}}$ that contains only even-parity clu
   \caption{Stages of decoding of the Union-Find decoder. A pre-processing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{E}}$ is constructed that satisfies theorem \ref{eq:anyevenparity}, where all erasures have an even number of syndromes. (Figure inspired by \cite{delfosse2017almost})} 
   \label{fig:ufstages}
 \end{figure}
-Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $C$ and a vertex in a single cluster boundary $\mathscr{B}(C)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure, and the altered decoder is therefore dubbed the Union-Find decoder \cite{delfosse2017almost}.
+Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $C$ and a vertex in a single cluster boundary $\mathscr{B}(C)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
+
+\subsubsection{Application of the Union-Find data structure}
+
+The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, consist of two functions for manipulating a set of elements partitioned into a number of disjoint subsets, and a set of rules for these manipulations. In the context of the surface code, the vertices $v\in V$ are the elements and each disjoint set is the set over vertices that support a cluster $\mathscr{B}(C)$ (definitions \ref{def:boundaryofedges}, \ref{def:cluster}). It is redundant to additionally store the sets $C$ for edges, as it lemma \ref{lem:singlecluster} implies that if a vertex $v\in \mathscr{B}(C)$, that all edges support by $v$ satisfy $e \in C$. 
+
+More specifically, we'll be using the disjoint-set tree implementation; each cluster is denoted by a tree, where each element or vertex points to its parent vertex. The function \codefunc{Find}$(v)$ is performed by following the parent pointers to the root $r_v$ of the tree, which is the representative element of the cluster. The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertices $u$ and $v$ by making one of the roots a child of another. We apply \emph{union by rank} and \emph{path compression} to ensure that the complexity is $\m{O}(n\alpha(n))$, where $\alpha(n)$ is the inverse of Ackermann's function and $n$ denotes the system size or number of vertices in $V$. For all practical purposes, $\alpha(n)\leq 4$. The Union-Find data structure, its tree implementation, the \emph{union by rank} and \emph{path compression} rules are all elaborately covered in appendix \ref{ap:unionfind}. Here, we also make a full analysis of its $\m{O}(n\alpha(n))$ complexity based on \cite{kozen1992design}. The Ackermann's function and its inverse are detailed in appendix \ref{ap:ackermann}
+
+Note that while the nodes in the tree are equivalent to vertices $v \in V$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in E$. The edge set $E$ with its erasure subset $\m{E}\subseteq E$ and subsequently cluster $C\subseteq \m{E}$ and forest $F_C\subseteq C$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $\bound(C)$ exists to point towards the representative element at the root.
+
 
 \paragraph{Data structure}
 Now it is clear what information is exactly needed to grow the clusters using the Union-Find algorithm. We will need to store the cluster in a sort of cluster-tree. At the root of each tree we store the size and parity of that cluster in order to facilitate weighted union and to select the odd clusters. We will need to store the state of each edge (empty, half-grown, or fully grown) in a table called \codeword{support}. And we need to keep track of the boundary of each cluster in a \codeword{boundary} list.
