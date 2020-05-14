@@ -87,7 +87,7 @@ Note that measuring the ancilla qubit in the computational basis will be equival
     (ZZ)\ket{10} &= -\ket{10} && (ZZ)\ket{11} &= \ket{11}
 \end{aligned}
 \end{equation}
-Now for our quantum three-bit repetition code, we need to setup ancilla qubits between each of the 3 qubits, such that the parity between any two qubits can be measured. For the state in equation \ref{eq:qec_3bitstate}, any parity measurement $ZZI$, $ZIZ$ or $IZZ$ will return even parity. If one of the qubits has encountered a bit-flip error such as in the second qubit in equation \ref{eq:qec_3bitflip}, two of the parity measurements will return a -1 eigenvalue, in this case $ZZI$ and $IZZ$.
+Now for our quantum three-bit repetition code, we need to setup ancilla qubits between each of the 3 qubits, such that the parity between any two qubits can be measured. For the state in equation \eqref{eq:qec_3bitstate}, any parity measurement $ZZI$, $ZIZ$ or $IZZ$ will return even parity. If one of the qubits has encountered a bit-flip error such as in the second qubit in equation \eqref{eq:qec_3bitflip}, two of the parity measurements will return a -1 eigenvalue, in this case $ZZI$ and $IZZ$.
 
 Furthermore, we see that no configuration of ancilla qubits could be set up for the three-bit repetition code to detect for phase errors, which was already set by the weight of the logical Z operator.
 

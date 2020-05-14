@@ -15,83 +15,97 @@ The Union-Find decoder is a new fast decoding algorithm for topological codes to
 Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in the coming sections and perform analyses on their complexities. 
 
 \subsection{The Peeling decoder}
-he Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \ref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \ref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $I$, $X$, $Y$ or $Z$ chosen uniformly at random. Due to this uniform distribution, the primal and dual lattices of the surface code can be decoded separately from each other. The erased edges of graph $G_v(V,E_v)$ and $G_f(V,E_f)$ (see section \ref{sec:toricgraph}) suffer uniformly distributed $\{I,X\}$ and $\{I,Z\}$, respectively. We will consider $G_v(V,E_v)$ and simplify its notation to $G(V,E)$. 
+he Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \eqref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \eqref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $I$, $X$, $Y$ or $Z$ chosen uniformly at random.
+\begin{theorem}\label{the:independentxy}
+  For erasure noise of equation \eqref{qec:eq:erasure}, where a qubit is erased and replaced with a totally mixed state equivalent to a qubit that suffers from uniformly chosen $\{I,X,Y,Z\}$, the primal and dual lattices of the surface code can be decoded independently from each other. 
+\end{theorem}
+\begin{proof}
+  Pauli $X$ errors exclusively trigger nontrivial star operator measurement on the vertices of the primal lattice. Pauli $Z$ errors exclusively trigger trigger nontrivial plaquette measurements on the vertices of the dual lattice, or faces of the primal lattice. Recall from section \ref{sec:toricgraph} that a graph $G(V,E,F)$ can be separated into sub-graphs $G_{V}(V,E_V)$ and $G_{F}(F,E_F)$. An uniformly distributed $\{I,X,Y,Z\}$ on $G(V,E,F)$ is hence equivalent to uniformly distributed $\{I,X\}$ and $\{I,Z\}$ that simultaneously and separately apply to $G_{V}$ and $G_{F}$, respectively, since $\{I,X\} \otimes \{I,Z\}=\{I,X,Y,Z\}$. 
+\end{proof}
+\begin{definition}\label{def:erasure}
+  Let the subset of qubits that suffer an erasure error (equation \eqref{qec:eq:erasure}) on a lattice $G(V,E)$ be denoted by $\gls{erasure}\subseteq E$. Edges in $\m{E}$ are replaced by uniformly distributed $\{I,X\}$ for the primal lattice (and $\{I,Z\}$ for the dual lattice). Let the set of edges that suffer an Pauli error due to this replacement by $P_\m{E}\subseteq \m{E}$. 
+\end{definition}
+\begin{definition}\label{def:pauliprod}
+  The \emph{Pauli product} of a set of edges $\tilde{E}$ is the defined as the product of Pauli operators on each of the edges in the set
+  \begin{equation}\label{eq:pauliprod}
+    \gls{pauliproduct}(\tilde{E}) = \prod_{e\in \tilde{E}} \hat{P}_e,
+  \end{equation}
+  where the Pauli operator $\hat{P}$ corresponds to $X$ if $\tilde{E}\subseteq E_v$ and otherwise $Z$ when $\tilde{E}\subseteq E_f$. 
+\end{definition}
 
-We describe the decoding process of the primal lattice $G(V,E)$ and denote the set of lost qubits by $\gls{erasure}\subseteq E$. The set of Pauli errors within the erasure is $P_\m{E} = \{X_1,...X_m\}$. Error detection is performed in the same way as Pauli errors; by measuring the set of star operators or vertices $V$, which returns a set of nontrivial syndrome measurements $\sigma \subseteq V$. The decoder of an erasure error is thus provided with the extra information $\m{E}$, the subset of erased qubit locations, next to $\sigma$. 
+\subsubsection{Decoder process}
+In this section, we will only consider the sub-graph $G_{V}(V,E_V)$ and denote it simply by $G(V,E)$. We describe the decoding process of an erasure $\m{E}$ with errors on $P_\m{E}$. Error detection is performed in the same way as Pauli errors; by measuring the set of stabilizer operators on vertices $V$, which returns a set of nontrivial syndrome measurements $\sigma \subseteq V$. The decoder of an erasure error is thus provided with the extra information $\m{E}$ on top of the nontrivial measurements $\sigma$. The decoding process of sub-graph $G_{F}(F,E_F)$ is equivalent to the process of $G_{V}(V,E_V)$.
 \begin{lemma}\label{lem:peelinguni}
-  For an erasure $\m{E} \subseteq E$ with uniformly distributed Pauli errors $P_\m{E}$ on a surface code, and a measured syndrome $\sigma$, any error  $\tilde{P}_\m{E}$ that produces $\sigma$ in a measurement is the most likely set of errors. 
+  For an erasure $\m{E} \subseteq E$ whose qubits are reinitiated with uniformly distributed Pauli errors resulting in errors on $P_\m{E}$, and a measured syndrome $\sigma$, any error $\tilde{P}_\m{E} \subseteq \m{E}$ that produces $\sigma$ in a measurement is the most likely set of errors. 
 \end{lemma}
 \begin{proof}
-  For the coset $\tilde{P}_\m{E}\cdot S$, where $\tilde{P}_\m{E}$ is some Pauli error caused by an erasure and $S$ is a set of stabilizers that act trivially on the codespace, the most likely configuration is the one that maximizes probability $\mathbb{P}(\tilde{P}_\m{E}\cdot S|\m{E},\sigma)$, where $\m{E}$ and $\sigma$ are known. This probability is proportional to $|\tilde{P}_\m{E}\cdot S \cap\m{E}|$. But since all qubits in $\m{E}$ suffer a Pauli error and this error is uniformly distributed, all configurations of $\tilde{P}_\m{E}$ have equal probability. 
-  % Let $\m{E}\subseteq E$ be an erasure, a set of qubits on which an erasure error occurs, and let $\sigma \subseteq \m{S}$ be the measured error syndrome, the subset of the stabilizer generator group $\m{S}$, that anticommute with the erasure errors. In the absence of Pauli errors, all errors $P$ must lie inside the erasure.Therefore, for any measured syndrome, the path of errors must also be in the erasure, which can be denoted by $P\subseteq \m{E}$. As a result of this, in the case that the Pauli errors within the erasure are uniformly distributed, any error $\tilde{P}\subseteq\m{E}$ that produces the syndrome $\sigma$ is the most likely coset. 
+  % For the coset $\tilde{P}_\m{E}\cdot S$, where $\tilde{P}_\m{E}$ is some Pauli error caused by an erasure and $S$ is a set of stabilizers that act trivially on the codespace, the most likely configuration is the one that maximizes probability $\mathbb{P}(\tilde{P}_\m{E}\cdot S|\m{E},\sigma)$, where $\m{E}$ and $\sigma$ are known. This probability is proportional to $|\tilde{P}_\m{E}\cdot S \cap\m{E}|$. But since all qubits in $\m{E}$ suffer a Pauli error and this error is uniformly distributed, all configurations of $\tilde{P}_\m{E}$ have equal probability. 
+  In the absence of Pauli errors, all edges with some error $P$ must lie inside $\m{E}$. Therefore, for any measured syndrome $\sigma$, the path of errors must also be in the erasure, which can be denoted by $\tilde{P}_\m{E} \subseteq \m{E}$. Since all errors in $\m{E}$ are uniformly distributed, any set of edges with errors $\tilde{P}_\m{E}$ with syndrome $\sigma$ is the most likely set. 
 \end{proof}
 
-Consequently, if the error set $\tilde{P}_\m{E}$ is applied as the correction operator $C=\tilde{P}_\m{E}$, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $C$, we now do not try to find paths within $\m{E}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made. 
+For this reason, if the correction $\hat{C}=\n{P}(\tilde{P}_\m{E})$ is applied to the lattice, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $\hat{C}$, the objective is not try to find paths within $\m{E}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made. 
 \begin{definition}\label{def:boundaryofedges}
-  The boundary or support of a set of edges $\gls{boundary}(\tilde{E})$ denotes the set of vertices $\tilde{V}$ that supports all edges $e\in \tilde{E}$.
+  The vertex boundary or support of a set of edges $\gls{boundary}(\tilde{E})$ denotes the set of vertices $\tilde{V}$ that supports all edges $e\in \tilde{E}$.
 \end{definition}
 \begin{definition}\label{def:forest}
   A spanning forest $F_{\tilde{E}}$ is a maximal subset of edges of $\tilde{E}$ that contains no cycles and $\mathscr{B}(F_{\tilde{E}}) = \mathscr{B}(\tilde{E})$.
 \end{definition}
-The first step in this is to produce $\gls{forest}$ inside $\m{E}$, where all syndrome vertices $\sigma$ are included in the support. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is connected \emph{acyclic} graph. Such a forest can be found in linear time by either a depth-first search or breadth-first search of the $\m{E}$. Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{correctionset}$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u\in\sigma$, remove $u$ from $\sigma$, and $e$ is added to $\m{C}$ and the vertex $v$ is \emph{flipped}, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The dual lattice can be decoded in a similar way.
-\begin{definition}
-  The \emph{Pauli product} of a set of edges $\tilde{E}$ is the defined as the product of Pauli operators on each of the edges in the set
-  \begin{equation}
-    \gls{pauliproduct}(\tilde{E}) = \prod_{e\in \tilde{E}} \hat{P}_e,
-  \end{equation}
-  where the Pauli operator $\hat{P}$ corresponds to $X$ if $\tilde{E}\subseteq E_v$ and $Z$ if $\tilde{E}\subseteq E_f$. 
-\end{definition}
+The first step  is to produce $\gls{forest}$ inside $\m{E}$, where all syndrome vertices $\sigma$ are included in the support per definition \ref{def:forest}. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is a connected \emph{acyclic} graph. Such a forest can be found in linear time by either a depth-first search of the $\m{E}$. Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{correctionset}\subseteq F_\m{E}$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u$ belong to the set of nontrivial syndrome measurements $\sigma$, remove $u$ from $\sigma$, add $e$ to $\m{C}$, and \emph{flip} the vertex $v$ in $\sigma$, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in $F_\m{E}$ and $\hat{C}=\n{P}(\m{C})$.
 \begin{algo}[algotitle=Peeling decoder (adapted from \cite{delfosse2017linear}), label=algo:peel]
   \begin{algorithm}[H]
     \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V$}
-    \KwResult{Correction $C$}
+    \KwResult{Correction $\hat{C}$}
     \BlankLine
     construct a spanning forest $F_\m{E} \subseteq\m{E}$\;
-    initialize $\m{C}$ by $\m{C} = {\emptyset}$\;
+    initialize $\m{C} = {\emptyset}$\;
     \While{$F_\m{E} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\m{E}$ \;
     \If{$u \in \sigma$}{
       add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
     \Else{do nothing}
     }
-    \KwRet{$C = \prod_{e\in \m{C}} X_e$}
+    \KwRet{$\n{P}(\m{C})$, see equation \eqref{eq:pauliprod}}
   \end{algorithm}
 \end{algo}
-The spanning forest $F_\m{E}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{E}})$ and therefore also in the number of qubits $\m{O}(n)$. Now, the structure of the forest $F_\m{E}$ is very dependent on from which vertex the DFS is started, and proof is required that any forest of $\m{E}$ is valid. Also, we show that for each forest, the peeling process returns the same correction.
+\input{tikzfigs/peeling_decoder}
+
+\subsubsection{Decoder validity}
+The spanning forest $F_\m{E}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{E}})$ and therefore also in the number of qubits $\m{O}(n)$. The structure of the forest $F_\m{E}$ is dependent on the root vertex from which the depth-first search is started, and proof is required that any forest of $\m{E}$ is valid. Also, we show that for all forests, the peeling process returns the same correction.
 
 \begin{lemma}\label{lem:anyforest}
   For any choice of $F_\m{E}$, there exists a subset $\m{C}\subseteq F_\m{E}$ such that $\mathscr{P}(\m{C})$ corrects the syndrome set $\sigma$.
 \end{lemma}
 \begin{proof}
-  There exists a subset of edges $\tilde{E} = \{e_1,...,e_m\} \subseteq F_\m{E}$ such that $\mathscr{P}(\tilde{E})$ has a syndrome $\sigma$. By the definition of the forest $F_\m{E}$, adding another edge $e' \in F_\m{E} \vartriangle \m{E}$ creates a cycle $\gamma' \subseteq F_\m{E} \cup \{e_i\}$, where $\vartriangle$ denotes the symmetric difference between two sets. Now $\tilde{E}$ can be replaced by $\tilde{E}'=\tilde{E}\vartriangle\gamma'$ whose Pauli product $\mathscr{P}(\tilde{E}')$ has the same syndrome $\sigma$, as $\vartriangle$ augments the matching path between syndromes within $\gamma'$. Now, any edge $e_r\in \gamma' \notin \tilde{E}'$ can be removed from to create a new forest $F_\m{E}'=F_\m{E} \cup \{e_i\}\setminus e_r|e_r \neq e'$. For any cycle that exists from larger than 3 elements, $e_r$ must exist. Thus the Pauli product of subset $\tilde{E}' \subseteq F_\m{E}'\subseteq \m{E}$ is also a valid error with syndrome $\sigma$, and $\mathscr{P}(\tilde{E}')$ corrects $\sigma$. This can be done any number of times, thus every $F_\m{E}$ is valid.   
+  There exists a subset of edges $\m{C} = \{e_1,e_2,...\} \subseteq F_\m{E}$ such that $\mathscr{P}(\m{C})$ has a syndrome $\sigma$. By the definition of the forest $F_\m{E}$, adding another edge $e' \in F_\m{E} \vartriangle \m{E}$ creates a cycle $\gamma' \subseteq F_\m{E} \cup \{e'\}$, where $\vartriangle$ denotes the symmetric difference between two sets. Now $\m{C}$ can be replaced by $\m{C}'=\m{C}\vartriangle\gamma'$ whose Pauli product $\mathscr{P}(\m{C}')$ has the same syndrome $\sigma$, as $\vartriangle$ augments the matching path between syndromes within $\gamma'$. Now, any edge $e_r\in \gamma' \vartriangle \m{C}'$ can be removed from $F_\m{E} \cup \{e'\}$ to create a new forest $F_\m{E}'=F_\m{E} \cup \{e_i\}\setminus e_r$. For any cycle that exists from larger than 3 elements, $e_r$ must exist. Thus the Pauli product of subset $\m{C}' \subseteq F_\m{E}'\subseteq \m{E}$ is also a valid error with syndrome $\sigma$, and $\mathscr{P}(\m{C}')$ corrects $\sigma$. This can be done any number of times, thus every $F_\m{E}$ is valid.   
 \end{proof}
 \begin{lemma}\label{lem:peelingfe}
-  The output correction set $\m{C}$ from the Peeling decoder is only dependent on spanning tree $F_\m{E}\subseteq\m{E}$, and not on the peeling process. 
+  For each forest $F_\m{E}$, the outcome $\m{C}$ after peeling is unique and independent from the order of peeling. 
 \end{lemma}
 \begin{proof}
-   For each $F_\m{E}$, the outcome $\m{C}$ after peeling is unique and independent from the order of peeling. If there exists two subsets $\m{C}$ and $\m{C}'$, applying both $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ yields the empty syndrome set $\sigma=\emptyset$, which means that either $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ is a cycle or $\m{C}=\m{C}'$. Since $F_\m{E}$ has no cycles it means that $m{C}$ must be unique within $F_\m{E}$.
+   If there exists two subsets $\m{C}\subseteq F_\m{E}$ and $\m{C}' \subseteq F_\m{E}$, such that $\n{P}(\m{C})$ and $\n{P}(\m{C}')$ corrects $\sigma$, then $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ commutes with the stabilizer. This means that either $\m{C}\vartriangle\m{C}'$ is a cycle or $\m{C}=\m{C}'$. Since $F_\m{E}$ has no cycles it means that $\m{C}$ must be unique within $F_\m{E}$.
 \end{proof}
 
-\input{tikzfigs/peeling_decoder}
-
-The peeling decoder will always output some correction $C$ such that $CP_\m{E}$ commutes with the stabilizer, given a set of nontrivial stabilizer measurements $\sigma$. This is proven by the previous lemmas. Finally, we will prove that this is true for any erasure $\m{E}\subseteq E$. 
-\begin{theorem}\label{eq:anyevenparity}
-  For any connected graph that suffered some erasure $\m{E}\subseteq E$ with pauli error $P_\m{E}$, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm \ref{algo:peel}) will produce a correction $\m{C}\subseteq \m{E}$ such that $\mathscr{P}(\m{C})P_\m{E}=CP_\m{E}$ commutes with the stabilizer.
+Per lemmas \ref{lem:anyforest} and \ref{lem:peelingfe}, for some error $P_\m{E}$ on erasure $\m{E}$, the Peeling decoder will always output some correction $\n{P}(\m{C})$ such that $\n{P}(\m{C})\n{P}(P_\m{E})$ commutes with the stabilizer. This correction is also the most likely correction per lemma \ref{lem:peelinguni}. Finally, we will prove that this is true for any erasure $\m{E}\subseteq E$. 
+\begin{theorem}\label{the:anyevenparity}
+  For any connected erasure $\m{E}\subseteq E$ with pauli error on $P_\m{E}$, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm \ref{algo:peel}) will produce a valid correction $\n{P}(\m{C})$.
 \end{theorem}
 \begin{proof}
   Consider a spanning forest $F_\m{E}$ containing $n_\sigma$ syndrome vertices. The forest is being stripped by the Peeling decoder on the leaf edge $e = (u,v)$, where the vertex $v$ is the pendant vertex. If $u\notin\sigma$, $e$ is simply removed from $F_\m{E}$ and $n_\sigma$ is unaltered. If $u\in\sigma$, $u$ is removed from $\sigma$ such that $n_\sigma'= n_\sigma -1$. Vertex $v$ is now flipped in $\sigma$, meaning that if $v\in\sigma$, it is removed and $n_\sigma'= n_\sigma -2$, or if  $v\notin\sigma$, it is added and $n_\sigma'= n_\sigma$. After peeling it must be that $n_\sigma=0$, from which follows that all erasures with \emph{even} parity can be solved. 
 \end{proof}
 
 \begin{definition}\label{def:cluster}
-  A cluster $C$ is a subset of an erasure $\m{E}$, such that the edges of $C$ form a connected graph. 
+  A cluster $C$ is a subset of an erasure $\m{E}$, such that the edges of $C$ form a connected graph. The parity of $C$ is the number of syndromes in its vertex boundary. 
+  \begin{equation}\label{eq:clusterparity}
+    \text{parity}(C) = \abs{\{v\in \sigma \cap \bound(C)\}}
+  \end{equation}
 \end{definition}
 \begin{lemma}\label{lem:singlecluster}
-  An edge $e$ can only belong to a single cluster. A vertex $v$ can only be in the boundary of a single cluster $\mathscr{B}(C)$. 
+  An edge can only belong to a single cluster. A vertex can only be in the vertex boundary of a single cluster $\mathscr{B}(C)$. 
 \end{lemma}
 \begin{proof}
   If there exists some edge $e$ that belongs to two clusters $C_i, C_j$, they are connected via $e$. Per definition \ref{def:cluster} clusters $C_i, C_j$ must be a single cluster. The same is true for some vertex $v$ that belongs to both $\mathscr{B}(C_i)$ and $\mathscr{B}(C_j)$. 
 \end{proof}
-For only erasure noise, all erasures must have even parity as all errors $P_\m{E}$ and thus all syndromes $\sigma \in \mathscr{B}(\m{E})$, which is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later. Finally, we note that an erasure $\m{E}$ may not be a single subset of connected edges, but rather many connected subsets, denoted by $C_i$. This does not change anything in the decoder, as the peeling algorithm will pass every edge once, which is ensured by lemma \ref{lem:singlecluster}. Each cluster $C_i$ returns its own connected acyclic $F_{C_i}$ that can be peeled separately from each other. 
+Given a graph $G(E,V)$ that is subjected to pure pure erasure noise, $\m{E}$ may not be a single subset of connected edges, but rather many connected subsets, or clusters, denoted by $\{C_1, C_2,...\}$. For each cluster $C_i$, all syndromes caused by errors on $P_{C_i}$ must be supported by $\bound(C_i)$. Since every cluster must be strictly disjoint per lemma \ref{lem:singlecluster}, the parity for each $C_i$ must therefore be even, and $C_i$ can be decoded individually per theorem \ref{the:anyevenparity}. Here, each $C_i$ a forest is made and peeled. This is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later. 
 \begin{theorem}
   The Peeling decoder (algorithm \ref{algo:peel}) is a linear-time maximum likelihood decoder for erasures up to $d-1$ qubits, where $d$ is the minimum distance of the code. 
 \end{theorem}
@@ -100,29 +114,30 @@ For only erasure noise, all erasures must have even parity as all errors $P_\m{E
 \end{proof}
 
 \subsubsection{Bounded surfaces}
-For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Let us again only consider the primal lattice which is now denoted by $G = (V_\iota\cup V_{\delta} \cup V_{\omega}, E_\iota \cup E_{\delta})$. Syndrome measurements on such a graph are only supported by $\sigma \subseteq V_\iota\cup V_\delta$, as $V_\delta$ are \emph{open} vertices that only exist to support boundary edges $E_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $V_\delta$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin V_\delta$. Furthermore, the construction of the forest $F_\m{E}$ requires an additional alteration.
+For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Recall that the graph of the primal lattice is now denoted by $G = (V_\iota\cup V_{\delta} \cup V_{\omega}, E_\iota \cup E_{\delta})$. Syndrome measurements on such a graph are only supported by $\sigma \subseteq V_\iota\cup V_\omega$, as $V_\delta$ are \emph{open} vertices that only exist to support boundary edges $E_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $V_\delta$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin V_\delta$. Furthermore, the construction of the forest $F_\m{E}$ requires an additional alteration.
 \begin{lemma}
   Two vertices $u,v$ within a forest $F_\m{E}$ that satisfy $u\in V_\delta, v \in V_\delta$ is equivalent to a cycle in $F_\m{E}$. 
 \end{lemma}
 \begin{proof}
   If there are an even number of vertices in a forest $F_\m{E}$ that are supported by $V_\delta$, it means that there are a number of unique paths within $F_\m{E}$ that lead from a element of $V_\delta$ to another element of $V_\delta$. Such a path is equivalent to some $\delta$-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
 \end{proof}
-Due to this, we ensure that each forest $F_\m{E}$ can only support a maximum of 1 element of $V_\delta$. The forests are grown starting from vertices of the set $V_\delta$, and the algorithm is completed by a DFS same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But yet every forest can still be peeled independently, as every edge can only be peeled once. 
+
+Due to this, we ensure that each forest $F_\m{E}$ can only support a maximum of 1 element of $V_\delta$. The forests are grown starting from vertices of the set $V_\delta$, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests $\{F_1, F_2,...\}$ that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma \ref{lem:anyforest}. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm \ref{algo:peelbound}. 
 
 \begin{algo}[algotitle=Peeling decoder for bounded surfaces (adapted from \cite{delfosse2017linear}), label=algo:peelbound]
   \begin{algorithm}[H]
-    \KwData{A graph $G = (V\cup V_\delta,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V$}
-    \KwResult{Correction $C$}
+    \KwData{A graph $G = (V_{\iota\omega}\cup V_\delta,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V_{\iota\omega}$}
+    \KwResult{Correction $\hat{C}$}
     \BlankLine
     construct a spanning forest $F_\m{E}\subseteq\m{E}$ with seed $V_\delta$\;
-    initialize $\m{C}$ by $\m{C} = {\emptyset}$\;
+    initialize $\m{C} = {\emptyset}$\;
     \While{$F_\m{E} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin V_\delta$, remove $e$ from $F_\m{E}$ \;
     \If{$u \in \sigma$}{
       add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
     \Else{do nothing}
     }
-    \KwRet{$C = \prod_{e\in \m{C}} X_e$}
+    \KwRet{$\n{P}(\m{C})$, see equation \eqref{eq:pauliprod}}
   \end{algorithm}
 \end{algo}
 \input{tikzfigs/peeling_bound.tex}
@@ -133,13 +148,13 @@ Due to this, we ensure that each forest $F_\m{E}$ can only support a maximum of 
 % Within the Union-Find algorithm, two features ensure that the complexity of the algorithm is not quadratic. 1). With \textbf{path compression}, as we traverse a tree from child to parent until we reach the root, we make sure that each vertex encountered that we have encountered along the way is pointed directly to the root. This doubles the cost of the \codefunc{find}, but speeds up any future call to any vertex on the traversed path. 2). With \textbf{weighted union}, we make sure to always make the smaller tree a child of the bigger tree. This ensures that the overall length of the path to the root stays minimal. In order to make this happen, we just need to store the size of the tree at the root.
 
 \subsection{Union-Find decoder}
-The Union-Find decoder \cite{delfosse2017almost} is a modification of the Peeling decoder that utilizes the Union-Find data structure \cite{tarjan1975efficiency} to additionally solve for Pauli errors, on top of erasure errors. In this section, we will first describe why a modification is needed, how the Union-Find data structure is applied, then move on the the algorithm itself and analyze its complexity. 
+The Union-Find decoder \cite{delfosse2017almost} is a modification of the Peeling decoder that utilizes the Union-Find data structure \cite{tarjan1975efficiency} to additionally solve for Pauli errors, on top of erasure errors. In this section, we will first describe why a modification is needed, then how the Union-Find data structure is applied, and finally move on the the algorithm itself and analyze its complexity. 
 
-The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or other types of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \ref{qec:eq:bitflip} and \ref{qec:eq:phaseflip}, which means that again we can consider the primal and dual lattices separately. These noise channels introduce extra Pauli errors $P_p$ such that not all Pauli errors are in the erasures $P\not\subseteq \m{E}$, where $P = P_p\triangle P_\m{E}$. This means also that not all syndromes are in the boundary of the erasure $\sigma \not\subseteq \mathscr{B}(\m{E})$ (definition \ref{def:boundaryofedges}), and odd parity clusters can occur. Per theorem \ref{eq:anyevenparity}, the Peeling decoder cannot solve for these errors, and needs some alteration.
+The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or any other type of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \ref{qec:eq:bitflip} and \ref{qec:eq:phaseflip}. This means that we can again consider the primal and dual lattices separately, as $X$ errors exclusively trigger nontrivial star operator measurements on the vertices of the primal lattice, and $Z$ errors exclusively trigger nontrivial plaquette measurements on vertices of the dual lattice. These noise channels introduce extra Pauli errors $P_p$ such that not all Pauli errors are in the erasures $P\not\subseteq \m{E}$, where $P = P_p\triangle P_\m{E}$. This means also that not all syndromes are in the boundary of the erasure $\sigma \not\subseteq \mathscr{B}(\m{E})$ (definition \ref{def:boundaryofedges}), and odd parity clusters can occur. Per theorem \ref{the:anyevenparity}, the Peeling decoder cannot solve for these errors.
 
-To this end, an altered erasure $\bar{\m{E}}$ that contains only even-parity clusters can be constructed from the syndrome $\sigma$ in a pre-processing step that is dubbed \emph{syndrome validation}. The validated erasure $\bar{\m{E}}$ is compatible with the peeling decoder. To do this, we sequentially grow the clusters with an odd parity by an half-edge on the boundaries on the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder. 
+To this end, we construct an altered erasure $\bar{\m{E}}$ that contains only even-parity clusters can be constructed from the syndrome $\sigma$ in a pre-processing step that is dubbed \emph{syndrome validation}. The validated erasure $\bar{\m{E}}$ is compatible with the peeling decoder. To do this, we sequentially grow the clusters with an odd parity on the boundaries of the clusters. When two odd parity clusters meet, the merged cluster will have a even parity, and can now be solved by the peeling decoder. 
 \begin{proposition}
-  The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{E}$, such that theorem \ref{eq:anyevenparity} is satisfied, after which the Peeling decoder can proceed as before. 
+  The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{E}$, such that theorem \ref{the:anyevenparity} is satisfied, after which the Peeling decoder can proceed as before. 
 \end{proposition}
 \begin{figure}[h]
   \centering
@@ -163,18 +178,34 @@ To this end, an altered erasure $\bar{\m{E}}$ that contains only even-parity clu
     \node[text width = 2cm, align=center] at (2.5,1) {\emph{Syndrome validation}};
     \node[text width = 2cm, align=center] at (7.5,1) {\emph{Peeling decoder}};
   \end{tikzpicture}
-  \caption{Stages of decoding of the Union-Find decoder. A pre-processing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{E}}$ is constructed that satisfies theorem \ref{eq:anyevenparity}, where all erasures have an even number of syndromes. (Figure inspired by \cite{delfosse2017almost})} 
+  \caption{Stages of decoding of the Union-Find decoder. A pre-processing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{E}}$ is constructed that satisfies theorem \ref{the:anyevenparity}, where all erasures have an even number of syndromes. (Figure inspired by \cite{delfosse2017almost})} 
   \label{fig:ufstages}
 \end{figure}
 Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $C$ and a vertex in a single cluster boundary $\mathscr{B}(C)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
 
 \subsubsection{Application of the Union-Find data structure}
-
 The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, consist of two functions for manipulating a set of elements partitioned into a number of disjoint subsets, and a set of rules for these manipulations. In the context of the surface code, the vertices $v\in V$ are the elements and each disjoint set is the set over vertices that support a cluster $\mathscr{B}(C)$ (definitions \ref{def:boundaryofedges}, \ref{def:cluster}). It is redundant to additionally store the sets $C$ for edges, as it lemma \ref{lem:singlecluster} implies that if a vertex $v\in \mathscr{B}(C)$, that all edges support by $v$ satisfy $e \in C$. 
 
 More specifically, we'll be using the disjoint-set tree implementation; each cluster is denoted by a tree, where each element or vertex points to its parent vertex. The function \codefunc{Find}$(v)$ is performed by following the parent pointers to the root $r_v$ of the tree, which is the representative element of the cluster. The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertices $u$ and $v$ by making one of the roots a child of another. We apply \emph{union by rank} and \emph{path compression} to ensure that the complexity is $\m{O}(n\alpha(n))$, where $\alpha(n)$ is the inverse of Ackermann's function and $n$ denotes the system size or number of vertices in $V$. For all practical purposes, $\alpha(n)\leq 4$. The Union-Find data structure, its tree implementation, the \emph{union by rank} and \emph{path compression} rules are all elaborately covered in appendix \ref{ap:unionfind}. Here, we also make a full analysis of its $\m{O}(n\alpha(n))$ complexity based on \cite{kozen1992design}. The Ackermann's function and its inverse are detailed in appendix \ref{ap:ackermann}
 
 Note that while the nodes in the tree are equivalent to vertices $v \in V$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in E$. The edge set $E$ with its erasure subset $\m{E}\subseteq E$ and subsequently cluster $C\subseteq \m{E}$ and forest $F_C\subseteq C$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $\bound(C)$ exists to point towards the representative element at the root.
+
+\subsubsection{Union-Find decoder data structure}
+We define in this section what it means to grow a cluster. For a cluster defined by disjoint-set tree of vertices $\bound(C)$, an iteration of growth means to add another layer of vertices that lie on the other boundary of the tree. To this end, we can view the edges $\delta C$ for which only one connected vertex in $\bound(C)$ as paths lead to the new vertices to be added to the tree. 
+\begin{equation}
+  \delta C = \{e=(u,v)\in C | u \in \bound(C), v \notin \bound(C)\}
+\end{equation}
+To grow a cluster, we thus traverse paths and add all vertices $\{v | (u,v) \in \delta C\}$ to the tree, by making it point toward the root $r_u$ in the tree. We denote this as the growth of edges $\delta C$. Note that every single-vertex addition to the tree can be viewed as an union event. If $v$ does not belong to another cluster, the addition is an union event between the tree of $\bound(C)$ and a single-element tree $\{v\}$. If $v$ does belong to another cluster with tree $\bound(C')$, it is an union event between two trees. We thus always apply $\codefunc{Find}(u)$ and $\codefunc{Find}(v)$ to find the respective roots $r_u, r_v$. If $r_u\neq r_v$, $\codefunc{Union}(r_u, r_v)$ returns the merged tree. 
+
+For two vertices $u,v$ that belong to different odd clusters and connected by $(u,v)$, where $(u,v)\in\delta C_u, (u,v) \in \delta C_v$, a round of growth where both clusters are grown would mean that the path of $(u,v)$ is considered twice. This does not make sense, as in the second traversal o $(u,v)$, both vertices already belong to the same cluster. To this end, we only traverse the path an half-edge length per round of growth. In the case such as above, both traversals from vertices $u$ and $v$ on edge $(u,v)$ cover a half-edge and meet in the middle. The state of how many times a path $e$ is traversed is tracked by a variable dubbed the \emph{support} of an edge $\codefunc{support}[e]$, which can take on values $\{0,1,2\}$; $0$ for \emph{not grown}, $1$ for\emph{half-grown} and $2$ for \emph{fully grown}. Growing an edge means to increase the value of $\codefunc{support}[e]$ by $1$, and to merge the cluster if $\codefunc{support}[e]=2$. 
+
+For the pre-processing step of syndrome validation, we thus needs to 1) store the clusters as disjoint-set trees, 2) store for each cluster the list of boundary edges $\delta C$ and 3) store some table \codefunc{support} for the growth state of all edges. 
+
+\subsubsection{Syndrome validation}
+In each round of growth at time $t$, there may be many clusters $C_{i,t}$ grown. If clusters are immediately merged within the same time step $t$ if some boundary edge $e\in \delta C$ reaches $\codefunc{support}[e]=2$, it is not possible to track which clusters have completed their growth and which have not. To this end, \codefunc{Union}'s are applied at the end of each round. 
+
+We initiate a round of growth at time $t$ by collecting a list $\m{L} = \{C_{0,t}, C_{1,t}, ...\}$ of odd syndrome parity clusters. Cluster are grown by growing the edges $e \in \delta C_{i,t} \forall \delta C_{i,t} \in \m{L}$, which is done by $\codefunc{support}[e] = \codefunc{support}[e] +1$. Add all edges with $\codefunc{support}[e]=2$ to a fusion list $\m{F}_t$. After all clusters are grown, for each edge $e=(u,v) \in \m{F}_t$, apply $r_u\codefunc{Find}(u)$ and $r_v\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundaries $\delta C_{i,t+1}$ which are supported by the newly added vertices $v$ and merge the new boundary lists $\delta C_{u,t+1}$ and $\delta C_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}$ and the process can be repeated until $\m{L}=\emptyset$. 
+
 
 
 \paragraph{Data structure}

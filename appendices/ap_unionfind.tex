@@ -88,7 +88,7 @@ The union by rank rule is then as follows: to apply $\codefunc{Union}(r_x,r_y)$,
   \end{equation}
 \end{lemma}
 \begin{proof}
-  Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus equality \ref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is is either the case that the tree is unchanged, or some other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$, hence $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
+  Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus equality \eqref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is is either the case that the tree is unchanged, or some other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$, hence $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
   
   If $R_{t+1}(x) = R_t(x) + 1$, then at time $t$ an union occurred that merged $T_t(x)$ and $T_t(y)$ by pointing $y$ to $x$, where
   \begin{equation*}
@@ -97,7 +97,7 @@ The union by rank rule is then as follows: to apply $\codefunc{Union}(r_x,r_y)$,
   Therefore
   \begin{align*}
     \abs{T_{t+1}(x)} &= \abs{T_t(y)} + \abs{T_t(x)} \\
-      &\geq 2^{R_t(y)} + 2^{R_t(x)} \text{ by induction equality \ref{eq:rankeq}} \\
+      &\geq 2^{R_t(y)} + 2^{R_t(x)} \text{ by induction equality \eqref{eq:rankeq}} \\
       &= 2^{R_t(y)} + 2^{R_t(y)} \\
       &= 2^{R_t(y)+1} \\
       &= 2^{R_{t+1}(x)},
@@ -177,12 +177,12 @@ Let $x.p$ denote the parent of an element $x$. With path compression, the parent
   R(x.p)\geq \akker(k,R(x)+2)-2
 \end{equation}
 \begin{definition}
-  The level of an element $K(x)$ is the largest value of $k$ for which equality \ref{eq:rankakker} holds: 
+  The level of an element $K(x)$ is the largest value of $k$ for which equality \eqref{eq:rankakker} holds: 
   \begin{equation}
     K(x) = \max \big\{ k |  R(x_p)\geq \akker(k,R(x)+2)-2\big\}.
   \end{equation}
 \end{definition}
-The level of an element $K(x)$ is time-dependant and can only increase in time due to path compression and the consequent increase in difference between ranks of $x$ and $x.p$. Furthermore, for minimal difference in ranks with $R(x) = 0$ and $R(x.p)=1$ the equality \ref{eq:rankakker} holds:
+The level of an element $K(x)$ is time-dependent and can only increase in time due to path compression and the consequent increase in difference between ranks of $x$ and $x.p$. Furthermore, for minimal difference in ranks with $R(x) = 0$ and $R(x.p)=1$ the equality \eqref{eq:rankakker} holds:
 \begin{eqnarray*}
   R(x.p) \geq R(x) + 1 = 1 = \akker(0,R(x) + 2)-2
 \end{eqnarray*}
@@ -207,7 +207,7 @@ Using this charge assignment method, we can (a) sum over all charged vertices an
   \begin{align*}
     n &> \lfloor \log n \rfloor + 2 \\
     &\geq R(x.p) + 2 \text{ by lemma \ref{lem:maxrank}}\\
-    &\geq \akker(k,R(x)+2) \text{ by equation \ref{eq:rankakker}}\\
+    &\geq \akker(k,R(x)+2) \text{ by equation \eqref{eq:rankakker}}\\
     &\geq \akker(k,2),
   \end{align*}
   where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns $\alpha(n) > k$, which gives us the upper bound of $K(x)$. 
