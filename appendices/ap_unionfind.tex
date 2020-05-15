@@ -8,7 +8,6 @@ The disjoint-set data structure consists of two types of instructions for manipu
 \end{itemize}
 We first show that a very simple implementation runs in $\m{O}(n^2)$ time. Applying the \emph{union by weight} rule, this is reduced to $\m{O}(n \log n)$. Combined with the \emph{Path compression} rule, the overall complexity is $\m{O}(n \alpha (n))$, where $\alpha$ is the inverse of Ackermann's function. The original proof \cite{tarjan1975efficiency} was further reinforced by subsequent publications \cite{tarjan1979class,tarjan1984worst} and was proven to be optimal \cite{fredman1989cell}. In this thesis, we will follow a simplified approach, where the \emph{union by weight} rule is replaced by a different by similar \emph{union by rank} rule \cite{kozen1992design}. Later Tarjan and also other sources used this to cast this analysis in terms of potential functions \cite{tarjan1999handout, harfst2000potential, cormen2009introduction}. Another approach is provided by \cite{seidel2005top}, where the upper bound is computed via a top-down method. 
 
-
 \subsection{Simple implementation}
 A simple implementation of the instructions would be to store for each set $X$ a list $l_X$ of all the elements it contains, and a pointer to $l_X$ at all elements $x\in l_X$, which is called the \emph{linked-list} representation. The function $\codefunc{find}(x)$ simply returns the list $l_X$, which represents the set. After a call to $\codefunc{Union}(X, Y)$, all elements of $l_Y$ are appended to $l_X$, and the pointers of all elements $y\in Y$ are updated. This takes $\m{O}(m)$ operations, where $m=|l_Y|$ the number of elements. In a system of $n$ elements, there may be a maximum of $n-1$ calls to \codefunc{Union}. As the $i$\textsuperscript{th} call involves sets $|l_X|=1$ and $|l_Y|=i$, the number of updates is 
 \begin{equation}
@@ -75,14 +74,17 @@ The pointer update in each set during a \codefunc{Union} can be minimized by a d
 \subsection{Union by rank}
 The \emph{union by weight} rule from the previous section can be implemented without any alteration. However, in the disjoint-set tree structure, a slightly different rule, \emph{union by rank}, can be implemented behaves similarly, but allows for a easier analysis of the complexity when combined with the \emph{path compression} rule, which is introduced in the next section. 
 
-\begin{definition}
-  The rank of a element $x$ is the maximum height of a subtree rooted in $x$. Let $R_t(x)$ denote the rank of element $x$ at time $t$. 
+\begin{definition}\label{def:tree}
+  Let $T_t(x)$ denote (sub)tree rooted in element $x$ at time $t$, and let $|T_t(x)|$ denote the number of elements in the (sub)tree. The tree $T_t(r_x)$ rooted at $r_x$ is equivalent to the full set $X$.
+\end{definition}
+\begin{definition}\label{def:rank}
+  The rank of a element $x$ is the maximum height of a (sub)tree $T_t(x)$. Let $R_t(x)$ denote the rank of element $x$ at time $t$. 
 \end{definition}
 
-The union by rank rule is then as follows: to apply $\codefunc{Union}(r_x,r_y)$, make the smaller-ranked root $R(r_y) < R(r_x)$ point to the larger; in case of a tie, also increase the rank of the new root by one. As long as a element $y$ has no parent, its rank can increase as other trees as pointed to itself. But as $y$ becomes a child of element $x$, the subtree rooted at $y$ becomes fixed and so does its rank. Any descendent $y$ of ancestor $x$ must thus always comply to $R(y)<R(x)$. The following lemmas give the intuition that the union by rank rule supports disjoint-set trees that are relatively balanced.
+The union by rank rule is then as follows: to merge sets $X$ and $Y$, apply $\codefunc{Union}(r_x,r_y)$ by pointing the smaller-ranked root $R(r_y) < R(r_x)$ to the larger; in case of a tie, also increase the rank of the new root by one. As long as a element $y$ has no parent, its rank can increase as other trees as pointed to itself. But as $y$ becomes a child of element $x$, the subtree rooted at $y$ becomes fixed and so does its rank. Any descendent $y$ of ancestor $x$ must thus always comply to $R(y)<R(x)$. The following lemmas give the intuition that the union by rank rule supports disjoint-set trees that are relatively balanced.
 
 \begin{lemma}\label{lem:rank}
-  Let $T_t(x)$ be the subtree rooted in element $x$ at time $t$, and let $|T_t(x)|$ denote the number of elements in the subtree, then if the weight by rank rule is implemented, it must be true that 
+  For any subtree $T_t(x)$ at time $t$ rooted at $x$ with rank $R_t(x)$, if the union by rank rule is implemented, it must be true that 
   \begin{equation}\label{eq:rankeq}
     \abs{T_t(x)} \geq 2^{R_t(x)}
   \end{equation}

@@ -26,12 +26,16 @@
 \graphicspath{{"/home/watermarkhu/links/onedriveuni/MEP - thesis Mark/Figures/ch_toric_code/"}}
 
 % Set algorithm2e package settings
-\usepackage[linesnumbered, vlined]{algorithm2e}
+\usepackage[linesnumbered, vlined, boxruled]{algorithm2e}
+\SetAlgoCaptionLayout{centerline}
+\setlength{\algoheightrule}{1pt}
+\setlength{\algotitleheightrule}{1pt}
+\setlength{\interspacetitleboxruled}{.5em}
 \SetStartEndCondition{ }{}{}
 \SetKwProg{Fn}{def}{\string:}{}
 \SetKw{KwTo}{in}
 \SetKwFor{For}{for}{\string:}{}
-\SetKwIF{If}{ElseIf}{Else}{if}{ then}{elif}{else:}{}
+\SetKwIF{If}{ElseIf}{Else}{if}{ then}{else if}{else}{}
 \SetKwFor{While}{while}{ do}{}
 \SetAlgoNoEnd\DontPrintSemicolon
 
@@ -115,27 +119,27 @@
 
 \begin{document}
 
-\include{_titlepage}
-\tableofcontents
-\printglossary[type=symbols,style=long]
+  \include{_titlepage}
+  \tableofcontents
+  \printglossary[type=symbols,style=long]
 
-\input{tikzfigs/function_draw_lattices}
+  \input{tikzfigs/function_draw_lattices}
 
-% \include{preliminary_report}
-% \include{chapters/ch_introduction}
+  % \include{preliminary_report}
+  % \include{chapters/ch_introduction}
 
-\include{chapters/ch_qec_basics}
-\include{chapters/ch_surface_code}
-\include{chapters/ch_decoders}
-\include{chapters/ch_ufdecoder_modifications}
-% \include{chapters/ch_threshold_results}
-\include{peeling_objects_1}
+  \include{chapters/ch_qec_basics}
+  \include{chapters/ch_surface_code}
+  \include{chapters/ch_decoders}
+  \include{chapters/ch_ufdecoder_modifications}
+  % \include{chapters/ch_threshold_results}
+  \include{peeling_objects_1}
 
-\begin{appendices}
-  \include{appendices/ap_bucket_sort}
-  \include{appendices/ap_unionfind}
-  \include{appendices/ap_ackermann}
-\end{appendices}
+  \begin{appendices}
+    \include{appendices/ap_bucket_sort}
+    \include{appendices/ap_unionfind}
+    \include{appendices/ap_ackermann}
+  \end{appendices}
 
-\printbibliography
+  \printbibliography
 \end{document}
