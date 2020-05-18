@@ -222,7 +222,7 @@ Next, we count the charges to a particular element $x$ over the entire sequence 
   Any element $x$ of rank $R(x) = r$ can be charged $r$ times before the charge is assigned to the \codefunc{Find} function.
 \end{lemma}
 \begin{proof}
-  For a charged time unit to be assigned to $x$ at time $t$, $x$ must have some ancestor $a$ such that $K(x) = K(a) = k$ for some value of $k$ (see figure \ref{fig:xcharge}a). Hence per equality \ref{eq:rankakker}
+  For a charged time unit to be assigned to $x$ at time $t$, $x$ must have some ancestor $a$ such that $K(x) = K(a) = k$ for some value of $k$ (see Figure \ref{fig:xcharge}a). Hence per equality \ref{eq:rankakker}
   \begin{align*}
     R_{t}(x.p) & \geq A(k,R_{t}(x))\\
     R_{t}(a.p) & \geq A(k,R_{t}(a)),
@@ -242,7 +242,7 @@ Next, we count the charges to a particular element $x$ over the entire sequence 
   \begin{equation*}
     R_{t+1}(r) = R_{t+1}(x.p) \geq A^2(k, R_{t+1}(x)).
   \end{equation*}
-  At this point $x.p$ is the root of the tree, and and calls to \codefunc{Find}$(x)$ will not result in a charge assignment. Suppose now that at some time $t' = t + \Delta t$ the subtree at $T(r)$ has a new root $r'$ due to some union operations, and $x$ has new ancestor $a'$ on the path to $r'$ that satisfies $K(x) = K(a')$ (see figure \ref{fig:xcharge}b). The same steps as before can be repeated. 
+  At this point $x.p$ is the root of the tree, and and calls to \codefunc{Find}$(x)$ will not result in a charge assignment. Suppose now that at some time $t' = t + \Delta t$ the subtree at $T(r)$ has a new root $r'$ due to some union operations, and $x$ has new ancestor $a'$ on the path to $r'$ that satisfies $K(x) = K(a')$ (see Figure \ref{fig:xcharge}b). The same steps as before can be repeated. 
   \begin{align*}
     R_{t'}(r') &\geq R_{t}(a'.p) \\
     &\geq A(k,R_{t'}(a')) \\

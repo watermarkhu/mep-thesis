@@ -1,0 +1,195 @@
+
+\tikzstyle{anyon2}=[circle, fill=OrangeRed, minimum size=0.15cm, inner sep=1, text=black, font=\tiny]
+\tikzstyle{node2}=[circle, fill=NavyBlue, minimum size=0.1cm, inner sep=1, text=black, font=\tiny]
+\tikzstyle{newnode}=[circle, fill=cyan, minimum size=0.1cm, inner sep=1, text=black, font=\tiny]
+\tikzstyle{newedge}=[line width=1, cyan]
+\tikzstyle{empty}=[inner sep=0]
+\tikzstyle{ocluster}=[line width=1, opacity=0.5, Peach]
+\tikzstyle{ecluster}=[line width=1, opacity=0.5, LimeGreen]
+\tikzstyle{legend}=[anchor=west, font=\small]
+
+\newcommand{\newedgeshort}[2]{
+  \draw[newedge] (#1,#2) ++(-.5,0) -- +(1,0);
+  \draw[newedge] (#1,#2) ++(0,-.5) -- +(0,1);
+}
+
+\newcommand{\newedgelong}[2]{
+  \draw[newedge] (#1,#2) ++(-.5,0) -- +(-.5,0) node[newnode]{};
+  \draw[newedge] (#1,#2) ++(.5,0) -- +(.5,0) node[newnode]{};
+  \draw[newedge] (#1,#2) ++(0,-.5) -- +(0,-.5) node[newnode]{};
+  \draw[newedge] (#1,#2) ++(0,.5) -- +(0,.5) node[newnode]{};
+}
+
+\newcommand{\newerasureshort}[2]{
+  \draw[erasure] (#1,#2) ++(-.5,0) -- +(1,0);
+  \draw[erasure] (#1,#2) ++(0,-.5) -- +(0,1);
+}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[on grid, scale=0.4]
+
+    \node[anchor=west] at (-12,2.5) {\emph{(a)} initial state};
+    \draw[step=1cm,gray,thin] (0,0) grid (7,5);
+    \draw[erasure] (2,2) -- ++(0,1) -- ++(1,0) node[midway, text=black]{$X$};
+    \path (3,3) -- ++(1,0) node[midway]{$X$} -- ++(1,0) node[midway]{$X$};
+    \path (3,1) -- ++(1,0) node[midway]{$X$};
+      
+    \begin{scope}[shift={(10,0)}]
+      \draw[thin] (0,5) -- ++(.5,0) ++(.5,0) node[legend]{normal edge};
+      \draw[thin] (0,4) -- ++(.5,0) node[error]{$X$} ++(.5,0) node[legend]{Pauli error};
+      \draw[erasure] (0,3) -- ++(.5,0) ++(.5,0) node[legend, text=black]{erased edge};
+      \path (0,2) -- ++(.5,0) node[anyon2,pos=.5]{} ++(.5,0) node[legend]{syndrome};
+      \path (0,1) -- ++(.5,0) node[node2,pos=.5]{} ++(.5,0) node[legend]{vertex in cluster};
+      \path (0,0) -- ++(.5,0) node[draw,circle,ocluster,pos=.5]{} ++(.5,0) node[legend]{odd cluster};
+      \path (0,-1) -- ++(.5,0) node[draw,circle,ecluster,pos=.5]{} ++(.5,0) node[legend]{even cluster};
+    \end{scope}
+
+    \begin{scope}[shift={(0,-7)}]
+      \node[anchor=west] at (-12,2.5) {\emph{(b)} identify syndrome};
+      \draw[step=1cm,gray,thin] (0,0) grid (7,5);
+      \draw[erasure] (2,2) node[node2]{} -- ++(0,1) node[anyon2]{} -- ++(1,0) node[node2]{};
+      \node[anyon2, RedOrange] at (5,3) {};
+      \node[anyon2, Rhodamine] at (3,1) {};
+      \node[anyon2, Plum] at (4,1) {};
+      \draw[ocluster] (2,3) ++(-.35,0) arc (180:90:.35) to [out=0, in=180] ++(.35,-.1) -- ++ (.65,0) arc (90:-90:.25) -- ++(-.5,0) arc (90:180:.25) -- ++(0,-.5) arc (0:-180:.25) -- ++(0,.65) to [out=90,in=270] cycle;
+      \draw[ocluster] (5,3) ++(.35,0) arc(0:360:.35);
+      \draw[ocluster] (3,1) ++(.35,0) arc(0:360:.35);
+      \draw[ocluster] (4,1) ++(.35,0) arc(0:360:.35);
+
+      \begin{scope}[shift={(10,-1)}]
+        \node[anchor=west] at (0,4) {Disjoint-set trees:};
+        \node[anyon2] at (1,3) (a) {};
+        \draw[thin] (.5,1) node[node2]{} -- (a);
+        \draw[thin] (1.5,1) node[node2]{} -- (a);
+        \node[anyon2, RedOrange] at (3,3) {};
+        \node[anyon2, Rhodamine] at (5,3) {};
+        \node[anyon2, Plum] at (7,3) {};
+      \end{scope}
+    \end{scope}
+
+    \begin{scope}[shift={(0,-14)}]
+      \node[anchor=west] at (-12,2.5) {\emph{(c)} growth step 1};
+      \draw[step=1cm,gray,thin] (0,0) grid (7,5);
+      \newerasureshort{5}{3}
+      \newerasureshort{2}{2}
+      \newerasureshort{2}{3}
+      \newerasureshort{3}{3}
+      \newerasureshort{3}{1}
+      \newerasureshort{4}{1}
+      \draw[erasure] (2,2) node[node2]{} -- ++(0,1) node[anyon2]{} -- ++(1,0) node[node2]{};
+      \node[anyon2, RedOrange] at (5,3) {};
+      \node[anyon2, Rhodamine] at (3,1) {};
+      \node[anyon2, Plum] at (4,1) {};
+      \draw[ocluster] (1.25,3) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-90:.25) arc (90:180:.25) arc (0:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:90:.25) arc (-90:90:.25) arc (270:180:.25);
+      \draw[ocluster] (2.25,1) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) to [out=270, in=90] ++(.25,-.5) to [out=270, in=90] ++(-.25,-.5) arc (0:-180:.25) arc (0:90:.25) arc (270:180:.25);
+      \draw[ocluster] (3.5,1) to [out=90,in=270] ++(.25,.5) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-180:.25) to [out=90,in=270] cycle;
+      \draw[ocluster] (4.25,3) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:180:.25);
+      \begin{scope}[shift={(10,0)}]
+        \node[anyon2] at (1,3) (a) {};
+        \draw[thin] (.5,1) node[node2]{} -- (a);
+        \draw[thin] (1.5,1) node[node2]{} -- (a);
+        \node[anyon2,RedOrange] at (3,3) {};
+        \node[anyon2,Rhodamine] at (5,3) (c) {};
+        \node[anyon2,Plum] at (7,3) (d) {};
+        \draw[decorate, decoration={brace, amplitude=3}] (d.south east) -- (c.south west) node[midway,below=.1]{merge};
+      \end{scope}
+    \end{scope}
+
+    \begin{scope}[shift={(0,-21)}]
+      \node[anchor=west] at (-12,2.5) {\emph{(d)} merge clusters step 1};
+      \draw[step=1cm,gray,thin] (0,0) grid (7,5);
+      \newerasureshort{5}{3}
+      \newerasureshort{2}{2}
+      \newerasureshort{2}{3}
+      \newerasureshort{3}{3}
+      \newerasureshort{3}{1}
+      \newerasureshort{4}{1}
+      \draw[erasure] (2,2) node[node2]{} -- ++(0,1) node[anyon2]{} -- ++(1,0) node[node2]{};
+      \node[anyon2,RedOrange] at (5,3) {};
+      \draw[erasure] (3,1) node[anyon2,Rhodamine]{} -- ++(1,0) node[anyon2,Plum]{};
+      \draw[ocluster] (1.25,3) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-90:.25) arc (90:180:.25) arc (0:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:90:.25) arc (-90:90:.25) arc (270:180:.25);
+      \draw[ocluster] (4.25,3) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:180:.25);
+      \draw[ecluster] (2.25,1) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:180:.25);
+      \begin{scope}[shift={(10,0)}]
+        \node[anyon2] at (1,3) (a) {};
+        \draw[thin] (.5,1) node[node2]{} -- (a);
+        \draw[thin] (1.5,1) node[node2]{} -- (a);
+        \node[anyon2,RedOrange] at (3,3) {};
+        \node[anyon2,Rhodamine] at (5,3) (c) {};
+        \node[anyon2,Plum] at (5,1) (d) {};
+        \draw[thin] (c) -- (d);
+      \end{scope}
+    \end{scope}
+
+    \begin{scope}[shift={(0,-28)}]
+      \node[anchor=west] at (-12,2.5) {\emph{(e)} growth step 2};
+      \draw[step=1cm,gray,thin] (0,0) grid (7,5);
+      \newerasureshort{3}{1}
+      \newerasureshort{4}{1}
+      \draw[erasure] (2,1) node[node2]{} -- ++(0,1) node[node2]{} -- ++(0,2) node[node2]{};
+      \draw[erasure] (5,2) node[node2]{} -- ++(0,2) node[node2]{};
+      \draw[erasure] (1,2) node[node2]{} -- ++(1,0) node[node2]{} -- ++(1,0) node[node2]{} -- ++(0,1) node[node2]{} -- ++(0,1) node[node2]{};
+      \draw[erasure] (1,3) node[node2]{} -- ++(1,0) node[anyon2]{} -- ++(1,0) node[node2]{} -- ++(1,0) node[node2]{} -- ++(1,0) node[anyon2,RedOrange]{} -- ++(1,0) node[node2]{};
+      \draw[erasure] (3,1) node[anyon2,Rhodamine]{} -- ++(1,0) node[anyon2,Plum]{};
+      \draw[ecluster] (2.25,1) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:180:.25);
+      \draw[ocluster] (4,3) arc (180:90:.25) -- ++(.25,0) arc (-90:0:.25) -- ++(0,.5) arc (180:0:.25) -- ++(0,-.5) arc (180:270:.25) -- ++(.5,0) arc (90:-90:.25) -- ++(-.5,0) arc (90:180:.25) -- ++(0,-.5) arc (0:-180:.25) -- ++(0,.5) arc (0:90:.25) -- ++(-.25,0) arc (270:180:.25);
+      \draw[ocluster] (4,3) arc(0:-90:.25) -- ++(-.25,0) arc (90:180:.25) -- ++(0,-.5) arc (0:-90:.25) -- ++(-.5,0) arc (90:180:.25) -- ++(0,-.5) arc (0:-180:.25) -- ++(0,.5) arc (0:90:.25) -- ++(-.5,0) arc (270:90:.25) arc (-90:90:.25) arc (270:90:.25) -- ++(.5,0) arc (-90:0:.25) -- ++(0,.5) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) -- ++(0,-.5) arc (180:270:.25) -- ++(.25,0) arc (90:0:.25);
+      \begin{scope}[shift={(10,1)}]
+        \node[anyon2] at (1,3) (a) {};
+        \draw[thin] (-.25,1) node[node2]{} -- (a);
+        \draw[thin] (-.75,1) node[node2](l){}  -- (a);
+        \draw[thin] (0.25,1) node[node2]{} -- (a);
+        \draw[thin] (0.75,1) node[node2]{} -- (a);
+        \draw[thin] (1.25,1) node[node2]{} -- (a);
+        \draw[thin] (1.75,1) node[node2]{} -- (a);
+        \draw[thin] (2.25,1) node[node2]{} -- (a);
+        \draw[thin] (2.75,1) node[node2]{} -- (a);
+        \node[anyon2,RedOrange] at (5,3)(b){};
+        \draw[thin] (4.25,1) node[node2]{} -- (b);
+        \draw[thin] (4.75,1) node[node2]{} -- (b);
+        \draw[thin] (5.25,1) node[node2]{} -- (b);
+        \draw[thin] (5.75,1) node[node2](r){} -- (b);
+        \node[anyon2,Rhodamine] at (7,3) (c) {};
+        \node[anyon2,Plum] at (7,1) (d) {};
+        \draw[thin] (c) -- (d);
+        \draw[decorate, decoration={brace, amplitude=3}] (r.south east) -- (l.south west) node[midway,below=.1]{merge};
+      \end{scope}
+    \end{scope}
+
+    \begin{scope}[shift={(0,-35)}]
+      \node[anchor=west] at (-12,2.5) {\emph{(f)} merge clusters step 2};
+      \draw[step=1cm,gray,thin] (0,0) grid (7,5);
+      \newerasureshort{3}{1}
+      \newerasureshort{4}{1}
+      \draw[erasure] (2,1) node[node2]{} -- ++(0,1) node[node2]{} -- ++(0,2) node[node2]{};
+      \draw[erasure] (5,2) node[node2]{} -- ++(0,2) node[node2]{};
+      \draw[erasure] (1,2) node[node2]{} -- ++(1,0) node[node2]{} -- ++(1,0) node[node2]{} -- ++(0,1) node[node2]{} -- ++(0,1) node[node2]{};
+      \draw[erasure] (1,3) node[node2]{} -- ++(1,0) node[anyon2]{} -- ++(1,0) node[node2]{} -- ++(1,0) node[node2]{} -- ++(1,0) node[anyon2,RedOrange]{} -- ++(1,0) node[node2]{};
+      \draw[erasure] (3,1) node[anyon2,Rhodamine]{} -- ++(1,0) node[anyon2,Plum]{};
+      \draw[ecluster] (2.25,1) arc (180:90:.25) arc (-90:0:.25) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) arc (180:270:.25) arc (90:-90:.25) arc (90:180:.25) arc (0:-180:.25) arc (0:180:.25) arc (0:-180:.25) arc (0:90:.25) arc (270:180:.25);
+      \draw[ecluster] (4,3) ++(0,.25) -- ++(.5,0) arc (-90:0:.25) -- ++(0,.5) arc (180:0:.25) -- ++(0,-.5) arc (180:270:.25) -- ++(.5,0) arc (90:-90:.25) -- ++(-.5,0) arc (90:180:.25) -- ++(0,-.5) arc (0:-180:.25) -- ++(0,.5) arc (0:90:.25) -- ++(-1,0)  arc (90:180:.25) -- ++(0,-.5) arc (0:-90:.25) -- ++(-.5,0) arc (90:180:.25) -- ++(0,-.5) arc (0:-180:.25) -- ++(0,.5) arc (0:90:.25) -- ++(-.5,0) arc (270:90:.25) arc (-90:90:.25) arc (270:90:.25) -- ++(.5,0) arc (-90:0:.25) -- ++(0,.5) arc (180:0:.25) arc (-180:0:.25) arc (180:0:.25) -- ++(0,-.5) arc (180:270:.25) -- cycle;
+      \begin{scope}[shift={(10,1)}]
+        \node[anyon2] at (1,3) (a) {};
+        \draw[thin] (-.25,1) node[node2]{} -- (a);
+        \draw[thin] (-.75,1) node[node2](l){}  -- (a);
+        \draw[thin] (0.25,1) node[node2]{} -- (a);
+        \draw[thin] (0.75,1) node[node2]{} -- (a);
+        \draw[thin] (1.25,1) node[node2]{} -- (a);
+        \draw[thin] (1.75,1) node[node2]{} -- (a);
+        \draw[thin] (2.25,1) node[node2]{} -- (a);
+        \draw[thin] (2.75,1) node[node2]{} -- (a);
+        \node[anyon2,RedOrange] at (3.25,1)(b){};
+        \draw[thin] (b) -- (a);
+        \draw[thin] (2.5,-1) node[node2]{} -- (b);
+        \draw[thin] (3,-1) node[node2]{} -- (b);
+        \draw[thin] (3.5,-1) node[node2]{} -- (b);
+        \draw[thin] (4,-1) node[node2](r){} -- (b);
+        \node[anyon2,Rhodamine] at (7,3) (c) {};
+        \node[anyon2,Plum] at (7,1) (d) {};
+        \draw[thin] (c) -- (d);
+      \end{scope}
+    \end{scope}
+  \end{tikzpicture}
+  \caption{Schematic representation of syndrome validation, the pre-processing step in the Union-Find decoder. (a) Errors on the lattice are now induced by either some erasure $P_\m{E}$ or independent Pauli errors $P_p$. (b) Clusters of connected erasure patterns are stored as disjoint-set trees of the Union-Find data structure. Subsequent grow iterations (c-d) and (e-f) ensure that all clusters have even parity of syndromes, such that it can be decoded by the Peeling decoder. (Figure inspired by \cite{delfosse2017almost})}\label{fig:ufdecoder}
+\end{figure}

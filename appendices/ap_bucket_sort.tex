@@ -1,7 +1,7 @@
 \chapter{Bucket sort}\label{ap.bucketsort}
 
 \paragraph{Maximum number of growth iterations}
-To categorize the clusters into buckets, we need to know how many buckets we would need. To find out, let us look at two generators that are placed maximally far from each other. On a even toric lattice with length $l$, they are placed $l/2$ horizontally and $l/2$ vertically from each other. If clusters from each bucket grow simultaneously by a half-edge, these two single-generator clusters would meet each other after $l$ iterations, or including odd lattices, after $2\lfloor l/2 \rfloor$ iterations. As illustrated in figure \ref{3.fig.maxgrowthit}, we see that now the entire lattice is covered, thus this is exactly the number of iterations needed.
+To categorize the clusters into buckets, we need to know how many buckets we would need. To find out, let us look at two generators that are placed maximally far from each other. On a even toric lattice with length $l$, they are placed $l/2$ horizontally and $l/2$ vertically from each other. If clusters from each bucket grow simultaneously by a half-edge, these two single-generator clusters would meet each other after $l$ iterations, or including odd lattices, after $2\lfloor l/2 \rfloor$ iterations. As illustrated in Figure \ref{3.fig.maxgrowthit}, we see that now the entire lattice is covered, thus this is exactly the number of iterations needed.
 
 \begin{lemma}
   Given a toric lattice with size $\{l,l\}$, a maximum number of $N_B = 2\lfloor l/2 \rfloor$ buckets is required for all generators to be connected, where clusters from each bucket is grown simultaneously.
@@ -27,7 +27,7 @@ Note that a cluster does not increase in size in alternating iterations, as the 
   S'_{cluster}(i) = 1 + \sum_{0}^{x=i} 4x = 2i(i+1) + 1
 \end{equation}
 
-We now have a very simple analytical function to place clusters into buckets, where the number of elements per bucket increases linearly with $4i + 8$. For a cluster of size $S$, its bucket number $i$ can be calculated by rewriting and flooring equation \ref{3.eq.series} $i=\lfloor (\sqrt{2S-1} - 1)/2 \rfloor$. Now earlier we disregarded the duplicate entries is $S_{cluster, i}$, so we need to take an extra step to check whether a cluster is in its half-grown state. These buckets are illustrated in figure \ref{3.fig.bucketsranges}a.
+We now have a very simple analytical function to place clusters into buckets, where the number of elements per bucket increases linearly with $4i + 8$. For a cluster of size $S$, its bucket number $i$ can be calculated by rewriting and flooring equation \ref{3.eq.series} $i=\lfloor (\sqrt{2S-1} - 1)/2 \rfloor$. Now earlier we disregarded the duplicate entries is $S_{cluster, i}$, so we need to take an extra step to check whether a cluster is in its half-grown state. These buckets are illustrated in Figure \ref{3.fig.bucketsranges}a.
 
 \begin{definition}[Bucket place method 1]\label{3.def.placebucket1}
   A cluster with size $S$ is placed in bucket number $i$ of $l$ buckets with $i=2\lfloor (\sqrt{2S-1} - 1)/2 \rfloor$ if cluster is fully grown, or $i=2\lfloor (\sqrt{2S-1} - 1)/2 \rfloor + 1$ otherwise.
@@ -39,13 +39,13 @@ We now have a very simple analytical function to place clusters into buckets, wh
   \caption{The first six buckets for a) method A from definition \ref{3.def.placebucket1} and b) method B from definition \ref{3.def.placebucket2}. Even buckets contains fully grown clusters, odd buckets contain half-grown clusters of the same size.}\label{3.fig.bucketsranges}
 \end{figure}
 
-Single-generator clusters, or clusters with size 1, is never caused by an only an erasure error. It might therefore by useful to give these clusters their own bucket, such that these single-generator clusters are always grown first, such as in figure \ref{3.fig.bucketsranges}b.
+Single-generator clusters, or clusters with size 1, is never caused by an only an erasure error. It might therefore by useful to give these clusters their own bucket, such that these single-generator clusters are always grown first, such as in Figure \ref{3.fig.bucketsranges}b.
 
 \begin{definition}[Bucket place method 2]\label{3.def.placebucket2}
   For separate single-generator buckets, check whether the cluster has size 1, in which case the clusters belongs in bucket 0 or 1 depending on its growth state. Otherwise, a cluster with size $S$ belongs in bucket number $i$ of $l$ buckets with $i=2\lfloor (\sqrt{2S-3} - 1)/2 \rfloor + 1$ if cluster is fully grown, or $i=2\lfloor (\sqrt{2S-3} - 1)/2 \rfloor + 2$ otherwise.
 \end{definition}
 
-To compare method 1 of definition \ref{3.def.placebucket1} and method 2 of definition \ref{3.def.placebucket2}, let us find the size of the largest odd possible on a lattice. Given that any two odd parity clusters grow simultaneously, this size is $S_{max} = (\lfloor l/2\rfloor-1)l$. We calculate the bucket number (for the half-grown state) for both methods and plot them versus the lattice size in figure \ref{3.fig.maxbucket}. The bucket number of the largest odd parity cluster for method 2 is exactly the largest available bucket. Therefore method 2 is most probably superior.
+To compare method 1 of definition \ref{3.def.placebucket1} and method 2 of definition \ref{3.def.placebucket2}, let us find the size of the largest odd possible on a lattice. Given that any two odd parity clusters grow simultaneously, this size is $S_{max} = (\lfloor l/2\rfloor-1)l$. We calculate the bucket number (for the half-grown state) for both methods and plot them versus the lattice size in Figure \ref{3.fig.maxbucket}. The bucket number of the largest odd parity cluster for method 2 is exactly the largest available bucket. Therefore method 2 is most probably superior.
 
 \begin{figure}[h]
   \centering
