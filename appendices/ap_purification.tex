@@ -1,0 +1,104 @@
+\chapter{Purification}
+
+\subsubsection*{Bell states}
+
+There are four maximally entangled two-qubit Bell states. Together, they form a maximally entangled basis known as the Bell basis.
+\begin{align}\label{bellpairs}
+  \ket{\phi^+} =& \frac{1}{2}\big(\ket{00}_{AB} + \ket{11}_{AB}\big) \\
+  \ket{\phi^-} =& \frac{1}{2}\big(\ket{00}_{AB} - \ket{11}_{AB}\big) \\
+  \ket{\psi^+} =& \frac{1}{2}\big(\ket{01}_{AB} + \ket{10}_{AB}\big) \\
+  \ket{\psi^-} =& \frac{1}{2}\big(\ket{01}_{AB} - \ket{10}_{AB}\big)
+\end{align}
+
+The Bell state that we want to prepare, $\ket{\phi^+}$, can be created by applying the Hadamard and the CNOT gate on two qubits.
+
+\begin{center}
+  \begin{tikzcd}
+  \lstick{$\ket{0}$} & \gate{H} & \ctrl{1} & \qw \rstick[wires=2]{$\ket{\phi^+}$}\\
+  \lstick{$\ket{0}$} & \qw & \targ{} & \qw
+\end{tikzcd}
+\end{center}
+
+However, due to the fact that the system is imperfect, a Werner state will be created instead with fidelity $F$, which is given by the following density matrix,
+\begin{equation}\label{werner}
+  \rho_W = F\ket{\phi}\bra{\phi} + \frac{1-F}{3}\sum_{i=1,2,3}\ket{\psi_i}\bra{\psi_i}
+\end{equation}
+where $\ket{\phi}$ now represents the Bell pair that we want to prepare, and $\ket{\psi_i}$ are the other three Bell states. The production of this noisy Bell pair will be illustrated by
+\begin{center}
+  \begin{tikzcd}
+      \lstick{$\ket{0}$} & \gate[style=bellstar]{} \vqw{1}& \qw \rstick[wires=2]{$\rho_W$}\\
+      \lstick{$\ket{0}$} & \gate[style=bellstar]{} & \qw
+  \end{tikzcd}
+\end{center}
+
+\subsubsection*{Single selection}
+Luckily, the fidelity of a noisy Bell pair can be enhanced through entanglement purification. In the process of \emph{single selection}, a single noisy Bell pair is used (utility pair) in order to enhance the fidelity of another noisy bell pair (target pair). Here CZ gates are applied between the first and second qubits of the two noisy pairs. A successful parity check on the utility pair yields an enhanced target pair.
+\begin{center}
+    \begin{tikzcd}[row sep={0.65cm,between origins}]
+      \lstick[wires=2]{utility} & \gate[style=bellstar]{} \vqw{1} & \qw & \ctrl{2} &\qw& \meterD{X} &\\
+      \qw & \gate[style=bellstar]{} & \qw & \qw & \ctrl{2} & \meterD{X} & \\
+      \lstick[wires=2]{target} & \gate[style=bellstar]{} \vqw{1}& \qw & \control{} & \qw & \gate[wires=2]{H} & \rstick[wires=2]{$\rho_{W+}$ if parity checked}\qw \\
+      \qw & \gate[style=bellstar]{}        & \qw & \qw & \control{} & &\qw
+    \end{tikzcd}
+\end{center}
+
+We should separate the qubits based on their location. Alice and Bob both holds one of the two qubits of both the utility and target pair. We put the qubits held by Alice on top, and Bob on the bottom.
+
+\begin{center}
+  \begin{tikzcd}[row sep={0.65cm,between origins}]
+    \lstick{$u_A$} & \qw & \gate[style=bellstar]{} \vqw{3} & \ctrl{1} & \meterD{X} \\
+    \lstick{$t_A$} & \gate[style=bellstar]{} \vqw{3} & \qw & \control{} & \qw \slice[style = black]{if parity checked} & \rstick[wires=4]{$\rho_{W+}$}\qw \\\\
+    \lstick{$u_B$} & \qw & \gate[style=bellstar]{}& \ctrl{1} & \meterD{X} & \\
+    \lstick{$t_B$} & \gate[style=bellstar]{} & \qw & \control{} & \qw & \qw
+  \end{tikzcd}
+\end{center}
+
+The enhanced Bell pair $\rho_{W,1}$ can be iteratively enhanced using the same scheme using newly created noisy Bell pairs $\rho_W$. After repeated iterations the fidelity will converge to some maximally attainable value, dependent on the fidelity of the noisy Bell pair. Two iterations of single selection is displayed below.
+
+\begin{center}
+  \begin{tikzcd}[row sep={0.65cm,between origins}]
+    \qw & \qw & \gate[style=bellstar]{} \vqw{4} & \ctrl{2} & \meterD{X} \\
+    \qw & \qw & \qw & \qw & \qw \slice{2} & \gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \meterD{X} \\
+    \qw & \gate[style=bellstar]{} \vqw{4} \slice{1} & \qw & \control{} & \qw & \qw & \control{} & \qw & \qw \\\\
+
+    \qw & \qw & \gate[style=bellstar]{} & \ctrl{2} & \meterD{X}\\
+    \qw & \qw & \qw & \qw & \qw & \gate[style=bellstar]{} & \ctrl{1} & \meterD{X} \\
+    \qw & \gate[style=bellstar]{} & \qw & \control{} & \qw & \qw & \control{} & \qw & \qw
+
+
+  \end{tikzcd}
+\end{center}
+
+
+\subsubsection*{Entanglement pumping}
+Within each iteration, we can add additional \emph{nested levels} to further improve the purification. In each nested level, we perform extra rounds of single selection, but taking two enhanced Bell pairs from the previous level as input. For example, in the first nested level, a Bell pair $\rho_{W+}$ is used to purify another Bell pair with the same fidelity to $\rho_{W++}$, which will be the input state for the second nested level.
+
+\subsubsection*{Double selection}
+Another approach which yields a higher enhanced fidelity utilizes two noisy Bell pairs ($u1$ and $u2$) to enhance a third pair ($t$). They perform a CZ gate locally between $u1$ and $t$, followed by another between $u2$ and $u1$. Now, they perform parity checks on $u1$ and $u2$. If both parity checks are passed, the protocol succeeds and the target qubit fidelity is enhanced.
+
+\begin{center}
+  \begin{tikzcd}[row sep={0.65cm,between origins}]
+    \lstick{$u2_A$} & \qw & \qw & \gate[style=bellstar]{} \vqw{4} & \qw & \ctrl{1} & \meterD{X} \\
+    \lstick{$u1_A$} & \qw & \gate[style=bellstar]{} \vqw{4} & \qw & \ctrl{1} & \control{} & \meterD{X} \\
+     \lstick{$t_A$}& \gate[style=bellstar]{} \vqw{4} & \qw & \qw & \control{} & \qw & \qw \slice[style=black]{if parities checked} & \rstick[wires=5]{$\rho_{W+}$}\qw \\\\
+    \lstick{$u2_B$} & \qw & \qw & \gate[style=bellstar]{} & \qw & \ctrl{1} & \meterD{X} \\
+    \lstick{$u1_B$} & \qw & \gate[style=bellstar]{} & \qw & \ctrl{1} & \control{} & \meterD{X} \\
+    \lstick{$t_B$}\qw & \gate[style=bellstar]{} & \qw & \qw & \control{} & \qw & \qw & \qw
+
+  \end{tikzcd}
+\end{center}
+
+
+%\begin{center}
+%\begin{adjustbox}{width=\textwidth}
+%  \begin{tikzcd}[row sep={0.75cm,between origins}]
+%    \qw & \qw & \qw &&&\qw&\qw&\qw&\qw &&&& \gate[wires=3,style=selection,label style=sel]{\sigma} \vqw{4} & \qw &&& \qw & \qw & \gate[style=bellstar]{} \vqw{4} &\ctrl{1} & \meterD{X}&\qw \\
+%    \qw & \gate[wires=2,style=selection,label style=sel]{\sigma} \vqw{4} & \qw &&&\gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \meterD{X} &\qw &&&&  & \qw &&& \gate[style=bellstar]{} \vqw{4} & \ctrl{1} & \qw & \gate{Z} & \meterD{X} &\qw \\
+%    \qw & & \qw &&& \qw &\gate{\sigma}&\qw&\qw &&&&  & \qw &&&\qw &\gate{\sigma}&\qw&\qw&\qw&\qw\\
+%    &&&= &&& &&&&& &&& =\\
+%    \qw & \qw & \qw &&&\qw&\qw&\qw&\qw &&&& \gate[wires=3,style=selection,label style=sel]{\sigma} & \qw &&& \qw & \qw & \gate[style=bellstar]{} &\ctrl{1} & \meterD{X} &\qw\\
+%    \qw & \gate[wires=2,style=selection,label style=sel]{\sigma} & \qw  &&&\gate[style=bellstar]{} & \ctrl{1} & \meterD{X} &\qw &&&& &\qw &&&\gate[style=bellstar]{} & \ctrl{1} & \qw & \gate{Z} &  \meterD{X} & \qw \\
+%    \qw & & \qw &&& \qw &\gate{\sigma}&\qw&\qw &&&& & \qw &&&\qw &\gate{\sigma}&\qw&\qw&\qw&\qw
+%  \end{tikzcd}
+%\end{adjustbox}
+%\end{center}

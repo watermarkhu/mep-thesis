@@ -1,0 +1,25 @@
+\chapter{Modifications to the Union-Find decoder}
+
+
+\section{Delayed Merge of boundary lists (DM)}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{parent_child_A.pdf}
+  \caption{The parent-child method for merging boundary lists. By storing a list of pointers of child clusters at the parent cluster, we needn't append the full boundary list from the child to the parent cluster. The tree representation (TR) is shown on the top right. } \label{3.fig.parentchildA}
+\end{figure}
+
+When two clusters merge, one needs to check for the larger cluster between the two, and make the smaller cluster the child of the bigger cluster, which lowers the depth of the tree and is called the \emph{weighted union rule}. Applied to the toric lattice, the Union-Find decoder also needs to append the boundary list (which contains all the boundary edges of a cluster) of the smaller cluster onto the list of the larger cluster. This method, as explained before, requires that the new boundary list needs to be checked again.
+
+In our application, instead of appending the entire boundary list, we just add a pointer stored at the parent cluster to the child cluster. As a parent can have many children, the pointers are appended to a list \codeword{children}. When growing a cluster, we first check if this cluster has any child clusters. If yes, these child clusters will be grown first by popping them from the list, but any new vertices will always be added to the parent cluster. Also during and after a merge, we make sure that any new vertices are always added to the parent cluster. Any child will exist in the list of a parent for one round of growth, after which its boundaries will be grown, and the child is absorbed into the parent. This method also works recursively by keeping track of the root cluster instead of just the parent cluster, and many levels of parent-child relationships can exists, but again, only for one round of growth.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{parent_child_B.pdf}
+  \caption{Growing a merged boundary using the parent-child method. The tree representation (TR) is shown on the top right. }\label{3.fig.parentchildB}
+\end{figure}
+
+
+\section{Growing Edge Priority based on path degeneracy (GEP)}
+\subsection{Degeneracy on connecting edges between Clusters (GEP-C)}
+\subsection{Degeneracy on Vertices with connecting edges (GEP-V)}
