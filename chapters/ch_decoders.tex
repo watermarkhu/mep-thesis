@@ -77,14 +77,32 @@ For this reason, if the correction $\hat{C}=\n{P}(\tilde{P}_\m{E})$ is applied t
 \begin{definition}\label{def:forest}
   A spanning forest $F_{\tilde{E}}$ is a maximal subset of edges of $\tilde{E}$ that contains no cycles and $\mathscr{B}(F_{\tilde{E}}) = \mathscr{B}(\tilde{E})$.
 \end{definition}
-The first step  is to produce $\gls{forest}$ inside $\m{E}$, where all syndrome vertices $\sigma$ are included in the composition per definition \ref{def:forest}. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is a connected \emph{acyclic} graph. Such a forest can be found in linear time by either a depth-first search of the $\m{E}$. Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{correctionset}\subseteq F_\m{E}$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u$ belong to the set of nontrivial syndrome measurements $\sigma$, remove $u$ from $\sigma$, add $e$ to $\m{C}$, and \emph{flip} the vertex $v$ in $\sigma$, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in $F_\m{E}$ and $\hat{C}=\n{P}(\m{C})$.
+The first step  is to produce $\gls{forest}$ inside $\m{E}$, where all syndrome vertices $\sigma$ are included in the composition per definition \ref{def:forest}. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is a connected \emph{acyclic} graph. Such a forest can be found in linear time by a depth-first search of $\m{E}$. We initiate $F_\m{E}$ as a empty set, pick some vertex $v$ in $\n{B}(\m{E})$ and add edges $(u,v)\notin F_\m{E}$ to $F_\m{E}$ and apply it recursively to the vertices $u$ (Algorithm \ref{algo:forest}). Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{correctionset}\subseteq F_\m{E}$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u$ belong to the set of nontrivial syndrome measurements $\sigma$, remove $u$ from $\sigma$, add $e$ to $\m{C}$, and \emph{flip} the vertex $v$ in $\sigma$, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in $F_\m{E}$ and $\hat{C}=\n{P}(\m{C})$.
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V$}
+  \KwData{Connected graph $\m{E}$}
+  \KwResult{Connected acyclic graph $F_\m{E}$}
+  \BlankLine
+  initiate $F_\m{E} = \emptyset$ \;
+  pick some vertex $v \in \m{E}$ \;
+  \For{$(v,u) \notin F_\m{E}$ }{
+    add $(v,u)$ to $F_\m{E}$\;
+    repeat lines 2-4 with $v=u$
+  }
+  \KwRet{$F_\m{E}$}
+  \BlankLine
+  \caption{\codefunc{Forest}}\label{algo:forest}
+\end{algorithm}
+
+\input{tikzfigs/peeling_decoder}
+
+\begin{algorithm}[h]
+  \BlankLine
+  \KwData{Graph $G = (V,E)$, erasure $\m{E} \subseteq E$, syndrome $\sigma \subseteq V$}
   \KwResult{Correction $\hat{C}$}
   \BlankLine
-  construct a spanning forest $F_\m{E} \subseteq\m{E}$\;
+  construct $F_\m{E} = \codefunc{Forest}(\m{E})$ (al. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$F_\m{E} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\m{E}$ \;
@@ -122,21 +140,21 @@ Per lemmas \ref{lem:anyforest} and \ref{lem:peelingfe}, for some error $P_\m{E}$
 \end{proof}
 
 \begin{definition}\label{def:cluster}
-  Let a cluster $\m{E}_i$ be a subset of an erasure $\m{E}$, such that the edges of $\m{E}_i$ form a connected graph, and $\bigcup \m{E}_i = \m{E}$. Let $C_i=\bound(\m{E}_i)$, the set of vertices in the composition of $\m{E}_i$, also be referred to as a cluster.
+  Let a cluster $\m{E}_i$ be a subset of an erasure $\m{E}$, such that the edges of $\m{E}_i$ form a connected graph, and $\bigcup \m{E}_i = \m{E}$. Let $V_i=\bound(\m{E}_i)\subseteq V$, the subset of vertices in the composition of $\m{E}_i$, also be referred to as a cluster.
 \end{definition}
 \begin{definition}\label{def:clusterparity}
-  The parity of a cluster is the number of syndromes in $C_i$.
+  The parity of a cluster is the number of syndromes in $V_i$.
   \begin{equation}\label{eq:clusterparity}
-    \text{parity}(C_i) = \abs{\sigma \cap C_i}
+    \text{parity}(V_i) = \abs{\sigma \cap V_i}
   \end{equation}
 \end{definition}
 \begin{lemma}\label{lem:singlecluster}
-  Two clusters $\m{E}_i, \m{E}_j$ or $C_i, C_j$ must be disjoint; $\m{E}_i\cap \m{E}_j = \emptyset$ and $C_i\cap C_j=\emptyset$. 
+  Two clusters $\m{E}_i, \m{E}_j$ or $V_i, V_j$ must be disjoint; $\m{E}_i\cap \m{E}_j = \emptyset$ and $V_i\cap V_j=\emptyset$. 
 \end{lemma}
 \begin{proof}
-  If there exists some edge $e$ that belongs to two clusters $\m{E}_i, \m{E}_j$, they are connected via $e$. Per definition \ref{def:cluster} clusters $\m{E}_i, \m{E}_j$ must be a single cluster. The same is true for some vertex $v$ that belongs to both $C_i$ and $C_j$.
+  If there exists some edge $e$ that belongs to two clusters $\m{E}_i, \m{E}_j$, they are connected via $e$. Per definition \ref{def:cluster} clusters $\m{E}_i, \m{E}_j$ must be a single cluster. The same is true for some vertex $v$ that belongs to both $V_i$ and $V_j$.
 \end{proof}
-Given a graph $G(E,V)$ that is subjected to pure pure erasure noise, $\m{E}$ may not be a single subset of connected edges, but rather many connected subsets, or clusters, denoted by $\{\m{E}_1, \m{E}_2,...\}$. For each cluster $\m{E}_i$, all syndromes caused by errors on $P_{\m{E}_i}$ must be in $C_i$. Since every cluster must be strictly disjoint per lemma \ref{lem:singlecluster}, the parity for each $C_i$ must therefore be even, and $\m{E}_i$ can be decoded individually per theorem \ref{the:anyevenparity}. Here, for each $\m{E}_i$ a forest is made and peeled. This is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later.
+Given a graph $G(E,V)$ that is subjected to pure pure erasure noise, $\m{E}$ may not be a single subset of connected edges, but rather many connected subsets, or clusters, denoted by $\{\m{E}_1, \m{E}_2,...\}$. For each cluster $\m{E}_i$, all syndromes caused by errors on $P_{\m{E}_i}$ must be in $V_i$. Since every cluster must be strictly disjoint per lemma \ref{lem:singlecluster}, the parity for each $V_i$ must therefore be even, and $\m{E}_i$ can be decoded individually per theorem \ref{the:anyevenparity}. Here, for each $\m{E}_i$ a forest is made and peeled. This is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later.
 \begin{theorem}
   The Peeling decoder (algorithm \ref{algo:peel}) is a linear-time maximum likelihood decoder for erasures up to $d-1$ qubits, where $d$ is the minimum distance of the code.
 \end{theorem}
@@ -157,10 +175,10 @@ Due to this, we ensure that each forest $F_\m{E}$ can only be supported by a max
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{A graph $G = (V_{\iota\omega}\cup V_\delta,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V_{\iota\omega}$}
+  \KwData{Graph $G = (V_{\iota\cup\omega}\cup V_\delta,E)$, erasure $\m{E} \subseteq E$, syndrome $\sigma \subseteq V_{\iota\cup\omega}$}
   \KwResult{Correction $\hat{C}$}
   \BlankLine
-  construct a spanning forest $F_\m{E}\subseteq\m{E}$ with seed $V_\delta$\;
+  construct $F_\m{E} = \codefunc{Forest}(\m{E})$ with seed $V_\delta$ (al. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$F_\m{E} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin V_\delta$, remove $e$ from $F_\m{E}$ \;
@@ -213,21 +231,21 @@ The independent noise model introduces extra Pauli $X$ errors on qubits or edges
   \caption{Stages of decoding of the Union-Find decoder. A pre-processing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{E}}$ is constructed that satisfies theorem \ref{the:anyevenparity}, where all erasures have an even number of syndromes. (Figure inspired by \cite{delfosse2017almost})}
   \label{fig:ufstages}
 \end{figure}
-Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $\m{E}_i$ and a vertex in a single $C_i=\bound(\m{E}_i)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
+Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $\m{E}_i$ and a vertex in a single $V_i=\bound(\m{E}_i)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
 
 \subsubsection{Application of the Union-Find data structure}
 The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, consist of two functions \codefunc{Union} and \codefunc{Find} for manipulating a set of $n$ elements partitioned into a number of disjoint subsets in the form of \emph{disjoint-set trees}. Function \codefunc{Find} follows a sequence of parent pointers in the tree to find the representation root element of the tree, and function \codefunc{Union} merges the trees of two disjoint subsets. This data structure has the property that the worst-case complexity for a sequence of \codefunc{Union}'s and \codefunc{Find}'s is $\m{O}(n\alpha(n))$, where $\alpha(n)$ is the inverse of Ackermann's function that grows at such slow rate that for all practical purposes, $\alpha(n)\leq 4$. 
 
-In the context of the surface code, the vertices $v\in V$ are the elements and each disjoint-set tree is equivalent to a cluster with vertex set $C_i$and edge set $\m{E}_i$ (definition \ref{def:cluster}), where each vertex $v\in C_i$ points to a parent vertex and the root vertex $r_v$ represents the cluster (see Figure \ref{fig:ufdecoder}b-f, right). Note that while the nodes in the tree are equivalent to vertices $v \in V$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in E$. The edge set $E$ with its erasure subset $\m{E}\subseteq E$ and subsequently cluster $\m{E}_i\subseteq \m{E}$ and forest $F_{\m{E}_i}\subseteq C$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $C_i$ exists to point towards the representative element at the root.
+In the context of the surface code, the vertices $v\in V$ are the elements and each disjoint-set tree is equivalent to a cluster with vertex set $V_i$ and edge set $\m{E}_i$ (definition \ref{def:cluster}), where each vertex $v\in V_i$ points to a parent vertex and the root vertex $r_v$ represents the cluster (see Figure \ref{fig:ufdecoder}b-f, right). Note that while the nodes in the tree are equivalent to vertices $v \in V$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in E$. The edge set $E$ with its erasure subset $\m{E}\subseteq E$ and subsequently cluster $\m{E}_i\subseteq \m{E}$ and forest $F_{\m{E}_i}\subseteq \m{E}_i$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $V_i$ exists to point towards the representative element at the root.
 \begin{definition}\label{def:trees}
-  Let $T(v)$ denote (sub)tree rooted in vertex $v$, and let $|T(v)|$ denote the number of vertices in the (sub)tree. The tree rooted at $r_v\in C_i$ is equivalent to the set $T(r_v)=C_i$. The height of an element $v$ of $T(r_v)$ is the distance from $v$ to the $r_v$. The rank of a tree is the maximum height in the tree. 
+  Let $T(v)$ denote (sub)tree rooted in vertex $v$, and let $|T(v)|$ denote the number of vertices in the (sub)tree. The tree rooted at $r_v\in V_i$ is equivalent to the set $T(r_v)=V_i$. The height of an element $v$ of $T(r_v)$ is the distance from $v$ to the $r_v$. The rank of a tree is the maximum height in the tree. 
 \end{definition}
 
 The function \codefunc{Find}$(v)$ is performed by following the parent pointers to the root $r_v$ (algorithm \ref{algo:find}), and its cost is therefore dependant on the height of the vertex in the tree; the distance of an element to the root. The function can be applied recursively such that all vertices in the sequence of parent pointers are pointed to the root, which decreases the height of the tree and reduces the cost to every future call to \codefunc{Find}. This is called \emph{path compression}. 
 \begin{algorithm}[h]
   \BlankLine
   \KwData{A vertex $v\in V$ of graph $G = (V,E)$}
-  \KwResult{The root $r_v$ of $T(r_v)\ni v$ (definition \ref{def:trees})}
+  \KwResult{The root $r_v$ of $T(r_v)\ni v$ (def. \ref{def:trees})}
   \BlankLine
   \eIf{$v=\text{parent}(v)$}{
     \KwRet{$v$}\;
@@ -242,7 +260,7 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
 \begin{algorithm}[h]
   \BlankLine
   \KwData{Vertex roots $r_u\in V$, $r_v\in V$}
-  \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (definition \ref{def:trees})}
+  \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
   \BlankLine
   \uIf{$|T(r_u)|<|T(r_v)|$}{
     $\text{parent}(r_u)=r_v$\;
@@ -260,7 +278,7 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
 \begin{algorithm}[h]
   \BlankLine
   \KwData{Vertex roots $r_u\in V$, $r_v\in V$}
-  \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (definition \ref{def:trees})}
+  \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
   \BlankLine
   \uIf{$\text{rank}(r_u)<\text{rank}(r_v)$}{
     $\text{parent}(r_u)=r_v$\;
@@ -279,32 +297,32 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
 The Union-Find data structure, its tree implementation, the \emph{union by rank}, \emph{union by weight} and \emph{path compression} rules are all elaborately covered in appendix \ref{ap:unionfind}. Here, we also make a full analysis of its $\m{O}(n\alpha(n))$ complexity based on \cite{kozen1992design}. The Ackermann's function and its inverse are detailed in appendix \ref{ap:ackermann}.
 
 \subsubsection{Additional data structure}
-We define in this section what it means to grow a cluster, and the additional data structure needed to facilitate such growth. For a cluster defined by disjoint-set tree of vertices $C_i$, an iteration of growth means to add another layer of neighboring vertices that lie on the outer boundary of the cluster. 
+We define in this section what it means to grow a cluster, and the additional data structure needed to facilitate such growth. For a cluster defined by disjoint-set tree of vertices $V_i$, an iteration of growth means to add another layer of neighboring vertices that lie on the outer boundary of the cluster. 
 \begin{definition}\label{def:clusterboud}
-  Let the boundary of a cluster $\delta C_i$ be the subset of vertices that supports one or more edges connected to vertices not in $C_i$. This set of edges is the boundary edge set $\delta \m{E}_i$, and can be considered as paths that lead to the neighboring vertices. To walk such path is dubbed as \emph{tracing} an edge. 
+  Let the boundary of a cluster $\delta V_i$ be the subset of vertices that supports one or more edges connected to vertices not in $V_i$. This set of edges is the boundary edge set $\delta \m{E}_i$, and can be considered as paths that lead to the neighboring vertices. To walk such path is dubbed as \emph{tracing} an edge. 
   \begin{align}
-    \delta C_i&= \left\{ v \in C_i | \exists \text{ neighbor }  u \notin C_i \right\} \\
-    \delta \m{E}_i &= \{(u,v)\in \m{E}_i | v \in C_i, u \notin C_i \}
+    \delta V_i&= \left\{ v \in V_i | \exists \text{ neighbor }  u \notin V_i \right\} \\
+    \delta \m{E}_i &= \{(u,v)\in \m{E}_i | v \in V_i, u \notin V_i \}
   \end{align}
 \end{definition}
-To grow a cluster, these paths are \emph{traced} and all vertices $\{u | (u,v) \in \delta \m{E}_i: u \notin C_i\}$ are added to $C_i$ by pointing $v$ toward the root $r_u$ in the tree. Note that every single-vertex addition to the tree can be viewed as an union event. If $v$ does not belong to another cluster, the addition is an union event between the tree of $C_i$ and a single-element tree $\{v\}$. If $v$ does belong to another cluster with tree $C_j$, it is an union event between two trees $|T|>1$. We thus always apply $\codefunc{Find}(u)$ and $\codefunc{Find}(v)$ to find the respective roots $r_u, r_v$, and if $r_u\neq r_v$ apply $\codefunc{Union}(r_u, r_v)$ to merge the trees.
+To grow a cluster, these paths are \emph{traced} and all vertices $\{u | (u,v) \in \delta \m{E}_i: u \notin V_i\}$ are added to $V_i$ by pointing $v$ toward the root $r_u$ in the tree. Note that every single-vertex addition to the tree can be viewed as an union event. If $v$ does not belong to another cluster, the addition is an union event between the tree of $V_i$ and a single-element tree $\{v\}$. If $v$ does belong to another cluster with tree $V_j$, it is an union event between two trees $|T|>1$. We thus always apply $\codefunc{Find}(u)$ and $\codefunc{Find}(v)$ to find the respective roots $r_u, r_v$, and if $r_u\neq r_v$ apply $\codefunc{Union}(r_u, r_v)$ to merge the trees.
 
-For two vertices $u,v$ that belong to different odd-parity clusters and connected by $(u,v)$, where $u \in \delta C_u, v \in \delta C_v$, a round of growth where both clusters are grown would mean that the path of $(u,v)$ is traced twice. This does not make sense, as during the second trace, both vertices already belong to the same cluster. To this end, we only trace the path an half-edge length per round of growth. In the case such as above, both traces from vertices $u$ and $v$ on edge $(u,v)$ cover a half-edge and meet in the middle, which prompts a single union event (see Figure \ref{fig:ufdecoder}c-d). 
+For two vertices $u,v$ that belong to different odd-parity clusters and connected by $(u,v)$, where $u \in \delta V_u, v \in \delta V_v$, a round of growth where both clusters are grown would mean that the path of $(u,v)$ is traced twice. This does not make sense, as during the second trace, both vertices already belong to the same cluster. To this end, we only trace the path an half-edge length per round of growth. In the case such as above, both traces from vertices $u$ and $v$ on edge $(u,v)$ cover a half-edge and meet in the middle, which prompts a single union event (see Figure \ref{fig:ufdecoder}c-d). 
 \begin{definition}\label{def:support}
   Let the \emph{support} of an edge be how many times a path on $e$ has been traced; the number of growth iterations the edge has been in some cluster boundary $\delta\m{E}_i$. The support of an edge can have values $\{0,1,2\}$; $0$ for \emph{untraced}, $1$ for \emph{half-traced} and $2$ for \emph{traced}.
 \end{definition}
-This can be stored in some look-up table $Support$. To trace an edge $e$ means to increase the $Support[e]$ by $1$, and to merge the cluster if $Support[e]=2$. This data structure implies that it is redundant to explicitly store the set of edges $\m{E}_i$ or the boundary edge set $\delta \m{E}_i$ for each cluster. Lemma \ref{lem:singlecluster} implies that if a vertex $v\in C_i$, that all traced edges supported by $v$ satisfy $e \in \m{E}_i$, such that
+This can be stored in some look-up table $Support$. To trace an edge $e$ means to increase the $Support[e]$ by $1$, and to merge the cluster if $Support[e]=2$. This data structure implies that it is redundant to explicitly store the set of edges $\m{E}_i$ or the boundary edge set $\delta \m{E}_i$ for each cluster. Lemma \ref{lem:singlecluster} implies that if a vertex $v\in V_i$, that all traced edges supported by $v$ satisfy $e \in \m{E}_i$, such that
 \begin{align}
-  \m{E}_i &= \left\{(u,v)|u\in C_i, v \in C_i, Support[(u,v)]=2\right\}\\
-  \delta \m{E}_i &= \left\{(u,v)| v \in \delta C_i, Support[(u,v)] \neq 2\right\}.
+  \m{E}_i &= \left\{(u,v)|u\in V_i, v \in V_i, Support[(u,v)]=2\right\}\\
+  \delta \m{E}_i &= \left\{(u,v)| v \in \delta V_i, Support[(u,v)] \neq 2\right\}.
 \end{align}
-Thus the vertex set of a cluster $C_i$, the boundary vertex set $\delta C_i$ and the table $Support$ provides the necessary data for constructing the forest $F_\m{E}$ and the subsequent peeling in the Peeling decoder.
+Thus the vertex set of a cluster $V_i$, the boundary vertex set $\delta V_i$ and the table $Support$ provides the necessary data for constructing the forest $F_\m{E}$ and the subsequent peeling in the Peeling decoder.
 
-Finally, in each round of growth, there may be many odd-parity clusters $\{C_{1}, C_{2},...\}$, which we collect in a list $\m{L}$. If two clusters are immediately merged within the same time step $t$ when some boundary edge $e$ reaches $Support[e]=2$, these clusters are merged into one, and it is not possible to track which part of the merged cluster have completed its growth and which have not. To this end, in a round of growth, \codefunc{Union}'s are applied after all clusters have grown. This is accomplished by initiating a \emph{fusion} list $\m{F}$ at the start of each round of growth; fully-traced edges are appended to this list; and merges are applied at the end of each round. We denote the subroutine for the growth of a cluster \codefunc{Grow} (Algorithm \ref{algo:ufgrow}).
+Finally, in each round of growth, there may be many odd-parity clusters $\{V_{1}, V_{2},...\}$, which we collect in a list $\m{L}$. If two clusters are immediately merged within the same time step $t$ when some boundary edge $e$ reaches $Support[e]=2$, these clusters are merged into one, and it is not possible to track which part of the merged cluster have completed its growth and which have not. To this end, in a round of growth, \codefunc{Union}'s are applied after all clusters have grown. This is accomplished by initiating a \emph{fusion} list $\m{F}$ at the start of each round of growth; fully-traced edges are appended to this list; and merges are applied at the end of each round. We denote the subroutine for the growth of a cluster \codefunc{Grow} (Algorithm \ref{algo:ufgrow}).
 
 
 \subsubsection{Syndrome validation}
-We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L} = \{C_{0,t}, C_{1,t}, ...\}$ of odd-parity clusters. A cluster $C_{i,t}$ is grown by $\codefunc{Grow}(\delta C_{i,t})$, during which all edges with $Support[e]=2$ are added to a \emph{fusion list} $\m{F}$. After all clusters are grown, for each edge $e=(u,v) \in \m{F}$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta C_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta C_{u,t+1}$ and $\delta C_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}$ and remove any duplicate elements. The process can be repeated until $\m{L}=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{E}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:uf}. 
+We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L} = \{V_{0,t}, V_{1,t}, ...\}$ of odd-parity clusters. A cluster $V_{i,t}$ is grown by $\codefunc{Grow}(\delta V_{i,t})$, during which all edges with $Support[e]=2$ are added to a \emph{fusion list} $\m{F}$. After all clusters are grown, for each edge $e=(u,v) \in \m{F}$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta V_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta V_{u,t+1}$ and $\delta V_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}$ and remove any duplicate elements. The process can be repeated until $\m{L}=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{E}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:uf}. 
 
 \input{tikzfigs/ufdecoder.tex}
 % \paragraph{Data structure}
@@ -321,12 +339,12 @@ We now describe the pre-processing step of syndrome validation. A round of growt
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Cluster with boundary $\delta C_i$, table $Support$, $\m{F}$}
+  \KwData{Cluster with boundary $\delta V_i$, table $Support$, $\m{F}$}
   \KwResult{Cluster with traced boundary edges}
   \BlankLine
 
-  \For{$v$ in $\delta C_i$}{
-    \For{edges in $\{(u,v) | v \in \delta C_i, Support[(u,v)]\neq 2$\}}{
+  \For{$v$ in $\delta V_i$}{
+    \For{edges in $\{(u,v) | v \in \delta V_i, Support[(u,v)]\neq 2$\}}{
       Add 1 to $Support[(u,v)]$ \;
       If $Support[(u,v)]=2$, add $(u,v)$ to $\m{F}$ \;
     }
@@ -341,13 +359,13 @@ We now describe the pre-processing step of syndrome validation. A round of growt
   \KwResult{Correction $\hat{C}$}
   \BlankLine
   \tcp{Syndrome validation}
-  Initialize clusters $C_i$ with boundaries $\delta C_i$ (def. \ref{def:clusterboud})\;
+  Initialize clusters $V_i$ with boundaries $\delta V_i$ (def. \ref{def:clusterboud})\;
   Initialize odd-parity clusters list $\m{L}$\;
   Initialize table $Support$ (def \ref{def:support})\;
   \While{$\m{L} \neq \emptyset$}{
     Initialize $\m{F}=\emptyset$ \;
-    \For{$C_i$ in $\m{L}$}{
-      get boundary $\delta C_i$, apply $\codefunc{Grow}(\delta C_i, Support, \m{F})$ (al. \ref{algo:ufgrow});
+    \For{$V_i$ in $\m{L}$}{
+      get boundary $\delta V_i$, apply $\codefunc{Grow}(\delta V_i, Support, \m{F})$ (al. \ref{algo:ufgrow});
     }
     \For{$(u,v)$ in $\m{F}$}{
       Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (al. \ref{algo:find})\;
@@ -365,50 +383,93 @@ We now describe the pre-processing step of syndrome validation. A round of growt
 
 \subsubsection{Time complexity of the Union-Find decoder}
 
-For a system of $n$ qubits, the initialization of the cluster $C_i$ and its boundaries $\delta C_i$, the odd parity cluster list $\m{L}$ and the table $Support$ all take $\m{O}(n)$ time. The each edge in $Support$ can be traced a maximum of 2 iterations, and also takes $\m{O}(n)$. Maintaining $\m{L}$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a "Almost-linear time decoding algorithm" \cite{delfosse2017almost}. 
+For a system of $n$ qubits, the initialization of the cluster $V_i$ and its boundaries $\delta V_i$, the odd parity cluster list $\m{L}$ and the table $Support$ all take $\m{O}(n)$ time. The each edge in $Support$ can be traced a maximum of 2 iterations, and also takes $\m{O}(n)$. Maintaining $\m{L}$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a "Almost-linear time decoding algorithm" \cite{delfosse2017almost}. 
 
+\subsection{Weighted growth}\label{sec:bucketclustersort}
+The vanilla Union-Find decoder of Algorithm \ref{algo:uf} has been reported to have a code threshold of $p_{th}=9.2\%$ for independent Pauli noise \cite{delfosse2017almost} on a toric code. Recall from section \ref{sec:threshold} that $p_{th}$ is the threshold error rate below which the chance of successful correction can be increased by increasing the system size or the number of qubits on the surface code. Delfosse \emph{et al.} has shown that this threshold can be improved to $p_{th}=9.9\%$ by applying \emph{weighted growth}, where the order of cluster growth is sorted according to the sizes of the cluster trees. However, the authors have not provided a description for this sorting. In this section, we will show why weighted growth improves the threshold and provide a description of a sorting method that operates within the time complexity of the Union-Find decoder. 
 
+% The vanilla UF decoder (as described by Delfosse \cite{delfosse2017almost}) has an error threshold of $9.2\%$ for a 2D toric lattice, that only suffers errors through a single Pauli channel. Delfosse has shown that the threshold can be improved by sorting the order of cluster growth, but has not provided a description of this sorting. In this chapter, we will show an implementation of this sorting routine that maintains a linear time complexity in section \ref{sec:bucketclustersort}. In section \ref{sec:oop}, we will show an object oriented approach of the UF decoder that allows for a straight forward data structure that is used for our implementation. In the remaining sections, we will show some other alterations to the UF decoder, that uses the inspiration of the MLD-decoder or the MWPM decoder to improve the error threshold while retaining a low time complexity.
 
-\subsection{Bucket Cluster Sort (BCS)}\label{sec:bucketclustersort}
-The vanilla UF decoder (as described by Delfosse \cite{delfosse2017almost}) has an error threshold of $9.2\%$ for a 2D toric lattice, that only suffers errors through a single Pauli channel. Delfosse has shown that the threshold can be improved by sorting the order of cluster growth, but has not provided a description of this sorting. In this chapter, we will show an implementation of this sorting routine that maintains a linear time complexity in section \ref{sec:bucketclustersort}. In section \ref{sec:oop}, we will show an object oriented approach of the UF decoder that allows for a straight forward data structure that is used for our implementation. In the remaining sections, we will show some other alterations to the UF decoder, that uses the inspiration of the MLD-decoder or the MWPM decoder to improve the error threshold while retaining a low time complexity.
+% To further increase the error threshold for the Union-Find decoder from $9.2\%$ to $9.9\%$, Delfosse implements \emph{weighted growth}, where clusters are grown in increasing order based on their sizes \cite{delfosse2017almost}. However, the main problem with weighted growth is that the clusters now need to be sorted, and that after each growth iteration another round of sorting is necessary, due to the fact that the clusters have changed sizes due to growth and merges, and the order of clusters may have been changed. Nickerson has not given a description of how weighted growth is implemented. As the complexity of the algorithm is now dominated by the Union-Find algorithm, we need to make sure that weighted growth does not add to this complexity. To avoid this iterative sorting, we need to make sure that the insertion of a new element in our sorted list of clusters does not depend on the values in that list.
 
+% The Bucket Cluster sorting algorithm as described in this section is evolved from a more complicated version that is described in appendix \ref{ap.bucketsort}, which has a sub-linear complexity of $\m{O}(\sqrt{n})$.
 
-To further increase the error threshold for the Union-Find decoder from $9.2\%$ to $9.9\%$, Delfosse implements \emph{weighted growth}, where clusters are grown in increasing order based on their sizes \cite{delfosse2017almost}. However, the main problem with weighted growth is that the clusters now need to be sorted, and that after each growth iteration another round of sorting is necessary, due to the fact that the clusters have changed sizes due to growth and merges, and the order of clusters may have been changed. Nickerson has not given a description of how weighted growth is implemented. As the complexity of the algorithm is now dominated by the Union-Find algorithm, we need to make sure that weighted growth does not add to this complexity. To avoid this iterative sorting, we need to make sure that the insertion of a new element in our sorted list of clusters does not depend on the values in that list.
-
-The Bucket Cluster sorting algorithm as described in this section is evolved from a more complicated version that is described in appendix \ref{ap.bucketsort}, which has a sub-linear complexity of $\m{O}(\sqrt{n})$.
-
-\subsubsection{How to sort for weighted growth using BCS}
-
-Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
-
-Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $C_\alpha, C_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $C_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $C_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
 
 \begin{lemma}\label{lem:incorrectedges}
-  For two clusters $C_\alpha, C_\beta$ with size $S_\alpha << S_\beta$ the number of vertices in the clusters, $Grow(S_\beta)$ will add a smaller amount of \emph{incorrect} edges to the cluster, which are edges that are not part of the matching.
+  For two clusters $V_i|\m{E}_i, V_j|\m{E}_j$ with sizes $|V_i| << |V_j|$, $\codefunc{Grow}(\delta V_i)$ will add fewer \emph{redundant} edges $e_r$ to $\m{E}_i$ compared to $\codefunc{Grow}(\delta V_j)$ to $\m{E}_j$, where redundant edges are not in the outputted correction set $\m{C}$. 
 \end{lemma}
+\begin{proof}
+  Consider an odd-parity cluster $V_i$. This cluster will be continuously grown until it merges with another odd cluster $V_k$. 
+  During a round of growth, $|\delta \m{E}_i|$ edges are added to the cluster, but only one edge in $\delta \m{E}_i$ will be in $\m{C}$, connecting the residual syndrome vertices from the two clusters, and all other edges will be peeled. Thus only $1/|\delta \m{E}_i|$ of edges are not added redundantly. For any cluster the size of its boundary will be proportional to the size of the cluster itself $|\delta \m{E}| \propto |V_i|$, which proves the stated lemma. 
+\end{proof}
 
-The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets, which replaces the odd cluster list $\m{L}$. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
+If there are only two clusters $V_i, V_j$ on the lattice with different cluster sizes, it would not matter which cluster is grown first. The number of clusters growths needed is equal to the minimum distance $d_{ij}$ between the two clusters. Either a sequence of $d_{ij}$ growths for $V_i$, $d_{ij}$ growths for $V_j$, or $d_{ij}$ growths distributed among $V_i$ and $V_j$ would achieve the same goal: connecting the two clusters into a single even-parity cluster. It is due to the existence of other clusters that \emph{weighted growth} makes a difference. If there are clusters $V_k$ with arbitrary parity located nearer to $V_i$ than $V_j$, the distribution of the $d_{ij}$ growths among $V_i$ and $V_j$ now determines the shape of the resulting clusters. If only $V_i$ is grown, it may be possible that it is merged with $V_k$ first, whereas if only $V_j$ is grown this may not be the case. The \emph{redundant} edges of lemma \ref{lem:incorrectedges} are therefore not insignificant, as it may lead to a different set of clusters entirely that may result to a \emph{right} correction set $\m{C}$, or not at all. Nevertheless, by growing smaller clusters first, each newly added edge has a higher possibility to be in $\m{C}$ than edges added during the growth of a larger cluster, which is why weighted growth leads to a increased threshold.
 
 
-\subsubsection{Growing a bucket}
-The procedure for the Union-Find decoder using the bucket sort algorithm is now to sequentially grow the clusters from a bucket starting from bucket 0, which contain the smallest single-generator clusters of size 1. After a round of growth, in the case of no merge event, these clusters are grown half edges, but are still size 1. We would therefore need twice as many buckets to differentiate between clusters without and with half-edges. Let us call them full-edged and half-edged clusters, respectively. Starting from bucket 0, even buckets contain full-edged clusters and odd buckets contain half-edged clusters of the same size. To grow a bucket, clusters are popped from the bucket, grown on the boundary, after which the clusters is to be distributed in a bucket again in a subroutine named \codefunc{Place}.
+\subsubsection{Sorting method}
+% Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
 
-\begin{equation}\label{eq:bucket_place}
-  \codefunc{Place}(C) = \begin{cases}
-               C\rightarrow b_{2(S_C-1)}, & \mbox{if $S_C$ even} \\
-               C\rightarrow b_{2(S_C-1)+1}, & \mbox{otherwise}
-             \end{cases}
-\end{equation}
+% Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $V_\alpha, V_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $V_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $V_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
+The challenging aspect to weighted growth is that the sizes of clusters change as they grow and merge. For $k_c\propto n$ clusters on a lattice at time $t$, where $n$ denotes the number of vertices, sorting these $k_c$ clusters using any \emph{comparison sort} methods such as \emph{Quicksort}, \emph{Merge sort}, \emph{Heapsort} has a worst-case complexity of $k_c \log k_c$ at best. Here, any time the size of a clusters changes, we need to compare its new size with all other clusters sizes. For a total of $k_g \propto 1/k_c$ clusters growths, the total number of operations needed to sort these $k_c$ clusters $k_g$ times may lead to a complexity that is worst than $\m{O}(n\alpha(n))$. Luckily, as the sizes of clusters can only take on integer values and is limited to $n$, we can utilize a \emph{non-comparison} sorting algorithm. Now, as the size of a cluster changes, we need not to compare it with the other clusters. Specifically, we will be using \emph{Bucket sort}. 
+\begin{definition}\label{def:buckets}
+  Bucket sort is a non-comparison sorting algorithm that distributes $n$ elements into $N_b$ buckets, whereafter each bucket is sorted individually. Bucket sort has average-case performance $\m{O}(n + n^2/N_b + N_b)$. The worst-case complexity for Bucket sort is $\m{O}(n^2)$, when all the elements are placed into a single bucket. Each bucket is labelled as $b_j$ and the list of all buckets is labelled as $Buckets=[b_1, b_2, ...,b_{N_b}]$. 
+\end{definition}
+In the context of weighted growth, if two clusters have the same size, it does not matter which cluster is grown first. Thus if for every cluster size $j$ we define a bucket $b_j$, it is not necessary to sort each bucket, and sorting each cluster takes $\m{O}(1)$ time. To apply Bucket sort as the sorting algorithm for weighted growth in the Union-Find decoder, we must do the following: 1) initiate $Buckets$ per Definition \ref{def:buckets}; 2) place the initial odd-parity clusters into these buckets, where the smallest single-vertex clusters are sorted into $b_1$ and the largest possible clusters into $b_{N_b}$; 3) grow and merge clusters sequentially from buckets starting from $b_1$, iterating over every bucket until $b_{N_b}$; sort grown and merged odd-parity clusters into buckets; 4) continue until all clusters have even parity. 
+\begin{definition}\label{def:clustersupport}
+  The \emph{support} of a cluster $V_i$ is the number of growth iterations a cluster has maintained the same size $|V_i|$, and can either be 0 or 1. 
+\end{definition}
+The size of a cluster is defined as $|V_i|$ the number of vertices in its cluster tree. As we trace the boundary edges per half-edge, a single round of growth does not necessarily add new vertices and increase $|V_i|$. Nevertheless, a cluster with size $|V_i|$ and boundary edges with support 1 is arguably \emph{larger} than a cluster with the same size $|V_i|$ and boundary edges with support 0. For this reason, we define 2 buckets per cluster size $|V_i|=k$. Based on the preceding paragraphs, we define a function \codefunc{Place} in Algorithm \ref{algo:place} that sorts a cluster in an appropriate bucket. After a cluster $V_i$ is grown, during which it may have merged with other clusters, we apply $\codefunc{Place}(V_i)$ immediately place it in a new bucket if it has odd parity. 
 
-In the case of no merge event, clusters grown from even bucket $b_i$ must be placed in odd bucket $b_{i + 1}$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $b_{j + 2k + 1}$ with $k \in \mathbb{N}_0$ the number of added vertices. Also in the case of a union event of clusters $C_\alpha$ and $C_\beta$, the new cluster $\codefunc{union}(C_\alpha, C_\beta) = C_{\alpha\beta}$ must be placed in a bucket $b_{\alpha\beta} > b_{\alpha}, b_{\alpha\beta} > b_{\beta}$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied". This ensures that for two clusters $C_\alpha$ and $C_\beta$ with $S_\alpha < S_\beta$, cluster A will be grown first, adding a fewer amount of "incorrect" edges as per lemma \ref{lem:incorrectedges}. Clusters of the same size $S_\alpha=S_\beta$ are placed in the same bucket and their order of growth is dependent on their order of placements.
+\begin{algorithm}[h]
+  \BlankLine
+  \KwData{Cluster $V_i$, list of buckets $Buckets$}
+  \KwResult{Cluster placed in bucket if it has odd parity}
+  \BlankLine
 
-All clusters within the same bucket are grown "together"; we first grow all the boundary edges of the clusters in the bucket by half, adding all fully grown edges to the fusion list $\m{F}$ and check for the union and new boundary edges for all clusters together per algorithm \ref{algo:uf}. The order of growth within the bucket is dependent on the order of cluster placement into the bucket.
+  \uIf(odd-parity cluster){$|\{\sigma_i \in V_i \}|$ is odd}{
+    \eIf{$Support(V_i)= 0$}{
+      bucket number $j = 2(|V_i|-1) + 1$
+    }{
+      bucket number $j = 2(|V_i|-1) + 2$
+    }
+    add $V_i$ to bucket $b_j = Buckets[j]$\;
+    store bucket number at cluster object $C.b = j$\;
+  }
+  \Else(even-parity cluster){
+    store zero bucket number at cluster object $C.b = 0$\;
+  }
+  \BlankLine
+  \caption{\codefunc{Place}}\label{algo:place}
+\end{algorithm}
 
-\begin{theorem}\label{the:bucket_order}
-  Weighted growth is achieved by growing the odd clusters sequentially starting from bucket $b_0$. Grown odd clusters from bucket $b_c$ are added back to the bucket list using the \codefunc{Place} subroutine, in a bucket $b_{g}$ where $g > c$. Clusters $C_\alpha$ and $C_\beta$ with $S_\alpha = S_\beta$ are placed int the same bucket $b_{S_\alpha}$, and are grown together. However, their growing order is dependent on the order of placement within the bucket.
-\end{theorem}
+% The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets, which replaces the odd cluster list $\m{L}$. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
 
-\subsubsection{Faulty entries}
+
+% \subsubsection{Growing a bucket}
+% The procedure for the Union-Find decoder using the bucket sort algorithm is now to sequentially grow the clusters from a bucket starting from bucket 0, which contain the smallest single-generator clusters of size 1. After a round of growth, in the case of no merge event, these clusters are grown half edges, but are still size 1. We would therefore need twice as many buckets to differentiate between clusters without and with half-edges. Let us call them full-edged and half-edged clusters, respectively. Starting from bucket 0, even buckets contain full-edged clusters and odd buckets contain half-edged clusters of the same size. To grow a bucket, clusters are popped from the bucket, grown on the boundary, after which the clusters is to be distributed in a bucket again in a subroutine named \codefunc{Place}.
+
+% \begin{equation}\label{eq:bucket_place}
+%   \codefunc{Place}(C) = \begin{cases}
+%                C\rightarrow b_{2(S_C-1)}, & \mbox{if $S_C$ even} \\
+%                C\rightarrow b_{2(S_C-1)+1}, & \mbox{otherwise}
+%              \end{cases}
+% \end{equation}
+
+% In the case of no merge event, clusters grown from even bucket $b_i$ must be placed in odd bucket $b_{i + 1}$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $b_{j + 2k + 1}$ with $k \in \mathbb{N}_0$ the number of added vertices. Also in the case of a union event of clusters $C_\alpha$ and $C_\beta$, the new cluster $\codefunc{union}(C_\alpha, C_\beta) = C_{\alpha\beta}$ must be placed in a bucket $b_{\alpha\beta} > b_{\alpha}, b_{\alpha\beta} > b_{\beta}$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied". This ensures that for two clusters $C_\alpha$ and $C_\beta$ with $S_\alpha < S_\beta$, cluster A will be grown first, adding a fewer amount of "incorrect" edges as per lemma \ref{lem:incorrectedges}. Clusters of the same size $S_\alpha=S_\beta$ are placed in the same bucket and their order of growth is dependent on their order of placements.
+
+% All clusters within the same bucket are grown "together"; we first grow all the boundary edges of the clusters in the bucket by half, adding all fully grown edges to the fusion list $\m{F}$ and check for the union and new boundary edges for all clusters together per algorithm \ref{algo:uf}. The order of growth within the bucket is dependent on the order of cluster placement into the bucket.
+
+% \begin{theorem}\label{the:bucket_order}
+%   Weighted growth is achieved by growing the odd clusters sequentially starting from bucket $b_0$. Grown odd clusters from bucket $b_c$ are added back to the bucket list using the \codefunc{Place} subroutine, in a bucket $b_{g}$ where $g > c$. Clusters $C_\alpha$ and $C_\beta$ with $S_\alpha = S_\beta$ are placed int the same bucket $b_{S_\alpha}$, and are grown together. However, their growing order is dependent on the order of placement within the bucket.
+% \end{theorem}
+
+\subsubsection{Growing buckets}
+
+In the original algorithm, we keep iterating over $\m{L}$ whilst there are odd-parity clusters remaining in the list, where in each round of growth the clusters increase in size and potentially merge to even parity. Here, we made sure that at the end of each round, the even-parity clusters are removed from $\m{L}$. 
+
+With weighted grow, the list of odd clusters $\m{L}$ from algorithm \ref{algo:uf} is replaced with the list of buckets $Buckets$. Growing each bucket $b_k$ is now equivalent to a round of growth. In each round $k$, we grow all clusters $V_i$ in $b_k$ with $\codefunc{Grow}(\delta V_i$). However, it is now possible for an odd-parity cluster $V_i$ to be grown and placed in bucket $b_m$ in round $k$, merged with some other odd-parity cluster to an even parity cluster in round $k+1$, and merged with another odd-parity cluster in round $k+2$ and placed in bucket $b_{m'}$. Thus in round $k+1$, the placement of $V_i$ in $b_m$ is invalid as its parity is even, and in round $k+1$ the placement is equally invalid as it is placed in both $b_m$ and $b_{m'}$. The placement is $b_m$ is thus a \emph{redundant placement}. 
+
+To avoid the growth of a redundantly placed cluster $V_i$, we check before $\codefunc{Grow}(\delta V_i$) that the cluster $V_i$ still belongs to the bucket $b_k$. To facilitate this check, at the end of the function \codefunc{Place} (Algorithm \ref{algo:place}), which is called immediately after a cluster is grown, we additionally store the bucket number at the cluster object $C.b = k$. When iterating over the bucket $b_k$, a cluster $V_i$ is conditionally grown only if $C.b = k$. When a cluster is merged to have even parity, its bucket number is updated to $C_b=0$, such that it will not be grown.  
 
 \begin{figure}
   \centering
@@ -416,54 +477,114 @@ All clusters within the same bucket are grown "together"; we first grow all the 
   \caption{Faulty entries of clusters can occur in the buckets, a) cluster that should not be there due to a merge event. Situation a can be solved by checking the parity of the cluster. Checking the parity of the root cluster solves a) and b). Checking the bucket\_number of the root cluster solves all.}\label{3.fig.clustermergeB}
 \end{figure}
 
-Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters $C_\alpha$ and $C_\beta$ during growth of $C_\beta$, cluster $C_\alpha$ has already been placed in a bucket, as it was still odd after its growth. But cluster $C_\alpha$ is now part of cluster $AB$ and has even parity, and the entry of cluster $C_\alpha$ is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
-
-Furthermore, it is possible that another cluster $C_\gamma$ merges onto $C_{\alpha\beta}$, such that the cluster $C_{\alpha\beta\gamma}$ is odd again. Now, the faulty entry of cluster A passes the previous test. To solve this issue, we store an extra bucket number $C_b$ at the root of a cluster. Whenever a cluster increases in size or merges to an odd parity cluster, we first update the $C_b$ to the appropriate value and place it in its bucket. If the cluster merges to an even parity cluster, we update the $C_b$ to $Null$. Now, every time a cluster is popped from bucket $i$, we can just check weather the current bucket corresponds to the $C_b$ of the root cluster.
-
-\begin{lemma}\label{lem:bucket_faulty}
-  Each bucket $b_i$ does not necessary contain clusters that still belong to $b_i$. Growth of these faulty entries are prevented by storing the bucket number $j$ at the cluster $C_b = j$ during \codefunc{Place} and checking for $i=j$ and odd cluster parity add the beginning of \codefunc{Grow}.
+\begin{lemma}\label{lem:numbuckets}
+  To apply Bucket sort for weighted growth on a lattice of $n$ vertices, a total of $N_b = n$ buckets are needed. 
 \end{lemma}
+\begin{proof}
+  On a lattice of $n$ vertices, a cluster $V_i$ can have a maximum size of $|V_i|=n$. The number of buckets needed for using Bucket sort for weighted growth is thus seemingly $N_b = 2n$, where for each cluster size two buckets are initiated. However, any cluster reaching size $|V_i|\geq n$, there must be at least on another cluster $V_j$ with size $|V_j|<n$. Cluster $V_j$ thus belongs to a lower bucket with $b_j < b_i$ that is grown before cluster $V_i$. As there are only $n$ vertices on the lattice, these clusters must merge before cluster $V_i$ is grown. Thus buckets $b_k$ with $k>n$ are always empty or contain strictly redundant placements.
+\end{proof}
 
-\subsubsection{Number of buckets}
-How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now trivial. But we need to make sure that the decoder \emph{can} give a solution. Consider an odd cluster $C_\mu$ of size $S_\alpha~n/2$ which covers half the lattice. There must exists another odd cluster $C_\beta$ for matchings to exists, which has size $S_\beta\leq n/2$.
-As per lemma \ref{the:bucket_order}, $C_\beta$ will grow before $C_\alpha$. As the remaining number of vertices is $n-S_\alpha-S_\beta$, $C_\beta$ can never grow larger than $C_\alpha$ and will merge into $C_\alpha$ if no other odd cluster exists. There exists a maximum cluster size $S_\mu$ for which after $\codefunc{Grow}(C_\mu)$ this is true. This cluster size $S_\mu$ is dependent on the code and the parity of lattice size $L$. We illustrate in Figure \ref{fig:bucket_cmsizes} the clusters $C_\mu$ for the toric and planar code. Their maximum odd cluster size $S_\mu$ is listed in table \ref{tab_smax}, where $L'=L-1$ for the planar code.
+Actually, for either a toric or planar code, the number of buckets required is slightly less than $n$. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. The pseudo-code for the Union-Find decoder with weighted growth implemented via Bucket sort (and dynamic forests, see next section) is listed in Algorithm \ref{algo:ufbucketdf}. 
 
-\begin{lemma}
-  Once an odd cluster $C_\alpha$ has reached a size $S_\alpha > S_\mu$, it is certain that a smaller cluster $C_\beta$ will grow in size before the bucket of $C_\alpha$ is reached, and it will merge into an even cluster $\codefunc{Union}(C_\alpha, C_\beta) = C_{\alpha\beta}$.
-\end{lemma}
+Initiating $n$ buckets takes $\m{O}(n)$ time. The placement of each cluster in a bucket and checking its bucket number takes $\m{O}(1)$ time. The total number of placements, including redundantly placed clusters, is upper bounded by the number of growths, which has not changed due to weighted growth, and thus does not add to the complexity. Thus the overall complexity of $\m{O}(n\alpha(n))$ is preserved. 
+% Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters $C_\alpha$ and $C_\beta$ during growth of $C_\beta$, cluster $C_\alpha$ has already been placed in a bucket, as it was still odd after its growth. But cluster $C_\alpha$ is now part of cluster $AB$ and has even parity, and the entry of cluster $C_\alpha$ is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
 
-\begin{table}
-  \centering
-  \begin{tabular}{|l|c|c|}
-    \hline
-    % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
-           & $L$ even                             & $L$ odd                                                 \\
-    \hline
-    Toric  & $S_\mu = L\times (\frac{L}{2}-1) -1$ & $S_\mu = L\times ( \frac{L'}{2} -2) + (\frac{L'}{2}-1)$ \\
-    \hline
-    Planar & $S_\mu = L \times (\frac{L}{2} -1) $ & $S_\mu = L'\times \frac{L'}{2} -1$                      \\
-    \hline
-  \end{tabular}
-  \caption{The maximum cluster size $S_\mu$ for which it is not certain that another cluster will merge onto the current cluster, or the maximum cluster size for which a cluster is allowed to grow.  }\label{tab_smax}
-\end{table}
+% Furthermore, it is possible that another cluster $C_\gamma$ merges onto $C_{\alpha\beta}$, such that the cluster $C_{\alpha\beta\gamma}$ is odd again. Now, the faulty entry of cluster A passes the previous test. To solve this issue, we store an extra bucket number $C_b$ at the root of a cluster. Whenever a cluster increases in size or merges to an odd parity cluster, we first update the $C_b$ to the appropriate value and place it in its bucket. If the cluster merges to an even parity cluster, we update the $C_b$ to $Null$. Now, every time a cluster is popped from bucket $i$, we can just check weather the current bucket corresponds to the $C_b$ of the root cluster.
+
+% \begin{lemma}\label{lem:bucket_faulty}
+%   Each bucket $b_i$ does not necessary contain clusters that still belong to $b_i$. Growth of these faulty entries are prevented by storing the bucket number $j$ at the cluster $C_b = j$ during \codefunc{Place} and checking for $i=j$ and odd cluster parity add the beginning of \codefunc{Grow}.
+% \end{lemma}
+
+% \begin{definition}
+%   This maximum odd-parity cluster size $S_\mu$ determines the number of buckets $k + 1$ we will need.
+%   \begin{equation}\label{eq:bucket_numbuckets}
+%     k = 2(S_\mu-1)
+%   \end{equation}
+% \end{definition}
+% Finally, 
+% How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now trivial. But we need to make sure that the decoder \emph{can} give a solution. Consider an odd cluster $C_\mu$ of size $S_\alpha~n/2$ which covers half the lattice. There must exists another odd cluster $C_\beta$ for matchings to exists, which has size $S_\beta\leq n/2$.
+% As per lemma \ref{the:bucket_order}, $C_\beta$ will grow before $C_\alpha$. As the remaining number of vertices is $n-S_\alpha-S_\beta$, $C_\beta$ can never grow larger than $C_\alpha$ and will merge into $C_\alpha$ if no other odd cluster exists. There exists a maximum cluster size $S_\mu$ for which after $\codefunc{Grow}(C_\mu)$ this is true. This cluster size $S_\mu$ is dependent on the code and the parity of lattice size $L$. We illustrate in Figure \ref{fig:bucket_cmsizes} the clusters $C_\mu$ for the toric and planar code. Their maximum odd cluster size $S_\mu$ is listed in table \ref{tab_smax}, where $L'=L-1$ for the planar code.
+
+% \begin{lemma}
+%   Once an odd cluster $C_\alpha$ has reached a size $S_\alpha > S_\mu$, it is certain that a smaller cluster $C_\beta$ will grow in size before the bucket of $C_\alpha$ is reached, and it will merge into an even cluster $\codefunc{Union}(C_\alpha, C_\beta) = C_{\alpha\beta}$.
+% \end{lemma}
+
+% \begin{table}
+%   \centering
+%   \begin{tabular}{|l|c|c|}
+%     \hline
+%     % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+%            & $L$ even                             & $L$ odd                                                 \\
+%     \hline
+%     Toric  & $S_\mu = L\times (\frac{L}{2}-1) -1$ & $S_\mu = L\times ( \frac{L'}{2} -2) + (\frac{L'}{2}-1)$ \\
+%     \hline
+%     Planar & $S_\mu = L \times (\frac{L}{2} -1) $ & $S_\mu = L'\times \frac{L'}{2} -1$                      \\
+%     \hline
+%   \end{tabular}
+%   \caption{The maximum cluster size $S_\mu$ for which it is not certain that another cluster will merge onto the current cluster, or the maximum cluster size for which a cluster is allowed to grow.  }\label{tab_smax}
+% \end{table}
 
 
-This maximum cluster size $S_\mu$ for growth determines the number of buckets $k + 1$ we will need.
-\begin{equation}\label{eq:bucket_numbuckets}
-  k = 2(S_\mu-1)
-\end{equation}
-Any cluster with size $S\leq S_\mu$ will be placed into a bucket according to equation \eqref{eq:bucket_place}. If $S>S_\mu$, the cluster will not be placed into a bucket, and shall be assigned bucket number $C_b=Null$, as there is no bucket available.
 
-\input{tikzfigs/bucket_largestcluster}
+% Any cluster with size $S\leq S_\mu$ will be placed into a bucket according to equation \eqref{eq:bucket_place}. If $S>S_\mu$, the cluster will not be placed into a bucket, and shall be assigned bucket number $C_b=Null$, as there is no bucket available.
 
-\subsubsection{Largest bucket occurrence}
-Not all buckets will be filled depending on the configuration of the lattice. It would therefore be redundant to go through all buckets just to find out that the majority of them is empty. To combat this, we can keep track of the largest filled bucket $b_M$. Whenever a bucket $b_i$ has been emptied and $i = M$, we can break out of the bucket loop to skip the remainder of the buckets.
+% \input{tikzfigs/bucket_largestcluster}
 
-\subsubsection{Complexity of BCS}
-Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\m{O}(1)$. There are a maximum of $\m{O}(L^2) = \m{O}(N)$ buckets to go through. Thus the overall complexity of $\m{O}(N\alpha(N))$ is preserved.
+% \subsubsection{Largest bucket occurrence}
+% Not all buckets will be filled depending on the configuration of the lattice. It would therefore be redundant to go through all buckets just to find out that the majority of them is empty. To combat this, we can keep track of the largest filled bucket $b_M$. Whenever a bucket $b_i$ has been emptied and $i = M$, we can break out of the bucket loop to skip the remainder of the buckets.
 
-\subsubsection{The BCS Union-Find decoder}
+% \subsubsection{Complexity of BCS}
+% Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\m{O}(1)$. There are a maximum of $\m{O}(L^2) = \m{O}(N)$ buckets to go through. Thus the overall complexity of $\m{O}(N\alpha(N))$ is preserved.
 
+
+\subsection{Dynamic forest}
+Syndrome validation outputs a validated erasure $\bar{\m{E}}$, a set of connected clusters with even syndrome parities $\{\m{E}_1, \m{E}_2, ...\}$. The task of the Peeling decoder is now to 1) make a set of forests $\{F_{\m{E}_1}, F_{\m{E}_2}, ...\}$ and 2) peel these forests and output a correction $\n{P}(\m{C})$ where $\m{C} = \{\m{C}_1, \m{C}_2,...\}$. Recall that a forest $F_{\m{E}_i}$ (Definition \ref{def:forest}) can be created by a depth-first search of the edge set $\m{E}_i$. We now show that via a simple extra step in syndrome validation, clusters $\m{E}_i$ can be grown such that it is always acyclic and $F_{\m{E}_i} = \m{E}_i$. 
+
+\begin{definition}
+  The dynamic forest $\m{F}_i$ is a subset of $\m{E}_i$, where the property of $\m{F}_i=F_{\m{E}_i}$ of definition \ref{def:forest} is always maintained during cluster growth.
+\end{definition}
+The dynamic forest $\m{F}_i$ can be maintained by an additional step when considering all edges from the fusion list $\m{F}$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $Support[(u,v)]$ if $r_u = r_v$. The pseudo-code for the Union-Find decoder with dynamic forests (and weighted growth implemented via Bucket sort, see previous section) is listed in Algorithm \ref{algo:ufbucketdf}.
+
+To maintain these dynamic forests $\m{F}_i$ has some benefits that may not be immediately clear. In the next chapter, we will present a modification of the Union-Find decoder that aims to minimize the weight of matchings or $|\m{C}|$ after peeling by selective sub-growth of clusters. The results of this modification shows that a decreased weight is to some extend a heuristic for an increased threshold, which can be testified by the superior threshold of the Minimum Weight Perfect Matching decoder (Section \ref{sec:MWPMdecoder}). This modification is reliant on clusters that are always acyclic, which motivates the dynamic forests routine. 
+
+Furthermore, when dynamic forests are not maintained, the shape of the forest $F_{\m{E}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}), and therefore the matching weight $|\m{C}|$, is dependent on the seed, the vertices where the depth-first search is initiated. If the seeds are selected randomly, minimum weight matchings within $\m{E}_i$ are not certain. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in V_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $F_{\m{E}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic forest $\m{F}_i$ during some growth iteration are equivalent to the breadth of edges added to $F_{\m{E}_i}$ in one of the breadth-first searches. 
+
+\begin{algorithm}[h]
+  \BlankLine
+  \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V$}
+  \KwResult{Correction $\hat{C}$}
+  \BlankLine
+  \tcp{Syndrome validation}
+  Initialize clusters $V_i$ with boundaries $\delta V_i$ (def. \ref{def:clusterboud})\;
+  Initialize $Buckets$ with odd-parity clusters (def. \ref{def:buckets})\;
+  Initialize table $Support$ (def \ref{def:support})\;
+  \For{bucket $b_k$ in $Buckets$}{
+    Initialize $\m{F}=\emptyset, \m{P}=\emptyset$\;
+    \For{$V_i$ in $b_k$}{
+      \If{$C.b$ is $k$}{
+        get boundary $\delta V_i$, apply $\codefunc{Grow}(\delta V_i, Support, \m{F})$ (al. \ref{algo:ufgrow})\;
+        add cluster $C$ to $\m{P}$\;
+      }
+    }
+    \For{$(u,v)$ in $\m{F}$}{
+      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (al. \ref{algo:find})\;
+      \eIf{$r_u \neq r_v$}{
+        apply $\codefunc{Union}(r_u,r_v)$ (al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+      }{
+        Subtract 1 from $Support[(u,v)]$\;
+      }
+    }
+    \For{cluster $C$ in $\m{P}$}{
+      $\codefunc{Place}(V_i)$ (al. \ref{algo:place})\;
+    }
+  }
+  \KwRet{Validated erasure forest $\bar{\m{F}}$}
+  \BlankLine
+  \tcp{Peeling decoder}
+  Run Peeling decoder (al. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
+  \BlankLine
+  \caption{Union-Find decoder with weighted growth and dynamic forests}\label{algo:ufbucketdf}
+\end{algorithm}
 
 
 \subsection{Performance}
