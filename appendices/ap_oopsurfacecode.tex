@@ -1,14 +1,8 @@
 \chapter{Object-oriented surface code simulations}
-In this chapter, we will present an object-oriented implementation of surface code simulations. The goal of this chapter is not to describe in detail the classes and methods used for these simulations, but mainly introduce the notion of object attributes. In the remainder of the thesis, we will often refer to variables that are stored \emph{at} some physical entity, with which we mean that the variable is stored as an attribute at the class instance of that entity. 
-We will cover the main structure and the base classes needed for a simulation and the benefits of using such structure in Section \ref{sec:oopstructure}, and showcase some of the visualization features of the package. 
-
-\section{Structure}\label{sec:oopstructure}
 Object-oriented programming is a class of programming based on the concept of \emph{objects}. Each object can contain data in the form of object \emph{attributes}, and code in the form of object \emph{methods}. A major feature of these objects is that they can interact with themselves or other object, modifying their own or other object's attributes with their methods. More often than not, these objects are \emph{class}-based, which means each objects are \emph{instances} of classes. 
 
 With the purpose of analyzing the Union-Find decoder (Section \ref{sec:UFdecoder}), we have  created a object-oriented programming package for simulating, decoding and visualizing a surface code. The package consists of the base classes \codefunc{qubit} and \codefunc{stabilizer} which are the base physical elements of a surface code, and several main classes that constructs, simulates and decoders the surface code. 
-\begin{definition}
-    An attribute $var$ stored at the object $x$ is denoted by the notation $x.var$. 
-\end{definition}
+
 Within the graph representation $G(V,E,F)$ (Section \ref{sec:toricgraph}), elements $v\in V$ and $f\in F$ are now instances of \emph{subclasses} of the \codefunc{stabilizer} class. A subclass is a class that inherits all methods and attributes of the parent class, while also new attributes and methods can be defined. Recall that vertices are equivalent to ancillary qubits with star operators measurements and faces are equivalent to ancillary qubits with plaquette operators measurements. For boundary vertex elements $V_\delta$ and non stabilizer vertex elements $V_\omega$, a different subclass can be defined in the same way. Attributes $var$ of a vertex $v$, an instance of a (sub)class of the \codefunc{stabilizer} class are denoted with $v.var$. For the primal and dual graphs $G_V(V,E_V), G_F(F,E_F)$, an instance of the \codefunc{qubit} class are equivalent to an edge in both $E_V$ and $E_F$. Attributes $var$ of an edge $e$, an instance of a (sub)class of the \codefunc{qubit} class are denoted with $e.var$. 
 
 Using these base classes, we can construct a surface code and do operations om them to simulate errors and decoders. The main class types necessary for such a simulation are:

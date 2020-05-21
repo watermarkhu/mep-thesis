@@ -119,19 +119,22 @@
 
 \begin{document}
 
+  \pagenumbering{roman} 
+
   \include{_titlepage}
   \setcounter{tocdepth}{1}
   \tableofcontents
   \printglossary[type=symbols,style=long]
+  \clearpage
 
   \input{tikzfigs/function_draw_lattices}
 
+  \pagenumbering{arabic} 
   % \include{preliminary_report}
-  % \include{chapters/ch_introduction}
-
+  \include{chapters/ch_introduction}
+  \include{chapters/ch_notations}
   \include{chapters/ch_qec_basics}
   \include{chapters/ch_surface_code}
-  \include{chapters/ch_oop}
   \include{chapters/ch_decoders}
   \include{chapters/ch_ufbb}
   \include{chapters/ch_ufmodifications}
@@ -143,6 +146,7 @@
     \include{appendices/ap_bucket_sort}
     \include{appendices/ap_unionfind}
     \include{appendices/ap_ackermann}
+    \include{appendices/ap_oopsurfacecode}
   \end{appendices}
 
   \printbibliography
