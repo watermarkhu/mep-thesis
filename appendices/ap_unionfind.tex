@@ -8,14 +8,14 @@ The disjoint-set data structure consists of two types of instructions for manipu
 \end{itemize}
 We first show that a very simple implementation runs in $\m{O}(n^2)$ time. Applying the \emph{union by weight} rule, this is reduced to $\m{O}(n \log n)$. Combined with the \emph{Path compression} rule, the overall complexity is $\m{O}(n \alpha (n))$, where $\alpha$ is the inverse of Ackermann's function. The original proof \cite{tarjan1975efficiency} was further reinforced by subsequent publications \cite{tarjan1979class,tarjan1984worst} and was proven to be optimal \cite{fredman1989cell}. In this thesis, we will follow a simplified approach, where the \emph{union by weight} rule is replaced by a different by similar \emph{union by rank} rule \cite{kozen1992design}. Later Tarjan and also other sources used this to cast this analysis in terms of potential functions \cite{tarjan1999handout, harfst2000potential, cormen2009introduction}. Another approach is provided by \cite{seidel2005top}, where the upper bound is computed via a top-down method. 
 
-\subsection{Simple implementation}
+\section{Simple implementation}
 A simple implementation of the instructions would be to store for each set $X$ a list $l_X$ of all the elements it contains, and a pointer to $l_X$ at all elements $x\in l_X$, which is called the \emph{linked-list} representation. The function $\codefunc{find}(x)$ simply returns the list $l_X$, which represents the set. After a call to $\codefunc{Union}(X, Y)$, all elements of $l_Y$ are appended to $l_X$, and the pointers of all elements $y\in Y$ are updated. This takes $\m{O}(m)$ operations, where $m=|l_Y|$ the number of elements. In a system of $n$ elements, there may be a maximum of $n-1$ calls to \codefunc{Union}. As the $i$\textsuperscript{th} call involves sets $|l_X|=1$ and $|l_Y|=i$, the number of updates is 
 \begin{equation}
   \sum_{i=1}^{n-1} i = \m{O}(n^2),
 \end{equation}
 where each \codefunc{Union} operation has on average $\m{O}(n)$ updates. 
 
-\subsection{Union by weight}
+\section{Union by weight}
 In the above case, we assume in each \codefunc{Union} the worst case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule to always append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(n \log n)$. 
 
 \begin{theorem}
@@ -25,7 +25,7 @@ In the above case, we assume in each \codefunc{Union} the worst case where a lar
   Consider a set $X$ with list $l_X$ that undergoes a sequence of \codefunc{Union} and \codefunc{Find} operations. The first time all pointers in $l_X$ are updated, the resulting set must have at least 2 elements. Similarly, the next time all pointers are updated, the resulting set must have at least 4 elements due to the weighted union rule. With system size $n$, any initial set $X$ can be updated at most $\log n$ times, where the update size is proportional to $n$. Hence the sequence takes $\m{O}(n \log n)$ time. 
 \end{proof}
 
-\subsection{Disjoint-set trees}
+\section{Disjoint-set trees}
 The pointer update in each set during a \codefunc{Union} can be minimized by a different representation of the Union-Find data structure, where each set is represented by a \emph{rooted tree}. Each member has a pointer to its parent, and the root of the tree points to itself, and is the representative element of the cluster. Function \codefunc{Find} is now performed by following the parent pointers until the root of the tree, and $\codefunc{Union}$ points one root towards another, such that there is only one single root that is the representative element. Each call to $\codefunc{Union}(r_x,r_y)$ is preceded by calls to $r_x=\codefunc{Find}(x)$ and $r_y=\codefunc{Find}(y)$ to find their respective roots and to link their trees if $r_x \neq r_y$. 
 
 \tikzstyle{lw1}=[line width=1]
@@ -71,7 +71,7 @@ The pointer update in each set during a \codefunc{Union} can be minimized by a d
   \label{fig:parentpointers}
 \end{figure}
 
-\subsection{Union by rank}
+\section{Union by rank}
 The \emph{union by weight} rule from the previous section can be implemented without any alteration. However, in the disjoint-set tree structure, a slightly different rule, \emph{union by rank}, can be implemented behaves similarly, but allows for a easier analysis of the complexity when combined with the \emph{path compression} rule, which is introduced in the next section. 
 
 \begin{definition}\label{def:tree}
@@ -136,7 +136,7 @@ We see that as the rank of the trees are bounded by $\m{O}(\log n)$, this result
     \end{align*}
 \end{proof}
 
-\subsection{Path compression}
+\section{Path compression}
 The \emph{path compression} rule for the \codefunc{Find} function is also very simple but highly effective. It operates by pointing all elements during a traversal of parent pointers until the root towards the root. Path compression thus partially decreases the height of the tree every time it is operated on a element in the tree. Note that path compression does not update the ranks of elements in the tree. For this reason, it is possible for a tree with root $r$ to have $R(r) > \max \text{ height } T(r)$. It still holds that for any element $x$ that once it has a parent $x_p$, its rank $R(x)$ is set. 
 
 \newcommand\DRAWTREE[3]{
@@ -190,7 +190,7 @@ The level of an element $K(x)$ is time-dependent and can only increase in time d
 \end{eqnarray*}
 where $\akker(0,2)=3$ (see appendix \ref{ap:ackermann}) and the level is thus al least $k(x)=0$. 
 
-\subsection{Disjoint-set tree complexity}
+\section{Disjoint-set tree complexity}
 Using the disjoint-set tree data structure, each \codefunc{Union} is preceded by two \codefunc{Find}'s to traverse the paths of each of the merging elements to their respective roots, while applying path compression. If the roots are different, the \codefunc{Union} operation takes constant time by making one root point to another, while applying union by rank. If the roots are the same, the trees will not be merged, but the \codefunc{Find} operations that preceded it were not in vain. Path compression decreases the length of the paths to roots such that any future calls to \codefunc{Find} in the same trees take less time.
 
 Each \codefunc{Union} operation thus requires constant time, and $m\leq n-1$ unions runs in $\m{O}(n)$ time. For the cost of the \codefunc{Find} function, we introduce here the concept of \emph{charge assignment}. The cost of each \codefunc{Find} function is equivalent to the number of elements along the path of the root, where each element $x$ takes one time unit. This time unit is then charged as follows:
