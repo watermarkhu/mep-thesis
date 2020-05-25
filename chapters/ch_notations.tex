@@ -1,7 +1,35 @@
 \chapter{Notations}
-In this chapter, we will present an object-oriented implementation of surface code simulations. The goal of this chapter is not to describe in detail the classes and methods used for these simulations, but mainly introduce the notion of object attributes. In the remainder of the thesis, we will often refer to variables that are stored \emph{at} some physical entity, with which we mean that the variable is stored as an attribute at the class instance of that entity. 
+In this chapter, we introduce the notations that we will be using throughout this thesis. With the defined notations, we also list the symbols used in this thesis. 
+
+\paragraph{Quantum operator}
+\begin{itemize}[leftmargin=4em, align=left]
+    \item[$\hat{X}$]  Hatted symbols denote quantum operators on a quantum state.
+\end{itemize}
+
+\paragraph{Sets and groups}
+\begin{itemize}[leftmargin=4em, align=left]
+    \item[$\m{X}$]  Calligraphic symbols denote some set of elements of the some type, or groups. 
+\end{itemize}
+
+\paragraph{Functions on sets}
+\begin{itemize}[leftmargin=4em, align=left]
+    \item[$\n{X}$]  Scripted symbols denote some function on a set, that has a set with elements of a different type as output. Set functions exists only to simplify notations. 
+\end{itemize}
+
+\paragraph{Algorithms}
+\begin{itemize}[leftmargin=4em, align=left]
+    \item[\codefunc{AlgorithmX}] Mono-spaced names refer to some applied function or algorithm. 
+\end{itemize}
+
+\paragraph{Object-attribute notation}
+\begin{itemize}[leftmargin=4em, align=left]
+    \item[$x.var$]  Symbols with $.$ in between denote some attribute $var$ stored at the object $x$.
+\end{itemize}
+\emph{In this thesis, we will use simulated results to benchmark and compare the performance for several types of decoders for the surface code (see Chapters \ref{ch:surfacecode}, \ref{ch:UFdecoder}). These simulations are performed using our own simulation package (see Appendix \ref{ap:oopsurfacecode}), which utilizes an object-oriented programming structure. In this structure, instances of an object, which is equivalent to elements of some set, have attributes that are stored at the object instance.}
 
 
-\begin{definition}
-    An attribute $var$ stored at the object $x$ is denoted by the notation $x.var$. 
-\end{definition}
+
+
+% In this chapter, we will present an object-oriented implementation of surface code simulations. The goal of this chapter is not to describe in detail the classes and methods used for these simulations, but mainly introduce the notion of object attributes. In the remainder of the thesis, we will often refer to variables that are stored \emph{at} some physical entity, with which we mean that the variable is stored as an attribute at the class instance of that entity. 
+
+

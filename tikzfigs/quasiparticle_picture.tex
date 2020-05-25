@@ -2,6 +2,7 @@
 \tikzstyle{bluenode}=[circle, fill=cyan!50, minimum size=4]
 \tikzstyle{redline}=[red!50, line width = 2]
 \tikzstyle{blueline}=[cyan!50, line width = 2]
+\tikzstyle{legend}=[anchor=west, font=\small]
 
 \newcommand{\drawquasigrid}{
   \draw[step=.4cm, opacity=.25] (0,0) grid (4,4);
@@ -14,7 +15,7 @@
   \node[rednode] (N6) at (1.95,1.8) {};
   \node[bluenode] (N7) at (1.6, 3.4) {};
   \node[bluenode] (N8) at (2.7, 3.5) {};
-  \node[bluenode] (N9) at (3.2, 1.5) {};
+  \node[bluenode] (N9) at (3.2, 2.2) {};
   \node[bluenode] (N10) at (3.1, 0.6) {};
   \draw[blueline] (N1) to[in=170, out=20] (N2);
   \draw[blueline] (N3) to[in=180, out=-10] (N4);
@@ -24,22 +25,22 @@
 }
 \begin{figure}
     \centering
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.9]
       \drawquasigrid
       \node at (2, -.5) {\emph{(a)}};
     \end{tikzpicture}
-    \hspace{1cm}
-    \begin{tikzpicture}
+    \hspace{.3cm}
+    \begin{tikzpicture}[scale=0.9]
       \drawquasigrid
       \draw[dashed, blueline] (N1) to[out=90, in=270] (N5);
       \draw[dashed, blueline] (N2) to[out=80, in=275] (N6);
       \draw[dashed, blueline] (N3) to[out=10, in=160] (N4);
       \draw[dashed, redline] (N7) to[out=-20, in=195] (N8);
-      \draw[dashed, redline] (N9) to[out=290, in=75] (N10);
+      \draw[dashed, redline] (N9) to[out=290, in=100] (N10);
       \node at (2, -.5) {\emph{(b)}};
     \end{tikzpicture}
-    \hspace{1cm}
-    \begin{tikzpicture}
+    \hspace{.3cm}
+    \begin{tikzpicture}[scale=0.9]
       \drawquasigrid
       \draw[yellow, line width=6, opacity=.3] (N3) to[in=180, out=-10] (N4);
       \draw[yellow, line width=6, opacity=.3] (N5) to[in=170, out=-20] (N6);
@@ -51,8 +52,18 @@
       \draw[dashed, blueline] (N5) to[out=200, in=45] (0, 1.75);
       \draw[dashed, blueline] (N4) to[out=80, in=225] (4, 1.75);
       \draw[dashed, redline] (N7) to[out=-20, in=195] (N8);
-      \draw[dashed, redline] (N9) to[out=290, in=75] (N10);
+      \draw[dashed, redline] (N9) to[out=290, in=100] (N10);
       \node at (2, -.5) {\emph{(c)}};
+
+
+      \node[rednode] at (4.8, 3.5){};
+      \node[bluenode] at (4.8,3){};
+      \draw[redline] (4.6,2.5) -- +(0.3,0);
+      \draw[redline, dashed] (4.6,2) -- +(0.3,0);
+      \draw[blueline] (4.6,1.5) -- +(0.3,0);
+      \draw[blueline, dashed] (4.6,1) -- +(0.3,0);
+      \draw[yellow, line width=6, opacity=.3] (4.6,.5) -- +(0.3,0);
+      \path (5,3.5) node[legend] {star} ++(0,-.5) node[legend] {plaquette} ++(0,-.5) node[legend] {$X$ errors} ++(0,-.5) node[legend] {$X$ correction} ++(0,-.5) node[legend] {$Z$ errors} ++(0,-.5) node[legend] {$Z$ correction} ++(0,-.5) node[legend] {logical error} ;
     \end{tikzpicture}
     \caption{The quasiparticle picture of stabilizer measurements. Anticommuting stabilizers behave as anyons (circles), where a chain of errors (lines) creates a pair of anyons. Figure (b) shows a successful decoding of (a). Figure (c) shows a pairing that resulted in a correction operator that is in a different class as the error operator, which acquires a logical error. (Figure inspired by \cite{naomi})}\label{fig:quasiparticle}
   \end{figure}

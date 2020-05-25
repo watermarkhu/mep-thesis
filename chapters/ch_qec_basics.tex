@@ -34,12 +34,12 @@ A pure qubit state can also be a superposition of the bases states and is encode
 
 \subsection{Pauli operators}\label{subsec:pauli}
 
-The Pauli operations are unitary operations on single qubits, and will be applied very often throughout this thesis. Including the identity operator, the Pauli group on a single qubit, $\gls{pauligroup}_1$, consists of:
+The Pauli operations are unitary operations on single qubits, and will be applied very often throughout this thesis. Including the identity operator, the Pauli group on a single qubit, $\gls{spauligroup}_1$, consists of:
 \begin{align}
-  \gls{X} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} &&
-  \gls{Y} = \begin{bmatrix} 0 & -i \\ i & 0 \end{bmatrix} &&
-  \gls{Z} = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} &&
-  \gls{I} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+  \gls{oX} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} &&
+  \gls{oY} = \begin{bmatrix} 0 & -i \\ i & 0 \end{bmatrix} &&
+  \gls{oZ} = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} &&
+  \gls{oI} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
 \end{align}
 The Pauli operators represent errors that can occur on a single qubit. The Pauli X operator is analogous to the classical \emph{bit-flip} error and acts on the qubit computational basis states:
 \begin{align}\label{eqq:qec_bitflip}
@@ -60,7 +60,7 @@ In order to do computations on the encoded qubit of our three-bit repetition cod
 
 Furthermore, we now have the logical Z operator which must map $\ket{0}_L$ to $-\ket{0}_L$ and $\ket{1}_L$ to $-\ket{1}_L$. We see that for example $Z\otimes I\otimes I$ achieves this, but also any other $\m{P}_3$ operator with two identities and one Pauli Z operator. Thus there are multiple operators that achieves the same. We formalize the logical operators as
 \begin{align}\label{eq:qec_3bitlogical}
-  \gls{Xlogical} = XXX && \gls{Zlogical} = ZII
+  \gls{oXlogical} = XXX && \gls{oZlogical} = ZII
 \end{align}
 
 The distance of a quantum code is the minimal weight of any logical operators on the code. In the above case, the weight of the encoded X operator $\bar{X}$ is 3, hence the code can detect up to 2 X errors, analogous to the classical case. However, the weight of the encoded Z operator $\bar{Z}$ is only 1, which means that Z errors cannot be detected at all.
@@ -102,9 +102,9 @@ In the quantum three-bit repetition code, we can very simply deduct which qubit 
 
 As we have seen above, we can use the Pauli group $\m{P}_n$ to easily describe a quantum error correcting code of $n$ qubits, without explicitly looking at the \emph{state} of the qubit. This powerful technique is called the \emph{stabilizer formalism} \cite{gottesman1997stabilizer}, and is the most widely formalism used to describe topological codes.
 
-A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators: 1) a set of \emph{stabilizer generators} $\gls{stabilizergenerator}$ which generates the \emph{stabilizer group} $\gls{stabilizergroup}$, an Abelian subgroup of the Pauli group, and 2) a set of encoded \emph{logical operators}. A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that
+A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators: 1) a set of \emph{stabilizer generators} $\gls{zstabilizergenerator}$ which generates the \emph{stabilizer group} $\gls{sstabilizergroup}$, an Abelian subgroup of the Pauli group, and 2) a set of encoded \emph{logical operators}. A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that
 \begin{align}
-  & \gls{stabilizer}\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \m{S}. &
+  & \gls{zstabilizer}\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \m{S}. &
 \end{align}
 The elements of the of the stabilizer group $S\in\m{S}$ are most simply referred to as \emph{stabilizers}. Any stabilizer $S$ can be written as a product of elements from a set of stabilizer generators $\mathfrak{s}=\{s_1,...,s_{N_s}\}$.  
 \begin{align}
@@ -123,7 +123,7 @@ The minimum weight of the logical operator determines the distance $d$ of the er
 
 As the stabilizers are a set of Pauli operators, they correspond to blip-flip or phase-flip errors that may have happened on any of our $n$ qubits. Furthermore, as any stabilizer leaves all states  $\ket{\psi}_i$ invariant, measuring the stabilizers does not disrupt the encoded information. If no error has occurred, all stabilizer measurements will return a '+1' eigenvalue, while any '-1' outcome points to the presence of errors, which we will call a \emph{stabilizer violation}.
 
-This outcome is dependent on whether an error caused by the error operator $\gls{perror}$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $P$ and generator $s$ commute then,
+This outcome is dependent on whether an error caused by the error operator $\gls{operror}$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $P$ and generator $s$ commute then,
 \begin{equation}
   sP\ket{\psi} = Ps\ket{\psi} = P\ket{\psi}
 \end{equation}

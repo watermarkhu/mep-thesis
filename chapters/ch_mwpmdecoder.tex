@@ -1,0 +1,35 @@
+
+\chapter{Minimum Weight Perfect Matching}\label{sec:MWPMdecoder}
+
+
+\section{Quasiparticle picture}
+The processes of error detection and correction can alternatively be presented in the \emph{quasiparticle picture}, where the anticommuting stabilizer measurements act like excitations on the lattice, which behave like the quasiparticles \emph{anyons}. A single error creates a pair of anyons, and a chain of errors causes movement of the anyon on the lattice. A pair of anyons can also annihilate each other when two error chains merge. The correction of errors can thus be viewed of movement of the correction chains until all anyons are annihilated. The quasiparticle picture removes the distracting underlying lattice from the problem, and decoding becomes simply identifying the right pairing between anyons to minimize the chance of a logical error.
+\input{tikzfigs/quasiparticle_picture}
+Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the errors suffered in Figure \ref{sf:fig_degenerate}a, which has suffered Z (blue lines) and X errors (red lines). The corresponding anyons can either be of the star type (red circle) or plaquette type (blue circle). Figure \ref{fig:quasiparticle}b shows a successful decoding. Note that here not all pairs are correctly identified, but the resulting loop still is in the same class of operators. In Figure \ref{fig:quasiparticle}c the correction has failed as the resulting loop in the correction is in a difference class compared to the error. As the loop still commutes with the stabilizer, no error can be detected, but the encoded qubit has acquired a logical error.
+
+\input{tikzfigs/mwpm}
+
+\section{Performance}
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+      \input{pgfplots/mwpm_toric_2d.pgf}
+    \end{subfigure}
+    \begin{subfigure}[b]{\textwidth}
+      \input{pgfplots/mwpm_planar_2d.pgf}
+    \end{subfigure}
+    \caption{<caption>}
+    \label{fig:thres_mwpm_2d}
+  \end{figure}
+  \begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+      \input{pgfplots/mwpm_toric_3d.pgf}
+    \end{subfigure}
+    \begin{subfigure}[b]{\textwidth}
+      \input{pgfplots/mwpm_planar_3d.pgf}
+    \end{subfigure}
+    \caption{<caption>}
+    \label{fig:thres_mwpm_3d}
+  \end{figure}

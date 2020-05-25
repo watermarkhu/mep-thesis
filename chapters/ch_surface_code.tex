@@ -1,5 +1,5 @@
 
-\chapter{The surface code}
+\chapter{The surface code}\label{ch:surfacecode}
 
 The variant of the stabilizer codes that we are going to explore in this thesis is Kitaev's \emph{surface code} \cite{kitaev2003fault}, which is of the category of \emph{topological codes}. Among this category, the surface code is preferable as it offers the highest error tolerance under realise noise channels and requires only local stabilizer measurements of physically neighboring qubits. Two variants of the surface code will be considered here, the \emph{toric code} in section \ref{sec:surface_toric} and the \emph{planar code} in section \ref{sec:surface_planar}, and various decoders are detailed in \ref{sec:surface_decoders}.
 \begin{figure}
@@ -72,14 +72,14 @@ To define a stabilizer code, we need to specify the $m$ independent stabilizer g
 \paragraph{Plaquette operators}
 For every face $f$ on our lattice, we define a plaquette operator $P_f$, consisting of tensor product of Pauli Z operators on qubits on these edges (see Figure \ref{sf:fig_toriclattice}a),
 \begin{equation}\label{eq:sf_plaquette}
-  \gls{plaquette} = \prod_{i\in Q(f)} Z_i
+  \gls{oplaquette} = \prod_{i\in Q(f)} Z_i
 \end{equation}
 where $Q(f)$ is the set of qubits touching face $f$. On a $L\times L$ grid there are $L^2$ plaquettes.
 
 \paragraph{Star operators}
 Similarly, for every vertex $v$ on our lattice, we define a star operator $S_v$, consisting of tensor product of Pauli X operators on qubits neighboring the vertex (see Figure \ref{sf:fig_toriclattice}b),
 \begin{equation}\label{eq:sf_star}
-  \gls{star} = \prod_{i\in Q(v)} X_i
+  \gls{ostar} = \prod_{i\in Q(v)} X_i
 \end{equation}
 where $Q(v)$ is the set of qubits neighboring vertex $v$. On a $L\times L$ grid there are $L^2$ plaquettes.
 
@@ -282,24 +282,24 @@ Since $Z$ and $X$ errors independently affect different types of stabilizer meas
 \subsection{Error correction}
 An error $P$ can be corrected by applying it again to the lattice. However, the problem is that the error operator $P$ is unknown. We must therefore try to identify the correct operator given the measured syndrome. As mentioned in the previous chapter, this relationship between error does not always map one-to-one, which it is not in the surface code. An error $E$ can be multiplied with some operator $L$ that commutes with the stabilizer and they will result in the same syndrome.
 
-If $L$ is in the stabilizer $\m{S}$, the product of the identified correction operator $\gls{correction}=P'$ with the real error operator $P$ will leave the code invariant. The resulting operator $CP=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $P$, $P\bar{Z}_1$, $P\bar{Z}_2$, $P\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
+If $L$ is in the stabilizer $\m{S}$, the product of the identified correction operator $\gls{ocorrection}=P'$ with the real error operator $P$ will leave the code invariant. The resulting operator $CP=L$ is a stabilizer operator. However, the encoded logical operators also commute with the stabilizer, which means that $P$, $P\bar{Z}_1$, $P\bar{Z}_2$, $P\bar{Z}_1\bar{Z}_2$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $C$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
 
 \subsection{Graph picture}\label{sec:toricgraph}
-Since it is the combinatorial structure of the lattice that defines the surface code, such a surface by be also denoted by a graph $\gls{graph}$. The graph is constructed by $G(\gls{vertices}, \gls{edges}, \gls{faces})$ by a vertex set $V$, edge set $E$ and face set $F$. Each edge $\gls{edge}\in E$ is defined by a pair of distinct vertices $e=\{v_i, v_j\}$ where $\gls{vertex}\in V$. Each face is a region that has the homology of a disk and is defined by the set of edges on its boundary. 
+Since it is the combinatorial structure of the lattice that defines the surface code, such a surface by be also denoted by a graph $\gls{ngraph}$. The graph is constructed by $G(\gls{svertices}, \gls{sedges}, \gls{sfaces})$ by a vertex set $V$, edge set $E$ and face set $F$. Each edge $\gls{nedge}\in E$ is defined by a pair of distinct vertices $e=\{v_i, v_j\}$ where $\gls{nvertex}\in V$. Each face is a region that has the homology of a disk and is defined by the set of edges on its boundary. 
 
-With respect to the toric code, each vertex is equivalent to the star operator type stabilizer generator $v\equiv S_v$, and each face $\gls{face}\in F$ is equivalent to the plaquette operator $f\equiv P_f$. The edges are thus the qubits, with two edges per qubit, one spanned by neighboring vertices and another by neighboring faces. Due to the duality of the lattice, the equivalence of vertices with stars and faces with plaquettes can naturally be switched. Also due to this, the graph $G$ can be split into two separate graphs $G_V(V, E_V)$ and $G_F(F, E_F)$, corresponding to the primal and dual lattices, where $E_V$ are the edges connecting the vertices $V$ and $E_F$ are the edges connecting the faces $F$. Each qubit is now represented by a single edge in both graphs and $E_v\cup E_f=E$. If we mention a graph spanned by only vertices and edges $(V,E)$, we refer to the graph $G_v$ of the primal lattice. 
+With respect to the toric code, each vertex is equivalent to the star operator type stabilizer generator $v\equiv S_v$, and each face $\gls{nface}\in F$ is equivalent to the plaquette operator $f\equiv P_f$. The edges are thus the qubits, with two edges per qubit, one spanned by neighboring vertices and another by neighboring faces. Due to the duality of the lattice, the equivalence of vertices with stars and faces with plaquettes can naturally be switched. Also due to this, the graph $G$ can be split into two separate graphs $G_V(V, E_V)$ and $G_F(F, E_F)$, corresponding to the primal and dual lattices, where $E_V$ are the edges connecting the vertices $V$ and $E_F$ are the edges connecting the faces $F$. Each qubit is now represented by a single edge in both graphs and $E_v\cup E_f=E$. If we mention a graph spanned by only vertices and edges $(V,E)$, we refer to the graph $G_v$ of the primal lattice. 
 
 
 \subsection{Code threshold}\label{sec:threshold}
 Since the distance $d$ of the toric code on a $L\times L$ is $L$, we would expect that we can improve the robustness of the code by increasing the lattice size $L$. However, this also increases the total number of errors in the lattice, that adds an increased level of complexity in choosing the correct correction operator.
 
-In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $\gls{pcorrect}$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $p_C$. The point of transition in the error rate is called the \emph{code threshold} $\gls{pthres}$.
+In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $\gls{zpcorrect}$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $p_C$. The point of transition in the error rate is called the \emph{code threshold} $\gls{zpthres}$.
 
 The code threshold is not the only parameter that determines the potential of a certain code for practical use. The behavior for error rates far below the threshold is also important, as is the number of physical qubits needed to achieve the sought after level of error suppression. Nevertheless, the code threshold provides us with a very easy and useful tool to benchmark different codes and different decoding algorithms, and to compare them with each other. Therefore, in this thesis we will heavily rely on the value of the code threshold. The value of the threshold is heavily dependent on the chosen error model and the physical conditions of the stabilizer measurements. To compare different decoding algorithms, we therefore will use independent and identically distributed errors (i.i.d. noise), which is the \emph{independent noise model} from section \ref{qec:sec_errormodels}.
 
 For the toric code, when the only source of errors is i.i.d. noise under the independent noise model, and all measurements can be made perfectly, the \emph{optimal threshold} has been proven to be 10.9\% (see section \ref{sec:optimal_decoder}). However, to achieve this value, one needs to consider all possible error configurations on the lattice to identify the correction operator $C$ that is most likely to be equal to the error operator $E$. This is a computationally heavy task that scales exponentially with the lattice size. It is therefore an impractical approach in reality.
 
-Luckily, there exists other decoding algorithms that can find a solution much faster, albeit at the cost of reducing the code threshold. Edmond's \emph{Minimum Weight Perfect Matching} (MWPM) decoder scales cubic with the system, which allows for faster decoding, and achieves a code threshold of 10.3\% (section \ref{sec:MWPMdecoder}). Including faulty measurements the threshold drops down to 2.9\%. The \emph{Union-Find} decoder is a relatively new addition to the set of decoders for the surface code. It scales \emph{almost} linearly with the system, and has a code threshold of 9.9\% (section \ref{sec:UFdecoder}). In this thesis, we will try to combine certain properties of different decoders. In particular, we have created a heuristic for minimum weight which can be applied to the Union-Find decoder.
+Luckily, there exists other decoding algorithms that can find a solution much faster, albeit at the cost of reducing the code threshold. Edmond's \emph{Minimum Weight Perfect Matching} (MWPM) decoder scales cubic with the system, which allows for faster decoding, and achieves a code threshold of 10.3\% (section \ref{sec:MWPMdecoder}). Including faulty measurements the threshold drops down to 2.9\%. The \emph{Union-Find} decoder is a relatively new addition to the set of decoders for the surface code. It scales \emph{almost} linearly with the system, and has a code threshold of 9.9\% (Chapter \ref{ch:UFdecoder}). In this thesis, we will try to combine certain properties of different decoders. In particular, we have created a heuristic for minimum weight which can be applied to the Union-Find decoder.
 
 \section{The planar code}\label{sec:surface_planar}
 
@@ -370,3 +370,8 @@ Other properties of the planar code are very similar to the toric code. The \emp
 The bulk of the planar code is similar to the toric code, where the stabilizer generators consists of 4 Pauli operators. This is especially true as the system size $N$ increases, as the internal elements scale with $N$ and the boundary elements scale with $\sqrt{N}$. Hence, the decoding algorithms for the planar code is very similar to the toric code, albeit some slight alterations will be needed. 
 
 
+\section{Decoders}\label{sec:surface_decoders}
+
+\subsection{The optimal decoder}\label{sec:optimal_decoder}
+
+\subsection{Neural network decoders}

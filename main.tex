@@ -7,6 +7,7 @@
 \usepackage{physics}
 \usepackage{adjustbox}
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
+\usepackage{framed,enumitem} 
 \usepackage[mathscr]{euscript}
 
 \let\oldemptyset\emptyset
@@ -75,40 +76,47 @@
 \tikzset{sel/.style={label position = below, yshift = 0.5cm}}
 
 
-\usepackage[symbols,nomain,nogroupskip,automake]{glossaries-extra}
+\usepackage[symbols,nomain,automake]{glossaries-extra}
+\usepackage{glossary-mcols}
 \makeglossaries
-\glsxtrnewsymbol[description={Pauli group}]{pauligroup}{\ensuremath{\m{P}}}
-\glsxtrnewsymbol[description={Pauli X operator}]{X}{\ensuremath{X}}
-\glsxtrnewsymbol[description={Pauli Y operator}]{Y}{\ensuremath{Y}}
-\glsxtrnewsymbol[description={Pauli Z operator}]{Z}{\ensuremath{Z}}
-\glsxtrnewsymbol[description={Identity operator}]{I}{\ensuremath{I}}
-\glsxtrnewsymbol[description={Logical X operator}]{Xlogical}{\ensuremath{\bar{X}}}
-\glsxtrnewsymbol[description={Logical Z operator}]{Zlogical}{\ensuremath{\bar{Z}}}
-\glsxtrnewsymbol[description={Stabilizer group}]{stabilizergroup}{\ensuremath{\m{S}}}
-\glsxtrnewsymbol[description={Stabilizer, element of $\m{S}$}]{stabilizer}{\ensuremath{S}}
-\glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{stabilizergenerator}{\ensuremath{s}}
-\glsxtrnewsymbol[description={Plaquette operator}]{plaquette}{\ensuremath{P_f}}
-\glsxtrnewsymbol[description={Star operator}]{star}{\ensuremath{S_v}}
-\glsxtrnewsymbol[description={Graph of vertices, edges (and faces)}]{graph}{\ensuremath{G}}
-\glsxtrnewsymbol[description={Vertex set}]{vertices}{\ensuremath{V}}
-\glsxtrnewsymbol[description={vertex, elemet of $V$}]{vertex}{\ensuremath{v}}
-\glsxtrnewsymbol[description={Edge set}]{edges}{\ensuremath{E}}
-\glsxtrnewsymbol[description={edge, element of $E$}]{edge}{\ensuremath{e}}
-\glsxtrnewsymbol[description={Face set}]{faces}{\ensuremath{F}}
-\glsxtrnewsymbol[description={Face, element of $F$}]{face}{\ensuremath{f}}
-\glsxtrnewsymbol[description={Probability of succesfull error correction}]{pcorrect}{\ensuremath{p_C}}
-\glsxtrnewsymbol[description={Threshold probability}]{pthres}{\ensuremath{p_{th}}}
-\glsxtrnewsymbol[description={Error operator, product of Pauli operators}]{perror}{\ensuremath{P}}
-\glsxtrnewsymbol[description={Correction operator, product of Pauli operators}]{correction}{\ensuremath{C}}
-\glsxtrnewsymbol[description={Erasure, subset of $E$}]{erasure}{\ensuremath{\m{E}}}
-\glsxtrnewsymbol[description={Forest of erasure $\m{E}$}]{forest}{\ensuremath{F_\m{E}}}
-\glsxtrnewsymbol[description={Pauli product of set of edges}]{pauliproduct}{\ensuremath{\mathscr{P}}}
-\glsxtrnewsymbol[description={Correction set, subset of $E$}]{correctionset}{\ensuremath{\m{C}}}
-\glsxtrnewsymbol[description={Boundary of an edge set}]{boundary}{\ensuremath{\mathscr{B}}}
+\glsxtrnewsymbol[description={Pauli group}]{spauligroup}{\ensuremath{\m{P}}}
+\glsxtrnewsymbol[description={Pauli X operator}]{oX}{\ensuremath{\hat{X}}}
+\glsxtrnewsymbol[description={Pauli Y operator}]{oY}{\ensuremath{\hat{Y}}}
+\glsxtrnewsymbol[description={Pauli Z operator}]{oZ}{\ensuremath{\hat{Z}}}
+\glsxtrnewsymbol[description={Identity operator}]{oI}{\ensuremath{\hat{I}}}
+\glsxtrnewsymbol[description={Logical X operator}]{oXlogical}{\ensuremath{\hat{X}_L}}
+\glsxtrnewsymbol[description={Logical Z operator}]{oZlogical}{\ensuremath{\hat{Z}_L}}
+
+\glsxtrnewsymbol[description={Stabilizer group}]{sstabilizergroup}{\ensuremath{\m{S}}}
+\glsxtrnewsymbol[description={Stabilizer, element of $\m{S}$}]{zstabilizer}{\ensuremath{S}}
+\glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{zstabilizergenerator}{\ensuremath{s}}
+\glsxtrnewsymbol[description={Plaquette operator}]{oplaquette}{\ensuremath{\hat{P}_f}}
+\glsxtrnewsymbol[description={Star operator}]{ostar}{\ensuremath{\hat{S}_v}}
+\glsxtrnewsymbol[description={Graph of a surface code}]{ngraph}{\ensuremath{G}}
+\glsxtrnewsymbol[description={Vertex set}]{svertices}{\ensuremath{V}}
+\glsxtrnewsymbol[description={vertex, elemet of $V$}]{nvertex}{\ensuremath{v}}
+\glsxtrnewsymbol[description={Edge set}]{sedges}{\ensuremath{E}}
+\glsxtrnewsymbol[description={edge, element of $E$}]{nedge}{\ensuremath{e}}
+\glsxtrnewsymbol[description={Face set}]{sfaces}{\ensuremath{F}}
+\glsxtrnewsymbol[description={Face, element of $F$}]{nface}{\ensuremath{f}}
+\glsxtrnewsymbol[description={Probability of error correction}]{zpcorrect}{\ensuremath{p_C}}
+\glsxtrnewsymbol[description={Threshold probability}]{zpthres}{\ensuremath{p_{th}}}
+\glsxtrnewsymbol[description={Error operator}]{operror}{\ensuremath{\hat{E}}}
+\glsxtrnewsymbol[description={Correction operator}]{ocorrection}{\ensuremath{\hat{C}}}
+\glsxtrnewsymbol[description={Erasure, subset of $E$}]{serasure}{\ensuremath{\m{R}}}
+\glsxtrnewsymbol[description={Forest of erasure $\m{R}$}]{sforest}{\ensuremath{\m{F}_\m{R}}}
+\glsxtrnewsymbol[description={Pauli product of set of edges}]{ppauliproduct}{\ensuremath{\mathscr{P}}}
+\glsxtrnewsymbol[description={Correction set, subset of $E$}]{scorrectionset}{\ensuremath{\m{C}}}
+\glsxtrnewsymbol[description={Boundary of an edge set}]{pboundary}{\ensuremath{\mathscr{B}}}
 
 
+\newcommand*{\Ngroupname}{Objects, elements of sets}
+\newcommand*{\Ogroupname}{Operators}
+\newcommand*{\Sgroupname}{Sets and groups}
+\newcommand*{\Pgroupname}{Set operations}
+\newcommand*{\Zgroupname}{Others}
 
-
+\renewcommand*{\glossarypreamble}{\vspace{-\baselineskip}}
 \usepackage[style=numeric-comp, sorting=none]{biblatex}
 \addbibresource{cit.bib}
 
@@ -124,7 +132,6 @@
   \include{_titlepage}
   \setcounter{tocdepth}{1}
   \tableofcontents
-  \printglossary[type=symbols,style=long]
   \clearpage
 
   \input{tikzfigs/function_draw_lattices}
@@ -133,9 +140,11 @@
   % \include{preliminary_report}
   \include{chapters/ch_introduction}
   \include{chapters/ch_notations}
+  \printglossary[type=symbols, style={mcoltreegroup}]
   \include{chapters/ch_qec_basics}
   \include{chapters/ch_surface_code}
-  \include{chapters/ch_decoders}
+  \include{chapters/ch_mwpmdecoder}
+  \include{chapters/ch_ufdecoder}
   \include{chapters/ch_ufbb}
   \include{chapters/ch_ufmodifications}
 
