@@ -814,7 +814,7 @@ To circumvent the PDC multiplicity, the calculation is suspended as much as poss
   Parity and delay calculations are only performed on the undefined part of a node set when a cluster is grown, not directly after a join.
 \end{lemma}
 
-The only task now is to store where the even subset $'\nset^e$ of the FO-join starts in the ancestry of subset $\nset^o$, as the sub-root of $'\nset^e$ is the starting point of the DFS's of the PDC. For each join between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $'n^o, 'n^e$, we additionally store the sub-root $'n^e_r$ of subset $'\m{N}^e$ at the root node of the resulting set $\m{N}^{o}$ as $n^{o}_r.u$, the \emph{undefined} sub-root. If $\m{N}^{o}$ is selected for growth as per theorem \ref{the:bucket_order}, we apply $\codefunc{CalcParity}(n^{o}_r.u)$ and $\codefunc{CalcDelay}(n^{o}_r.u)$ calculate parities and delays in undefined parts of the set, if it exists. The recursiveness of these function will make sure that the PDC are performed on all children nodes of (and including) $n^{o}_r.u$. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
+The only task now is to store where the even subset $'\nset^e$ of the FO-join starts in the ancestry of subset $\nset^o$, as the sub-root of $'\nset^e$ is the starting point of the DFS's of the PDC. For each join between odd node set $'\m{N}^o$ and even node set $'\m{N}^e$ on nodes $'n^o, 'n^e$, we additionally store the sub-root $'n^e_r$ of subset $'\m{N}^e$ at the root node of the resulting set $\m{N}^{o}$ as $n^{o}_r.u$, the \emph{undefined} sub-root. If $\m{N}^{o}$ is selected for growth, we apply $\codefunc{CalcParity}(n^{o}_r.u)$ and $\codefunc{CalcDelay}(n^{o}_r.u)$ calculate parities and delays in undefined parts of the set, if it exists. The recursiveness of these function will make sure that the PDC are performed on all children nodes of (and including) $n^{o}_r.u$. We then call $\codefunc{Bloom}(n_r)$ per theorem \ref{the:grownode}.
 
 This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any IO-join, we don't know yet whether another O-join will occur, thus each IO-join to cluster $''\nset^o$ is treated as a FO-join. For a IO-join, we thus also store the undefined sub-root $u_1$ at the root $r_1=''n_r^o$. If $''\nset^o$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and lastly the "real final" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined sub-root $u_2='n_r^e$ at the new root of $r_2='n_r^o$. Due to theorem \ref{the:nodejoint}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions of the set.
 
@@ -1297,3 +1297,45 @@ The inspiration for the UF decoder is the Peeling decoder \cite{delfosse2017line
 To account for these erasures, we must construct the node sets for these initial erasure clusters. We can easily check that for an erasure-cluster, the PMW for each neighboring vertex is different. Each vertex in the cluster is therefore a node in $\nset$, where each syndrome vertex is a syndrome-node $\sigma$, and every other vertex is a junction-node $j$. Note that if the erasure is connected to the boundary, we need to make sure that only a single edge is connected to the boundary, where the single boundary vertex in the cluster naturally is a boundary node $\beta$. After constructing these initial clusters and node sets, we can proceed to the UFBB algorithm.  
 
 \section{Performance}
+
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { 
+    | >{\raggedright\arraybackslash}X 
+    || >{\centering\arraybackslash}X 
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.10229 \pm 0.00007$ & $0.7312$ & $0.02846 \pm 0.00003$ & $0.9165$ \\
+   \hline
+   Planar code  & $0.9927 \pm 0.0001$ & $0.8689$ & $0.02711 \pm 0.00006$ & $0.9480$ \\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Union-Find Balanced-Bloom decoder. $L = 8:8:64, L=8:4:24$}\label{tab:ufbblow}
+\end{table}
+
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { 
+    | >{\raggedright\arraybackslash}X 
+    || >{\centering\arraybackslash}X 
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.1007 \pm 0.0001$ & $0.769 $ & $0.0278 \pm 0.0003$ & $0.941$ \\
+   \hline
+   Planar code  & $0.9615 \pm 0.0004$ & $0.904$ &$0.02455 \pm 0.0004$ & $0.982$ \\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Union-Find Balanced-Bloom decoder $L = 72:8:96, L=28:4:44$}\label{tab:ufbbhigh}
+\end{table}

@@ -138,7 +138,7 @@ Recall the logical operators consists of the Pauli operators, and must commute w
 
 Note that these logical operators are not unique. As the logical operators commute with the stabilizers, these $\hat{X}_L$ and $\hat{Z}_L$ operators can be multiplied with e.g. a plaquette or star operator, respectively, which create a diversion from its original path. But as the path still loops around the torus, this is still a valid logical operator.
 
-The logical operators have a minimum length of $L$ qubits, which is also the distance of the toric code (see Definition \ref{def:disntance}). The toric code is therefore a $[L^2,2,L]$ in the [n,k,d] notation. This implies that the toric code might be more robust against errors if the size of the lattice is increased. Later we will see that this is also very much dependent on the type of decoder that is used, and that different decoders will lead to different regimes of error for which this reasoning is true.
+The logical operators have a minimum length of $L$ qubits, which is also the distance of the toric code (see Definition \ref{def:distance}). The toric code is therefore a $[L^2,2,L]$ in the [n,k,d] notation. This implies that the toric code might be more robust against errors if the size of the lattice is increased. Later we will see that this is also very much dependent on the type of decoder that is used, and that different decoders will lead to different regimes of error for which this reasoning is true.
 
 \def\QS{10}
 \def\s{1}
@@ -374,3 +374,16 @@ The bulk of the planar code is similar to the toric code, where the stabilizer g
 \subsection{The optimal decoder}\label{sec:optimal_decoder}
 
 \subsection{Neural network decoders}
+
+\section{Threshold simulations}
+
+To test for the threshold Pauli error value, we simulate for a large number of samples at various lattice sizes for a range of Pauli error rates around $p = 0.1$. For the threshold, only Pauli X errors are considered, as Pauli Z errors will give the same result. For each lattice size and Pauli error rate, the samples will return a probability rate of successful decodings $P_{succes}$. We will then fit the data to the function (\cite{wang2003confinement}, equation 43):
+\begin{eqnarray}
+% \nonumber % Remove numbering (before each equation)
+P_{succes} &=& A + Bx + Cx^2 + \begin{cases}
+                                D_{even}\cdot L^{-1/\mu_{even}} &\text{L even}\\
+                                D_{odd}\cdot L^{-1/\mu_{odd}} &\text{L odd}
+                              \end{cases}\\
+\text{with } x &=& (p - p_{thres})L^{1/\nu}
+\end{eqnarray}\label{eq.4.fit}
+where all but $P_{succes}$, $p$ and $L$ are fitting parameters. Note that there are distinct values for $D$ and $\mu$ for even and odd lattices. This is due to a discrepancy in the decoder threshold caused by a nonnegligible finite-size effect for even and odd lattices. Therefore, for each fit done on any dataset, only data from even or odd lattices will be selected. The fitting of the data will be done in Python using a least squared method. 

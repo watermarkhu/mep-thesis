@@ -41,7 +41,7 @@ For this reason, if the correction $\hat{C}=\n{P}(\tilde{\m{E}_\m{R}})$ is appli
 \end{definition}
 The first step  is to produce $\m{T}_{\tilde{\m{E}}}$ inside $\m{R}$, where all syndrome vertices $\sigma$ are included in the composition per definition \ref{def:forest}. Hence if $\m{R}$ is a connected graph, then $\m{T}_\m{R}$ is a connected \emph{acyclic} graph. Such a forest can be found in linear time by a depth-first search of $\m{R}$. We initiate $\m{T}_\m{R}$ as a empty set, pick some vertex $v$ in $\n{B}(\m{R})$ and add edges $(u,v)\notin \m{T}_\m{R}$ to $\m{T}_\m{R}$ and apply it recursively to the vertices $u$ (Algorithm \ref{algo:forest}). Next, the decoder further reduces the size of the spanning forest $\m{T}_\m{R}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{scorrectionset}\subseteq \m{T}_\m{R}$, initiated as an empty set. The decoder loops over all edges in $\m{T}_\m{R}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $\m{T}_\m{R}$. If the so-called \emph{pendant} vertex $u$ belong to the set of nontrivial syndrome measurements $\sigma$, remove $u$ from $\sigma$, add $e$ to $\m{C}$, and \emph{flip} the vertex $v$ in $\sigma$, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $\m{T}_\m{R}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in $\m{T}_\m{R}$ and $\hat{C}=\n{P}(\m{C})$.
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Connected graph $\m{R}$}
   \KwResult{Connected acyclic graph $\m{T}_\m{R}$}
@@ -59,7 +59,7 @@ The first step  is to produce $\m{T}_{\tilde{\m{E}}}$ inside $\m{R}$, where all 
 
 \input{tikzfigs/peeling_decoder}
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Graph $G = (\m{V},\m{E})$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}$}
   \KwResult{Correction set $m{C}$}
@@ -138,7 +138,7 @@ For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the
 
 Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a maximum of 1 element of $\m{V}_\delta$. The forests are grown starting from vertices of the set $\m{V}_\delta$, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests $\{\m{T}_1, \m{T}_2,...\}$ that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma \ref{lem:anyforest}. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm \ref{algo:peelbound}.
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Graph $G = (\m{V}_{\iota\cup\omega}\cup \m{V}_\delta,E)$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}_{\iota\cup\omega}$}
   \KwResult{Correction set $\m{C}$}
@@ -171,7 +171,7 @@ The independent noise model introduces extra Pauli-X errors on qubits or edges $
 \begin{proposition}
   The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{\m{R}}=f(\m{R},\sigma)$, such that theorem \ref{the:anyevenparity} is satisfied. The validated erasure $\bar{\m{R}}$ and syndrome set $\sigma$ are passed to the Peeling decoder and can decoded as before.
 \end{proposition}
-\begin{figure}[h]
+\begin{figure}[htb]
   \centering
   \begin{tikzpicture}
     \node[draw, circle, OrangeRed, fill=OrangeRed!50!white, line width=1, text=black] (s1) at (0,1.5) {$\sigma$};
@@ -208,7 +208,7 @@ The minimum size of a cluster is now defined by an empty edge set and a single s
 \end{definition}
 
 The function \codefunc{Find}$(v)$ is performed by following the parent pointers to the root $r_v$ (algorithm \ref{algo:find}), and its cost is therefore dependant on the height of the vertex in the tree; the distance of an element to the root. The function can be applied recursively such that all vertices in the sequence of parent pointers are pointed to the root, which decreases the height of the tree and reduces the cost to every future call to \codefunc{Find}. This is called \emph{path compression}. 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{A vertex $v\in \m{V}$ of graph $G=(\m{V},\m{E})$}
   \KwResult{The root $r_v$ of $T(r_v)\ni v$ (def. \ref{def:trees})}
@@ -223,7 +223,7 @@ The function \codefunc{Find}$(v)$ is performed by following the parent pointers 
 \end{algorithm}
 
 The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ and $r_v$ by making one of the roots a child of another. By comparing the sizes of the trees $|T(r_u)|, |T_(r_v)|$, the height of the combined tree can be minimized, again to reduce the cost to any future calls to \codefunc{Find}. This is called \emph{union by weight}, where the weight stands of the number of elements in the tree (algorithm \ref{algo:unionweight}). Alternatively, \emph{union by rank} compares the ranks of vertex nodes $r_u,r_v$, where the rank is defined as the maximum height of the tree (algorithm \ref{algo:unionrank}).
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Vertex roots $r_u\in \m{V}$, $r_v\in \m{V}$}
   \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
@@ -241,7 +241,7 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
   \caption{\codefunc{Union} with \emph{union by weight}}\label{algo:unionweight}
 \end{algorithm}
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Vertex roots $r_u\in \m{V}$, $r_v\in \m{V}$}
   \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
@@ -286,7 +286,7 @@ Thus for every cluster $c_i$, the disjoint-set tree of vertices $\m{V}_i=c_i.\m{
 
 Finally, in each round of growth, there may be many odd-parity clusters $\{c_{1}, c_{2},...\}$, which we collect in a list $\gls{sloddlist}$. If two clusters are immediately merged within the same time step $t$ when some boundary edge $e$ reaches $e.support=2$, these clusters are merged into one, and it is not possible to track which part of the merged cluster have completed its growth and which have not. To this end, in a round of growth, \codefunc{Union}'s are applied after all clusters have grown. This is accomplished by initiating a \emph{merging} list $\gls{slmerging}$ at the start of each round of growth; fully-traced edges are appended to this list; and merges are applied at the end of each round. We denote the subroutine for the growth of a cluster \codefunc{Grow} (Algorithm \ref{algo:ufgrow}).
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Cluster $c_i$ with boundary $\delta \m{V}_i$, $\m{L}_m$}
   \KwResult{Cluster with traced boundary edges}
@@ -318,7 +318,7 @@ We now describe the pre-processing step of syndrome validation. A round of growt
 
 % Finally, we need to update the elements in the cluster list $\m{L}_o$. First, we replace each element $u$ with its potential new cluster root \codefunc{find(u)} in line 7. We can avoid creating duplicate elements by maintaining an extra look-up table that keeps track of the elements $\m{L}_o$ at the beginning of each round of growth. In line 8, we update the \codeword{boundary} lists of all the clusters in $\m{L}_o$, and in line 9, even clusters are removed from the list, preparing it for the next round of growth.
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{A graph $G=(\m{V},\m{E})$, an erasure $\m{R} \subseteq \m{E}$ and syndrome $\sigma \subseteq \m{V}$}
   \KwResult{Correction set $\m{C}$}
@@ -383,7 +383,7 @@ In the context of weighted growth, if two clusters have the same size, it does n
 \end{definition}
 As we trace the boundary edges per half-edge, a single round of growth does not necessarily add new vertices and increase $|c_i|$. Nevertheless, a cluster with size $|c_i|$ and boundary edges with support 1 is arguably \emph{larger} than a cluster with the same size $|c_i|$ and boundary edges with support 0. For this reason, we define 2 buckets per cluster size $|c_i|=k$. Based on the preceding paragraphs, we define a function \codefunc{Place} in Algorithm \ref{algo:place} that sorts a cluster in an appropriate bucket. After a cluster $c_i$ is grown, during which it may have merged with other clusters, we apply $\codefunc{Place}(c_i)$ immediately to place it in a new bucket if it has odd parity. However, as merges between clusters are maintained by the merging list $\m{L}_m$ and merges are applied after cluster growths of the same iterations, we need to maintain an additional list $\gls{slplace}$ place a list of cluster after merges.  
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{Cluster $c_i$, list of buckets $\m{L}_b$}
   \KwResult{Cluster placed in bucket if it has odd parity}
@@ -518,7 +518,7 @@ To maintain these dynamic trees $\m{T}_i$ has some benefits that may not be imme
 
 Furthermore, when dynamic cluster trees are not maintained, the shape of the forest $\m{T}_{\m{R}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}), and therefore the matching weight $|\m{C}|$, is dependent on the seed, the vertices where the depth-first search is initiated. If the seeds are selected randomly, minimum weight matchings within $\m{R}_i$ are not certain. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in \m{V}_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $\m{T}_{\m{R}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic tree $\m{T}_i$ during some growth iteration are equivalent to the breadth of edges added to $\m{T}_{\m{R}_i}$ in one of the breadth-first searches. 
 
-\begin{algorithm}[h]
+\begin{algorithm}[htb]
   \BlankLine
   \KwData{A graph $G=(\m{V},\m{E})$, an erasure $\m{R} \subseteq \m{E}$ and syndrome $\sigma \subseteq \m{V}$}
   \KwResult{Correction set $\m{C}$}
@@ -551,8 +551,30 @@ Furthermore, when dynamic cluster trees are not maintained, the shape of the for
   \tcp{Peeling decoder}
   Run Peeling decoder (al. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
   \BlankLine
-  \caption{Union-Find decoder with weighted growth and dynamic forests}\label{algo:ufbucketdf}
+  \caption{Union-Find decoder with bucket-weighted growth and dynamic forests}\label{algo:ufbucketdf}
 \end{algorithm}
 
 
 \section{Performance}
+
+
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { 
+    | >{\raggedright\arraybackslash}X 
+    || >{\centering\arraybackslash}X 
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.10009 \pm 0.00002$ & $0.7279$ & $0.02685 \pm 0.00001$ & $0.9208$ \\
+   \hline
+   Planar code & $0.99939 \pm 0.00002$ & $0.84595$ & $0.02660 \pm 0.00001$ & $0.932$\\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Union-Find decoder with bucket-weighted growth and dynamic forests $L = 8:8:128, L=8:4:40$}\label{tab:uf}
+\end{table}

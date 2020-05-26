@@ -11,7 +11,31 @@ Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the er
 
 \section{Performance}
 
-\begin{figure}[ht]
+
+
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { 
+    | >{\raggedright\arraybackslash}X 
+    || >{\centering\arraybackslash}X 
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X
+    | >{\centering\arraybackslash}X | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.10349 \pm 0.00004$ & $0.7158$ & $0.02965 \pm 0.00003$ & $0.9024$ \\
+   \hline
+   Planar code  & $0.10292 \pm 0.00005$ & $0.8478$ & $0.02928 \pm 0.00003$ & $0.928$ \\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Minimum-Weight Perfect Matching decoder $L = 8:8:64, L=8:2:22$}\label{tab:mwpm}
+\end{table}
+
+
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
       \input{pgfplots/mwpm_toric_2d.pgf}
@@ -22,7 +46,7 @@ Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the er
     \caption{<caption>}
     \label{fig:thres_mwpm_2d}
   \end{figure}
-  \begin{figure}[ht]
+  \begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
       \input{pgfplots/mwpm_toric_3d.pgf}

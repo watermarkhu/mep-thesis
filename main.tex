@@ -9,15 +9,31 @@
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{framed,enumitem} 
 \usepackage[mathscr]{euscript}
+\usepackage{xcolor, xparse, todonotes}
 
-\let\oldemptyset\emptyset
-\let\emptyset\varnothing
-
+% Set math environments
 \setlength{\parindent}{24pt}
 \newtheorem{definition}{Definition}[chapter]
 \newtheorem{lemma}{Lemma}[chapter]
 \newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{proposition}{Proposition}[chapter]
+
+% Set new commands
+\newcommand{\codeword}[1]{\texttt{\textcolor{MidnightBlue}{#1}}}
+%\newcommand{\codefunc}[1]{\texttt{\textcolor{OliveGreen}{#1}}}
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\newcommand{\codefunc}[1]{\texttt{#1}}
+\newcommand{\m}[1]{\mathcal{#1}}
+\newcommand{\n}[1]{\mathscr{#1}}
+\newcommand{\bound}{\mathscr{B}}
+\newcommand{\akker}{\mathscr{A}}
+\newcommand{\nset}{\mathcal{N}}
+\newcommand{\vset}{\mathcal{V}}
+\newcommand{\pre}[1]{ {}^{#1} }
+\newcommand{\ceil}[1]{{\left \lceil #1 \right \rceil }}
+\newcommand{\floor}[1]{{\left \lfloor #1 \right \rfloor }}
+
 
 % Set graphics folder
 \usepackage{float}
@@ -50,23 +66,11 @@
     boxed title style={boxrule=-1pt},
     fonttitle=\bfseries, coltitle=black, algotitle={}, #1}
 
-\usepackage{xcolor, listings, xparse, todonotes}
 
-\newcommand{\codeword}[1]{\texttt{\textcolor{MidnightBlue}{#1}}}
-%\newcommand{\codefunc}[1]{\texttt{\textcolor{OliveGreen}{#1}}}
-\newcommand{\codefunc}[1]{\texttt{#1}}
-\newcommand{\m}[1]{\mathcal{#1}}
-\newcommand{\n}[1]{\mathscr{#1}}
-\newcommand{\bound}{\mathscr{B}}
-\newcommand{\akker}{\mathscr{A}}
-\newcommand{\nset}{\mathcal{N}}
-\newcommand{\vset}{\mathcal{V}}
-\newcommand{\pre}[1]{ {}^{#1} }
-\newcommand{\ceil}[1]{{\left \lceil #1 \right \rceil }}
-\newcommand{\floor}[1]{{\left \lfloor #1 \right \rfloor }}
-
+% listings of pseudocodes
+\usepackage{listings}
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
-% Set quantikz settings
+
 \usepackage{tikz}
 \usetikzlibrary{quantikz,shapes,calc,math,patterns}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
@@ -75,9 +79,10 @@
 \tikzset{selection/.style={draw, signal, signal to =south, minimum size = 1em, inner sep = 0pt}}
 \tikzset{sel/.style={label position = below, yshift = 0.5cm}}
 
-
+% Glossary
 \usepackage[symbols,nomain,automake]{glossaries-extra}
 \usepackage{glossary-mcols}
+
 \makeglossaries
 \glsxtrnewsymbol[description={Pauli group}]{spauligroup}{\ensuremath{\m{P}}}
 \glsxtrnewsymbol[description={Pauli X operator}]{oX}{\ensuremath{\hat{X}}}
@@ -86,12 +91,10 @@
 \glsxtrnewsymbol[description={Identity operator}]{oI}{\ensuremath{\hat{I}}}
 \glsxtrnewsymbol[description={Logical X operator}]{oXlogical}{\ensuremath{\hat{X}_L}}
 \glsxtrnewsymbol[description={Logical Z operator}]{oZlogical}{\ensuremath{\hat{Z}_L}}
-
 \glsxtrnewsymbol[description={Stabilizer group}]{sstabilizergroup}{\ensuremath{\m{S}}}
 \glsxtrnewsymbol[description={Stabilizer, element of $\m{S}$}]{ostabilizer}{\ensuremath{\hat{S}}}
 \glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{sstabilizergenset}{\ensuremath{\mathfrak{s}}}
 \glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{ostabilizergenerator}{\ensuremath{\hat{s}}}
-
 \glsxtrnewsymbol[description={Plaquette operator}]{oplaquette}{\ensuremath{\hat{P}_f}}
 \glsxtrnewsymbol[description={Star operator}]{ostar}{\ensuremath{\hat{S}_v}}
 \glsxtrnewsymbol[description={Graph of a surface code}]{ngraph}{\ensuremath{G}}
@@ -118,16 +121,20 @@
 \glsxtrnewsymbol[description={Bucket with number $k$}]{zbucket}{\ensuremath{b_k}}
 \glsxtrnewsymbol[description={List of clusters for placement}]{slplace}{\ensuremath{\m{L}_p}}
 
-
+\renewcommand*{\glossarypreamble}{\vspace{-\baselineskip}}
 \newcommand*{\Ngroupname}{Objects, elements of sets}
 \newcommand*{\Ogroupname}{Operators}
 \newcommand*{\Sgroupname}{Sets and groups}
 \newcommand*{\Pgroupname}{Set operations}
 \newcommand*{\Zgroupname}{Others}
 
-\renewcommand*{\glossarypreamble}{\vspace{-\baselineskip}}
+% Referencing
 \usepackage[style=numeric-comp, sorting=none]{biblatex}
 \addbibresource{cit.bib}
+
+% Tables
+\usepackage{tabularx, hhline} 
+
 
 \title{mep-thesis}
 \author{Shui Hu}

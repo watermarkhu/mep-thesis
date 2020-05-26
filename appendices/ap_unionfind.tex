@@ -31,7 +31,7 @@ The pointer update in each set during a \codefunc{Union} can be minimized by a d
 \tikzstyle{lw1}=[line width=1]
 \tikzstyle{fnode}=[draw, circle, minimum size=0.55cm, inner sep=0, lw1]
 
-\begin{figure}[]
+\begin{figure}[htb]
   \centering
   \begin{tikzpicture}[on grid]
     \node at (1.5,-1) {\emph{(a)}};
@@ -143,7 +143,7 @@ The \emph{path compression} rule for the \codefunc{Find} function is also very s
   \node[fnode] at (#1,#2) (#3) {$#3$};
   \draw[lw1, fill=white!80!black] (#3.south) -- +(0.3,-1) -- +(-0.3,-1) -- cycle;
 }
-\begin{figure}[h]
+\begin{figure}[htb]
   \centering
   \begin{tikzpicture}
     \DRAWTREE{0}{0}{e}
