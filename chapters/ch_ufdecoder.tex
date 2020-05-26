@@ -4,55 +4,55 @@ The Union-Find decoder is a new fast decoding algorithm for topological codes to
 Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in the coming sections and perform analyses on their complexities.
 
 \section{Peeling decoder}
-The Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \eqref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \eqref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $I$, $X$, $Y$ or $Z$ chosen uniformly at random.
+The Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \eqref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \eqref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $\hat{I}$, $\hat{X}$, $\hat{Y}$ or $\hat{Z}$ chosen uniformly at random.
 \begin{theorem}\label{the:independentxy}
-  For erasure noise of equation \eqref{qec:eq:erasure}, where a qubit is erased and replaced with a totally mixed state equivalent to a qubit that suffers from uniformly chosen $\{I,X,Y,Z\}$, the primal and dual lattices of the surface code can be decoded independently from each other.
+  For erasure noise of equation \eqref{qec:eq:erasure}, where a qubit is erased and replaced with a totally mixed state equivalent to a qubit that suffers from uniformly chosen $\{\hat{I},\hat{X},\hat{Y},\hat{Z}\}$, the primal and dual lattices of the surface code can be decoded independently from each other.
 \end{theorem}
 \begin{proof}
-  Pauli $X$ errors exclusively trigger nontrivial star operator measurement on the vertices of the primal lattice. Pauli $Z$ errors exclusively trigger trigger nontrivial plaquette measurements on the vertices of the dual lattice, or faces of the primal lattice. Recall from section \ref{sec:toricgraph} that a graph $G(V,E,F)$ can be separated into sub-graphs $G_{V}(V,E_V)$ and $G_{F}(F,E_F)$. An uniformly distributed $\{I,X,Y,Z\}$ on $G(V,E,F)$ is hence equivalent to uniformly distributed $\{I,X\}$ and $\{I,Z\}$ that simultaneously and separately apply to $G_{V}$ and $G_{F}$, respectively, since $\{I,X\} \otimes \{I,Z\}=\{I,X,Y,Z\}$.
+  Pauli-X errors exclusively trigger nontrivial star operator measurement on the vertices of the primal lattice. Pauli-Z errors exclusively trigger trigger nontrivial plaquette measurements on the vertices of the dual lattice, or faces of the primal lattice. Recall from section \ref{sec:toricgraph} that a graph $G(\m{V},\m{E},\m{F})$ can be separated into sub-graphs $G_v(\m{V},\m{E}_v)$ and $G_f(\m{F},\m{E}_f)$. An uniformly distributed $\{\hat{I},\hat{X},\hat{Y},\hat{Z}\}$ on $G(\m{V},\m{E},\m{F})$ is hence equivalent to uniformly distributed $\{\hat{I}, \hat{X}\}$ and $\{\hat{I}, \hat{Z}\}$ that simultaneously and separately apply to $G_v$ and $G_f$, respectively, since $\{\hat{I}, \hat{X}\} \otimes \{\hat{I}, \hat{Z}\}=\{\hat{I},\hat{X},\hat{Y},\hat{Z}\}$.
 \end{proof}
 \begin{definition}\label{def:erasure}
-  Let the subset of qubits that suffer an erasure error (equation \eqref{qec:eq:erasure}) on a lattice $G(V,E)$ be denoted by $\gls{serasure}\subseteq E$. Edges in $\m{E}$ are replaced by uniformly distributed $\{I,X\}$ for the primal lattice (and $\{I,Z\}$ for the dual lattice). Let the set of edges that suffer an Pauli error due to this replacement by $P_\m{E}\subseteq \m{E}$.
+  Let the subset of qubits that suffer an erasure error (equation \eqref{qec:eq:erasure}) on a lattice $G(\m{V},\m{E})$ be denoted by $\gls{serasure}\subseteq \m{E}$. Edges in $\m{R}$ are replaced by uniformly distributed $\{\hat{I}, \hat{X}\}$ for the primal lattice (and $\{\hat{I}, \hat{Z}\}$ for the dual lattice). Let the set of edges that suffer an Pauli error due to this replacement by $\m{E}_\m{R}\subseteq \m{R}$.
 \end{definition}
 \begin{definition}\label{def:pauliprod}
-  The \emph{Pauli product} of a set of edges $\tilde{E}$ is the defined as the product of Pauli operators on each of the edges in the set
+  The \emph{Pauli product} of a set of edges $\tilde{\m{E}}$ is the defined as the product of Pauli operators on each of the edges in the set
   \begin{equation}\label{eq:pauliprod}
-    \gls{ppauliproduct}(\tilde{E}) = \prod_{e\in \tilde{E}} \hat{P}_e,
+    \gls{ppauliproduct}(\tilde{\m{E}}) = \prod_{e\in \tilde{\m{E}}} \hat{P}_e,
   \end{equation}
-  where the Pauli operator $\hat{P}$ corresponds to $X$ if $\tilde{E}\subseteq E_v$ and otherwise $Z$ when $\tilde{E}\subseteq E_f$.
+  where the Pauli operator $\hat{P}$ corresponds to $\hat{X}$ if $\tilde{\m{E}}\subseteq \m{E}_v$ and otherwise $\hat{Z}$ when $\tilde{\m{E}}\subseteq \m{E}_f$.
 \end{definition}
 
 \subsection{Decoder process}
-In this section, we will only consider the sub-graph $G_{V}(V,E_V)$ and denote it simply by $G(V,E)$. We describe the decoding process of an erasure $\m{E}$ with errors on $P_\m{E}$. Error detection is performed in the same way as Pauli errors; by measuring the set of stabilizer operators on vertices $V$, which returns a set of nontrivial syndrome measurements $\sigma \subseteq V$. The decoder of an erasure error is thus provided with the extra information $\m{E}$ on top of the nontrivial measurements $\sigma$. The decoding process of sub-graph $G_{F}(F,E_F)$ is equivalent to the process of $G_{V}(V,E_V)$.
+In this section, we will only consider the sub-graph $G_v(\m{V},\m{E}_v)$ and denote it simply by $G(\m{V},\m{E})$. We describe the decoding process of an erasure $\m{R}$ with errors on $\m{E}_\m{R}$. Error detection is performed in the same way as Pauli errors; by measuring the set of stabilizer operators on vertices $\m{V}$, which returns a set of nontrivial syndrome measurements $\sigma \subseteq \m{V}$ (see Definition \ref{def:syndrome}). The decoder of an erasure error is thus provided with the extra information $\m{R}$ on top of the nontrivial measurements $\sigma$. The decoding process of sub-graph $G_f(\m{F},\m{E}_f)$ is equivalent to the process of $G_v(\m{V},\m{E}_v)$.
 \begin{lemma}\label{lem:peelinguni}
-  For an erasure $\m{E} \subseteq E$ whose qubits are reinitiated with uniformly distributed Pauli errors resulting in errors on $P_\m{E}$, and a measured syndrome $\sigma$, any error $\tilde{P}_\m{E} \subseteq \m{E}$ that produces $\sigma$ in a measurement is the most likely set of errors.
+  For an erasure $\m{R} \subseteq \m{E}$ whose qubits are reinitialized with uniformly distributed Pauli errors resulting in errors on $\m{E}_\m{R}$, and a measured syndrome $\sigma$, any error $\tilde{\m{E}_\m{R}} \subseteq \m{R}$ that produces $\sigma$ in a measurement is the most likely set of errors.
 \end{lemma}
 \begin{proof}
-  % For the coset $\tilde{P}_\m{E}\cdot S$, where $\tilde{P}_\m{E}$ is some Pauli error caused by an erasure and $S$ is a set of stabilizers that act trivially on the codespace, the most likely configuration is the one that maximizes probability $\mathbb{P}(\tilde{P}_\m{E}\cdot S|\m{E},\sigma)$, where $\m{E}$ and $\sigma$ are known. This probability is proportional to $|\tilde{P}_\m{E}\cdot S \cap\m{E}|$. But since all qubits in $\m{E}$ suffer a Pauli error and this error is uniformly distributed, all configurations of $\tilde{P}_\m{E}$ have equal probability. 
-  In the absence of Pauli errors, all edges with some error $P$ must lie inside $\m{E}$. Therefore, for any measured syndrome $\sigma$, the path of errors must also be in the erasure, which can be denoted by $\tilde{P}_\m{E} \subseteq \m{E}$. Since all errors in $\m{E}$ are uniformly distributed, any set of edges with errors $\tilde{P}_\m{E}$ with syndrome $\sigma$ is the most likely set.
+  % For the coset $\tilde{\m{E}_\m{R}}\cdot S$, where $\tilde{\m{E}_\m{R}}$ is some Pauli error caused by an erasure and $S$ is a set of stabilizers that act trivially on the codespace, the most likely configuration is the one that maximizes probability $\mathbb{P}(\tilde{\m{E}_\m{R}}\cdot S|\m{R},\sigma)$, where $\m{R}$ and $\sigma$ are known. This probability is proportional to $|\tilde{\m{E}_\m{R}}\cdot S \cap\m{R}|$. But since all qubits in $\m{R}$ suffer a Pauli error and this error is uniformly distributed, all configurations of $\tilde{\m{E}_\m{R}}$ have equal probability. 
+  In the absence of Pauli errors, all edges with some error must lie inside $\m{R}$. Therefore, for any measured syndrome $\sigma$, the path of errors must also be in the erasure, which can be denoted by $\tilde{\m{E}_\m{R}} \subseteq \m{R}$. Since all errors in $\m{R}$ are uniformly distributed, any set of edges with errors $\tilde{\m{E}_\m{R}}$ with syndrome $\sigma$ is the most likely set.
 \end{proof}
 
-For this reason, if the correction $\hat{C}=\n{P}(\tilde{P}_\m{E})$ is applied to the lattice, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $\hat{C}$, the objective is not try to find paths within $\m{E}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made.
+For this reason, if the correction $\hat{C}=\n{P}(\tilde{\m{E}_\m{R}})$ is applied to the lattice, the resulting decoder is a \emph{maximum likelihood decoder}. In order to find $\hat{C}$, the objective is not try to find paths within $\m{R}$ that pair the syndrome vertices of $\sigma$, but rather try to recursively shrink the set of edges on which a decision is to be made.
 \begin{definition}\label{def:boundaryofedges}
-  The vertex boundary or \emph{composition} of a set of edges $\gls{pboundary}(\tilde{E})$ denotes the set of vertices $\tilde{V}$ that supports all edges $e\in \tilde{E}$.
+  The vertex boundary or \emph{composition} of a set of edges $\gls{pboundary}(\tilde{\m{E}})$ denotes the set of vertices $\tilde{\m{V}}$ that supports all edges $e\in \tilde{\m{E}}$.
 \end{definition}
 \begin{definition}\label{def:forest}
-  A spanning forest $\gls{sforest}$ is a maximal subset of edges of $\tilde{E}$ that contains no cycles and $\mathscr{B}(F_{\tilde{E}}) = \mathscr{B}(\tilde{E})$.
+  A spanning forest $\gls{sforest}$ is a maximal subset of edges of an set of edges $\tilde{\m{E}}$ that contains no cycles and $\mathscr{B}(\m{T}_{\tilde{\m{E}}}) = \mathscr{B}(\tilde{\m{E}})$. Each connected element of the forest is a tree. 
 \end{definition}
-The first step  is to produce $F_{\tilde{E}}$ inside $\m{E}$, where all syndrome vertices $\sigma$ are included in the composition per definition \ref{def:forest}. Hence if $\m{E}$ is a connected graph, then $F_\m{E}$ is a connected \emph{acyclic} graph. Such a forest can be found in linear time by a depth-first search of $\m{E}$. We initiate $F_\m{E}$ as a empty set, pick some vertex $v$ in $\n{B}(\m{E})$ and add edges $(u,v)\notin F_\m{E}$ to $F_\m{E}$ and apply it recursively to the vertices $u$ (Algorithm \ref{algo:forest}). Next, the decoder further reduces the size of the spanning forest $F_\m{E}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{scorrectionset}\subseteq F_\m{E}$, initiated as an empty set. The decoder loops over all edges in $F_\m{E}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $F_\m{E}$. If the so-called \emph{pendant} vertex $u$ belong to the set of nontrivial syndrome measurements $\sigma$, remove $u$ from $\sigma$, add $e$ to $\m{C}$, and \emph{flip} the vertex $v$ in $\sigma$, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $F_\m{E}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in $F_\m{E}$ and $\hat{C}=\n{P}(\m{C})$.
+The first step  is to produce $\m{T}_{\tilde{\m{E}}}$ inside $\m{R}$, where all syndrome vertices $\sigma$ are included in the composition per definition \ref{def:forest}. Hence if $\m{R}$ is a connected graph, then $\m{T}_\m{R}$ is a connected \emph{acyclic} graph. Such a forest can be found in linear time by a depth-first search of $\m{R}$. We initiate $\m{T}_\m{R}$ as a empty set, pick some vertex $v$ in $\n{B}(\m{R})$ and add edges $(u,v)\notin \m{T}_\m{R}$ to $\m{T}_\m{R}$ and apply it recursively to the vertices $u$ (Algorithm \ref{algo:forest}). Next, the decoder further reduces the size of the spanning forest $\m{T}_\m{R}$ by sequentially peeling edges from the tree, while constructing the correction set $\gls{scorrectionset}\subseteq \m{T}_\m{R}$, initiated as an empty set. The decoder loops over all edges in $\m{T}_\m{R}$, each time picking a \emph{leaf} edge $e = \{u,v\}$, connected to the forest by only one vertex $v$, removing the leaf edge from $\m{T}_\m{R}$. If the so-called \emph{pendant} vertex $u$ belong to the set of nontrivial syndrome measurements $\sigma$, remove $u$ from $\sigma$, add $e$ to $\m{C}$, and \emph{flip} the vertex $v$ in $\sigma$, such that $v$ is added to $\sigma$ if $v \notin \sigma$, and removed from $\sigma$ if $v\in\sigma$.  If $u\notin\sigma$, the edge $e$ is simply removed from $\m{T}_\m{R}$ (see algorithm \ref{algo:peel}). On account of these rules, edges on a branch that had a syndrome vertex as a leaf will continuously be added to $\m{C}$ until it encounters another syndrome vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in $\m{T}_\m{R}$ and $\hat{C}=\n{P}(\m{C})$.
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Connected graph $\m{E}$}
-  \KwResult{Connected acyclic graph $F_\m{E}$}
+  \KwData{Connected graph $\m{R}$}
+  \KwResult{Connected acyclic graph $\m{T}_\m{R}$}
   \BlankLine
-  initiate $F_\m{E} = \emptyset$ \;
-  pick some vertex $v \in \m{E}$ \;
-  \For{$(v,u) \notin F_\m{E}$ }{
-    add $(v,u)$ to $F_\m{E}$\;
+  initiate $\m{T}_\m{R} = \emptyset$ \;
+  pick some vertex $v \in \m{R}$ \;
+  \For{$(v,u) \notin \m{T}_\m{R}$ }{
+    add $(v,u)$ to $\m{T}_\m{R}$\;
     repeat lines 2-4 with $v=u$
   }
-  \KwRet{$F_\m{E}$}
+  \KwRet{$\m{T}_\m{R}$}
   \BlankLine
   \caption{\codefunc{Forest}}\label{algo:forest}
 \end{algorithm}
@@ -61,93 +61,96 @@ The first step  is to produce $F_{\tilde{E}}$ inside $\m{E}$, where all syndrome
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Graph $G = (V,E)$, erasure $\m{E} \subseteq E$, syndrome $\sigma \subseteq V$}
-  \KwResult{Correction $\hat{C}$}
+  \KwData{Graph $G = (\m{V},\m{E})$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}$}
+  \KwResult{Correction set $m{C}$}
   \BlankLine
-  construct $F_\m{E} = \codefunc{Forest}(\m{E})$ (al. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ (al. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
-  \While{$F_\m{E} \neq \emptyset$}{
-    pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $F_\m{E}$ \;
+  \While{$\m{T}_\m{R} \neq \emptyset$}{
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $\m{T}_\m{R}$ \;
     \If{$u \in \sigma$}{
       add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
   }
-  \KwRet{$\n{P}(\m{C})$, see equation \eqref{eq:pauliprod}}
+  \KwRet{$\m{C}$}
   \BlankLine
   \caption{Peeling decoder \cite{delfosse2017linear}}\label{algo:peel}
 \end{algorithm}
-\input{tikzfigs/peeling_decoder}
 
 \subsection{Decoder validity}
-The spanning forest $F_\m{E}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{E}})$ and therefore also in the number of qubits $\m{O}(n)$. The structure of the forest $F_\m{E}$ is dependent on the root vertex from which the depth-first search is started, and proof is required that any forest of $\m{E}$ is valid. Also, we show that for all forests, the peeling process returns the same correction.
+The spanning forest $\m{T}_\m{R}$ can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus the Peeling decoder has a linear time complexity in the size of the erasure $\m{O}(\abs{\m{R}})$ and therefore also in the number of qubits $\m{O}(n)$. The structure of the forest $\m{T}_\m{R}$ is dependent on the root vertex from which the depth-first search is started, and proof is required that any forest of $\m{R}$ is valid. Also, we show that for all forests, the peeling process returns the same correction.
 
 \begin{lemma}\label{lem:anyforest}
-  For any choice of $F_\m{E}$, there exists a subset $\m{C}\subseteq F_\m{E}$ such that $\mathscr{P}(\m{C})$ corrects the syndrome set $\sigma$.
+  For any choice of $\m{T}_\m{R}$, there exists a subset $\m{C}\subseteq \m{T}_\m{R}$ such that $\mathscr{P}(\m{C})$ corrects the syndrome set $\sigma$.
 \end{lemma}
 \begin{proof}
-  There exists a subset of edges $\m{C} = \{e_1,e_2,...\} \subseteq F_\m{E}$ such that $\mathscr{P}(\m{C})$ has a syndrome $\sigma$. By the definition of the forest $F_\m{E}$, adding another edge $e' \in F_\m{E} \vartriangle \m{E}$ creates a cycle $\gamma' \subseteq F_\m{E} \cup \{e'\}$, where $\vartriangle$ denotes the symmetric difference between two sets. Now $\m{C}$ can be replaced by $\m{C}'=\m{C}\vartriangle\gamma'$ whose Pauli product $\mathscr{P}(\m{C}')$ has the same syndrome $\sigma$, as $\vartriangle$ augments the matching path between syndromes within $\gamma'$. Now, any edge $e_r\in \gamma' \vartriangle \m{C}'$ can be removed from $F_\m{E} \cup \{e'\}$ to create a new forest $F_\m{E}'=F_\m{E} \cup \{e_i\}\setminus e_r$. For any cycle that exists from larger than 3 elements, $e_r$ must exist. Thus the Pauli product of subset $\m{C}' \subseteq F_\m{E}'\subseteq \m{E}$ is also a valid error with syndrome $\sigma$, and $\mathscr{P}(\m{C}')$ corrects $\sigma$. This can be done any number of times, thus every $F_\m{E}$ is valid.
+  There exists a subset of edges $\m{C} = \{e_1,e_2,...\} \subseteq \m{T}_\m{R}$ such that $\mathscr{P}(\m{C})$ has a syndrome $\sigma$. By the definition of the forest $\m{T}_\m{R}$, adding another edge $e' \in \m{T}_\m{R} \vartriangle \m{R}$ creates a cycle $\gamma' \subseteq \m{T}_\m{R} \cup \{e'\}$, where $\vartriangle$ denotes the symmetric difference between two sets. Now $\m{C}$ can be replaced by $\m{C}'=\m{C}\vartriangle\gamma'$ whose Pauli product $\mathscr{P}(\m{C}')$ has the same syndrome $\sigma$, as $\vartriangle$ augments the matching path between syndromes within $\gamma'$. Now, any edge $e_r\in \gamma' \vartriangle \m{C}'$ can be removed from $\m{T}_\m{R} \cup \{e'\}$ to create a new forest $\m{T}_\m{R}'=\m{T}_\m{R} \cup \{e_i\}\setminus e_r$. For any cycle that exists from larger than 3 elements, $e_r$ must exist. Thus the Pauli product of subset $\m{C}' \subseteq \m{T}_\m{R}'\subseteq \m{R}$ is also a valid error with syndrome $\sigma$, and $\mathscr{P}(\m{C}')$ corrects $\sigma$. This can be done any number of times, thus every $\m{T}_\m{R}$ is valid.
 \end{proof}
 \begin{lemma}\label{lem:peelingfe}
-  For each forest $F_\m{E}$, the outcome $\m{C}$ after peeling is unique and independent from the order of peeling.
+  For each forest $\m{T}_\m{R}$, the outcome $\m{C}$ after peeling is unique and independent from the order of peeling.
 \end{lemma}
 \begin{proof}
-  If there exists two subsets $\m{C}\subseteq F_\m{E}$ and $\m{C}' \subseteq F_\m{E}$, such that $\n{P}(\m{C})$ and $\n{P}(\m{C}')$ corrects $\sigma$, then $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ commutes with the stabilizer. This means that either $\m{C}\vartriangle\m{C}'$ is a cycle or $\m{C}=\m{C}'$. Since $F_\m{E}$ has no cycles it means that $\m{C}$ must be unique within $F_\m{E}$.
+  If there exists two subsets $\m{C}\subseteq \m{T}_\m{R}$ and $\m{C}' \subseteq \m{T}_\m{R}$, such that $\n{P}(\m{C})$ and $\n{P}(\m{C}')$ corrects $\sigma$, then $\mathscr{P}(\m{C})\mathscr{P}(\m{C}')$ commutes with the stabilizer. This means that either $\m{C}\vartriangle\m{C}'$ is a cycle or $\m{C}=\m{C}'$. Since $\m{T}_\m{R}$ has no cycles it means that $\m{C}$ must be unique within $\m{T}_\m{R}$.
 \end{proof}
 
-Per lemmas \ref{lem:anyforest} and \ref{lem:peelingfe}, for some error $P_\m{E}$ on erasure $\m{E}$, the Peeling decoder will always output some correction $\n{P}(\m{C})$ such that $\n{P}(\m{C})\n{P}(P_\m{E})$ commutes with the stabilizer. This correction is also the most likely correction per lemma \ref{lem:peelinguni}. Finally, we will prove that this is true for any erasure $\m{E}\subseteq E$.
+Per lemmas \ref{lem:anyforest} and \ref{lem:peelingfe}, for some error $\m{E}_\m{R}$ on erasure $\m{R}$, the Peeling decoder will always output some correction $\n{P}(\m{C})$ such that $\n{P}(\m{C})\n{P}(\m{E}_\m{R})$ commutes with the stabilizer. This correction is also the most likely correction per lemma \ref{lem:peelinguni}. Finally, we will prove that this is true for any erasure $\m{R}\subseteq \m{E}$.
 \begin{theorem}\label{the:anyevenparity}
-  For any connected erasure $\m{E}\subseteq E$ with pauli error on $P_\m{E}$, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm \ref{algo:peel}) will produce a valid correction $\n{P}(\m{C})$.
+  For any connected erasure $\m{R}\subseteq \m{E}$ with pauli error on $\m{E}_\m{R}$, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm \ref{algo:peel}) will produce a valid correction $\n{P}(\m{C})$.
 \end{theorem}
 \begin{proof}
-  Consider a spanning forest $F_\m{E}$ containing $n_\sigma$ syndrome vertices. The forest is being stripped by the Peeling decoder on the leaf edge $e = (u,v)$, where the vertex $v$ is the pendant vertex. If $u\notin\sigma$, $e$ is simply removed from $F_\m{E}$ and $n_\sigma$ is unaltered. If $u\in\sigma$, $u$ is removed from $\sigma$ such that $n_\sigma'= n_\sigma -1$. Vertex $v$ is now flipped in $\sigma$, meaning that if $v\in\sigma$, it is removed and $n_\sigma'= n_\sigma -2$, or if  $v\notin\sigma$, it is added and $n_\sigma'= n_\sigma$. After peeling it must be that $n_\sigma=0$, from which follows that all erasures with \emph{even} parity can be solved.
+  Consider a spanning forest $\m{T}_\m{R}$ containing $n_\sigma$ syndrome vertices. The forest is being stripped by the Peeling decoder on the leaf edge $e = (u,v)$, where the vertex $v$ is the pendant vertex. If $u\notin\sigma$, $e$ is simply removed from $\m{T}_\m{R}$ and $n_\sigma = |\sigma|$ is unaltered. If $u\in\sigma$, $u$ is removed from $\sigma$ such that $n_\sigma'= n_\sigma -1$. Vertex $v$ is now flipped in $\sigma$, meaning that if $v\in\sigma$, it is removed and $n_\sigma'= n_\sigma -2$, or if  $v\notin\sigma$, it is added and $n_\sigma'= n_\sigma$. After peeling it must be that $n_\sigma=0$, from which follows that all erasures with \emph{even} parity can be solved.
 \end{proof}
 
 \begin{definition}\label{def:cluster}
-  Let a cluster $\m{E}_i$ be a subset of an erasure $\m{E}$, such that the edges of $\m{E}_i$ form a connected graph, and $\bigcup \m{E}_i = \m{E}$. Let $V_i=\bound(\m{E}_i)\subseteq V$, the subset of vertices in the composition of $\m{E}_i$, also be referred to as a cluster.
+  Let a cluster $\gls{ncluster}_i$ be a \emph{subgraph} of $G(\m{V},\m{E})$ constructed by a set of erased edges $\m{E}_i$ and vertices $\m{V}_i$ that form a connected graph. The set of connected edges can be a subset of an erasure $\m{R}$, or a tree component or subset of a forest $\m{T}_\m{R}$, denoted by $\m{R}_i$ and $\m{T}_{\m{R}_i}$, respectively. The set of of vertices of a cluster is denoted by $\m{V}_i = \bound(\m{R}_i) = \bound(\m{T}_{\m{R}_i})$.
 \end{definition}
 \begin{definition}\label{def:clusterparity}
-  The parity of a cluster is the number of syndromes in $V_i$.
-  \begin{equation}\label{eq:clusterparity}
-    \text{parity}(V_i) = \abs{\sigma \cap V_i}
-  \end{equation}
+  The parity of a cluster $c_i$ is the number of syndromes in its vertex set $\m{V}_i$. The size of a cluster is the size of its vertex set. 
+  \begin{align}\label{eq:clusterparity}
+    \text{parity}(c_i) &= \abs{\sigma \cap \m{V}_i} \\
+    \abs{c_i} &= \abs{\m{V}_i}
+  \end{align}
 \end{definition}
 \begin{lemma}\label{lem:singlecluster}
-  Two clusters $\m{E}_i, \m{E}_j$ or $V_i, V_j$ must be disjoint; $\m{E}_i\cap \m{E}_j = \emptyset$ and $V_i\cap V_j=\emptyset$. 
+  Two clusters $c_i, c_j$ must have disjoint edge sets and disjoint vertex sets, such that
+  \begin{equation}
+    \m{E}_i\cap \m{E}_j = \emptyset, \hspace{1cm} \m{V}_i\cap \m{V}_j=\emptyset.
+  \end{equation}
 \end{lemma}
 \begin{proof}
-  If there exists some edge $e$ that belongs to two clusters $\m{E}_i, \m{E}_j$, they are connected via $e$. Per definition \ref{def:cluster} clusters $\m{E}_i, \m{E}_j$ must be a single cluster. The same is true for some vertex $v$ that belongs to both $V_i$ and $V_j$.
+  If there exists some edge $e$ that belongs to two clusters $\m{E}_i, \m{E}_j$, they are connected via $e$. Per definition \ref{def:cluster} clusters $\m{E}_i, \m{E}_j$ must be a single cluster. The same is true for some vertex $v$ that belongs to both $\m{V}_i$ and $\m{V}_j$.
 \end{proof}
-Given a graph $G(E,V)$ that is subjected to pure pure erasure noise, $\m{E}$ may not be a single subset of connected edges, but rather many connected subsets, or clusters, denoted by $\{\m{E}_1, \m{E}_2,...\}$. For each cluster $\m{E}_i$, all syndromes caused by errors on $P_{\m{E}_i}$ must be in $V_i$. Since every cluster must be strictly disjoint per lemma \ref{lem:singlecluster}, the parity for each $V_i$ must therefore be even, and $\m{E}_i$ can be decoded individually per theorem \ref{the:anyevenparity}. Here, for each $\m{E}_i$ a forest is made and peeled. This is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later.
+Given a graph $G(\m{E},\m{V})$ that is subjected to pure pure erasure noise, $\m{R}$ may not be a single subset of connected edges, but rather many connected subsets of erased edges belonging to clusters, denoted by $\{\m{R}_1, \m{R}_2,...\}$. For each cluster edge set $\m{R}_i$, all syndromes caused by errors on $\m{E}_{\m{R}_i}$ must be in $\m{V}_i$. Since every cluster must be strictly disjoint per lemma \ref{lem:singlecluster}, the parity for each $\m{V}_i$ must therefore be even, and $\m{R}_i$ can be decoded individually per theorem \ref{the:anyevenparity}. Here, for every $\m{R}_i$ a tree $\m{T}_{\m{R}_i}$ is made and peeled. This is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later.
 \begin{theorem}
   The Peeling decoder (algorithm \ref{algo:peel}) is a linear-time maximum likelihood decoder for erasures up to $d-1$ qubits, where $d$ is the minimum distance of the code.
 \end{theorem}
 \begin{proof}
-  If the erasure $\m{E}$ is not a superset of edges $\tilde{E}$ such that $\n{P}(\tilde{E})=L$ some logical operator, a correction $\n{P}(\m{C})$ to some error $P_\m{E}$ cannot result in a logical error, as $\m{C}\cup P_\m{E}\subseteq \m{E}$. As $|L|\geq d$, this is the case for any erasure pattern up to $d-1$ qubits. Furthermore, on account of lemmas \ref{lem:peelinguni}, \ref{lem:anyforest} and \ref{lem:peelingfe}, any correction set $\m{C}\subseteq F_\m{E}$ is the most likely correction.
+  If the erasure $\m{R}$ is not a superset of edges $\tilde{\m{E}}$ such that $\n{P}(\tilde{\m{E}})=L$ some logical operator, a correction $\n{P}(\m{C})$ to some error $\m{E}_\m{R}$ cannot result in a logical error, as $\m{C}\cup \m{E}_\m{R}\subseteq \m{R}$. As $|L|\geq d$, this is the case for any erasure pattern up to $d-1$ qubits. Furthermore, on account of lemmas \ref{lem:peelinguni}, \ref{lem:anyforest} and \ref{lem:peelingfe}, any correction set $\m{C}\subseteq \m{T}_\m{R}$ is the most likely correction.
 \end{proof}
 
 \subsection{Bounded surfaces}
-For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Recall that the graph of the primal lattice is now denoted by $G = (V_\iota\cup V_{\delta} \cup V_{\omega}, E_\iota \cup E_{\delta})$. Syndrome measurements on such a graph are limited to $\sigma \subseteq V_\iota\cup V_\omega$, as $V_\delta$ are \emph{open} vertices that only exist to support boundary edges $E_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $V_\delta$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin V_\delta$. Furthermore, the construction of the forest $F_\m{E}$ requires an additional alteration.
+For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Recall that the graph of the primal lattice is now denoted by $G = (\m{V}_\iota\cup \m{V}_{\delta} \cup \m{V}_{\omega}, \m{E}_\iota \cup \m{E}_{\delta})$. Syndrome measurements on such a graph are limited to $\sigma \subseteq \m{V}_\iota\cup \m{V}_\omega$, as $\m{V}_\delta$ are \emph{open} vertices that only exist to support boundary edges $\m{E}_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $\m{V}_\delta$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin \m{V}_\delta$. Furthermore, the construction of the forest $\m{T}_\m{R}$ requires an additional alteration.
 \begin{lemma}
-  Two vertices $u,v$ within a forest $F_\m{E}$ that satisfy $u\in V_\delta, v \in V_\delta$ is equivalent to a cycle in $F_\m{E}$.
+  Two vertices $u,v$ within a forest $\m{T}_\m{R}$ that satisfy $u\in \m{V}_\delta, v \in \m{V}_\delta$ is equivalent to a cycle in $\m{T}_\m{R}$.
 \end{lemma}
 \begin{proof}
-  If there are an even number of vertices in a forest $F_\m{E}$ that are in $V_\delta$, it means that there are a number of unique paths within $F_\m{E}$ that lead from a element of $V_\delta$ to another element of $V_\delta$. Such a path is equivalent to some $\delta$-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
+  If there are an even number of vertices in a forest $\m{T}_\m{R}$ that are in $\m{V}_\delta$, it means that there are a number of unique paths within $\m{T}_\m{R}$ that lead from a element of $\m{V}_\delta$ to another element of $\m{V}_\delta$. Such a path is equivalent to some $\delta$-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
 \end{proof}
 
-Due to this, we ensure that each forest $F_\m{E}$ can only be supported by a maximum of 1 element of $V_\delta$. The forests are grown starting from vertices of the set $V_\delta$, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests $\{F_1, F_2,...\}$ that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma \ref{lem:anyforest}. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm \ref{algo:peelbound}.
+Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a maximum of 1 element of $\m{V}_\delta$. The forests are grown starting from vertices of the set $\m{V}_\delta$, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests $\{\m{T}_1, \m{T}_2,...\}$ that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma \ref{lem:anyforest}. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm \ref{algo:peelbound}.
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Graph $G = (V_{\iota\cup\omega}\cup V_\delta,E)$, erasure $\m{E} \subseteq E$, syndrome $\sigma \subseteq V_{\iota\cup\omega}$}
-  \KwResult{Correction $\hat{C}$}
+  \KwData{Graph $G = (\m{V}_{\iota\cup\omega}\cup \m{V}_\delta,E)$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}_{\iota\cup\omega}$}
+  \KwResult{Correction set $\m{C}$}
   \BlankLine
-  construct $F_\m{E} = \codefunc{Forest}(\m{E})$ with seed $V_\delta$ (al. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\delta$ (al. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
-  \While{$F_\m{E} \neq \emptyset$}{
-    pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin V_\delta$, remove $e$ from $F_\m{E}$ \;
+  \While{$\m{T}_\m{R} \neq \emptyset$}{
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin \m{V}_\delta$, remove $e$ from $\m{T}_\m{R}$ \;
     \If{$u \in \sigma$}{
       add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
   }
-  \KwRet{$\n{P}(\m{C})$, see equation \eqref{eq:pauliprod}}
+  \KwRet{$\m{C}$}
   \BlankLine
   \caption{Peeling decoder for bounded surfaces \cite{delfosse2017linear}}\label{algo:peelbound}
 \end{algorithm}
@@ -162,19 +165,19 @@ Due to this, we ensure that each forest $F_\m{E}$ can only be supported by a max
 \section{Union-Find decoder}
 The Union-Find decoder \cite{delfosse2017almost} is a modification of the Peeling decoder that utilizes the Union-Find data structure \cite{tarjan1975efficiency} to additionally solve for Pauli errors, on top of erasure errors. In this section, we will first describe why a modification is needed, then how the Union-Find data structure is applied, and finally move on the the algorithm itself and analyze its complexity.
 
-The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or any other type of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \eqref{qec:eq:bitflip} and \eqref{qec:eq:phaseflip}. Pauli $X$ errors, now caused by both erasure and bit-flips, exclusively trigger nontrivial star operator measurements on the vertices of the primal lattice. Pauli $Z$ errors, now caused by both erasure and phase-flips, exclusively trigger nontrivial plaquette measurements on vertices of the dual lattice. This means that theorem \ref{the:independentxy} still holds for the combined independent Pauli and erasure noise model, such that the the primal and dual lattices can be decoded separately. Again, we will only consider the primal lattice of graph $G(E,V)$ subjected to Pauli $X$ errors and erasures with replacement from uniformly distributed $\{I,X\}$, as the process of decoding the dual lattice is analogous to the primal lattice. For a combined noise model of erasure noise and depolarizing noise of equation \eqref{qec:eq:depolarizing}, theorem \ref{the:independentxy} fails, and is for this reason not considered in this thesis.
+The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or any other type of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \eqref{qec:eq:bitflip} and \eqref{qec:eq:phaseflip}. Pauli-X errors, now caused by both erasure and bit-flips, exclusively trigger nontrivial star operator measurements on the vertices of the primal lattice. Pauli-Z errors, now caused by both erasure and phase-flips, exclusively trigger nontrivial plaquette measurements on vertices of the dual lattice. This means that theorem \ref{the:independentxy} still holds for the combined independent Pauli and erasure noise model, such that the the primal and dual lattices can be decoded separately. Again, we will only consider the primal lattice of graph $G(\m{E},\m{V})$ subjected to Pauli-X errors and erasures with replacement from uniformly distributed $\{\hat{I}, \hat{X}\}$, as the process of decoding the dual lattice is analogous to the primal lattice. For a combined noise model of erasure noise and depolarizing noise of equation \eqref{qec:eq:depolarizing}, theorem \ref{the:independentxy} fails, and is for this reason not considered in this thesis.
 
-The independent noise model introduces extra Pauli $X$ errors on qubits or edges $P_p\subseteq E$ such that not all Pauli errors $P$ are in the erasures $\m{E}$, where the Pauli errors induced by the erasure is denoted by $P_\m{E}$ and $P = P_p\triangle P_\m{E}$ (see Figure \ref{fig:ufdecoder}a). This means also that not all syndromes are in the vertex boundary of the erasure $\sigma \not\subseteq \mathscr{B}(\m{E})$ (definition \ref{def:boundaryofedges}), and odd-parity clusters can occur (definitions \ref{def:cluster}, \ref{def:clusterparity}) (see Figure \ref{fig:ufdecoder} b). Per theorem \ref{the:anyevenparity}, the Peeling decoder cannot solve for these errors. To this end, we construct an altered erasure $\bar{\m{E}} = f(\m{E},\sigma)$ that contains only even-parity clusters in a pre-processing step that is dubbed \emph{syndrome validation}. The validated erasure $\bar{\m{E}}$ is compatible with the peeling decoder. To do this, we sequentially grow the odd-parity clusters in diameter by adding neighboring vertices to the clusters. When two odd-parity clusters meet, the merged cluster will have a even parity, and can now be solved by the Peeling decoder.
+The independent noise model introduces extra Pauli-X errors on qubits or edges $\m{E}_p\subseteq \m{E}$ such that not all Pauli errors are in the erasures $\m{R}$, where the Pauli errors induced by the erasure is denoted by $\m{E}_\m{R}$ (see Figure \ref{fig:ufdecoder}a). This means also that not all syndromes are in the vertex boundary of the erasure $\sigma \not\subseteq \mathscr{B}(\m{R})$ (definition \ref{def:boundaryofedges}), and odd-parity clusters can occur (definitions \ref{def:cluster}, \ref{def:clusterparity}) (see Figure \ref{fig:ufdecoder} b). Per theorem \ref{the:anyevenparity}, the Peeling decoder cannot solve for these errors. To this end, we construct an altered erasure $\bar{\m{R}} = f(\m{R},\sigma)$ that contains only even-parity clusters in a pre-processing step that is dubbed \emph{syndrome validation}. The validated erasure $\bar{\m{R}}$ is compatible with the peeling decoder. To do this, we sequentially grow the odd-parity clusters in diameter by adding neighboring vertices and edges to the clusters, effecting \emph{growing the erasure}. While these added edges are not truly erased, it does not matter for the decoder. When two odd-parity clusters meet, the merged cluster will have a even parity, and can now be solved by the Peeling decoder.
 \begin{proposition}
-  The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{\m{E}}=f(\m{E},\sigma)$, such that theorem \ref{the:anyevenparity} is satisfied. The validated erasure $\bar{\m{E}}$ and syndrome set $\sigma$ are passed to the Peeling decoder and can decoded as before.
+  The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{\m{R}}=f(\m{R},\sigma)$, such that theorem \ref{the:anyevenparity} is satisfied. The validated erasure $\bar{\m{R}}$ and syndrome set $\sigma$ are passed to the Peeling decoder and can decoded as before.
 \end{proposition}
 \begin{figure}[h]
   \centering
   \begin{tikzpicture}
     \node[draw, circle, OrangeRed, fill=OrangeRed!50!white, line width=1, text=black] (s1) at (0,1.5) {$\sigma$};
-    \node[draw, circle, NavyBlue, fill=NavyBlue!50!white, line width =1, text=black] (e1) at (0,.5) {$\m{E}$};
+    \node[draw, circle, NavyBlue, fill=NavyBlue!50!white, line width =1, text=black] (e1) at (0,.5) {$\m{R}$};
     \node[draw, circle, OrangeRed, fill=OrangeRed!50!white, line width=1, text=black] (s2) at (5,1.5) {$\sigma$};
-    \node[draw, circle, NavyBlue, fill=NavyBlue!50!white, line width =1, text=black] (e2) at (5,.5) {$\bar{\m{E}}$};
+    \node[draw, circle, NavyBlue, fill=NavyBlue!50!white, line width =1, text=black] (e2) at (5,.5) {$\bar{\m{R}}$};
     \draw[OrangeRed, line width = 1] (s2) -- +(-1,0);
     \draw[NavyBlue, line width = 1] (e2) -- +(-1,0);
     \draw[OrangeRed, line width = 1, -latex]  (s1) -- +(1,0);
@@ -187,26 +190,27 @@ The independent noise model introduces extra Pauli $X$ errors on qubits or edges
     \node[left=0 of e1, align=right] {erasure};
     \node[right=0 of c, align=left] {correction};
     \draw[line width=1] (1,0) rectangle +(3,2) (6,0) rectangle ++(3,2);
-    \node[text width = 2cm, align=center] at (2.5,1) {\emph{Syndrome validation $f(\m{E}, \sigma)$}};
+    \node[text width = 2cm, align=center] at (2.5,1) {\emph{Syndrome validation $f(\m{R}, \sigma)$}};
     \node[text width = 2cm, align=center] at (7.5,1) {\emph{Peeling decoder}};
   \end{tikzpicture}
-  \caption{Stages of decoding of the Union-Find decoder. A pre-processing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{E}}$ is constructed that satisfies theorem \ref{the:anyevenparity}, where all erasures have an even number of syndromes. (Figure inspired by \cite{delfosse2017almost})}
+  \caption{Stages of decoding of the Union-Find decoder. A pre-processing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{R}}$ is constructed that satisfies theorem \ref{the:anyevenparity}, where all erasures have an even number of syndromes. (Figure inspired by \cite{delfosse2017almost})}
   \label{fig:ufstages}
 \end{figure}
-Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $\m{E}_i$ and a vertex in a single $V_i=\bound(\m{E}_i)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
+Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $\m{E}_i$ and a vertex in a single $\m{V}_i=\bound(\m{E}_i)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
 
 \subsection{Application of the Union-Find data structure}
-The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, consist of two functions \codefunc{Union} and \codefunc{Find} for manipulating a set of $n$ elements partitioned into a number of disjoint subsets in the form of \emph{disjoint-set trees}. Function \codefunc{Find} follows a sequence of parent pointers in the tree to find the representation root element of the tree, and function \codefunc{Union} merges the trees of two disjoint subsets. This data structure has the property that the worst-case complexity for a sequence of \codefunc{Union}'s and \codefunc{Find}'s is $\m{O}(n\alpha(n))$, where $\alpha(n)$ is the inverse of Ackermann's function that grows at such slow rate that for all practical purposes, $\alpha(n)\leq 4$. 
+The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, consist of two functions \codefunc{Union} and \codefunc{Find} for manipulating a set of $n$ elements partitioned into a number of disjoint subsets in the form of \emph{disjoint-set trees}. Function \codefunc{Find} follows a sequence of parent pointers in the tree to find the representation root element of the tree $T$, and function \codefunc{Union} merges the trees of two disjoint subsets. This data structure has the property that the worst-case complexity for a sequence of \codefunc{Union}'s and \codefunc{Find}'s is $\m{O}(n\alpha(n))$, where $\alpha(n)$ is the inverse of Ackermann's function that grows at such slow rate that for all practical purposes, $\alpha(n)\leq 4$. 
 
-In the context of the surface code, the vertices $v\in V$ are the elements and each disjoint-set tree is equivalent to a cluster with vertex set $V_i$ and edge set $\m{E}_i$ (definition \ref{def:cluster}), where each vertex $v\in V_i$ points to a parent vertex and the root vertex $r_v$ represents the cluster (see Figure \ref{fig:ufdecoder}b-f, right). Note that while the nodes in the tree are equivalent to vertices $v \in V$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in E$. The edge set $E$ with its erasure subset $\m{E}\subseteq E$ and subsequently cluster $\m{E}_i\subseteq \m{E}$ and forest $F_{\m{E}_i}\subseteq \m{E}_i$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $V_i$ exists to point towards the representative element at the root.
+In the context of the surface code, the vertices $v\in \m{V}$ are the elements and each disjoint-set tree is equivalent to a cluster $c_i$ with vertex set $\m{V}_i$ and edge set $\m{E}_i$, where each vertex $v\in \m{V}_i$ points to a parent vertex and the root vertex $r_v$ represents the cluster (see Figure \ref{fig:ufdecoder}b-f, right). Recall from Definition \ref{def:cluster} that the edge set $\m{E}_i$ contain only erased edges.
+The minimum size of a cluster is now defined by an empty edge set and a single syndrome-vertex in the vertex set. Note that while the nodes in the tree are equivalent to vertices $v \in \m{V}$, parent pointers in the disjoint-set tree structure are \emph{not} equivalent to edges $e\in \m{E}$. The edge set $\m{E}$ with its erasure subset $\m{R}\subseteq \m{E}$ and subsequently cluster edges $\m{E}_i\subseteq \m{R}$ and tree $\m{T}_{\m{E}_i}\subseteq \m{E}_i$ are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree $\m{V}_i$ exists to point towards the representative element at the root.
 \begin{definition}\label{def:trees}
-  Let $T(v)$ denote (sub)tree rooted in vertex $v$, and let $|T(v)|$ denote the number of vertices in the (sub)tree. The tree rooted at $r_v\in V_i$ is equivalent to the set $T(r_v)=V_i$. The height of an element $v$ of $T(r_v)$ is the distance from $v$ to the $r_v$. The rank of a tree is the maximum height in the tree. 
+  Let $\gls{zuftree}(v)$ denote (sub)tree rooted in vertex $v$, and let $|T(v)|$ denote the number of vertices in the (sub)tree. The tree rooted at $r_v\in \m{V}_i$ is equivalent to the set $T(r_v)=\m{V}_i$. The height of an element $v$ of $T(r_v)$ is the distance from $v$ to the $r_v$. The rank of a tree is the maximum height in the tree. 
 \end{definition}
 
 The function \codefunc{Find}$(v)$ is performed by following the parent pointers to the root $r_v$ (algorithm \ref{algo:find}), and its cost is therefore dependant on the height of the vertex in the tree; the distance of an element to the root. The function can be applied recursively such that all vertices in the sequence of parent pointers are pointed to the root, which decreases the height of the tree and reduces the cost to every future call to \codefunc{Find}. This is called \emph{path compression}. 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{A vertex $v\in V$ of graph $G = (V,E)$}
+  \KwData{A vertex $v\in \m{V}$ of graph $G=(\m{V},\m{E})$}
   \KwResult{The root $r_v$ of $T(r_v)\ni v$ (def. \ref{def:trees})}
   \BlankLine
   \eIf{$v=\text{parent}(v)$}{
@@ -221,7 +225,7 @@ The function \codefunc{Find}$(v)$ is performed by following the parent pointers 
 The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ and $r_v$ by making one of the roots a child of another. By comparing the sizes of the trees $|T(r_u)|, |T_(r_v)|$, the height of the combined tree can be minimized, again to reduce the cost to any future calls to \codefunc{Find}. This is called \emph{union by weight}, where the weight stands of the number of elements in the tree (algorithm \ref{algo:unionweight}). Alternatively, \emph{union by rank} compares the ranks of vertex nodes $r_u,r_v$, where the rank is defined as the maximum height of the tree (algorithm \ref{algo:unionrank}).
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Vertex roots $r_u\in V$, $r_v\in V$}
+  \KwData{Vertex roots $r_u\in \m{V}$, $r_v\in \m{V}$}
   \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
   \BlankLine
   \uIf{$|T(r_u)|<|T(r_v)|$}{
@@ -239,7 +243,7 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Vertex roots $r_u\in V$, $r_v\in V$}
+  \KwData{Vertex roots $r_u\in \m{V}$, $r_v\in \m{V}$}
   \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
   \BlankLine
   \uIf{$\text{rank}(r_u)<\text{rank}(r_v)$}{
@@ -259,93 +263,91 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
 The Union-Find data structure, its tree implementation, the \emph{union by rank}, \emph{union by weight} and \emph{path compression} rules are all elaborately covered in appendix \ref{ap:unionfind}. Here, we also make a full analysis of its $\m{O}(n\alpha(n))$ complexity based on \cite{kozen1992design}. The Ackermann's function and its inverse are detailed in appendix \ref{ap:ackermann}.
 
 \subsection{Additional data structure}
-We define in this section what it means to grow a cluster, and the additional data structure needed to facilitate such growth. For a cluster defined by disjoint-set tree of vertices $V_i$, an iteration of growth means to add another layer of neighboring vertices that lie on the outer boundary of the cluster. 
+We define in this section what it means to grow a cluster, and the additional data structure needed to facilitate such growth. For a cluster defined by disjoint-set tree of vertices $\m{V}_i$, an iteration of growth means to add another layer of neighboring vertices that lie on the outer boundary of the cluster. 
 \begin{definition}\label{def:clusterboud}
-  Let the boundary of a cluster $\delta V_i$ be the subset of vertices that supports one or more edges connected to vertices not in $V_i$. This set of edges is the boundary edge set $\delta \m{E}_i$, and can be considered as paths that lead to the neighboring vertices. To walk such path is dubbed as \emph{tracing} an edge. 
+  For a cluster $c_i$, let its boundary be defined by a subset of edges and vertices $\delta \m{E}_i \subseteq \m{E}_i$, $\delta \m{V}_i \subseteq \m{V}_i$. The boundary vertex set $\delta \m{V}_i$ supports one or more edges connected to vertices not in $\m{V}_i$. This set of edges is the boundary edge set $\delta \m{E}_i$, and can be considered as paths that lead to the neighboring vertices. To walk such path is dubbed as \emph{tracing} an edge. 
   \begin{align}
-    \delta V_i&= \left\{ v \in V_i | \exists \text{ neighbor }  u \notin V_i \right\} \\
-    \delta \m{E}_i &= \{(u,v)\in \m{E}_i | v \in V_i, u \notin V_i \}
+    \delta \m{V}_i&= \left\{ v \in \m{V}_i | \exists \text{ neighbor }  u \notin \m{V}_i \right\} \\
+    \delta \m{E}_i &= \{(u,v)\in \m{E}_i | v \in \m{V}_i, u \notin \m{V}_i \}
   \end{align}
 \end{definition}
-To grow a cluster, these paths are \emph{traced} and all vertices $\{u | (u,v) \in \delta \m{E}_i: u \notin V_i\}$ are added to $V_i$ by pointing $v$ toward the root $r_u$ in the tree. Note that every single-vertex addition to the tree can be viewed as an union event. If $v$ does not belong to another cluster, the addition is an union event between the tree of $V_i$ and a single-element tree $\{v\}$. If $v$ does belong to another cluster with tree $V_j$, it is an union event between two trees $|T|>1$. We thus always apply $\codefunc{Find}(u)$ and $\codefunc{Find}(v)$ to find the respective roots $r_u, r_v$, and if $r_u\neq r_v$ apply $\codefunc{Union}(r_u, r_v)$ to merge the trees.
+To grow a cluster, these paths are \emph{traced} and all vertices $\{u | (u,v) \in \delta \m{E}_i: u \notin \m{V}_i\}$ are added to $\m{V}_i$ by pointing $v$ toward the root $r_u$ in the tree. Note that every single-vertex addition to the tree can be viewed as an union event. If $v$ does not belong to another cluster, the addition is an union event between the tree of $\m{V}_i$ and a single-element tree $\{v\}$. If $v$ does belong to another cluster with tree $\m{V}_j$, it is an union event between two trees $|T|>1$. We thus always apply $\codefunc{Find}(u)$ and $\codefunc{Find}(v)$ to find the respective roots $r_u, r_v$, and if $r_u\neq r_v$ apply $\codefunc{Union}(r_u, r_v)$ to merge the trees.
 
-For two vertices $u,v$ that belong to different odd-parity clusters and connected by $(u,v)$, where $u \in \delta V_u, v \in \delta V_v$, a round of growth where both clusters are grown would mean that the path of $(u,v)$ is traced twice. This does not make sense, as during the second trace, both vertices already belong to the same cluster. To this end, we only trace the path an half-edge length per round of growth. In the case such as above, both traces from vertices $u$ and $v$ on edge $(u,v)$ cover a half-edge and meet in the middle, which prompts a single union event (see Figure \ref{fig:ufdecoder}c-d). 
+For two vertices $u,v$ that belong to different odd-parity clusters and connected by $(u,v)$, where $u \in \delta \m{V}_u, v \in \delta \m{V}_v$, a round of growth where both clusters are grown would mean that the path of $(u,v)$ is traced twice. This does not make sense, as during the second trace, both vertices already belong to the same cluster. To this end, we only trace the path an half-edge length per round of growth. In the case such as above, both traces from vertices $u$ and $v$ on edge $(u,v)$ cover a half-edge and meet in the middle, which prompts a single union event (see Figure \ref{fig:ufdecoder}c-d). 
 \begin{definition}\label{def:support}
   Let the \emph{support} of an edge be how many times a path on $e$ has been traced; the number of growth iterations the edge has been in some cluster boundary $\delta\m{E}_i$. The support of an edge can have values $\{0,1,2\}$; $0$ for \emph{untraced}, $1$ for \emph{half-traced} and $2$ for \emph{traced}.
 \end{definition}
-This can be stored in some look-up table $Support$. To trace an edge $e$ means to increase the $Support[e]$ by $1$, and to merge the cluster if $Support[e]=2$. This data structure implies that it is redundant to explicitly store the set of edges $\m{E}_i$ or the boundary edge set $\delta \m{E}_i$ for each cluster. Lemma \ref{lem:singlecluster} implies that if a vertex $v\in V_i$, that all traced edges supported by $v$ satisfy $e \in \m{E}_i$, such that
+This can be stored in some look-up table $Support$, or as an attribute at the edge object $e.support$. To trace an edge $e$ means to increase the $e.support$ by $1$, and to merge the cluster if $e.support=2$. This data structure implies that it is redundant to explicitly store the set of edges $\m{E}_i$ or the boundary edge set $\delta \m{E}_i$ for each cluster. Lemma \ref{lem:singlecluster} implies that if a vertex $v\in \m{V}_i$, that all traced edges supported by $v$ satisfy $e \in \m{E}_i$, such that
 \begin{align}
-  \m{E}_i &= \left\{(u,v)|u\in V_i, v \in V_i, Support[(u,v)]=2\right\}\\
-  \delta \m{E}_i &= \left\{(u,v)| v \in \delta V_i, Support[(u,v)] \neq 2\right\}.
+  \m{E}_i &= \left\{(u,v)|u\in \m{V}_i, v \in \m{V}_i, (u,v).support=2\right\}\\
+  \delta \m{E}_i &= \left\{(u,v)| v \in \delta \m{V}_i, (u,v).support \neq 2\right\}.
 \end{align}
-Thus the vertex set of a cluster $V_i$, the boundary vertex set $\delta V_i$ and the table $Support$ provides the necessary data for constructing the forest $F_\m{E}$ and the subsequent peeling in the Peeling decoder.
+Thus for every cluster $c_i$, the disjoint-set tree of vertices $\m{V}_i=c_i.\m{V}$, the boundary vertex set $\delta \m{V}_i=c_i.\delta \m{V}$ and the table $Support$ or attribute $e.support$ provides the necessary data for constructing the forest $\m{T}_\m{R}$ and the subsequent peeling in the Peeling decoder.
 
-Finally, in each round of growth, there may be many odd-parity clusters $\{V_{1}, V_{2},...\}$, which we collect in a list $\m{L}$. If two clusters are immediately merged within the same time step $t$ when some boundary edge $e$ reaches $Support[e]=2$, these clusters are merged into one, and it is not possible to track which part of the merged cluster have completed its growth and which have not. To this end, in a round of growth, \codefunc{Union}'s are applied after all clusters have grown. This is accomplished by initiating a \emph{fusion} list $\m{F}$ at the start of each round of growth; fully-traced edges are appended to this list; and merges are applied at the end of each round. We denote the subroutine for the growth of a cluster \codefunc{Grow} (Algorithm \ref{algo:ufgrow}).
-
-
-\subsection{Syndrome validation}
-We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L} = \{V_{0,t}, V_{1,t}, ...\}$ of odd-parity clusters. A cluster $V_{i,t}$ is grown by $\codefunc{Grow}(\delta V_{i,t})$, during which all edges with $Support[e]=2$ are added to a \emph{fusion list} $\m{F}$. After all clusters are grown, for each edge $e=(u,v) \in \m{F}$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta V_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta V_{u,t+1}$ and $\delta V_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}$ and remove any duplicate elements. The process can be repeated until $\m{L}=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{E}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:uf}. 
-
-\input{tikzfigs/ufdecoder.tex}
-% \paragraph{Data structure}
-% Now it is clear what information is exactly needed to grow the clusters using the Union-Find algorithm. We will need to store the cluster in a sort of cluster-tree. At the root of each tree we store the size and parity of that cluster in order to facilitate weighted union and to select the odd clusters. We will need to store the state of each edge (empty, half-grown, or fully grown) in a table called \codeword{support}. And we need to keep track of the boundary of each cluster in a \codeword{boundary} list.
-
-% \paragraph{The routine}
-% The full routine of the Union-Find decoder as originally described (\cite{delfosse2017almost}, Algorithm 2) is listed in Algorithm \ref{algo:uf}. In line 1-2, we initialize the data structures, and a list of odd cluster roots $\m{L}$. We will loop over this list until it is empty, or that there are no more odd clusters left.
-
-% In each growth iteration, we will need to keep track of which clusters have merged onto one, therefore the fusion list $\m{F}$ is initialized in line 4. We loop over all the edges from the \codeword{boundary} of the clusters from $\m{L}$ in line 5, and grow each edge by an half-edge in \codeword{support}. If an edge is fully grown, it is added to $\m{F}$.
-
-% For each edge $(u,v)$ in $\m{F}$, we need to check whether the neighboring vertices belong to different clusters, and merge these clusters if they do. This is done using the Union-Find algorithm in line 6. We call \codefunc{find(u)} and \codefunc{find(v)} to find the cluster roots of the vertices. If they do not have the same root, we make one cluster the child of another by \codefunc{union(u,v)}. Note that this does not only merge two existing clusters, also new vertices, which have themselves as their roots, are added to the cluster this way. We also need to combine the boundary lists of the two clusters.
-
-% Finally, we need to update the elements in the cluster list $\m{L}$. First, we replace each element $u$ with its potential new cluster root \codefunc{find(u)} in line 7. We can avoid creating duplicate elements by maintaining an extra look-up table that keeps track of the elements $\m{L}$ at the beginning of each round of growth. In line 8, we update the \codeword{boundary} lists of all the clusters in $\m{L}$, and in line 9, even clusters are removed from the list, preparing it for the next round of growth.
+Finally, in each round of growth, there may be many odd-parity clusters $\{c_{1}, c_{2},...\}$, which we collect in a list $\gls{sloddlist}$. If two clusters are immediately merged within the same time step $t$ when some boundary edge $e$ reaches $e.support=2$, these clusters are merged into one, and it is not possible to track which part of the merged cluster have completed its growth and which have not. To this end, in a round of growth, \codefunc{Union}'s are applied after all clusters have grown. This is accomplished by initiating a \emph{merging} list $\gls{slmerging}$ at the start of each round of growth; fully-traced edges are appended to this list; and merges are applied at the end of each round. We denote the subroutine for the growth of a cluster \codefunc{Grow} (Algorithm \ref{algo:ufgrow}).
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Cluster with boundary $\delta V_i$, table $Support$, $\m{F}$}
+  \KwData{Cluster $c_i$ with boundary $\delta \m{V}_i$, $\m{L}_m$}
   \KwResult{Cluster with traced boundary edges}
   \BlankLine
 
-  \For{$v$ in $\delta V_i$}{
-    \For{edges in $\{(u,v) | v \in \delta V_i, Support[(u,v)]\neq 2$\}}{
-      Add 1 to $Support[(u,v)]$ \;
-      If $Support[(u,v)]=2$, add $(u,v)$ to $\m{F}$ \;
+  \For{$v$ in $\delta \m{V}_i$}{
+    \For{edges in $\{(u,v) | v \in \delta \m{V}_i, (u,v).support\neq 2$\}}{
+      Add 1 to $(u,v).support$ \;
+      If $(u,v).support=2$, add $(u,v)$ to $\m{L}_m$ \;
     }
   }
   \BlankLine
   \caption{\codefunc{Grow}}\label{algo:ufgrow}
 \end{algorithm}
 
+\subsection{Syndrome validation}
+We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L}_o = \{c_{0,t}, c_{1,t}, ...\}$ of odd-parity clusters. A cluster $\m{V}_{i,t}$ is grown by $\codefunc{Grow}(\delta \m{V}_{i,t})$, during which all edges with $e.support=2$ are added to merging list $\m{L}_m$. After all clusters are grown, for each edge $e=(u,v) \in \m{L}_m$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta \m{V}_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta \m{V}_{u,t+1}$ and $\delta \m{V}_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}_o$ and remove any duplicate elements. The process can be repeated until $\m{L}_o=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{R}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:uf}. 
+
+\input{tikzfigs/ufdecoder.tex}
+% \paragraph{Data structure}
+% Now it is clear what information is exactly needed to grow the clusters using the Union-Find algorithm. We will need to store the cluster in a sort of cluster-tree. At the root of each tree we store the size and parity of that cluster in order to facilitate weighted union and to select the odd clusters. We will need to store the state of each edge (empty, half-grown, or fully grown) in a table called \codeword{support}. And we need to keep track of the boundary of each cluster in a \codeword{boundary} list.
+
+% \paragraph{The routine}
+% The full routine of the Union-Find decoder as originally described (\cite{delfosse2017almost}, Algorithm 2) is listed in Algorithm \ref{algo:uf}. In line 1-2, we initialize the data structures, and a list of odd cluster roots $\m{L}_o$. We will loop over this list until it is empty, or that there are no more odd clusters left.
+
+% In each growth iteration, we will need to keep track of which clusters have merged onto one, therefore the fusion list $\m{F}$ is initialized in line 4. We loop over all the edges from the \codeword{boundary} of the clusters from $\m{L}_o$ in line 5, and grow each edge by an half-edge in \codeword{support}. If an edge is fully grown, it is added to $\m{F}$.
+
+% For each edge $(u,v)$ in $\m{F}$, we need to check whether the neighboring vertices belong to different clusters, and merge these clusters if they do. This is done using the Union-Find algorithm in line 6. We call \codefunc{find(u)} and \codefunc{find(v)} to find the cluster roots of the vertices. If they do not have the same root, we make one cluster the child of another by \codefunc{union(u,v)}. Note that this does not only merge two existing clusters, also new vertices, which have themselves as their roots, are added to the cluster this way. We also need to combine the boundary lists of the two clusters.
+
+% Finally, we need to update the elements in the cluster list $\m{L}_o$. First, we replace each element $u$ with its potential new cluster root \codefunc{find(u)} in line 7. We can avoid creating duplicate elements by maintaining an extra look-up table that keeps track of the elements $\m{L}_o$ at the beginning of each round of growth. In line 8, we update the \codeword{boundary} lists of all the clusters in $\m{L}_o$, and in line 9, even clusters are removed from the list, preparing it for the next round of growth.
+
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V$}
-  \KwResult{Correction $\hat{C}$}
+  \KwData{A graph $G=(\m{V},\m{E})$, an erasure $\m{R} \subseteq \m{E}$ and syndrome $\sigma \subseteq \m{V}$}
+  \KwResult{Correction set $\m{C}$}
   \BlankLine
   \tcp{Syndrome validation}
-  Initialize clusters $V_i$ with boundaries $\delta V_i$ (def. \ref{def:clusterboud})\;
-  Initialize odd-parity clusters list $\m{L}$\;
-  Initialize table $Support$ (def \ref{def:support})\;
-  \While{$\m{L} \neq \emptyset$}{
-    Initialize $\m{F}=\emptyset$ \;
-    \For{$V_i$ in $\m{L}$}{
-      get boundary $\delta V_i$, apply $\codefunc{Grow}(\delta V_i, Support, \m{F})$ (al. \ref{algo:ufgrow});
+  Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$ (def. \ref{def:clusterboud})\;
+  Initialize odd-parity clusters list $\m{L}_o$\;
+  \While{$\m{L}_o \neq \emptyset$}{
+    Initialize $\m{L}_m=\emptyset$ \;
+    \For{$c_i$ in $\m{L}_o$}{
+      $\codefunc{Grow}(c_i, \m{L}_m)$ (al. \ref{algo:ufgrow});
     }
-    \For{$(u,v)$ in $\m{F}$}{
+    \For{$(u,v)$ in $\m{L}_m$}{
       Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (al. \ref{algo:find})\;
       If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
     } 
-    Remove even clusters from $\m{L}$\;
+    Remove even clusters from $\m{L}_o$\;
   }
-  \KwRet{Validated erasure $\bar{\m{E}}$}
+  \KwRet{Validated erasure $\bar{\m{R}}$}
   \BlankLine
   \tcp{Peeling decoder}
-  Run Peeling decoder (al. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{E}}$
+  Run Peeling decoder (al. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
   \BlankLine
   \caption{Union-Find decoder \cite{delfosse2017almost}}\label{algo:uf}
 \end{algorithm}
 
 \subsection{Time complexity of the Union-Find decoder}
 
-For a system of $n$ qubits, the initialization of the cluster $V_i$ and its boundaries $\delta V_i$, the odd parity cluster list $\m{L}$ and the table $Support$ all take $\m{O}(n)$ time. The each edge in $Support$ can be traced a maximum of 2 iterations, and also takes $\m{O}(n)$. Maintaining $\m{L}$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a "Almost-linear time decoding algorithm" \cite{delfosse2017almost}. 
+For a system of $n$ qubits, the initialization of the cluster $\m{V}_i$ and its boundaries $\delta \m{V}_i$ and the odd parity cluster list $\m{L}_o$ all take $\m{O}(n)$ time. Each edge can be traced a maximum of 2 iterations, thus tracing also takes $\m{O}(n)$. Maintaining $\m{L}_o$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a "Almost-linear time decoding algorithm" \cite{delfosse2017almost}. 
 
 \section{Weighted growth}\label{sec:bucketclustersort}
 The vanilla Union-Find decoder of Algorithm \ref{algo:uf} has been reported to have a code threshold of $p_{th}=9.2\%$ for independent Pauli noise \cite{delfosse2017almost} on a toric code. Recall from section \ref{sec:threshold} that $p_{th}$ is the threshold error rate below which the chance of successful correction can be increased by increasing the system size or the number of qubits on the surface code. Delfosse \emph{et al.} has shown that this threshold can be improved to $p_{th}=9.9\%$ by applying \emph{weighted growth}, where the order of cluster growth is sorted according to the sizes of the cluster trees. However, the authors have not provided a description for this sorting. In this section, we will show why weighted growth improves the threshold and provide a description of a sorting method that operates within the time complexity of the Union-Find decoder. 
@@ -358,53 +360,52 @@ The vanilla Union-Find decoder of Algorithm \ref{algo:uf} has been reported to h
 
 
 \begin{lemma}\label{lem:incorrectedges}
-  For two clusters $V_i|\m{E}_i, V_j|\m{E}_j$ with sizes $|V_i| << |V_j|$, $\codefunc{Grow}(\delta V_i)$ will add fewer \emph{redundant} edges $e_r$ to $\m{E}_i$ compared to $\codefunc{Grow}(\delta V_j)$ to $\m{E}_j$, where redundant edges are not in the outputted correction set $\m{C}$. 
+  For two clusters $c_i, c_j$ with sizes $|c_i| << |c_j|$, $\codefunc{Grow}(c_i)$ will add fewer \emph{redundant} edges $e_r$ to $\m{E}_i$ compared to $\codefunc{Grow}(c_j)$ to $\m{E}_j$, where redundant edges are not in the outputted correction set $\m{C}$. 
 \end{lemma}
 \begin{proof}
-  Consider an odd-parity cluster $V_i$. This cluster will be continuously grown until it merges with another odd cluster $V_k$. 
-  During a round of growth, $|\delta \m{E}_i|$ edges are added to the cluster, but only one edge in $\delta \m{E}_i$ will be in $\m{C}$, connecting the residual syndrome vertices from the two clusters, and all other edges will be peeled. Thus only $1/|\delta \m{E}_i|$ of edges are not added redundantly. For any cluster the size of its boundary will be proportional to the size of the cluster itself $|\delta \m{E}| \propto |V_i|$, which proves the stated lemma. 
+  Recall from Definition \ref{def:clusterparity} that the size of a cluster is the number of vertices in its cluster tree. Consider an odd-parity cluster $c_i$. This cluster will be continuously grown until it merges with another odd cluster $c_k$. During a round of growth, $|\delta \m{E}_i|$ edges are added to the cluster, but only one edge in $\delta \m{E}_i$ will be in $\m{C}$, connecting the residual syndrome vertices from the two clusters, and all other edges will be peeled. Thus only $1/|\delta \m{E}_i|$ of edges are not added redundantly. For any cluster the size of its boundary will be proportional to the size of the cluster itself $|\delta \m{E}| \propto |\m{V}_i|$, which proves the stated lemma. 
 \end{proof}
 
-If there are only two clusters $V_i, V_j$ on the lattice with different cluster sizes, it would not matter which cluster is grown first. The number of clusters growths needed is equal to the minimum distance $d_{ij}$ between the two clusters. Either a sequence of $d_{ij}$ growths for $V_i$, $d_{ij}$ growths for $V_j$, or $d_{ij}$ growths distributed among $V_i$ and $V_j$ would achieve the same goal: connecting the two clusters into a single even-parity cluster. It is due to the existence of other clusters that \emph{weighted growth} makes a difference. If there are clusters $V_k$ with arbitrary parity located nearer to $V_i$ than $V_j$, the distribution of the $d_{ij}$ growths among $V_i$ and $V_j$ now determines the shape of the resulting clusters. If only $V_i$ is grown, it may be possible that it is merged with $V_k$ first, whereas if only $V_j$ is grown this may not be the case. The \emph{redundant} edges of lemma \ref{lem:incorrectedges} are therefore not insignificant, as it may lead to a different set of clusters entirely that may result to a \emph{right} correction set $\m{C}$, or not at all. Nevertheless, by growing smaller clusters first, each newly added edge has a higher possibility to be in $\m{C}$ than edges added during the growth of a larger cluster, which is why weighted growth leads to a increased threshold.
+If there are only two clusters $c_i, c_j$ on the lattice with different cluster sizes, it would not matter which cluster is grown first. The number of clusters growths needed is equal to the minimum distance $d_{ij}$ between the two clusters. Either a sequence of $d_{ij}$ growths for $c_i$, $d_{ij}$ growths for $c_j$, or $d_{ij}$ growths distributed among $c_i$ and $c_j$ would achieve the same goal: connecting the two clusters into a single even-parity cluster. It is due to the existence of other clusters that \emph{weighted growth} makes a difference. If there are clusters $c_k$ with arbitrary parity located nearer to $c_i$ than $c_j$, the distribution of the $d_{ij}$ growths among $c_i$ and $c_j$ now determines the shape of the resulting clusters. If only $c_i$ is grown, it may be possible that it is merged with $c_k$ first, whereas if only $c_j$ is grown this may not be the case. The \emph{redundant} edges of lemma \ref{lem:incorrectedges} are therefore not insignificant, as it may lead to a different set of clusters entirely that may result to a \emph{right} correction set $\m{C}$, or not at all. Nevertheless, by growing smaller clusters first, each newly added edge has a higher possibility to be in $\m{C}$ than edges added during the growth of a larger cluster, which is why weighted growth leads to a increased threshold.
 
 
 \subsection{Sorting method}
 % Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
 
-% Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $V_\alpha, V_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $V_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $V_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
-The challenging aspect to weighted growth is that the sizes of clusters change as they grow and merge. For $k_c\propto n$ clusters on a lattice at time $t$, where $n$ denotes the number of vertices, sorting these $k_c$ clusters using any \emph{comparison sort} methods such as \emph{Quicksort}, \emph{Merge sort}, \emph{Heapsort} has a worst-case complexity of $k_c \log k_c$ at best. Here, any time the size of a clusters changes, we need to compare its new size with all other clusters sizes. For a total of $k_g \propto 1/k_c$ clusters growths, the total number of operations needed to sort these $k_c$ clusters $k_g$ times may lead to a complexity that is worst than $\m{O}(n\alpha(n))$. Luckily, as the sizes of clusters can only take on integer values and is limited to $n$, we can utilize a \emph{non-comparison} sorting algorithm. Now, as the size of a cluster changes, we need not to compare it with the other clusters. Specifically, we will be using \emph{Bucket sort}. 
+% Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $\m{V}_\alpha, \m{V}_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $\m{V}_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $\m{V}_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
+The challenging aspect to weighted growth is that the sizes of clusters change as they grow and merge. For $n_c\propto n$ clusters on a lattice at time $t$, where $n$ denotes the number of vertices, sorting these $n_c$ clusters using any \emph{comparison sort} methods such as \emph{Quicksort}, \emph{Merge sort}, \emph{Heapsort} has a worst-case complexity of $n_c \log n_c$ at best. Here, any time the size of a clusters changes, we need to compare its new size with all other clusters sizes. For a total of $n_c \propto 1/n_c$ clusters growths, the total number of operations needed to sort these $n_c$ clusters $n_c$ times may lead to a complexity that is worst than $\m{O}(n\alpha(n))$. Luckily, as the sizes of clusters can only take on integer values and is limited to $n$, we can utilize a \emph{non-comparison} sorting algorithm. Now, as the size of a cluster changes, we need not to compare it with the other clusters. Specifically, we will be using \emph{Bucket sort}. 
 \begin{definition}\label{def:buckets}
-  Bucket sort is a non-comparison sorting algorithm that distributes $n$ elements into $N_b$ buckets, whereafter each bucket is sorted individually. Bucket sort has average-case performance $\m{O}(n + n^2/N_b + N_b)$. The worst-case complexity for Bucket sort is $\m{O}(n^2)$, when all the elements are placed into a single bucket. Each bucket is labelled as $b_j$ and the list of all buckets is labelled as $Buckets=[b_1, b_2, ...,b_{N_b}]$. 
+  Bucket sort is a non-comparison sorting algorithm that distributes $n$ elements into $N_b$ buckets, whereafter each bucket is sorted individually. Bucket sort has average-case performance $\m{O}(n + n^2/N_b + N_b)$. The worst-case complexity for Bucket sort is $\m{O}(n^2)$, when all the elements are placed into a single bucket. Each bucket is labelled as $\gls{zbucket}$ and the list of all buckets is labelled as $\gls{slbuckets}=[b_1, b_2, ...,b_{N_b}]$. 
 \end{definition}
-In the context of weighted growth, if two clusters have the same size, it does not matter which cluster is grown first. Thus if for every cluster size $j$ we define a bucket $b_j$, it is not necessary to sort each bucket, and sorting each cluster takes $\m{O}(1)$ time. To apply Bucket sort as the sorting algorithm for weighted growth in the Union-Find decoder, we must do the following: 1) initiate $Buckets$ per Definition \ref{def:buckets}; 2) place the initial odd-parity clusters into these buckets, where the smallest single-vertex clusters are sorted into $b_1$ and the largest possible clusters into $b_{N_b}$; 3) grow and merge clusters sequentially from buckets starting from $b_1$, iterating over every bucket until $b_{N_b}$; sort grown and merged odd-parity clusters into buckets; 4) continue until all clusters have even parity. 
+In the context of weighted growth, if two clusters have the same size, it does not matter which cluster is grown first. Thus if for every cluster size $j$ we define a bucket $b_k$, it is not necessary to sort each bucket, and sorting each cluster takes $\m{O}(1)$ time. To apply Bucket sort as the sorting algorithm for weighted growth in the Union-Find decoder, we must do the following: 1) initiate $\m{L}_b$ per Definition \ref{def:buckets}; 2) place the initial odd-parity clusters into these buckets, where the smallest single-vertex clusters are sorted into $b_1$ and the largest possible clusters into $b_{N_b}$; 3) grow and merge clusters sequentially from buckets starting from $b_1$, iterating over every bucket until $b_{N_b}$; sort grown and merged odd-parity clusters into buckets; 4) continue until all clusters have even parity. 
 \begin{definition}\label{def:clustersupport}
-  The \emph{support} of a cluster $V_i$ is the number of growth iterations a cluster has maintained the same size $|V_i|$, and can either be 0 or 1. 
+  The \emph{support} of a cluster $c_i.support$ is the number of growth iterations a cluster has maintained the same size $|c_i|$, and can either be 0 or 1. 
 \end{definition}
-The size of a cluster is defined as $|V_i|$ the number of vertices in its cluster tree. As we trace the boundary edges per half-edge, a single round of growth does not necessarily add new vertices and increase $|V_i|$. Nevertheless, a cluster with size $|V_i|$ and boundary edges with support 1 is arguably \emph{larger} than a cluster with the same size $|V_i|$ and boundary edges with support 0. For this reason, we define 2 buckets per cluster size $|V_i|=k$. Based on the preceding paragraphs, we define a function \codefunc{Place} in Algorithm \ref{algo:place} that sorts a cluster in an appropriate bucket. After a cluster $V_i$ is grown, during which it may have merged with other clusters, we apply $\codefunc{Place}(V_i)$ immediately place it in a new bucket if it has odd parity. 
+As we trace the boundary edges per half-edge, a single round of growth does not necessarily add new vertices and increase $|c_i|$. Nevertheless, a cluster with size $|c_i|$ and boundary edges with support 1 is arguably \emph{larger} than a cluster with the same size $|c_i|$ and boundary edges with support 0. For this reason, we define 2 buckets per cluster size $|c_i|=k$. Based on the preceding paragraphs, we define a function \codefunc{Place} in Algorithm \ref{algo:place} that sorts a cluster in an appropriate bucket. After a cluster $c_i$ is grown, during which it may have merged with other clusters, we apply $\codefunc{Place}(c_i)$ immediately to place it in a new bucket if it has odd parity. However, as merges between clusters are maintained by the merging list $\m{L}_m$ and merges are applied after cluster growths of the same iterations, we need to maintain an additional list $\gls{slplace}$ place a list of cluster after merges.  
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{Cluster $V_i$, list of buckets $Buckets$}
+  \KwData{Cluster $c_i$, list of buckets $\m{L}_b$}
   \KwResult{Cluster placed in bucket if it has odd parity}
   \BlankLine
 
-  \uIf(odd-parity cluster){$|\{\sigma_i \in V_i \}|$ is odd}{
-    \eIf{$Support(V_i)= 0$}{
-      bucket number $j = 2(|V_i|-1) + 1$
+  \uIf(odd-parity cluster){$c_i$ is odd}{
+    \eIf{$Support(\m{V}_i)= 0$}{
+      bucket number $k = 2(|\m{V}_i|-1) + 1$
     }{
-      bucket number $j = 2(|V_i|-1) + 2$
+      bucket number $k = 2(|\m{V}_i|-1) + 2$
     }
-    add $V_i$ to bucket $b_j = Buckets[j]$\;
-    store bucket number at cluster object $C.b = j$\;
+    add $\m{V}_i$ to bucket $b_k = \m{L}_b[j]$\;
+    store bucket number at cluster object $c_i.bucket = j$\;
   }
   \Else(even-parity cluster){
-    store zero bucket number at cluster object $C.b = 0$\;
+    store zero bucket number at cluster object $c_i.bucket = 0$\;
   }
   \BlankLine
   \caption{\codefunc{Place}}\label{algo:place}
 \end{algorithm}
 
-% The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets, which replaces the odd cluster list $\m{L}$. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
+% The sorting method that is suited for our case is \emph{Bucket sort}. In this algorithm, the elements are distributed into $k$ buckets, after which each bucket is sorted individually and the buckets are concatenated to return the sorted elements. Applied to the clusters, we sort the odd-parity clusters into $k$ buckets, which replaces the odd cluster list $\m{L}_o$. As the sizes of the clusters can only take on integer values, each bucket can be assigned a clusters size, and sorting of each individual bucket is not necessary. Furthermore, as we are not interested in the overall order of clusters, concatenating of the buckets is not necessary.
 
 
 % \subsubsection{Growing a bucket}
@@ -427,23 +428,25 @@ The size of a cluster is defined as $|V_i|$ the number of vertices in its cluste
 
 \subsection{Growing buckets}
 
-In the original algorithm, we keep iterating over $\m{L}$ whilst there are odd-parity clusters remaining in the list, where in each round of growth the clusters increase in size and potentially merge to even parity. Here, we made sure that at the end of each round, the even-parity clusters are removed from $\m{L}$. 
+In the original algorithm, we keep iterating over $\m{L}_o$ whilst there are odd-parity clusters remaining in the list, where in each round of growth the clusters increase in size and potentially merge to even parity. Here, we made sure that at the end of each round, the even-parity clusters are removed from $\m{L}_o$. 
 
-With weighted grow, the list of odd clusters $\m{L}$ from algorithm \ref{algo:uf} is replaced with the list of buckets $Buckets$. Growing each bucket $b_k$ is now equivalent to a round of growth. In each round $k$, we grow all clusters $V_i$ in $b_k$ with $\codefunc{Grow}(\delta V_i$). However, it is now possible for an odd-parity cluster $V_i$ to be grown and placed in bucket $b_m$ in round $k$, merged with some other odd-parity cluster to an even parity cluster in round $k+1$, and merged with another odd-parity cluster in round $k+2$ and placed in bucket $b_{m'}$. Thus in round $k+1$, the placement of $V_i$ in $b_m$ is invalid as its parity is even, and in round $k+1$ the placement is equally invalid as it is placed in both $b_m$ and $b_{m'}$. The placement is $b_m$ is thus a \emph{redundant placement}. 
+With weighted grow, the list of odd clusters $\m{L}_o$ from algorithm \ref{algo:uf} is replaced with the list of buckets $\m{L}_b$. Growing each bucket $b_k$ is now equivalent to a round of growth. In each round $k$, we grow all clusters $c_i$ in $b_k$ with $\codefunc{Grow}(c_i$). However, it is now possible for an odd-parity cluster $c_i$ to be grown and placed in bucket $b_m$ in round $k$, merged with some other odd-parity cluster to an even parity cluster in round $k+1$, and merged with another odd-parity cluster in round $k+2$ and placed in bucket $b_{m'}$. Thus in round $k+1$, the placement of $c_i$ in $b_m$ is invalid as its parity is even, and in round $k+1$ the placement is equally invalid as it is placed in both $b_m$ and $b_{m'}$. The placement is $b_m$ is thus a \emph{redundant placement} (see Figure \ref{3.fig.clustermergeB}).
 
-To avoid the growth of a redundantly placed cluster $V_i$, we check before $\codefunc{Grow}(\delta V_i$) that the cluster $V_i$ still belongs to the bucket $b_k$. To facilitate this check, at the end of the function \codefunc{Place} (Algorithm \ref{algo:place}), which is called immediately after a cluster is grown, we additionally store the bucket number at the cluster object $C.b = k$. When iterating over the bucket $b_k$, a cluster $V_i$ is conditionally grown only if $C.b = k$. When a cluster is merged to have even parity, its bucket number is updated to $C_b=0$, such that it will not be grown.  
+To avoid the growth of a redundantly placed cluster $c_i$, we check before $\codefunc{Grow}(c_i$) that the cluster $c_i$ still belongs to the bucket $b_k$. To facilitate this check, at the end of the function \codefunc{Place} (Algorithm \ref{algo:place}), which is called immediately after a cluster is grown, we additionally store the bucket number at the cluster object $c_i.bucket = k$. When iterating over the bucket $b_k$, a cluster $c_i$ is conditionally grown only if $c_i.bucket = k$. When a cluster is merged to have even parity, its bucket number is updated to $c_i.bucket=0$, such that it will not be grown.  
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{cluster_merge_A.pdf}
   \caption{Faulty entries of clusters can occur in the buckets, a) cluster that should not be there due to a merge event. Situation a can be solved by checking the parity of the cluster. Checking the parity of the root cluster solves a) and b). Checking the bucket\_number of the root cluster solves all.}\label{3.fig.clustermergeB}
+  \todo[inline]{Figure text not fitting thesis} 
 \end{figure}
+
 
 \begin{lemma}\label{lem:numbuckets}
   To apply Bucket sort for weighted growth on a lattice of $n$ vertices, a total of $N_b = n$ buckets are needed. 
 \end{lemma}
 \begin{proof}
-  On a lattice of $n$ vertices, a cluster $V_i$ can have a maximum size of $|V_i|=n$. The number of buckets needed for using Bucket sort for weighted growth is thus seemingly $N_b = 2n$, where for each cluster size two buckets are initiated. However, any cluster reaching size $|V_i|\geq n$, there must be at least on another cluster $V_j$ with size $|V_j|<n$. Cluster $V_j$ thus belongs to a lower bucket with $b_j < b_i$ that is grown before cluster $V_i$. As there are only $n$ vertices on the lattice, these clusters must merge before cluster $V_i$ is grown. Thus buckets $b_k$ with $k>n$ are always empty or contain strictly redundant placements.
+  On a lattice of $n$ vertices, a cluster $c_i$ can have a maximum size of $|\m{V}_i|=n$. The number of buckets needed for using Bucket sort for weighted growth is thus seemingly $N_b = 2n$, where for each cluster size two buckets are initiated. However, any cluster reaching size $|\m{V}_i|\geq n$, there must be at least on another cluster $c_j$ with size $|\m{V}_j|<n$. Cluster $c_j$ thus belongs to a lower bucket with $b_j < b_i$ that is grown before cluster $c_i$. As there are only $n$ vertices on the lattice, these clusters must merge before cluster $c_i$ is grown. Thus buckets $b_k$ with $k>n$ are always empty or contain strictly redundant placements.
 \end{proof}
 
 Actually, for either a toric or planar code, the number of buckets required is slightly less than $n$. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. The pseudo-code for the Union-Find decoder with weighted growth implemented via Bucket sort (and dynamic forests, see next section) is listed in Algorithm \ref{algo:ufbucketdf}. 
@@ -500,44 +503,47 @@ Initiating $n$ buckets takes $\m{O}(n)$ time. The placement of each cluster in a
 
 
 \section{Dynamic forest}
-Syndrome validation outputs a validated erasure $\bar{\m{E}}$, a set of connected clusters with even syndrome parities $\{\m{E}_1, \m{E}_2, ...\}$. The task of the Peeling decoder is now to 1) make a set of forests $\{F_{\m{E}_1}, F_{\m{E}_2}, ...\}$ and 2) peel these forests and output a correction $\n{P}(\m{C})$ where $\m{C} = \{\m{C}_1, \m{C}_2,...\}$. Recall that a forest $F_{\m{E}_i}$ (Definition \ref{def:forest}) can be created by a depth-first search of the edge set $\m{E}_i$. We now show that via a simple extra step in syndrome validation, clusters $\m{E}_i$ can be grown such that it is always acyclic and $F_{\m{E}_i} = \m{E}_i$. 
+Syndrome validation outputs a validated erasure $\bar{\m{R}}$, a set of connected clusters with even syndrome parities with edge sets $\{\m{E}_1, \m{E}_2, ...\} \equiv \{\bar{\m{R}}_1, \bar{\m{R}}_2, ...\}$. The task of the Peeling decoder is now to 1) make a set of trees such that the edges sets of clusters are $\{\m{E}_1, \m{E}_2, ...\} \equiv \{\m{T}_{\m{E}_1}, \m{T}_{\m{E}_2}, ...\}$ and 2) peel these forests and output a correction $\n{P}(\m{C})$ where $\m{C} = \{\m{C}_1, \m{C}_2,...\}$. Recall that a tree $\m{T}_{\m{R}_i}$ (Definition \ref{def:forest}) can be created by a depth-first search of the edge set $\m{R}_i$. We now show that via a simple extra step in syndrome validation, clusters $\m{R}_i$ can be grown such that it is always acyclic and $\m{T}_{\m{R}_i} = \m{R}_i$. 
 
 \begin{definition}
-  The dynamic forest $\m{F}_i$ is a subset of $\m{E}_i$, where the property of $\m{F}_i=F_{\m{E}_i}$ of definition \ref{def:forest} is always maintained during cluster growth.
+  The dynamic cluster tree $\m{T}_i$ is a subset of $\m{E}_i$, the edge set of a cluster $c_i$, where the property of Definition \ref{def:forest} is always maintained during growth, such that
+  \begin{equation}
+    \m{E}_{i,t}\equiv\m{T}_{\m{E}_{i,t}} \forall t \text{ during growth}.
+  \end{equation}
 \end{definition}
-The dynamic forest $\m{F}_i$ can be maintained by an additional step when considering all edges from the fusion list $\m{F}$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $Support[(u,v)]$ if $r_u = r_v$. The pseudo-code for the Union-Find decoder with dynamic forests (and weighted growth implemented via Bucket sort, see previous section) is listed in Algorithm \ref{algo:ufbucketdf}.
+The dynamic cluster tree $\m{T}_i$ replaces $\m{E}_i$ as the edge set of a cluster $c_i$ and can be maintained by an additional step when considering all edges from the merging list $\m{L}_m$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $(u,v).support$ if $r_u = r_v$. The pseudo-code for the Union-Find decoder with dynamic forests (and weighted growth implemented via Bucket sort, see previous section) is listed in Algorithm \ref{algo:ufbucketdf}.
 
-To maintain these dynamic forests $\m{F}_i$ has some benefits that may not be immediately clear. In the next chapter, we will present a modification of the Union-Find decoder that aims to minimize the weight of matchings or $|\m{C}|$ after peeling by selective sub-growth of clusters. The results of this modification shows that a decreased weight is to some extend a heuristic for an increased threshold, which can be testified by the superior threshold of the Minimum Weight Perfect Matching decoder (Section \ref{sec:MWPMdecoder}). This modification is reliant on clusters that are always acyclic, which motivates the dynamic forests routine. 
+\todo[inline]{make connection with results section}
+To maintain these dynamic trees $\m{T}_i$ has some benefits that may not be immediately clear. In the next chapter, we will present a modification of the Union-Find decoder that aims to minimize the weight of matchings or $|\m{C}|$ after peeling by selective sub-growth of clusters. The results of this modification shows that a decreased weight is to some extend a heuristic for an increased threshold, which can be testified by the superior threshold of the Minimum Weight Perfect Matching decoder (Section \ref{sec:MWPMdecoder}). This modification is reliant on clusters that are always acyclic, which motivates the dynamic forests routine. 
 
-Furthermore, when dynamic forests are not maintained, the shape of the forest $F_{\m{E}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}), and therefore the matching weight $|\m{C}|$, is dependent on the seed, the vertices where the depth-first search is initiated. If the seeds are selected randomly, minimum weight matchings within $\m{E}_i$ are not certain. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in V_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $F_{\m{E}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic forest $\m{F}_i$ during some growth iteration are equivalent to the breadth of edges added to $F_{\m{E}_i}$ in one of the breadth-first searches. 
+Furthermore, when dynamic cluster trees are not maintained, the shape of the forest $\m{T}_{\m{R}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}), and therefore the matching weight $|\m{C}|$, is dependent on the seed, the vertices where the depth-first search is initiated. If the seeds are selected randomly, minimum weight matchings within $\m{R}_i$ are not certain. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in \m{V}_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $\m{T}_{\m{R}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic tree $\m{T}_i$ during some growth iteration are equivalent to the breadth of edges added to $\m{T}_{\m{R}_i}$ in one of the breadth-first searches. 
 
 \begin{algorithm}[h]
   \BlankLine
-  \KwData{A graph $G = (V,E)$, an erasure $\m{E} \subseteq E$ and syndrome $\sigma \subseteq V$}
-  \KwResult{Correction $\hat{C}$}
+  \KwData{A graph $G=(\m{V},\m{E})$, an erasure $\m{R} \subseteq \m{E}$ and syndrome $\sigma \subseteq \m{V}$}
+  \KwResult{Correction set $\m{C}$}
   \BlankLine
   \tcp{Syndrome validation}
-  Initialize clusters $V_i$ with boundaries $\delta V_i$ (def. \ref{def:clusterboud})\;
-  Initialize $Buckets$ with odd-parity clusters (def. \ref{def:buckets})\;
-  Initialize table $Support$ (def \ref{def:support})\;
-  \For{bucket $b_k$ in $Buckets$}{
-    Initialize $\m{F}=\emptyset, \m{P}=\emptyset$\;
-    \For{$V_i$ in $b_k$}{
-      \If{$C.b$ is $k$}{
-        get boundary $\delta V_i$, apply $\codefunc{Grow}(\delta V_i, Support, \m{F})$ (al. \ref{algo:ufgrow})\;
-        add cluster $C$ to $\m{P}$\;
+  Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$ (def. \ref{def:clusterboud})\;
+  Initialize $\m{L}_b$ with odd-parity clusters (def. \ref{def:buckets})\;
+  \For{bucket $b_k$ in $\m{L}_b$}{
+    Initialize $\m{L}_m=\emptyset, \m{L}_p=\emptyset$\;
+    \For{$c_i$ in $b_k$}{
+      \If{$c_i.bucket$ is $k$}{
+        $\codefunc{Grow}(c_i, \m{L}_m)$ (al. \ref{algo:ufgrow});
+        add $c_i$ to $\m{L}_p$\;
       }
     }
-    \For{$(u,v)$ in $\m{F}$}{
+    \For{$(u,v)$ in $\m{L}_m$}{
       Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (al. \ref{algo:find})\;
       \eIf{$r_u \neq r_v$}{
         apply $\codefunc{Union}(r_u,r_v)$ (al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
       }{
-        Subtract 1 from $Support[(u,v)]$\;
+        Subtract 1 from $(u,v).support$\;
       }
     }
-    \For{cluster $C$ in $\m{P}$}{
-      $\codefunc{Place}(V_i)$ (al. \ref{algo:place})\;
+    \For{cluster $c_i$ in $\m{L}_p$}{
+      $\codefunc{Place}(c_i, \m{L}_b)$ (al. \ref{algo:place})\;
     }
   }
   \KwRet{Validated erasure forest $\bar{\m{F}}$}

@@ -15,11 +15,14 @@ In order to do computations, a NOT gate may be applied to the codewords to flip 
 \begin{equation}
  000 \leftrightarrow 111
 \end{equation}
-A \emph{bit-flip} error can occur on any of the three bits in the code, which flips the single bit-value from 0 to 1 and 1 to 0. An error can be \emph{detected} by measuring the bits and comparing whether the bits have equal value. An detected error can be \emph{corrected} by computing the majority-function of the bitstring. Thus the three-bit repetition code will be correctly corrected if less than half of the bits were flipped.
+A \emph{bit-flip} error can occur on any of the three bits in the code, which flips the single bit-value from 0 to 1 and 1 to 0. An error can be \emph{detected} by measuring the bits and comparing whether the bits have equal value. An detected error can be \emph{corrected} by computing the majority-function of the bit-string. Thus the three-bit repetition code will be correctly corrected if less than half of the bits were flipped.
 \begin{align}
   0_L \xrightarrow{E_2} 010 \xrightarrow{correction} 000 && 0_L \xrightarrow{E_2, E_3} 011 \xrightarrow{correction} 111
 \end{align}
-The \emph{distance} $d$ of a classical code is the minimum amount of bit flips to transfer one codeword to another. In the case of the three-bit repetition code, the code distance is 3. The number of bits in de code $n$, the number of encoded bits $k$ and the distance of a code can be used to fully describe a code in the $[n, k, d]$ notation. The three-bit repetition code is a $[3,1,3]$ code.
+\begin{definition}\label{def:distance}
+  The \emph{distance} $d$ of a classical code is the minimum amount of bit flips to transfer one codeword to another. 
+\end{definition}
+In the case of the three-bit repetition code, the code distance is 3. The number of bits in de code $n$, the number of encoded bits $k$ and the distance of a code can be used to fully describe a code in the $[n, k, d]$ notation. The three-bit repetition code is a $[3,1,3]$ code.
 
 \section{Quantum three-bit repetition code}\label{sec:quantum3bit}
 
@@ -43,27 +46,27 @@ The Pauli operations are unitary operations on single qubits, and will be applie
 \end{align}
 The Pauli operators represent errors that can occur on a single qubit. The Pauli X operator is analogous to the classical \emph{bit-flip} error and acts on the qubit computational basis states:
 \begin{align}\label{eqq:qec_bitflip}
-  & X\ket{0} = \ket{1} && X\ket{1} = \ket{0} &
+  & \hat{X}\ket{0} = \ket{1} && \hat{X}\ket{1} = \ket{0} &
 \end{align}
-Additionally, the Pauli Z operator introduces phase errors on a quantum bit:
+which will be referred to as a \emph{X-error}. Additionally, the Pauli Z operator introduces phase errors on a quantum bit:
 \begin{align}\label{eq:eqc_phaseflip}
-  & Z\ket{0} = -\ket{0} && Z\ket{1} = -\ket{1} &
+  & \hat{Z}\ket{0} = -\ket{0} && \hat{Z}\ket{1} = -\ket{1} &
 \end{align}
-The elements of the Pauli group on $n$ qubits, $\m{P}_n$, consists of tensor products of single qubit Pauli operators, such that  $\m{P}_n = \m{P}_1^{\otimes n}$. We use the index of a Pauli operator to indicated on which qubit it has operated on, while other qubits are acted on by the identify. In cases without indices, the order of the operators indicate the qubit it acts on. For example, element $P=X_1\otimes X_2 = XX$ on the three-bit repetition code means that qubit 1 and 2 have been acted on by the Pauli X operator, while qubit 3 is acted on by the identity. The tensor product symbol is often omitted for clarity, such that the above operation can be also written as  $P=X_1X_2$. The \emph{weight} of an operator is the number of qubits on which it does not act non-trivially. On the pure  three-qubit encoded state, a bit-flip error on the second qubit is applied as:
+and will be referred to as a \emph{Z-error}. The elements of the Pauli group on $n$ qubits, $\m{P}_n$, consists of tensor products of single qubit Pauli operators, such that  $\m{P}_n = \m{P}_1^{\otimes n}$. We use the index of a Pauli operator to indicated on which qubit it has operated on, while other qubits are acted on by the identify. In cases without indices, the order of the operators indicate the qubit it acts on. For example, element $\hat{X}_1\otimes \hat{X}_2=\hat{X}\otimes \hat{X}$ on the three-bit repetition code means that qubit 1 and 2 have been acted on by the Pauli X operator, while qubit 3 is acted on by the identity. The tensor product symbol is often omitted for simplification, such that the above operation can be also written as $\hat{X}_1\hat{X}_2$. The \emph{weight} of an operator is the number of qubits on which it does not act non-trivially. On the pure  three-qubit encoded state, a bit-flip error on the second qubit is applied as:
 \begin{equation}\label{eq:qec_3bitflip}
-  X_2\ket{\psi}_L = (I\otimes X \otimes I) \ket{\psi}_L = \alpha\ket{010} + \beta\ket{101}
+  \hat{X}_2\ket{\psi}_L = (\hat{I}\otimes \hat{X} \otimes \hat{I}) \ket{\psi}_L = (\hat{I} \hat{X} \hat{I}) \ket{\psi}_L= \alpha\ket{010} + \beta\ket{101}
 \end{equation}
 
 \subsection{Logical operations}
 
-In order to do computations on the encoded qubit of our three-bit repetition code, we wish to find the Pauli operators in $\m{P}_3$ which flips any basis of the basis states of the encoded qubit to the other. We find that $X\otimes X\otimes X$ transforms $\ket{0}_L$ to $\ket{1}_L$, which is known as the logical bit-flip.
+In order to do computations on the encoded qubit of our three-bit repetition code, we wish to find the Pauli operators in $\m{P}_3$ which flips any basis of the basis states of the encoded qubit to the other. We find that $\hat{X}\otimes \hat{X}\otimes \hat{X}$ transforms $\ket{0}_L$ to $\ket{1}_L$, which is known as the logical bit-flip.
 
-Furthermore, we now have the logical Z operator which must map $\ket{0}_L$ to $-\ket{0}_L$ and $\ket{1}_L$ to $-\ket{1}_L$. We see that for example $Z\otimes I\otimes I$ achieves this, but also any other $\m{P}_3$ operator with two identities and one Pauli Z operator. Thus there are multiple operators that achieves the same. We formalize the logical operators as
+Furthermore, we now have the logical Z operator which must map $\ket{0}_L$ to $-\ket{0}_L$ and $\ket{1}_L$ to $-\ket{1}_L$. We see that for example $\hat{Z}\otimes \hat{I}\otimes \hat{I}$ achieves this, but also any other $\m{P}_3$ operator with two identities and one Pauli Z operator. Thus there are multiple operators that achieves the same. We formalize the logical operators as
 \begin{align}\label{eq:qec_3bitlogical}
-  \gls{oXlogical} = XXX && \gls{oZlogical} = ZII
+  \gls{oXlogical} = \hat{X}\hat{X}\hat{X} && \gls{oZlogical} = \hat{Z}\hat{I}\hat{I}
 \end{align}
 
-The distance of a quantum code is the minimal weight of any logical operators on the code. In the above case, the weight of the encoded X operator $\bar{X}$ is 3, hence the code can detect up to 2 X errors, analogous to the classical case. However, the weight of the encoded Z operator $\bar{Z}$ is only 1, which means that Z errors cannot be detected at all.
+The distance of a quantum code is the minimal weight of any logical operators on the code. In the above case, the weight of the encoded X operator $\hat{X}_L$ is 3, hence the code can detect up to 2 X-errors, analogous to the classical case. However, the weight of the encoded Z operator $\hat{Z}_L$ is only 1, which means that Z-errors cannot be detected at all.
 
 \subsection{Error detection}
 
@@ -79,72 +82,81 @@ To detect errors in our repetition code, we now cannot measure the states direct
   \caption{The quantum circuit for a parity measurement on two qubits, $Q_1$ and $Q_2$, which is measured on the ancilla qubit prepared in $\ket{0}$. }\label{fig:2qubitparity}
 \end{figure}
 
-
-Note that measuring the ancilla qubit in the computational basis will be equivalent to measuring $Z\otimes Z$ on the first two qubits, as
+Note that measuring the ancilla qubit in the computational basis will be equivalent to measuring $\hat{Z}\otimes \hat{Z}$ on the first two qubits, as
 \begin{equation}
 \begin{aligned}
-    (ZZ)\ket{00} &= \ket{00} && (ZZ)\ket{01} &= -\ket{01} \\
-    (ZZ)\ket{10} &= -\ket{10} && (ZZ)\ket{11} &= \ket{11}
+    (\hat{Z}\hat{Z})\ket{00} &= \ket{00} && (\hat{Z}\hat{Z})\ket{01} &= -\ket{01} \\
+    (\hat{Z}\hat{Z})\ket{10} &= -\ket{10} && (\hat{Z}\hat{Z})\ket{11} &= \ket{11}
 \end{aligned}
 \end{equation}
-Now for our quantum three-bit repetition code, we need to setup ancilla qubits between each of the 3 qubits, such that the parity between any two qubits can be measured. For the state in equation \eqref{eq:qec_3bitstate}, any parity measurement $ZZI$, $ZIZ$ or $IZZ$ will return even parity. If one of the qubits has encountered a bit-flip error such as in the second qubit in equation \eqref{eq:qec_3bitflip}, two of the parity measurements will return a -1 eigenvalue, in this case $ZZI$ and $IZZ$.
+Now for our quantum three-bit repetition code, we need to setup ancilla qubits between each of the 3 qubits, such that the parity between any two qubits can be measured. For the state in equation \eqref{eq:qec_3bitstate}, any parity measurement $\hat{Z}\hat{Z}\hat{I}$, $\hat{Z}\hat{I}\hat{Z}$ or $\hat{I}\hat{Z}\hat{Z}$ will return even parity. If one of the qubits has encountered a bit-flip error such as in the second qubit in equation \eqref{eq:qec_3bitflip}, two of the parity measurements will return a -1 eigenvalue, in this case $\hat{Z}\hat{Z}\hat{I}$ and $\hat{I}\hat{Z}\hat{Z}$.
 
 Furthermore, we see that no configuration of ancilla qubits could be set up for the three-bit repetition code to detect for phase errors, which was already set by the weight of the logical Z operator.
 
 \subsection{Error correction}
 
-As the error has been identified, we can apply correct Pauli operator from $\m{P}_3$ to correct the error. In the above case, we wish to apply $IXI$ to clip the second qubit to correct the code.
+As the error has been identified, we can apply correct Pauli operator from $\m{P}_3$ to correct the error. In the above case, we wish to apply $\hat{}\hat{}\hat{}$ to clip the second qubit to correct the code.
 
-In the quantum three-bit repetition code, we can very simply deduct which qubit has encountered an error from the combination of uneven parity measurements. This is called \emph{decoding} the error and is the main function of a \emph{decoder}. More complex error correcting codes involves decoding algorithms which are far more complex than in the three-bit repetition code, which we will see more of later.
+In the quantum three-bit repetition code, we can very simply deduct which qubit has encountered an error from the combination of uneven parity measurements. This is called \emph{decoding} the error and is the main function of a \emph{decoder}. More compleX-error correcting codes involves decoding algorithms which are far more complex than in the three-bit repetition code, which we will see more of later.
 
 
 \section{Stabilizer Formalism}\label{sec:stabilizerformalism}
 
 As we have seen above, we can use the Pauli group $\m{P}_n$ to easily describe a quantum error correcting code of $n$ qubits, without explicitly looking at the \emph{state} of the qubit. This powerful technique is called the \emph{stabilizer formalism} \cite{gottesman1997stabilizer}, and is the most widely formalism used to describe topological codes.
 
-A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators: 1) a set of \emph{stabilizer generators} $\gls{zstabilizergenerator}$ which generates the \emph{stabilizer group} $\gls{sstabilizergroup}$, an Abelian subgroup of the Pauli group, and 2) a set of encoded \emph{logical operators}. A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that
+\begin{definition}\label{def:stabilizer}
+  A stabilizer group is the set of Pauli operators which leave all states $\ket{\psi}_i$ from the \emph{codespace}, a subspace of the Hilbert space of $n$ qubits spanned by the codeword basis states, invariant, such that
 \begin{align}
-  & \gls{zstabilizer}\ket{\psi}_i = \ket{\psi}_i, && \forall S \in \m{S}. &
+  & \gls{ostabilizer}\ket{\psi}_i = \ket{\psi}_i, && \forall \hat{S} \in \m{S}. &
 \end{align}
-The elements of the of the stabilizer group $S\in\m{S}$ are most simply referred to as \emph{stabilizers}. Any stabilizer $S$ can be written as a product of elements from a set of stabilizer generators $\mathfrak{s}=\{s_1,...,s_{N_s}\}$.  
-\begin{align}
- & S = \prod_{j=1}^{N_s}s_j^{a_j}, && a_j \in {0, 1} &
-\end{align}
-The set of stabilizer generators $\mathfrak{s}$ is \emph{independent} if no generator can be written as a product of other generators. This implies that any stabilizer can be written in terms of the bitstring $a_1, a_2, ...a_{N_s}$ and that the stabilizer group takes up $N_s$ degrees of freedom of the Hilbert space of $N$ qubits. The remaining $N-N_s = N_l$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $N_l$ logical qubits are to be encoded by $N$ qubits, we require a total of $N_s = N-N_l$ independent stabilizer generators.
+\end{definition}
+A quantum error correcting code that can be described using the stabilizer formalism is called a \emph{stabilizer code}. A stabilizer code is defined by two sets of operators: 1) a set of \emph{stabilizer generators} $\hat{S}$ which generates the \emph{stabilizer group} $\gls{sstabilizergroup}$, an Abelian subgroup of the Pauli group, and 2) a set of encoded \emph{logical operators}. The elements of the of the stabilizer group $\hat{S}\in\m{S}$ are most simply referred to as \emph{stabilizers}. 
+\begin{definition}\label{def:stabilizergen}
+  Let $\gls{sstabilizergenset}=\{\gls{ostabilizergenerator}_1,\hat{s}_2,...\}$ denote the set of stabilizer generators. Any stabilizer $S$ can be written as a product of elements from $\mathfrak{s}$, such that 
+  \begin{align}
+  & S = \prod_{j=1}^{n_s}\hat{s}_j^{a_j}, && a_j \in \{0, 1\}. &
+  \end{align}
+\end{definition}
+The set of stabilizer generators $\mathfrak{s}$ is \emph{independent}: if no generator can be written as a product of other generators. This implies that any stabilizer can be written in terms of the bit-string $\{a_1, a_2, ...\}$ and that the stabilizer group takes up $N_s$ degrees of freedom of the Hilbert space of $N$ qubits. The remaining $n-n_s = n_L$ degrees of freedom which are not specified by the stabilizers make up the \emph{codespace}, the subspace spanned by the logical basis states, or the number of encoded logical qubits. Thus, if $n_L$ logical qubits are to be encoded by $N$ qubits, we require a total of $n_s= n-n_L$ independent stabilizer generators.
 
 
 \subsection{Encoded logical operators}
 
-Next to the set of stabilizers, we can construct the set of logical operators that will act on the encoded qubits from a set commutation rules. First of all, all logical operators must commute with all elements of the stabilizers, as a logical operator is made up from Pauli operators, and any Pauli operator which anticommutes with a stabilizer cannot leave the codespace invariant. Note that his means that a logical operator is not unique, as it can be multiplied with an element of the stabilizer. Secondly, we can impose commutation rules for the logical operators themselves based on the Pauli operators that they are representing. For example, logical $\bar{X}$ and $\bar{Z}$ operators must anticommute.
+Next to the set of stabilizers, we can construct the set of logical operators that will act on the encoded qubits from a set commutation rules. First of all, all logical operators must commute with all elements of the stabilizers, as a logical operator is made up from Pauli operators, and any Pauli operator which anticommutes with a stabilizer cannot leave the codespace invariant. Note that his means that a logical operator is not unique, as it can be multiplied with an element of the stabilizer. Secondly, we can impose commutation rules for the logical operators themselves based on the Pauli operators that they are representing. For example, logical $\hat{X}_L$ and $\hat{Z}_L$ operators must anticommute.
 
 The minimum weight of the logical operator determines the distance $d$ of the error correcting code. This is thus the minimal amount of errors that can cause a logical failure. Together with the total number of qubits $n$ and number of logical qubits $k$, they provide a rough measure of the error correcting capabilities of the code.
 
 \subsection{Error detection procedure}
 
 As the stabilizers are a set of Pauli operators, they correspond to blip-flip or phase-flip errors that may have happened on any of our $n$ qubits. Furthermore, as any stabilizer leaves all states  $\ket{\psi}_i$ invariant, measuring the stabilizers does not disrupt the encoded information. If no error has occurred, all stabilizer measurements will return a '+1' eigenvalue, while any '-1' outcome points to the presence of errors, which we will call a \emph{stabilizer violation}.
-
-This outcome is dependent on whether an error caused by the error operator $\gls{operror}$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $P$ and generator $s$ commute then,
+\begin{definition}
+  Let $\hat{E}$ denote an error operator, which is a product of Pauli operators acting on a codespace. 
+\end{definition}
+This outcome is dependent on whether an error caused by the error operator $\hat{E}$, must either commute or anticommute with the stabilizer generators, since all operators are members of the same Pauli group $\m{P}_n$. If $\hat{E}$ and generator $\hat{s}$ commute then,
 \begin{equation}
-  sP\ket{\psi} = Ps\ket{\psi} = P\ket{\psi}
+  \hat{s}\hat{E}\ket{\psi} = \hat{E}\hat{s}\ket{\psi} = \hat{E}\ket{\psi}
 \end{equation}
-which means that the post-error state is a +1 eigenstate of $S_j$. If $O$ and generator $S_j$ anticommute then,
+which means that the post-error state is a +1 eigenstate of $\hat{s}$. If $\hat{E}$ and generator $\hat{s}$ anticommute then,
 \begin{equation}\label{qec:eq:stabmeas}
-  sP\ket{\psi} = -Ps\ket{\psi} = -P\ket{\psi}
+  \hat{s}\hat{E}\ket{\psi} = -\hat{E}\hat{s}\ket{\psi} = -\hat{E}\ket{\psi}
 \end{equation}
-and the post-error state is a -1 eigenstate of $s$. Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns a series of eigenvalue outcomes that is called the \emph{syndrome}. However, it is not necessary to measure all operators in the stabilizer group $\m{S}$. Measuring the set of independent stabilizer generators $\mathfrak{s}=\{s_1,...,s_{N_s}\}$ suffices as any other stabilizer is just a combination of already measured states.
+and the post-error state is a -1 eigenstate of $\hat{s}$. 
+\begin{definition}\label{def:syndrome}
+  Let $\sigma$ denote the \emph{syndrome}; the set of non-trivial stabilizer measurements. It is called as such because it gives an indication of the underlying error, just as the term is just in medical terms. 
+\end{definition}
+Errors on stabilizers codes are therefore detected by measuring the stabilizers, which returns the syndrome. However, it is not necessary to measure all operators in the stabilizer group $\m{S}$. Measuring the set of independent stabilizer generators $\mathfrak{s}$ suffices as any other stabilizer is just a combination of already measured states.
 
 \subsection{Error models}\label{qec:sec_errormodels}
-
 Any qubit can be subject to a combination of errors, each can be caused by a difference factor in our quantum system. To generalize these errors, we define certain \emph{error models} that constricts the errors that take place. Here, we list a few models that we will encounter in this thesis. 
 
 \paragraph{Independent noise model}
 We were already introduced in the \emph{bit-flip} and \emph{phase-flip} errors in section \ref{subsec:pauli}. But let us know generalized them in the form of the density matrix $\rho$. Let $\Phi$ be a quantum channel that maps $\rho$ to $\Phi(\rho)$, and let the chance of a bit-flip error be $p_X$, the resulting state should be
 \begin{equation}\label{qec:eq:bitflip}
-  \Phi_X(\rho) = (1-p_X)\rho + p_X(X\rho X).
+  \Phi_X(\rho) = (1-p_X)\rho + p_X(\hat{X}\rho \hat{X}).
 \end{equation}
 Analogously, let the chance of a phase-flip error be $p_Z$, the resulting state should be
 \begin{equation}\label{qec:eq:phaseflip}
-  \Phi_Z(\rho) = (1-p_Z)\rho + p_Z(Z\rho Z).
+  \Phi_Z(\rho) = (1-p_Z)\rho + p_Z(\hat{Z}\rho \hat{Z}).
 \end{equation}
 
 The bit-flip and phase-flip errors can be considered together as the \emph{independent noise model} or the \emph{uncorrelated noise model}. As the two types of errors are independent, they can be studied separately from each other.
@@ -152,15 +164,15 @@ The bit-flip and phase-flip errors can be considered together as the \emph{indep
 \paragraph{The depolarizing noise model}
 In the \emph{depolarizing} noise model, the afflicted quantum state is replaced by a complete mixed state with probability $p_D$. Let the completely mixed state be written as
 \begin{equation}\label{qec:eq:mixstate}
-  \frac{1}{2}I = \frac{1}{4}(\rho + X\rho X + Y\rho Y + Z\rho Z),
+  \frac{1}{2}I = \frac{1}{4}(\rho + \hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}),
 \end{equation}
 then the depolarizing channel is described as
 \begin{align}\label{qec:eq:depolarizing}
-  \nonumber \Phi_D(\rho) &= (1-p_D)\rho + p_D\left(\frac{1}{2}I\right) \\
-  \nonumber &= \left(1-\frac{3}{4}p_D\right)\rho + \frac{p_D}{4}(X\rho X + Y\rho Y + Z\rho Z) \\
-  &= (1-p^*_D)\rho + \frac{p^*_D}{3}(X\rho X + Y\rho Y + Z\rho Z),
+  \nonumber \Phi_D(\rho) &= (1-p_D)\rho + p_D\left(\frac{1}{2}\hat{I}\right) \\
+  \nonumber &= \left(1-\frac{3}{4}p_D\right)\rho + \frac{p_D}{4}(\hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}) \\
+  &= (1-p^*_D)\rho + \frac{p^*_D}{3}(\hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}),
 \end{align}
-which can be interpreted as the state $\rho$ is left untouched with probability $p^*_D =\frac{3}{4}p_D$, and each Pauli gate is applied to it with probability $1-p^*_D$. Differently from the \emph{independent noise model}, to optimally decode, we need to take into account correlations between X and Z errors.
+which can be interpreted as the state $\rho$ is left untouched with probability $p^*_D =\frac{3}{4}p_D$, and each Pauli gate is applied to it with probability $1-p^*_D$. Differently from the \emph{independent noise model}, to optimally decode, we need to take into account correlations between X and Z-errors.
 
 \paragraph{The erasure noise model}
 In the \emph{erasure} noise model, a qubit is completely erased or lost from the system,
@@ -172,23 +184,23 @@ where the state $\ket{e}$ is outside the qubit space. Such a loss can be detecte
 
 \subsection{Error correction or decoding}
 
-As the Pauli operators are self-inverse, any error $E$ can be corrected by applying it again. From the measurement outcomes of a stabilizer measurement, we can deduce which error $E$ must have caused the syndrome. However, this relationship is not always one-to-one, as an error $E$ and its multiplication with a stabilizer $ES$ will lead to an identical syndrome. This is called the \emph{code degeneracy}. The choice of the most appropriate error to correct is not a trivial task, and algorithms that are tasked to automate this process are called \emph{decoders}.
+As the Pauli operators are self-inverse, any error $\hat{E}$ can be corrected by applying it again. From the syndrome of a stabilizer measurement, we can make an attempt at deducing which error $\hat{E}$ must have caused the syndrome. However, this relationship is not always one-to-one, as an error $\hat{E}$ and its multiplication with a stabilizer $\hat{E}\hat{S}$ will lead to an identical syndrome. This is called the \emph{code degeneracy}. The choice of the most appropriate error to correct is not a trivial task, and algorithms that are tasked to automate this process are called \emph{decoders}.
 
 \subsection{Stabilizer codes}
 
-The three-qubit repetition code we already covered can now be described in the stabilizer formalism. We had already found that the logical operators are encoded $\bar{X} = XXX$ and $\bar{Z} = ZII$. Other logical operators also exist up to a stabilizer. The stabilizer generators are needed to complete its description. We had found that two parity measurements, for example $ZZI$ and $IZZ$, will identify the error, as they will either commute or anticommute with the error, as such they are a set of independent stabilizer generators. 
+The three-qubit repetition code we already covered can now be described in the stabilizer formalism. We had already found that the logical operators are encoded $\hat{X}_L = \hat{X}\hat{X}\hat{X}$ and $\hat{Z}_L = \hat{Z}\hat{I}\hat{I}$. Other logical operators also exist up to a stabilizer. The stabilizer generators are needed to complete its description. We had found that two parity measurements, for example $\hat{Z}\hat{Z}\hat{I}$ and $\hat{I}\hat{Z}\hat{Z}$, will identify the error, as they will either commute or anticommute with the error, as such they are a set of independent stabilizer generators. 
 
-The resulting measurement of '+1' or '-1' eigenvalues make up the syndrome. De decoder algorithm here is quite simple, but fails in the case if there is more than 1 bit-flip error. The code has $n=3$ and $n_S=2$ which results in the expected $n_L = 1$ encoded bits. The distance $d$ of the is 1, which conforms that there are certain errors, in this case phase-flip errors, which this code cannot detect.
+The resulting measurement of '+1' or '-1' eigenvalues make up the syndrome. De decoder algorithm here is quite simple, but fails in the case if there is more than 1 bit-flip error. The code has $n=3$ and $n_s=2$ which results in the expected $n_L = 1$ encoded bits. The distance $d$ of the is 1, which conforms that there are certain errors, in this case phase-flip errors, which this code cannot detect.
 
 The smallest code which can correctly solve for both single bit-flip and phase-flip errors is the \emph{5-qubit repetition code} \cite{laflamme1996perfect}. This code has the following stabilizer generators:
 \begin{align}
-  XZZXI && IXZZX && XIXZZ && ZXIXZ
+  \hat{X}\hat{Z}\hat{Z}\hat{X}\hat{I} && \hat{I}\hat{X}\hat{Z}\hat{Z}\hat{X} && \hat{X}\hat{I}\hat{X}\hat{Z}\hat{Z} && \hat{Z}\hat{X}\hat{I}\hat{X}\hat{Z}
 \end{align}
 with the logical operators up to a stabilizer:
 \begin{align}
-  & \bar{X} = XXXXX && \bar{Z} = ZIIII &
+  & \hat{X}_L = \hat{X}\hat{X}\hat{X}\hat{X}\hat{X} && \hat{Z}_L = \hat{Z}\hat{I}\hat{I}\hat{I}\hat{I} &
 \end{align}
-This codes now has $n=5$ bits with $n_S = 4$ stabilizers, which means it still encodes for a single bit.\\
+This codes now has $n=5$ bits with $N_s = 4$ stabilizers, which means it still encodes for a single bit.\\
 \\
 \\
 With the principles of encoding and decoding in the quantum error correction in mind, we are now ready to move on to a more complicated variant of stabilizer codes, the \emph{surface code}. 
