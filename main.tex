@@ -67,7 +67,7 @@
     fonttitle=\bfseries, coltitle=black, algotitle={}, #1}
 
 
-% listings of pseudocodes
+% listings of pseudo-codes
 \usepackage{listings}
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 
@@ -104,7 +104,7 @@
 \glsxtrnewsymbol[description={edge, element of $E$}]{nedge}{\ensuremath{e}}
 \glsxtrnewsymbol[description={Face set}]{sfaces}{\ensuremath{\m{F}}}
 \glsxtrnewsymbol[description={Face, element of $F$}]{nface}{\ensuremath{f}}
-\glsxtrnewsymbol[description={Probability of error correction}]{zpcorrect}{\ensuremath{p_C}}
+\glsxtrnewsymbol[description={Probability of error correction}]{zpcorrect}{\ensuremath{k_C}}
 \glsxtrnewsymbol[description={Threshold probability}]{zpthres}{\ensuremath{p_{th}}}
 \glsxtrnewsymbol[description={Error operator}]{operror}{\ensuremath{\hat{E}}}
 \glsxtrnewsymbol[description={Correction operator}]{ocorrection}{\ensuremath{\hat{C}}}
@@ -133,7 +133,7 @@
 \addbibresource{cit.bib}
 
 % Tables
-\usepackage{tabularx, hhline} 
+\usepackage{tabularx, hhline, multirow} 
 \newcolumntype{L}[1]{>{\hsize=#1\hsize\raggedright\arraybackslash}X}%
 \newcolumntype{R}[1]{>{\hsize=#1\hsize\raggedleft\arraybackslash}X}%
 \newcolumntype{C}[1]{>{\hsize=#1\hsize\centering\arraybackslash}X}%
@@ -150,6 +150,8 @@
   \include{_titlepage}
   \setcounter{tocdepth}{1}
   \tableofcontents
+  \include{chapters/ch_notations}
+  \printglossary[type=symbols, style={mcoltreegroup}]
   \clearpage
 
   \input{tikzfigs/function_draw_lattices}
@@ -157,8 +159,6 @@
   \pagenumbering{arabic} 
   % \include{preliminary_report}
   \include{chapters/ch_introduction}
-  \include{chapters/ch_notations}
-  \printglossary[type=symbols, style={mcoltreegroup}]
   \include{chapters/ch_qec_basics}
   \include{chapters/ch_surface_code}
   \include{chapters/ch_mwpmdecoder}
@@ -174,6 +174,7 @@
     \include{appendices/ap_ackermann}
     \include{appendices/ap_bucket_sort}
     \include{appendices/ap_ufpseudocodes}
+    \include{appendices/ap_simulationfigures}
     \include{appendices/ap_oopsurfacecode}
   \end{appendices}
 
