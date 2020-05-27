@@ -64,7 +64,7 @@ The first step  is to produce $\m{T}_{\tilde{\m{E}}}$ inside $\m{R}$, where all 
   \KwData{Graph $G = (\m{V},\m{E})$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}$}
   \KwResult{Correction set $m{C}$}
   \BlankLine
-  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ (Al. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ (Alg. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$\m{T}_\m{R} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $\m{T}_\m{R}$ \;
@@ -143,7 +143,7 @@ Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a
   \KwData{Graph $G = (\m{V}_{\iota\cup\omega}\cup \m{V}_\delta,E)$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}_{\iota\cup\omega}$}
   \KwResult{Correction set $\m{C}$}
   \BlankLine
-  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\delta$ (Al. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\delta$ (Alg. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$\m{T}_\m{R} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin \m{V}_\delta$, remove $e$ from $\m{T}_\m{R}$ \;
@@ -168,7 +168,7 @@ The Union-Find decoder \cite{delfosse2017almost} is a modification of the Peelin
 The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or any other type of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \eqref{qec:eq:bitflip} and \eqref{qec:eq:phaseflip}. Pauli-X errors, now caused by both erasure and bit-flips, exclusively trigger nontrivial star operator measurements on the vertices of the primal lattice. Pauli-Z errors, now caused by both erasure and phase-flips, exclusively trigger nontrivial plaquette measurements on vertices of the dual lattice. This means that theorem \ref{the:independentxy} still holds for the combined independent Pauli and erasure noise model, such that the the primal and dual lattices can be decoded separately. Again, we will only consider the primal lattice of graph $G(\m{E},\m{V})$ subjected to Pauli-X errors and erasures with replacement from uniformly distributed $\{\hat{I}, \hat{X}\}$, as the process of decoding the dual lattice is analogous to the primal lattice. For a combined noise model of erasure noise and depolarizing noise of equation \eqref{qec:eq:depolarizing}, theorem \ref{the:independentxy} fails, and is for this reason not considered in this thesis.
 
 The independent noise model introduces extra Pauli-X errors on qubits or edges $\m{E}_p\subseteq \m{E}$ such that not all Pauli errors are in the erasures $\m{R}$, where the Pauli errors induced by the erasure is denoted by $\m{E}_\m{R}$ (see Figure \ref{fig:ufdecoder}a). This means also that not all syndromes are in the vertex boundary of the erasure $\sigma \not\subseteq \mathscr{B}(\m{R})$ (definition \ref{def:boundaryofedges}), and odd-parity clusters can occur (definitions \ref{def:cluster}, \ref{def:clusterparity}) (see Figure \ref{fig:ufdecoder} b). Per theorem \ref{the:anyevenparity}, the Peeling decoder cannot solve for these errors. To this end, we construct an altered erasure $\bar{\m{R}} = f(\m{R},\sigma)$ that contains only even-parity clusters in a pre-processing step that is dubbed \emph{syndrome validation}. The validated erasure $\bar{\m{R}}$ is compatible with the peeling decoder. To do this, we sequentially grow the odd-parity clusters in diameter by adding neighboring vertices and edges to the clusters, effecting \emph{growing the erasure}. While these added edges are not truly erased, it does not matter for the decoder. When two odd-parity clusters meet, the merged cluster will have a even parity, and can now be solved by the Peeling decoder.
-\begin{proposition}
+\begin{proposition}\label{prop:ufdecoder}
   The Peeling decoder can be altered to additionally solve for Pauli errors by a pre-processing step that initializes some altered erasure $\bar{\m{R}}=f(\m{R},\sigma)$, such that theorem \ref{the:anyevenparity} is satisfied. The validated erasure $\bar{\m{R}}$ and syndrome set $\sigma$ are passed to the Peeling decoder and can decoded as before.
 \end{proposition}
 \begin{figure}[htb]
@@ -303,7 +303,7 @@ Finally, in each round of growth, there may be many odd-parity clusters $\{c_{1}
 \end{algorithm}
 
 \subsection{Syndrome validation}
-We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L}_o = \{c_{0,t}, c_{1,t}, ...\}$ of odd-parity clusters. A cluster $\m{V}_{i,t}$ is grown by $\codefunc{Grow}(\delta \m{V}_{i,t})$, during which all edges with $e.support=2$ are added to merging list $\m{L}_m$. After all clusters are grown, for each edge $e=(u,v) \in \m{L}_m$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta \m{V}_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta \m{V}_{u,t+1}$ and $\delta \m{V}_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}_o$ and remove any duplicate elements. The process can be repeated until $\m{L}_o=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{R}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:uf}. 
+We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L}_o = \{c_{0,t}, c_{1,t}, ...\}$ of odd-parity clusters. A cluster $\m{V}_{i,t}$ is grown by $\codefunc{Grow}(\delta \m{V}_{i,t})$, during which all edges with $e.support=2$ are added to merging list $\m{L}_m$. After all clusters are grown, for each edge $e=(u,v) \in \m{L}_m$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta \m{V}_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta \m{V}_{u,t+1}$ and $\delta \m{V}_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}_o$ and remove any duplicate elements. The process can be repeated until $\m{L}_o=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{R}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:uf}. This algorithm fulfills Proposition \ref{prop:ufdecoder}.
 
 \input{tikzfigs/ufdecoder.tex}
 % \paragraph{Data structure}
@@ -329,18 +329,18 @@ We now describe the pre-processing step of syndrome validation. A round of growt
   \While{$\m{L}_o \neq \emptyset$}{
     Initialize $\m{L}_m=\emptyset$ \;
     \For{$c_i$ in $\m{L}_o$}{
-      $\codefunc{Grow}(c_i, \m{L}_m)$ (Al. \ref{algo:ufgrow});
+      $\codefunc{Grow}(c_i, \m{L}_m)$ (Alg. \ref{algo:ufgrow});
     }
     \For{$(u,v)$ in $\m{L}_m$}{
-      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Al. \ref{algo:find})\;
-      If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (Al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Alg. \ref{algo:find})\;
+      If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (Alg. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
     } 
     Remove even clusters from $\m{L}_o$\;
   }
   \KwRet{Validated erasure $\bar{\m{R}}$}
   \BlankLine
   \tcp{Peeling decoder}
-  Run Peeling decoder (Al. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
+  Run Peeling decoder (Alg. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
   \BlankLine
   \caption{Union-Find decoder \cite{delfosse2017almost}}\label{algo:uf}
 \end{algorithm}
@@ -451,8 +451,7 @@ To avoid the growth of a redundantly placed cluster $c_i$, we check before $\cod
 \begin{proof}
   On a lattice of $n$ vertices, a cluster $c_i$ can have a maximum size of $|\m{V}_i|=n$. The number of buckets needed for using Bucket sort for weighted growth is thus seemingly $N_b = 2n$, where for each cluster size two buckets are initiated. However, any cluster reaching size $|\m{V}_i|\geq n$, there must be at least on another cluster $c_j$ with size $|\m{V}_j|<n$. Cluster $c_j$ thus belongs to a lower bucket with $b_j < b_i$ that is grown before cluster $c_i$. As there are only $n$ vertices on the lattice, these clusters must merge before cluster $c_i$ is grown. Thus buckets $b_k$ with $k>n$ are always empty or contain strictly redundant placements.
 \end{proof}
-
-Actually, for either a toric or planar code, the number of buckets required is slightly less than $n$. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. We dub the Union-Find decoder with weighted growth applied via the bucket sort method introduced in this section the \emph{Union-Find Bucket Weighted Growth} decoder. The pseudocode for this decoder is presented in Algorithm \ref{algo:ufbwg}.  
+Actually, for either a toric or planar code, the number of buckets required is slightly less than $n$. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. 
 
 Initiating $n$ buckets takes $\m{O}(n)$ time. The placement of each cluster in a bucket and checking its bucket number takes $\m{O}(1)$ time. The total number of placements, including redundantly placed clusters, is upper bounded by the number of growths, which has not changed due to weighted growth, and thus does not add to the complexity. Thus the overall complexity of $\m{O}(n\alpha(n))$ is preserved. 
 % Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters $C_\alpha$ and $C_\beta$ during growth of $C_\beta$, cluster $C_\alpha$ has already been placed in a bucket, as it was still odd after its growth. But cluster $C_\alpha$ is now part of cluster $AB$ and has even parity, and the entry of cluster $C_\alpha$ is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
@@ -513,15 +512,12 @@ Syndrome validation outputs a validated erasure $\bar{\m{R}}$, a set of connecte
     \m{E}_{i,t}\equiv\m{T}_{\m{E}_{i,t}} \forall t \text{ during growth}.
   \end{equation}
 \end{definition}
-The dynamic cluster tree $\m{T}_i$ replaces $\m{E}_i$ as the edge set of a cluster $c_i$ and can be maintained by an additional step when considering all edges from the merging list $\m{L}_m$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $(u,v).support$ if $r_u = r_v$. We dub the Union-Find decoder with dynamically maintainted trees the \emph{Union-Find Dynamic Forest decoder}. The pseudocode for this decoder is presented in Algorithm \ref{algo:ufdf}.
+The dynamic cluster tree $\m{T}_i$ replaces $\m{E}_i$ as the edge set of a cluster $c_i$ and can be maintained by an additional step when considering all edges from the merging list $\m{L}_m$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $(u,v).support$ if $r_u = r_v$. 
 
-\todo[inline]{make connection with results section}
-To maintain these dynamic trees $\m{T}_i$ has some benefits that may not be immediately clear. In the next chapter, we will present a modification of the Union-Find decoder that aims to minimize the weight of matchings or $|\m{C}|$ after peeling by selective sub-growth of clusters. The results of this modification shows that a decreased weight is to some extend a heuristic for an increased threshold, which can be testified by the superior threshold of the Minimum Weight Perfect Matching decoder (Section \ref{sec:MWPMdecoder}). This modification is reliant on clusters that are always acyclic, which motivates the dynamic forests routine. 
-
-Furthermore, when dynamic cluster trees are not maintained, the shape of the forest $\m{T}_{\m{R}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}), and therefore the matching weight $|\m{C}|$, is dependent on the seed, the vertices where the depth-first search is initiated. If the seeds are selected randomly, minimum weight matchings within $\m{R}_i$ are not certain. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in \m{V}_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $\m{T}_{\m{R}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic tree $\m{T}_i$ during some growth iteration are equivalent to the breadth of edges added to $\m{T}_{\m{R}_i}$ in one of the breadth-first searches. 
-
-\subsection{Decoder labelling}
-
+\begin{proposition}\label{prop:mw1}
+  As the Minimum-Weight Perfect Matching decoder has been reported to have a higher code threshold than the Union-Find decoder, there is an intuition that the weight of the matching $|\m{C}|$ within the Union-Find decoder must also be kept minimal. 
+\end{proposition}
+When dynamic cluster trees are not maintained, the shape of the forest $\m{T}_{\m{R}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}) is dependent on the seed from which the depth-first search is started (Algorithm \ref{algo:forest}).  If the seeds are selected randomly, minimum weight matchings within $\m{R}_i$ can not be ensured. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in \m{V}_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $\m{T}_{\m{R}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic tree $\m{T}_i$ during some growth iteration are equivalent to the breadth of edges added to $\m{T}_{\m{R}_i}$ in one of the breadth-first searches. Furthermore, to dynamically maintain a forest of clusters is crucial for a modification of the Union-Find decoder that will be presented in the next chapter, which is reliant on clusters that are always acyclic. 
 
 \begin{algorithm}[htb]
   \BlankLine
@@ -531,106 +527,104 @@ Furthermore, when dynamic cluster trees are not maintained, the shape of the for
   \tcp{Syndrome validation}
   Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$\;
   Initialize $\m{L}_b$\tcp*{Ensures weighted growth}
-  \codefunc{Place} odd-parity clusters in $\m{L}_b$ (Al. \ref{algo:place})\;
+  \codefunc{Place} odd-parity clusters in $\m{L}_b$ (Alg. \ref{algo:place})\;
   \For{bucket $b_k$ in $\m{L}_b$}{
     Initialize $\m{L}_m=\emptyset, \m{L}_p=\emptyset$\;
     \For{$c_i$ in $b_k$}{
       \If{$c_i.bucket$ is $k$}{
-        $\codefunc{Grow}(c_i, \m{L}_m)$ (Al. \ref{algo:ufgrow});
+        $\codefunc{Grow}(c_i, \m{L}_m)$ (Alg. \ref{algo:ufgrow});
         add $c_i$ to $\m{L}_p$\;
       }
     }
     \For{$(u,v)$ in $\m{L}_m$}{
-      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Al. \ref{algo:find})\;
+      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Alg. \ref{algo:find})\;
       \eIf{$r_u \neq r_v$}{
-        apply $\codefunc{Union}(r_u,r_v)$ (Al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+        apply $\codefunc{Union}(r_u,r_v)$ (Alg. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
       }{
         Subtract 1 from $(u,v).support$\tcp*{Maintains dynamic tree}
       }
     }
     \For{cluster $c_i$ in $\m{L}_p$}{
-      $\codefunc{Place}(c_i, \m{L}_b)$ (Al. \ref{algo:place})\;
+      $\codefunc{Place}(c_i, \m{L}_b)$ (Alg. \ref{algo:place})\;
     }
   }
   \KwRet{Validated erasure forest $\bar{\m{F}}$}
   \BlankLine
   \tcp{Peeling decoder}
-  Run Peeling decoder (Al. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
+  Run Peeling decoder (Alg. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
   \BlankLine
-  \caption{Union-Find decoder with bucket-weighted growth and dynamic forests}\label{algo:ufbucketdf}
+  \caption{Dynamic-Forest Bucket Union-Find decoder}\label{algo:dfbuf}
 \end{algorithm}
+
+\subsection{Decoder labelling}
+With the application of weighted growth through bucket sort and the maintenance of a dynamic forest, we now have several implementations of the Union-Find decoder. From this point on, we refer to Algorithm \ref{algo:uf} as the \emph{Static-Forest Union-Find} decoder, as it does not maintain a dynamic forest. We dub the Static-Forest Union-Find decoder with weighted growth applied via the bucket sort method introduced in this section the \emph{Static-Forest Bucket Union-Find} decoder. The pseudo-code for this decoder is presented in Algorithm \ref{algo:sfbuf}. We dub the Union-Find decoder with dynamically maintained trees the \emph{Dynamic-Forest Union-Find} decoder. The pseudo-code for this decoder is presented in Algorithm \ref{algo:dfuf}. The decoder that combines both methods is dubbed the \emph{Dynamic-Forest Bucket Union-Find} decoder, and its pseudo-code is presented in Algorithm \ref{algo:dfbuf}. As we compare the performance of these implementations in the next section, we will be using abbreviations according to Table \ref{tab:uftable}.
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { | R{0.6} || C{1.2} | C{1.2} | }
+    \hline
+    & No weighted growth &  Bucket weighted growth \\
+    \hhline{|=||=|=|}
+    Static forest & SUF decoder (Alg. \ref{algo:uf}) & SBUF decoder (Alg. \ref{algo:sfbuf})\\
+    \hline
+    Dynamic forest & DUF decoder (Alg. \ref{algo:dfuf}) & DBUF decoder (Alg. \ref{algo:dfbuf})\\
+    \hline
+  \end{tabularx}
+  \caption{Abbreviated names for the implementations of the Union-Find decoder}\label{tab:uftable}
+\end{table}
 
 
 \section{Performance}\label{sec:ufperformance}
 
+We benchmark the performance of each of the implementations of the Union-Find decoder (Table \ref{tab:uftable}) as described in Section \ref{sec:simthres}. We simulate for the decoder success rate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ for the independent noise model (Definition \ref{def:independent}), and on lattice sizes $[8,12,16,20,24,28,32,36]$ for the phenomenal noise model (Definition \ref{def:pheno}). To obtain the code threshold $p_th$, we simulate for a minimum of $9$ error rates $p_X$ around the suspected threshold value for a minimum of $96.000$ samples. For the exact simulation configuration for each lattice and decoder combination, we refer to the figures of the threshold-fits included in Appendix \ref{ap:figuf}. 
 
-%UFUWGNDF
 \begin{table}[htb]
   \centering
-  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
-   \hline
-   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
-   \hline
-   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
-   \hhline{|=||=|=|=|=|}
-   Toric code & $0.09716 \pm 0.00003$ & $0.7336$ & $- \pm 0.0000-$ & $-$ \\
-   \hline
-   Planar code & $0.09782 \pm 0.00005$ & $0.8578$ & $- \pm 0.0000-$ & $-$\\
-  \hline
+  \begin{tabularx}{\textwidth} { | L{.7} | R{.7} || C{1.8} | C{.5} | C{1.8} | C{.5} | }
+    \hline
+    \multicolumn{2}{|c|}{\multirow{2}*{}} & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenological noise} \\
+    \cline{3-6}
+    \multicolumn{2}{|c|}{}                & $p_{th}$ & $k_C$ & $p_{th}$ & $k_C$ \\
+    \hhline{|=|=||=|=|=|=|}
+    \multirow{4}*{Toric}    & SUF & $0.09716 \pm 0.00003$ & $0.7336$ & $ 0.02531 \pm 0.00005$ & $0.9239$ \\
+                            \cline{2-6}
+                            & DUF & $0.09789 \pm 0.00003$ & $0.7432$ & $0.2563 \pm 0.00004$ & $0.9364$ \\
+                            \cline{2-6}
+                            & SBUF & $0.09984 \pm 0.00003$ & $0.7286$ & $0.02681 \pm 0.00002$ & $0.9132$ \\
+                            \cline{2-6}
+                            & DBUF & $0.10009 \pm 0.00002$ & $0.7279$ & $0.02685 \pm 0.00001$ & $0.9208$ \\
+    \hhline{|=|=||=|=|=|=|}
+    \multirow{4}{*}{Planar} & SUF & $0.09782 \pm 0.00005$ & $0.8578$ & $0.02570 \pm 0.00003$ & $0.9410$\\
+                            \cline{2-6}        
+                            & DUF & $0.09775 \pm 0.00003$ & $0.8591$ & $0.2572 \pm 0.00003$ & $0.9400$\\
+                            \cline{2-6}
+                            & SBUF & $0.09973 \pm 0.00005$ & $0.8490$ & $0.02661 \pm 0.00001$ & $0.9320$\\
+                            \cline{2-6}
+                            & DBUF & $0.09994 \pm 0.00002$ & $0.8460$ & $0.02660 \pm 0.00001$ & $0.9322$\\
+                            \hline
   \end{tabularx}
-  \caption{Sumulation results for the Union-Find decoder with 1) no weighted growth 2) static forest $L = 8:8:64, L=8:4:36$}\label{tab:ufndfwug}
+  \caption{Threshold error rates $p_{th}$ and decoding success rates $k_C$ for the implementations of the  Union-Find decoder.}\label{tab:ufndfwug}
 \end{table}
 
-% UFUWG
-\begin{table}[htb]
+From the literature, the vanilla unweighted Union-Find decoder is reported to have a threshold of $p_{th}=0.092$ for independent noise and $p_{th}=0.024$ for phenomenological noise. The weighted variant, for which no description was provided and led to our implementation using bucket sort, is reported to have a threshold of $p_{th}=0.099$ for independent noise and $p_{th}=0.026$ for phenomenological noise \cite{delfosse2017almost}. The SUF decoder should be equivalent to the vanilla unweighted Union-Find decoder. However, the threshold values of these implementations clear do not match. This points towards other differences in implementations that is unfortunately unknown to us. For better or worse, we have not been able to further reduce the threshold of our implementation. 
+The SBUF decoder should be equivalent to the vanilla weighted variant. The threshold values differ within a range of about $0.001$, or $0.1\%$. While this may seem as they are within range to conclude that they match, note that the threshold of the Minimum-Weight Perfect Matching decoder is only $0.4\%$ higher at $p_{th}=10.3\%$. As the threshold for the unweighted variant already pointed to other differences in implementations, we speculate that our implementation improves upon the original. 
+
+Furthermore, it can be concluded from Table \ref{tab:uftable} that the dynamic forest variants of the decoders have a slightly increased or equal threshold and decoding success rate. To find out whether the intuition from Proposition \ref{prop:mw1} is true, we compare the matching weight $|\m{C}|$ for every implementation of the Union-Find decoder with the minimum weight obtained with the Minimum-Weight Perfect Matching decoder in Figure \ref{fig:mwcomp_uf_toric_2d}, for a toric code with independent noise on $p_X=0.098$. Similar figures for other configurations can be found in Section \ref{ap:figufcomp}. From these figures, we can conclude that dynamic forest does decrease the matching weight. This adds to the credibility to the intuition from Proposition \ref{prop:mw1}. We restate the proposition as the following:
+\begin{proposition}
+  There is a intuition that a decreased weight is to some extend a heuristic for an increased threshold. 
+\end{proposition}
+
+\todo[inline]{add other figures in ap:figufcomp}
+\begin{figure}[htbp]
   \centering
-  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
-   \hline
-   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
-   \hline
-   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
-   \hhline{|=||=|=|=|=|}
-   Toric code & $0.09789 \pm 0.00003$ & $0.7432$ & $- \pm -$ & $-$ \\
-   \hline
-   Planar code & $0.09775 \pm 0.00003$ & $0.8591$ & $- \pm -$ & $-$\\
-  \hline
-  \end{tabularx}
-  \caption{Sumulation results for the Union-Find decoder with 1) no weighted growth 2) dynamic forests  $L = 8:8:64, L=8:4:36$}\label{tab:ufuwg}
-\end{table}
+  \begin{subfigure}[b]{\textwidth}
+      \input{pgfplots/mwcomp_uf_toric_2d_p98_nnorm.pgf}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+      \input{pgfplots/mwcomp_uf_toric_2d_p98_norm.pgf}
+  \end{subfigure}
+  \caption{<caption>}
+  \label{fig:mwcomp_uf_toric_2d}
+\end{figure}
 
 
-% UFNDF
-\begin{table}[htb]
-  \centering
-  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
-   \hline
-   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
-   \hline
-   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
-   \hhline{|=||=|=|=|=|}
-   Toric code & $0.09984 \pm 0.00003$ & $0.7286$ & $- \pm -$ & $-$ \\
-   \hline
-   Planar code & $- \pm -$ & $-$ & $- \pm -$ & $-$\\
-  \hline
-  \end{tabularx}
-  \caption{Sumulation results for the Union-Find decoder with 1) bucket-weighted growth 2) static forest  $L = 8:8:64, L=8:4:36$}\label{tab:ufndf}
-\end{table}
-
-
-
-% UF
-\begin{table}[htb]
-  \centering
-  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
-   \hline
-   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
-   \hline
-   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
-   \hhline{|=||=|=|=|=|}
-   Toric code & $0.10009 \pm 0.00002$ & $0.7279$ & $0.02685 \pm 0.00001$ & $0.9208$ \\
-   \hline
-   Planar code & $0.09994 \pm 0.00002$ & $0.8460$ & $0.02660 \pm 0.00001$ & $0.932$\\
-  \hline
-  \end{tabularx}
-  \caption{Sumulation results for the Union-Find decoder with 1) bucket-weighted growth 2) dynamic forests $L = 8:8:128, L=8:4:40$}\label{tab:uf}
-\end{table}
+\todo[inline]{running time comparison}

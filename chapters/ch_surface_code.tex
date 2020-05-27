@@ -292,7 +292,7 @@ With respect to the toric code, each vertex refers to a ancillary qubit correspo
 \subsection{Code threshold}\label{sec:threshold}
 Since the distance $d$ of the toric code on a $L\times L$ is $L$, we would expect that we can improve the robustness of the code by increasing the lattice size $L$. However, this also increases the total number of errors in the lattice, that adds an increased level of complexity in choosing the correct correction operator.
 
-In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $\gls{zpcorrect}$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $p_C$. The point of transition in the error rate is called the \emph{code threshold} $\gls{zpthres}$.
+In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $\gls{zpcorrect}$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $k_C$. The point of transition in the error rate is called the \emph{code threshold} $\gls{zpthres}$.
 
 The code threshold is not the only parameter that determines the potential of a certain code for practical use. The behavior for error rates far below the threshold is also important, as is the number of physical qubits needed to achieve the sought after level of error suppression. Nevertheless, the code threshold provides us with a very easy and useful tool to benchmark different codes and different decoding algorithms, and to compare them with each other. Therefore, in this thesis we will heavily rely on the value of the code threshold. The value of the threshold is heavily dependent on the chosen error model and the physical conditions of the stabilizer measurements. To compare different decoding algorithms, we therefore will use independent and identically distributed errors (i.i.d. noise), which is the \emph{independent noise model} from section \ref{qec:sec_errormodels}.
 
@@ -375,15 +375,22 @@ The bulk of the planar code is similar to the toric code, where the stabilizer g
 
 \subsection{Neural network decoders}
 
-\section{Threshold simulations}
+\section{Threshold simulations}\label{sec:simthres}
 
-To test for the threshold Pauli error value, we simulate for a large number of samples at various lattice sizes for a range of Pauli error rates around $p = 0.1$. For the threshold, only Pauli X errors are considered, as Pauli Z errors will give the same result. For each lattice size and Pauli error rate, the samples will return a probability rate of successful decodings $P_{succes}$. We will then fit the data to the function (\cite{wang2003confinement}, equation 43):
-\begin{eqnarray}
+
+
+We simulate for the decoder success rate on toric and planar lattices for the independent noise model (Definition \ref{def:independent}), and on lattices for the phenomenal noise model (Definition \ref{def:pheno}). Under these conditions, the lattice can be separated into the primal lattice containing the star operator X parity check measurement, and the dual lattice containing the plaquette operator Z parity check measurements. Any simulation will be performed on the primal lattice with a single error rate $p_X$ for both bit-flips and noisy measurements. The dual lattice is under these conditions equivalent to the primal lattice. 
+
+To test for the threshold Pauli error value, we simulate for a large number of samples at various lattice sizes for a range of Pauli error rates around the threshold value. For each lattice size and Pauli error rate, the samples will return a probability rate of successful decodings $P_{C}$. We will then fit the data to the function (\cite{wang2003confinement}, equation 43)
+\begin{align}\label{eq.4.fit}
 % \nonumber % Remove numbering (before each equation)
-P_{succes} &=& A + Bx + Cx^2 + \begin{cases}
-                                D_{even}\cdot L^{-1/\mu_{even}} &\text{L even}\\
-                                D_{odd}\cdot L^{-1/\mu_{odd}} &\text{L odd}
-                              \end{cases}\\
-\text{with } x &=& (p - p_{thres})L^{1/\nu}
-\end{eqnarray}\label{eq.4.fit}
-where all but $P_{succes}$, $p$ and $L$ are fitting parameters. Note that there are distinct values for $D$ and $\mu$ for even and odd lattices. This is due to a discrepancy in the decoder threshold caused by a nonnegligible finite-size effect for even and odd lattices. Therefore, for each fit done on any dataset, only data from even or odd lattices will be selected. The fitting of the data will be done in Python using a least squared method. 
+  \nonumber P_{C} =& A + Bx + Cx^2 \\
+    %+ \begin{cases}
+    %   D_{even}\cdot L^{-1/\mu_{even}} &\text{L even}\\
+    %   D_{odd}\cdot L^{-1/\mu_{odd}} &\text{L odd}
+    % \end{cases}\\
+  \text{with } x =& (p - p_{th})L^{1/\nu}
+\end{align}
+for $p_{th}$, where all but $P_{C}$, $p$ and $L$ are fitting parameters. The threshold error rate $p_{th}$, as well as the decoding success rate $k_C$ at the threshold, will be used to benchmark and compare decoders. The fitting of the data will be done in Python using a least squared method. 
+
+% Note that there are distinct values for $D$ and $\mu$ for even and odd lattices. This is due to a discrepancy in the decoder threshold caused by a non-negligible finite-size effect for even and odd lattices. Therefore, for each fit done on any dataset, only data from even or odd lattices will be selected.

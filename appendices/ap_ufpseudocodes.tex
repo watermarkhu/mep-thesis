@@ -8,29 +8,29 @@
   \tcp{Syndrome validation}
   Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$\;
   Initialize $\m{L}_b$\tcp*{Ensures weighted growth}
-  \codefunc{Place} odd-parity clusters in $\m{L}_b$ (Al. \ref{algo:place})\;
+  \codefunc{Place} odd-parity clusters in $\m{L}_b$ (Alg. \ref{algo:place})\;
   \For{bucket $b_k$ in $\m{L}_b$}{
     Initialize $\m{L}_m=\emptyset, \m{L}_p=\emptyset$\;
     \For{$c_i$ in $b_k$}{
       \If{$c_i.bucket$ is $k$}{
-        $\codefunc{Grow}(c_i, \m{L}_m)$ (Al. \ref{algo:ufgrow});
+        $\codefunc{Grow}(c_i, \m{L}_m)$ (Alg. \ref{algo:ufgrow});
         add $c_i$ to $\m{L}_p$\;
       }
     }
     \For{$(u,v)$ in $\m{L}_m$}{
-      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Al. \ref{algo:find})\;
-      If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (Al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Alg. \ref{algo:find})\;
+      If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (Alg. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
     }
     \For{cluster $c_i$ in $\m{L}_p$}{
-      $\codefunc{Place}(c_i, \m{L}_b)$ (Al. \ref{algo:place})\;
+      $\codefunc{Place}(c_i, \m{L}_b)$ (Alg. \ref{algo:place})\;
     }
   }
   \KwRet{Validated erasure forest $\bar{\m{F}}$}
   \BlankLine
   \tcp{Peeling decoder}
-  Run Peeling decoder (Al. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
+  Run Peeling decoder (Alg. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
   \BlankLine
-  \caption{Union-Find Bucket Weighted Growth decoder}\label{algo:ufbwg}
+  \caption{Static-Forest Bucket Union-Find Bucket decoder}\label{algo:sfbuf}
 \end{algorithm}
 
 
@@ -45,13 +45,13 @@
     \While{$\m{L}_o \neq \emptyset$}{
       Initialize $\m{L}_m=\emptyset$ \;
       \For{$c_i$ in $\m{L}_o$}{
-        $\codefunc{Grow}(c_i, \m{L}_m)$ (Al. \ref{algo:ufgrow});
+        $\codefunc{Grow}(c_i, \m{L}_m)$ (Alg. \ref{algo:ufgrow});
       }
       \For{$(u,v)$ in $\m{L}_m$}{
-        Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Al. \ref{algo:find})\;
+        Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Alg. \ref{algo:find})\;
 
         \eIf{$r_u \neq r_v$}{
-            apply $\codefunc{Union}(r_u,r_v)$ (Al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+            apply $\codefunc{Union}(r_u,r_v)$ (Alg. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
         }{
             Subtract 1 from $(u,v).support$\tcp*{Maintains dynamic tree}
         }
@@ -61,8 +61,8 @@
     \KwRet{Validated erasure $\bar{\m{R}}$}
     \BlankLine
     \tcp{Peeling decoder}
-    Run Peeling decoder (Al. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
+    Run Peeling decoder (Alg. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
     \BlankLine
-    \caption{Union-Find Dynamic Forest decoder}\label{algo:ufdf}
+    \caption{Dynamic-Forest Union-Find decoder}\label{algo:dfuf}
   \end{algorithm}
 

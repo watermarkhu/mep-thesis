@@ -149,39 +149,49 @@ Errors on stabilizers codes are therefore detected by measuring the stabilizers,
 \subsection{Error models}\label{qec:sec_errormodels}
 Any qubit can be subject to a combination of errors, each can be caused by a difference factor in our quantum system. To generalize these errors, we define certain \emph{error models} that constricts the errors that take place. Here, we list a few models that we will encounter in this thesis. 
 
-\paragraph{Independent noise model}
-We were already introduced in the \emph{bit-flip} and \emph{phase-flip} errors in section \ref{subsec:pauli}. But let us know generalized them in the form of the density matrix $\rho$. Let $\Phi$ be a quantum channel that maps $\rho$ to $\Phi(\rho)$, and let the chance of a bit-flip error be $p_X$, the resulting state should be
-\begin{equation}\label{qec:eq:bitflip}
-  \Phi_X(\rho) = (1-p_X)\rho + p_X(\hat{X}\rho \hat{X}).
-\end{equation}
-Analogously, let the chance of a phase-flip error be $p_Z$, the resulting state should be
-\begin{equation}\label{qec:eq:phaseflip}
-  \Phi_Z(\rho) = (1-p_Z)\rho + p_Z(\hat{Z}\rho \hat{Z}).
-\end{equation}
+\begin{definition}\label{def:independent}
+  Let the \emph{independent noise model} or the \emph{uncorrelated noise model} be the combination of the \emph{bit-flip} and \emph{phase-flip} errors, introduced in section \ref{subsec:pauli}, where the bit-flip and phase-flip are \emph{uncorrelated}
 
-The bit-flip and phase-flip errors can be considered together as the \emph{independent noise model} or the \emph{uncorrelated noise model}. As the two types of errors are independent, they can be studied separately from each other.
+  It can be generalized in the form of the density matrix $\rho$. Let $\Phi$ be a quantum channel that maps $\rho$ to $\Phi(\rho)$, and let the chance of a bit-flip error be $p_X$, the resulting state should be
+  \begin{equation}\label{qec:eq:bitflip}
+    \Phi_X(\rho) = (1-p_X)\rho + p_X(\hat{X}\rho \hat{X}).
+  \end{equation}
+  Analogously, let the chance of a phase-flip error be $p_Z$, the resulting state should be
+  \begin{equation}\label{qec:eq:phaseflip}
+    \Phi_Z(\rho) = (1-p_Z)\rho + p_Z(\hat{Z}\rho \hat{Z}).
+  \end{equation}
+  As the two types of errors are independent, they can be studied separately from each other.
+\end{definition}
 
-\paragraph{The depolarizing noise model}
-In the \emph{depolarizing} noise model, the afflicted quantum state is replaced by a complete mixed state with probability $p_D$. Let the completely mixed state be written as
-\begin{equation}\label{qec:eq:mixstate}
-  \frac{1}{2}I = \frac{1}{4}(\rho + \hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}),
-\end{equation}
-then the depolarizing channel is described as
-\begin{align}\label{qec:eq:depolarizing}
-  \nonumber \Phi_D(\rho) &= (1-p_D)\rho + p_D\left(\frac{1}{2}\hat{I}\right) \\
-  \nonumber &= \left(1-\frac{3}{4}p_D\right)\rho + \frac{p_D}{4}(\hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}) \\
-  &= (1-p^*_D)\rho + \frac{p^*_D}{3}(\hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}),
-\end{align}
-which can be interpreted as the state $\rho$ is left untouched with probability $p^*_D =\frac{3}{4}p_D$, and each Pauli gate is applied to it with probability $1-p^*_D$. Differently from the \emph{independent noise model}, to optimally decode, we need to take into account correlations between X and Z-errors.
+\begin{definition}\label{def:depolarizing}
+  In the \emph{depolarizing noise model}, the afflicted quantum state is replaced by a complete mixed state with probability $p_D$. Let the completely mixed state be written as
+  \begin{equation}\label{qec:eq:mixstate}
+    \frac{1}{2}I = \frac{1}{4}(\rho + \hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}),
+  \end{equation}
+  then the depolarizing channel is described as
+  \begin{align}\label{qec:eq:depolarizing}
+    \nonumber \Phi_D(\rho) &= (1-p_D)\rho + p_D\left(\frac{1}{2}\hat{I}\right) \\
+    \nonumber &= \left(1-\frac{3}{4}p_D\right)\rho + \frac{p_D}{4}(\hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}) \\
+    &= (1-p^*_D)\rho + \frac{p^*_D}{3}(\hat{X}\rho \hat{X} + \hat{Y}\rho \hat{Y} + \hat{Z}\rho \hat{Z}),
+  \end{align}
+  which can be interpreted as the state $\rho$ is left untouched with probability $p^*_D =\frac{3}{4}p_D$, and each Pauli gate is applied to it with probability $1-p^*_D$. Differently from the \emph{independent noise model}, to optimally decode, we need to take into account correlations between X and Z-errors.
+\end{definition}
 
-\paragraph{The erasure noise model}
-In the \emph{erasure} noise model, a qubit is completely erased or lost from the system,
-\begin{equation}\label{qec:eq:erasure}
-  \Phi_E(\rho) = (1-p_E)\rho + p_E\ket{e}\bra{e},
-\end{equation}
-where the state $\ket{e}$ is outside the qubit space. Such a loss can be detected and the missing qubit is then replaced by a qubit in the totally mixed state (equation \eqref{qec:eq:mixstate}). The erasure channel can therefore be seen as the depolarizing channel with the extra property that it can be detected which qubits suffer the error.
+\begin{definition}\label{def:erasure}
+  In the \emph{erasure noise model}, a qubit is completely erased or lost from the system,
+  \begin{equation}\label{qec:eq:erasure}
+    \Phi_E(\rho) = (1-p_E)\rho + p_E\ket{e}\bra{e},
+  \end{equation}
+  where the state $\ket{e}$ is outside the qubit space. Such a loss can be detected and the missing qubit is then replaced by a qubit in the totally mixed state (equation \eqref{qec:eq:mixstate}). The erasure channel can therefore be seen as the depolarizing noise model with the extra property that it can be detected which qubits suffer the error.
+\end{definition}
 
-\todo[inline]{noisy measurments}
+\begin{definition}\label{def:pheno}
+  The \emph{phenomenological noise model} refers to the combination of the independent noise model (Definition \ref{def:independent}) with the addition of noisy measurements. If we define a syndrome measurement to be a state defined by $\rho_M$, then a noisy measurement is equivalent to a bit-flip of chance $p_X$ of the measurement state
+  \begin{equation}\label{eq:pheno}
+    \Phi_M(\rho_M)=  (1-p_X)\rho_M + p_X(\hat{X}\rho_M \hat{X}).
+  \end{equation}
+\end{definition}
+
 
 \subsection{Error correction or decoding}
 
