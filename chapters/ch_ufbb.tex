@@ -2,7 +2,7 @@
 
 % Recall that in the Union-Find decoder, each cluster represented by a set of vertices $C_i = |\{v_1, v_2, ...\}$ stored as a disjoint-set tree of the Union-Find data structure. To find the parent cluster of any given vertex, we follow subsequent parent pointers to the root vertex of the tree, which is the representative element of the cluster. Merges between clusters is done by simply pointing the root of one tree to another. By implementing additional rules \emph{path compression} and either \emph{union by weight} or \emph{union by rank}, the heights of the trees are dynamically kept low, such that the overall complexity of the algorithm for a system of $n$ qubits is $n\alpha(n)$, where $\alpha(n)\leq 4$ for all physical values of $n$. 
 
-In this chapter we describe a modification of the UF-decoder, dubbed the \emph{Union-Find Balanced Bloom} (UFBB) decoder, that increases the threshold of the UF-decoder by improving its heuristic for minimum-weight matchings, while retaining a relatively low time-complexity. Within the vanilla UF-decoder, not all odd clusters are grown at the same time. Larger clusters relatively add more "incorrect edges" to themselves than compared to a smaller cluster (lemma \ref{lem:incorrectedges}). The UF decoder therefore applies \emph{weighted growth} of clusters, where the order of cluster growth is sorted based on the cluster sizes. We have shown a linear time implementation in the Bucket Cluster Sort in section \ref{sec:bucketclustersort}. With the addition of weighted growth, the error threshold of the UF decoder is increased from $9.2\%$ to $9.9\%$ for a 2D toric lattice \cite{delfosse2017almost}. This approaches but still lacks in terms of the $10.3\%$ error threshold of the MWPM decoder.
+In this chapter we describe a modification of the UF-decoder, dubbed the \emph{Union-Find Balanced Bloom} (UFBB) decoder, that increases the threshold of the UF-decoder by improving its heuristic for minimum-weight matchings, while retaining a relatively low time-complexity. Within the vanilla UF-decoder, not all odd clusters are grown at the same time. Larger clusters relatively add more "incorrect edges" to themselves than compared to a smaller cluster (lemma \ref{lem:incorrectedges}). The UF decoder therefore applies \emph{weighted growth} of clusters, where the order of cluster growth is sorted based on the cluster sizes. We have shown a linear time implementation in the Bucket Cluster Sort in section \ref{sec:bucketwg}. With the addition of weighted growth, the error threshold of the UF decoder is increased from $9.2\%$ to $9.9\%$ for a 2D toric lattice \cite{delfosse2017almost}. This approaches but still lacks in terms of the $10.3\%$ error threshold of the MWPM decoder.
 
 The UF decoder is in fact a heuristic for minimum-weight matchings. A large cluster is generally the result of multiple rounds of growth of a smaller cluster. Each iteration of cluster growth buries the syndromes within that cluster with a layer of edges, of which only a small portion will be part of the matching, where each layer adds to the matching weight. With weighted growth, smaller clusters are grown first, such that this effect is less dominant. But the UF decoder is unsurprisingly less successful at minimum-weight than the MWPM decoder, which does this perfectly. The MWPM decoder considers all possible matchings by constructing a fully connected graph where the edges have the distance between syndrome as weights. The UF decoder does not look at the lattice in such a global way, but performs locally on each cluster. This should yield the same result conceptually, but in reality it does not due to a major weakness; In each round of growth, all boundary edges are grown simultaneously. The potential union of two clusters is reserved to one edge but may occur on many, is only handled after each round, where the order of the merging edges determines which edge is selected as the bridge. This leaves us with the question: Should all boundary edges of a cluster be grown simultaneously?
 
@@ -1300,12 +1300,7 @@ To account for these erasures, we must construct the node sets for these initial
 
 \begin{table}[htb]
   \centering
-  \begin{tabularx}{\textwidth} { 
-    | >{\raggedright\arraybackslash}X 
-    || >{\centering\arraybackslash}X 
-    | >{\centering\arraybackslash}X
-    | >{\centering\arraybackslash}X
-    | >{\centering\arraybackslash}X | }
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
    \hline
    & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
    \hline
@@ -1321,12 +1316,8 @@ To account for these erasures, we must construct the node sets for these initial
 
 \begin{table}[htb]
   \centering
-  \begin{tabularx}{\textwidth} { 
-    | >{\raggedright\arraybackslash}X 
-    || >{\centering\arraybackslash}X 
-    | >{\centering\arraybackslash}X
-    | >{\centering\arraybackslash}X
-    | >{\centering\arraybackslash}X | }
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
+
    \hline
    & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
    \hline

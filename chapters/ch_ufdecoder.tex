@@ -1,9 +1,9 @@
 \chapter{Union-Find decoder}\label{ch:UFdecoder}
 The Union-Find decoder is a new fast decoding algorithm for topological codes to correct for Pauli errors, erasure errors, and the combination of both errors. The worst-case complexity of the algorithm is $\m{O}(n\alpha(n))$, where $n$ is the number of physical qubits and $\alpha$ is the inverse of Ackermann's function, which is very slowly growing, and is proven that $a(n)\leq 3$ for any practical amount of qubits.
 
-Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in the coming sections and perform analyses on their complexities.
+Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in Sections \ref{sec:peelingdecoder}-\ref{sec:ufdecoder} and perform analyses on their complexities. In Section \ref{sec:ufimplementations}, we present two of our altered implemenations of the Union-Find decoder. We simulate and compare the performances of each implementation in section \ref{sec:ufperformance}.
 
-\section{Peeling decoder}
+\section{Peeling decoder}\label{sec:peelingdecoder}
 The Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \eqref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \eqref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $\hat{I}$, $\hat{X}$, $\hat{Y}$ or $\hat{Z}$ chosen uniformly at random.
 \begin{theorem}\label{the:independentxy}
   For erasure noise of equation \eqref{qec:eq:erasure}, where a qubit is erased and replaced with a totally mixed state equivalent to a qubit that suffers from uniformly chosen $\{\hat{I},\hat{X},\hat{Y},\hat{Z}\}$, the primal and dual lattices of the surface code can be decoded independently from each other.
@@ -64,7 +64,7 @@ The first step  is to produce $\m{T}_{\tilde{\m{E}}}$ inside $\m{R}$, where all 
   \KwData{Graph $G = (\m{V},\m{E})$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}$}
   \KwResult{Correction set $m{C}$}
   \BlankLine
-  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ (al. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ (Al. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$\m{T}_\m{R} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $\m{T}_\m{R}$ \;
@@ -143,7 +143,7 @@ Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a
   \KwData{Graph $G = (\m{V}_{\iota\cup\omega}\cup \m{V}_\delta,E)$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}_{\iota\cup\omega}$}
   \KwResult{Correction set $\m{C}$}
   \BlankLine
-  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\delta$ (al. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\delta$ (Al. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$\m{T}_\m{R} \neq \emptyset$}{
     pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin \m{V}_\delta$, remove $e$ from $\m{T}_\m{R}$ \;
@@ -160,9 +160,9 @@ Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a
 
 % To keep track of the vertices of a cluster, it will be represented as a \emph{cluster tree}, where an arbitrary vertex of the cluster will be the root, and any other vertex will be a child of the root. Whenever an edge $(u,v)$ is fully grown, we will need to traverse the trees of the two vertices $u$ and $v$, and check whether they have the same root; whether they belong to the same cluster. If not, a merge is initiated by making the root of smaller cluster a child of the bigger cluster. These functions, \codefunc{find} and \codefunc{union} respectively, are part of the Union-Find algorithm (not to be confused with the Union-Find decoder) \cite{tarjan1975efficiency}.
 
-% Within the Union-Find algorithm, two features ensure that the complexity of the algorithm is not quadratic. 1). With \textbf{path compression}, as we traverse a tree from child to parent until we reach the root, we make sure that each vertex encountered that we have encountered along the way is pointed directly to the root. This doubles the cost of the \codefunc{find}, but speeds up any future call to any vertex on the traversed path. 2). With \textbf{weighted union}, we make sure to always make the smaller tree a child of the bigger tree. This ensures that the overall length of the path to the root stays minimal. In order to make this happen, we just need to store the size of the tree at the root.
+% Within the Union-Find algorithm, two features ensure that the complexity of the algorithm is not quadratic. 1). With \textbf{path compression}, as we traverse a tree from child to parent until we reach the root, we make sure that each vertex encountered that we have encountered along the way is pointed directly to the root. This doubles the cost of the \codefunc{find}, but speeds up any future call to any vertex on the traversed path. 2). With \textbf{weighted union}, we make sure to always make the smaller tree a child of the bigger tree. This ensures that the overall length of the path to the root stays minimAl. In order to make this happen, we just need to store the size of the tree at the root.
 
-\section{Union-Find decoder}
+\section{Union-Find decoder}\label{sec:ufdecoder}
 The Union-Find decoder \cite{delfosse2017almost} is a modification of the Peeling decoder that utilizes the Union-Find data structure \cite{tarjan1975efficiency} to additionally solve for Pauli errors, on top of erasure errors. In this section, we will first describe why a modification is needed, then how the Union-Find data structure is applied, and finally move on the the algorithm itself and analyze its complexity.
 
 The Peeling decoder solves exclusively for erasure errors. To be able to compare with the MWPM decoder, or any other type of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations \eqref{qec:eq:bitflip} and \eqref{qec:eq:phaseflip}. Pauli-X errors, now caused by both erasure and bit-flips, exclusively trigger nontrivial star operator measurements on the vertices of the primal lattice. Pauli-Z errors, now caused by both erasure and phase-flips, exclusively trigger nontrivial plaquette measurements on vertices of the dual lattice. This means that theorem \ref{the:independentxy} still holds for the combined independent Pauli and erasure noise model, such that the the primal and dual lattices can be decoded separately. Again, we will only consider the primal lattice of graph $G(\m{E},\m{V})$ subjected to Pauli-X errors and erasures with replacement from uniformly distributed $\{\hat{I}, \hat{X}\}$, as the process of decoding the dual lattice is analogous to the primal lattice. For a combined noise model of erasure noise and depolarizing noise of equation \eqref{qec:eq:depolarizing}, theorem \ref{the:independentxy} fails, and is for this reason not considered in this thesis.
@@ -198,7 +198,7 @@ The independent noise model introduces extra Pauli-X errors on qubits or edges $
 \end{figure}
 Per lemma \ref{lem:singlecluster}, an edge can only be in a single cluster $\m{E}_i$ and a vertex in a single $\m{V}_i=\bound(\m{E}_i)$. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
 
-\subsection{Application of the Union-Find data structure}
+\subsection{Application of the Union-Find data structure}\label{sec:ufdata}
 The Union-Find data structure, also known as the \emph{disjoint-set} data structure \cite{tarjan1975efficiency}, consist of two functions \codefunc{Union} and \codefunc{Find} for manipulating a set of $n$ elements partitioned into a number of disjoint subsets in the form of \emph{disjoint-set trees}. Function \codefunc{Find} follows a sequence of parent pointers in the tree to find the representation root element of the tree $T$, and function \codefunc{Union} merges the trees of two disjoint subsets. This data structure has the property that the worst-case complexity for a sequence of \codefunc{Union}'s and \codefunc{Find}'s is $\m{O}(n\alpha(n))$, where $\alpha(n)$ is the inverse of Ackermann's function that grows at such slow rate that for all practical purposes, $\alpha(n)\leq 4$. 
 
 In the context of the surface code, the vertices $v\in \m{V}$ are the elements and each disjoint-set tree is equivalent to a cluster $c_i$ with vertex set $\m{V}_i$ and edge set $\m{E}_i$, where each vertex $v\in \m{V}_i$ points to a parent vertex and the root vertex $r_v$ represents the cluster (see Figure \ref{fig:ufdecoder}b-f, right). Recall from Definition \ref{def:cluster} that the edge set $\m{E}_i$ contain only erased edges.
@@ -262,7 +262,7 @@ The function \codefunc{Union}$(r_u,r_v)$ links the trees of vertex roots $r_u$ a
 
 The Union-Find data structure, its tree implementation, the \emph{union by rank}, \emph{union by weight} and \emph{path compression} rules are all elaborately covered in appendix \ref{ap:unionfind}. Here, we also make a full analysis of its $\m{O}(n\alpha(n))$ complexity based on \cite{kozen1992design}. The Ackermann's function and its inverse are detailed in appendix \ref{ap:ackermann}.
 
-\subsection{Additional data structure}
+\subsection{Additional data structure}\label{sec:ufdataextra}
 We define in this section what it means to grow a cluster, and the additional data structure needed to facilitate such growth. For a cluster defined by disjoint-set tree of vertices $\m{V}_i$, an iteration of growth means to add another layer of neighboring vertices that lie on the outer boundary of the cluster. 
 \begin{definition}\label{def:clusterboud}
   For a cluster $c_i$, let its boundary be defined by a subset of edges and vertices $\delta \m{E}_i \subseteq \m{E}_i$, $\delta \m{V}_i \subseteq \m{V}_i$. The boundary vertex set $\delta \m{V}_i$ supports one or more edges connected to vertices not in $\m{V}_i$. This set of edges is the boundary edge set $\delta \m{E}_i$, and can be considered as paths that lead to the neighboring vertices. To walk such path is dubbed as \emph{tracing} an edge. 
@@ -329,18 +329,18 @@ We now describe the pre-processing step of syndrome validation. A round of growt
   \While{$\m{L}_o \neq \emptyset$}{
     Initialize $\m{L}_m=\emptyset$ \;
     \For{$c_i$ in $\m{L}_o$}{
-      $\codefunc{Grow}(c_i, \m{L}_m)$ (al. \ref{algo:ufgrow});
+      $\codefunc{Grow}(c_i, \m{L}_m)$ (Al. \ref{algo:ufgrow});
     }
     \For{$(u,v)$ in $\m{L}_m$}{
-      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (al. \ref{algo:find})\;
-      If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Al. \ref{algo:find})\;
+      If $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (Al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
     } 
     Remove even clusters from $\m{L}_o$\;
   }
   \KwRet{Validated erasure $\bar{\m{R}}$}
   \BlankLine
   \tcp{Peeling decoder}
-  Run Peeling decoder (al. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
+  Run Peeling decoder (Al. \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
   \BlankLine
   \caption{Union-Find decoder \cite{delfosse2017almost}}\label{algo:uf}
 \end{algorithm}
@@ -349,15 +349,18 @@ We now describe the pre-processing step of syndrome validation. A round of growt
 
 For a system of $n$ qubits, the initialization of the cluster $\m{V}_i$ and its boundaries $\delta \m{V}_i$ and the odd parity cluster list $\m{L}_o$ all take $\m{O}(n)$ time. Each edge can be traced a maximum of 2 iterations, thus tracing also takes $\m{O}(n)$. Maintaining $\m{L}_o$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a "Almost-linear time decoding algorithm" \cite{delfosse2017almost}. 
 
-\section{Weighted growth}\label{sec:bucketclustersort}
-The vanilla Union-Find decoder of Algorithm \ref{algo:uf} has been reported to have a code threshold of $p_{th}=9.2\%$ for independent Pauli noise \cite{delfosse2017almost} on a toric code. Recall from section \ref{sec:threshold} that $p_{th}$ is the threshold error rate below which the chance of successful correction can be increased by increasing the system size or the number of qubits on the surface code. Delfosse \emph{et al.} has shown that this threshold can be improved to $p_{th}=9.9\%$ by applying \emph{weighted growth}, where the order of cluster growth is sorted according to the sizes of the cluster trees. However, the authors have not provided a description for this sorting. In this section, we will show why weighted growth improves the threshold and provide a description of a sorting method that operates within the time complexity of the Union-Find decoder. 
+\section{Implementations of the Union-Find decoder}\label{sec:ufimplementations}
 
-% The vanilla UF decoder (as described by Delfosse \cite{delfosse2017almost}) has an error threshold of $9.2\%$ for a 2D toric lattice, that only suffers errors through a single Pauli channel. Delfosse has shown that the threshold can be improved by sorting the order of cluster growth, but has not provided a description of this sorting. In this chapter, we will show an implementation of this sorting routine that maintains a linear time complexity in section \ref{sec:bucketclustersort}. In section \ref{sec:oop}, we will show an object oriented approach of the UF decoder that allows for a straight forward data structure that is used for our implementation. In the remaining sections, we will show some other alterations to the UF decoder, that uses the inspiration of the MLD-decoder or the MWPM decoder to improve the error threshold while retaining a low time complexity.
+The vanilla Union-Find decoder of Algorithm \ref{algo:uf} has been reported to have a code threshold of $p_{th}=9.2\%$ for independent Pauli noise \cite{delfosse2017almost} on a toric code. Recall from section \ref{sec:threshold} that $p_{th}$ is the threshold error rate below which the chance of successful correction can be increased by increasing the system size or the number of qubits on the surface code. Delfosse \emph{et Al.} has shown that this threshold can be improved to $p_{th}=9.9\%$ by applying \emph{weighted growth}, where the order of cluster growth is sorted according to the sizes of the cluster trees. However, the authors have not provided a description for this sorting. We will show an implementation of wegithed growth in Section \ref{sec:bucketwg}. Furthermore, we introduce another implementation that dynamically maintains a forest during growth in Section \ref{sec:dynamicforest}.
+
+\subsection{Bucket weighted growth}\label{sec:bucketwg}
+In this section, we will first show why weighted growth improves the threshold, and provide a description of a sorting method utilising \emph{Bucket sort} that operates within the time complexity of the Union-Find decoder. 
+
+% The vanilla UF decoder (as described by Delfosse \cite{delfosse2017almost}) has an error threshold of $9.2\%$ for a 2D toric lattice, that only suffers errors through a single Pauli channel. Delfosse has shown that the threshold can be improved by sorting the order of cluster growth, but has not provided a description of this sorting. In this chapter, we will show an implementation of this sorting routine that maintains a linear time complexity in section \ref{sec:bucketwg}. In section \ref{sec:oop}, we will show an object oriented approach of the UF decoder that allows for a straight forward data structure that is used for our implementation. In the remaining sections, we will show some other alterations to the UF decoder, that uses the inspiration of the MLD-decoder or the MWPM decoder to improve the error threshold while retaining a low time complexity.
 
 % To further increase the error threshold for the Union-Find decoder from $9.2\%$ to $9.9\%$, Delfosse implements \emph{weighted growth}, where clusters are grown in increasing order based on their sizes \cite{delfosse2017almost}. However, the main problem with weighted growth is that the clusters now need to be sorted, and that after each growth iteration another round of sorting is necessary, due to the fact that the clusters have changed sizes due to growth and merges, and the order of clusters may have been changed. Nickerson has not given a description of how weighted growth is implemented. As the complexity of the algorithm is now dominated by the Union-Find algorithm, we need to make sure that weighted growth does not add to this complexity. To avoid this iterative sorting, we need to make sure that the insertion of a new element in our sorted list of clusters does not depend on the values in that list.
 
 % The Bucket Cluster sorting algorithm as described in this section is evolved from a more complicated version that is described in appendix \ref{ap.bucketsort}, which has a sub-linear complexity of $\m{O}(\sqrt{n})$.
-
 
 \begin{lemma}\label{lem:incorrectedges}
   For two clusters $c_i, c_j$ with sizes $|c_i| << |c_j|$, $\codefunc{Grow}(c_i)$ will add fewer \emph{redundant} edges $e_r$ to $\m{E}_i$ compared to $\codefunc{Grow}(c_j)$ to $\m{E}_j$, where redundant edges are not in the outputted correction set $\m{C}$. 
@@ -369,7 +372,7 @@ The vanilla Union-Find decoder of Algorithm \ref{algo:uf} has been reported to h
 If there are only two clusters $c_i, c_j$ on the lattice with different cluster sizes, it would not matter which cluster is grown first. The number of clusters growths needed is equal to the minimum distance $d_{ij}$ between the two clusters. Either a sequence of $d_{ij}$ growths for $c_i$, $d_{ij}$ growths for $c_j$, or $d_{ij}$ growths distributed among $c_i$ and $c_j$ would achieve the same goal: connecting the two clusters into a single even-parity cluster. It is due to the existence of other clusters that \emph{weighted growth} makes a difference. If there are clusters $c_k$ with arbitrary parity located nearer to $c_i$ than $c_j$, the distribution of the $d_{ij}$ growths among $c_i$ and $c_j$ now determines the shape of the resulting clusters. If only $c_i$ is grown, it may be possible that it is merged with $c_k$ first, whereas if only $c_j$ is grown this may not be the case. The \emph{redundant} edges of lemma \ref{lem:incorrectedges} are therefore not insignificant, as it may lead to a different set of clusters entirely that may result to a \emph{right} correction set $\m{C}$, or not at all. Nevertheless, by growing smaller clusters first, each newly added edge has a higher possibility to be in $\m{C}$ than edges added during the growth of a larger cluster, which is why weighted growth leads to a increased threshold.
 
 
-\subsection{Sorting method}
+\subsubsection{Sorting method}
 % Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
 
 % Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $\m{V}_\alpha, \m{V}_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $\m{V}_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $\m{V}_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
@@ -426,7 +429,7 @@ As we trace the boundary edges per half-edge, a single round of growth does not 
 %   Weighted growth is achieved by growing the odd clusters sequentially starting from bucket $b_0$. Grown odd clusters from bucket $b_c$ are added back to the bucket list using the \codefunc{Place} subroutine, in a bucket $b_{g}$ where $g > c$. Clusters $C_\alpha$ and $C_\beta$ with $S_\alpha = S_\beta$ are placed int the same bucket $b_{S_\alpha}$, and are grown together. However, their growing order is dependent on the order of placement within the bucket.
 % \end{theorem}
 
-\subsection{Growing buckets}
+\subsubsection{Growing buckets}
 
 In the original algorithm, we keep iterating over $\m{L}_o$ whilst there are odd-parity clusters remaining in the list, where in each round of growth the clusters increase in size and potentially merge to even parity. Here, we made sure that at the end of each round, the even-parity clusters are removed from $\m{L}_o$. 
 
@@ -449,7 +452,7 @@ To avoid the growth of a redundantly placed cluster $c_i$, we check before $\cod
   On a lattice of $n$ vertices, a cluster $c_i$ can have a maximum size of $|\m{V}_i|=n$. The number of buckets needed for using Bucket sort for weighted growth is thus seemingly $N_b = 2n$, where for each cluster size two buckets are initiated. However, any cluster reaching size $|\m{V}_i|\geq n$, there must be at least on another cluster $c_j$ with size $|\m{V}_j|<n$. Cluster $c_j$ thus belongs to a lower bucket with $b_j < b_i$ that is grown before cluster $c_i$. As there are only $n$ vertices on the lattice, these clusters must merge before cluster $c_i$ is grown. Thus buckets $b_k$ with $k>n$ are always empty or contain strictly redundant placements.
 \end{proof}
 
-Actually, for either a toric or planar code, the number of buckets required is slightly less than $n$. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. The pseudo-code for the Union-Find decoder with weighted growth implemented via Bucket sort (and dynamic forests, see next section) is listed in Algorithm \ref{algo:ufbucketdf}. 
+Actually, for either a toric or planar code, the number of buckets required is slightly less than $n$. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. We dub the Union-Find decoder with weighted growth applied via the bucket sort method introduced in this section the \emph{Union-Find Bucket Weighted Growth} decoder. The pseudocode for this decoder is presented in Algorithm \ref{algo:ufbwg}.  
 
 Initiating $n$ buckets takes $\m{O}(n)$ time. The placement of each cluster in a bucket and checking its bucket number takes $\m{O}(1)$ time. The total number of placements, including redundantly placed clusters, is upper bounded by the number of growths, which has not changed due to weighted growth, and thus does not add to the complexity. Thus the overall complexity of $\m{O}(n\alpha(n))$ is preserved. 
 % Now let us be clear: \emph{only odd parity clusters will be placed in buckets, but each bucket does not only contain odd parity clusters}. As a merge happens between two odd parity clusters $C_\alpha$ and $C_\beta$ during growth of $C_\beta$, cluster $C_\alpha$ has already been placed in a bucket, as it was still odd after its growth. But cluster $C_\alpha$ is now part of cluster $AB$ and has even parity, and the entry of cluster $C_\alpha$ is faulty. To prevent growth of the \emph{faulty entry}, we can check for the parity of the root cluster.
@@ -467,7 +470,7 @@ Initiating $n$ buckets takes $\m{O}(n)$ time. The placement of each cluster in a
 %   \end{equation}
 % \end{definition}
 % Finally, 
-% How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now trivial. But we need to make sure that the decoder \emph{can} give a solution. Consider an odd cluster $C_\mu$ of size $S_\alpha~n/2$ which covers half the lattice. There must exists another odd cluster $C_\beta$ for matchings to exists, which has size $S_\beta\leq n/2$.
+% How many buckets do we exactly need? On a lattice there can be $n$ vertices, and a clusters can therefore grow to size $n$, spanning the entire lattice. Naturally, if a cluster spans the entire lattice, the solution given by the peeling decoder is now triviAl. But we need to make sure that the decoder \emph{can} give a solution. Consider an odd cluster $C_\mu$ of size $S_\alpha~n/2$ which covers half the lattice. There must exists another odd cluster $C_\beta$ for matchings to exists, which has size $S_\beta\leq n/2$.
 % As per lemma \ref{the:bucket_order}, $C_\beta$ will grow before $C_\alpha$. As the remaining number of vertices is $n-S_\alpha-S_\beta$, $C_\beta$ can never grow larger than $C_\alpha$ and will merge into $C_\alpha$ if no other odd cluster exists. There exists a maximum cluster size $S_\mu$ for which after $\codefunc{Grow}(C_\mu)$ this is true. This cluster size $S_\mu$ is dependent on the code and the parity of lattice size $L$. We illustrate in Figure \ref{fig:bucket_cmsizes} the clusters $C_\mu$ for the toric and planar code. Their maximum odd cluster size $S_\mu$ is listed in table \ref{tab_smax}, where $L'=L-1$ for the planar code.
 
 % \begin{lemma}
@@ -501,8 +504,7 @@ Initiating $n$ buckets takes $\m{O}(n)$ time. The placement of each cluster in a
 % \subsubsection{Complexity of BCS}
 % Let us focus on the operations on a single cluster before it is grown an half-edge. A cluster is placed in a bucket, popped from that bucket some time after, checked for faulty entry, and if passed grown. All these operations are done linear time $\m{O}(1)$. There are a maximum of $\m{O}(L^2) = \m{O}(N)$ buckets to go through. Thus the overall complexity of $\m{O}(N\alpha(N))$ is preserved.
 
-
-\section{Dynamic forest}
+\subsection{Dynamic forest}\label{sec:dynamicforest}
 Syndrome validation outputs a validated erasure $\bar{\m{R}}$, a set of connected clusters with even syndrome parities with edge sets $\{\m{E}_1, \m{E}_2, ...\} \equiv \{\bar{\m{R}}_1, \bar{\m{R}}_2, ...\}$. The task of the Peeling decoder is now to 1) make a set of trees such that the edges sets of clusters are $\{\m{E}_1, \m{E}_2, ...\} \equiv \{\m{T}_{\m{E}_1}, \m{T}_{\m{E}_2}, ...\}$ and 2) peel these forests and output a correction $\n{P}(\m{C})$ where $\m{C} = \{\m{C}_1, \m{C}_2,...\}$. Recall that a tree $\m{T}_{\m{R}_i}$ (Definition \ref{def:forest}) can be created by a depth-first search of the edge set $\m{R}_i$. We now show that via a simple extra step in syndrome validation, clusters $\m{R}_i$ can be grown such that it is always acyclic and $\m{T}_{\m{R}_i} = \m{R}_i$. 
 
 \begin{definition}
@@ -511,12 +513,15 @@ Syndrome validation outputs a validated erasure $\bar{\m{R}}$, a set of connecte
     \m{E}_{i,t}\equiv\m{T}_{\m{E}_{i,t}} \forall t \text{ during growth}.
   \end{equation}
 \end{definition}
-The dynamic cluster tree $\m{T}_i$ replaces $\m{E}_i$ as the edge set of a cluster $c_i$ and can be maintained by an additional step when considering all edges from the merging list $\m{L}_m$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $(u,v).support$ if $r_u = r_v$. The pseudo-code for the Union-Find decoder with dynamic forests (and weighted growth implemented via Bucket sort, see previous section) is listed in Algorithm \ref{algo:ufbucketdf}.
+The dynamic cluster tree $\m{T}_i$ replaces $\m{E}_i$ as the edge set of a cluster $c_i$ and can be maintained by an additional step when considering all edges from the merging list $\m{L}_m$ in Algorithm \ref{algo:uf}. Previously, we merged the trees of $r_u$ and $r_v$ if $r_u \neq r_v$. Now, if $r_u = r_v$, vertices $u$ and $v$ already are in the same tree. Adding $(u,v)$ to the tree would be equivalent to a cycle. We therefore subtract 1 from $(u,v).support$ if $r_u = r_v$. We dub the Union-Find decoder with dynamically maintainted trees the \emph{Union-Find Dynamic Forest decoder}. The pseudocode for this decoder is presented in Algorithm \ref{algo:ufdf}.
 
 \todo[inline]{make connection with results section}
 To maintain these dynamic trees $\m{T}_i$ has some benefits that may not be immediately clear. In the next chapter, we will present a modification of the Union-Find decoder that aims to minimize the weight of matchings or $|\m{C}|$ after peeling by selective sub-growth of clusters. The results of this modification shows that a decreased weight is to some extend a heuristic for an increased threshold, which can be testified by the superior threshold of the Minimum Weight Perfect Matching decoder (Section \ref{sec:MWPMdecoder}). This modification is reliant on clusters that are always acyclic, which motivates the dynamic forests routine. 
 
 Furthermore, when dynamic cluster trees are not maintained, the shape of the forest $\m{T}_{\m{R}_i}$ created during the first step of the Peeling decoder (Algorithm \ref{algo:peel}), and therefore the matching weight $|\m{C}|$, is dependent on the seed, the vertices where the depth-first search is initiated. If the seeds are selected randomly, minimum weight matchings within $\m{R}_i$ are not certain. Instead of the depth-first search of Algorithm \ref{algo:forest}, minimal $|\m{C}|$ can be achieved by a number of parallel \emph{breadth-first searches} with syndrome vertices $\sigma_i \in \m{V}_i$ as seeds, where iteratively edges of the same breadth or same distance from any syndrome vertex are added to $\m{T}_{\m{R}_i}$. We will not provide a pseudo-code for this alternative \codefunc{Forest} function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic tree $\m{T}_i$ during some growth iteration are equivalent to the breadth of edges added to $\m{T}_{\m{R}_i}$ in one of the breadth-first searches. 
+
+\subsection{Decoder labelling}
+
 
 \begin{algorithm}[htb]
   \BlankLine
@@ -524,48 +529,99 @@ Furthermore, when dynamic cluster trees are not maintained, the shape of the for
   \KwResult{Correction set $\m{C}$}
   \BlankLine
   \tcp{Syndrome validation}
-  Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$ (def. \ref{def:clusterboud})\;
-  Initialize $\m{L}_b$ with odd-parity clusters (def. \ref{def:buckets})\;
+  Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$\;
+  Initialize $\m{L}_b$\tcp*{Ensures weighted growth}
+  \codefunc{Place} odd-parity clusters in $\m{L}_b$ (Al. \ref{algo:place})\;
   \For{bucket $b_k$ in $\m{L}_b$}{
     Initialize $\m{L}_m=\emptyset, \m{L}_p=\emptyset$\;
     \For{$c_i$ in $b_k$}{
       \If{$c_i.bucket$ is $k$}{
-        $\codefunc{Grow}(c_i, \m{L}_m)$ (al. \ref{algo:ufgrow});
+        $\codefunc{Grow}(c_i, \m{L}_m)$ (Al. \ref{algo:ufgrow});
         add $c_i$ to $\m{L}_p$\;
       }
     }
     \For{$(u,v)$ in $\m{L}_m$}{
-      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (al. \ref{algo:find})\;
+      Get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Al. \ref{algo:find})\;
       \eIf{$r_u \neq r_v$}{
-        apply $\codefunc{Union}(r_u,r_v)$ (al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+        apply $\codefunc{Union}(r_u,r_v)$ (Al. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
       }{
-        Subtract 1 from $(u,v).support$\;
+        Subtract 1 from $(u,v).support$\tcp*{Maintains dynamic tree}
       }
     }
     \For{cluster $c_i$ in $\m{L}_p$}{
-      $\codefunc{Place}(c_i, \m{L}_b)$ (al. \ref{algo:place})\;
+      $\codefunc{Place}(c_i, \m{L}_b)$ (Al. \ref{algo:place})\;
     }
   }
   \KwRet{Validated erasure forest $\bar{\m{F}}$}
   \BlankLine
   \tcp{Peeling decoder}
-  Run Peeling decoder (al. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
+  Run Peeling decoder (Al. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
   \BlankLine
   \caption{Union-Find decoder with bucket-weighted growth and dynamic forests}\label{algo:ufbucketdf}
 \end{algorithm}
 
 
-\section{Performance}
+\section{Performance}\label{sec:ufperformance}
 
 
+%UFUWGNDF
 \begin{table}[htb]
   \centering
-  \begin{tabularx}{\textwidth} { 
-    | >{\raggedright\arraybackslash}X 
-    || >{\centering\arraybackslash}X 
-    | >{\centering\arraybackslash}X
-    | >{\centering\arraybackslash}X
-    | >{\centering\arraybackslash}X | }
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.09716 \pm 0.00003$ & $0.7336$ & $- \pm 0.0000-$ & $-$ \\
+   \hline
+   Planar code & $0.09782 \pm 0.00005$ & $0.8578$ & $- \pm 0.0000-$ & $-$\\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Union-Find decoder with 1) no weighted growth 2) static forest $L = 8:8:64, L=8:4:36$}\label{tab:ufndfwug}
+\end{table}
+
+% UFUWG
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.09789 \pm 0.00003$ & $0.7432$ & $- \pm -$ & $-$ \\
+   \hline
+   Planar code & $0.09775 \pm 0.00003$ & $0.8591$ & $- \pm -$ & $-$\\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Union-Find decoder with 1) no weighted growth 2) dynamic forests  $L = 8:8:64, L=8:4:36$}\label{tab:ufuwg}
+\end{table}
+
+
+% UFNDF
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
+   \hline
+   & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
+   \hline
+   & $p_{th}$ & $p_{C}$ & $p_{th}$ & $p_{C}$ \\
+   \hhline{|=||=|=|=|=|}
+   Toric code & $0.09984 \pm 0.00003$ & $0.7286$ & $- \pm -$ & $-$ \\
+   \hline
+   Planar code & $- \pm -$ & $-$ & $- \pm -$ & $-$\\
+  \hline
+  \end{tabularx}
+  \caption{Sumulation results for the Union-Find decoder with 1) bucket-weighted growth 2) static forest  $L = 8:8:64, L=8:4:36$}\label{tab:ufndf}
+\end{table}
+
+
+
+% UF
+\begin{table}[htb]
+  \centering
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
    \hline
    & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
    \hline
@@ -573,8 +629,8 @@ Furthermore, when dynamic cluster trees are not maintained, the shape of the for
    \hhline{|=||=|=|=|=|}
    Toric code & $0.10009 \pm 0.00002$ & $0.7279$ & $0.02685 \pm 0.00001$ & $0.9208$ \\
    \hline
-   Planar code & $0.99939 \pm 0.00002$ & $0.84595$ & $0.02660 \pm 0.00001$ & $0.932$\\
+   Planar code & $0.09994 \pm 0.00002$ & $0.8460$ & $0.02660 \pm 0.00001$ & $0.932$\\
   \hline
   \end{tabularx}
-  \caption{Sumulation results for the Union-Find decoder with bucket-weighted growth and dynamic forests $L = 8:8:128, L=8:4:40$}\label{tab:uf}
+  \caption{Sumulation results for the Union-Find decoder with 1) bucket-weighted growth 2) dynamic forests $L = 8:8:128, L=8:4:40$}\label{tab:uf}
 \end{table}
