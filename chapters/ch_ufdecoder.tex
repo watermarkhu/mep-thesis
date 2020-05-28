@@ -1,7 +1,7 @@
 \chapter{Union-Find decoder}\label{ch:UFdecoder}
 The Union-Find decoder is a new fast decoding algorithm for topological codes to correct for Pauli errors, erasure errors, and the combination of both errors. The worst-case complexity of the algorithm is $\m{O}(n\alpha(n))$, where $n$ is the number of physical qubits and $\alpha$ is the inverse of Ackermann's function, which is very slowly growing, and is proven that $a(n)\leq 3$ for any practical amount of qubits.
 
-Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in Sections \ref{sec:peelingdecoder}-\ref{sec:ufdecoder} and perform analyses on their complexities. In Section \ref{sec:ufimplementations}, we present two of our altered implemenations of the Union-Find decoder. We simulate and compare the performances of each implementation in section \ref{sec:ufperformance}.
+Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the MWPM-decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the \emph{Peeling decoder} has been developed that can solve errors over the erasure channel with a linear time complexity. The \emph{Union-Find} decoder is an extensions that additionally solves for Pauli errors. We will explore both algorithms in Sections \ref{sec:peelingdecoder}-\ref{sec:ufdecoder} and perform analyses on their complexities. In Section \ref{sec:ufimplementations}, we present two of our altered implementations of the Union-Find decoder. We simulate and compare the performances of each implementation in section \ref{sec:ufperformance}.
 
 \section{Peeling decoder}\label{sec:peelingdecoder}
 The Peeling decoder acquired its name by the nature of its behavior of sequentially \emph{peeling} from some tree of qubit-edges until the correction operator is left \cite{delfosse2017linear}. The scope of this decoder is limited to \emph{erasure} errors, or errors suffered through the erasure channel. Recall from equation \eqref{qec:eq:erasure} that in an erasure, each qubit is erased from the system independently with probability $p_E$. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation \eqref{qec:eq:mixstate}, which can be interpreted as the original state that suffers from a Pauli error $\hat{I}$, $\hat{X}$, $\hat{Y}$ or $\hat{Z}$ chosen uniformly at random.
@@ -609,22 +609,38 @@ From the literature, the vanilla unweighted Union-Find decoder is reported to ha
 The SBUF decoder should be equivalent to the vanilla weighted variant. The threshold values differ within a range of about $0.001$, or $0.1\%$. While this may seem as they are within range to conclude that they match, note that the threshold of the Minimum-Weight Perfect Matching decoder is only $0.4\%$ higher at $p_{th}=10.3\%$. As the threshold for the unweighted variant already pointed to other differences in implementations, we speculate that our implementation improves upon the original. 
 
 Furthermore, it can be concluded from Table \ref{tab:uftable} that the dynamic forest variants of the decoders have a slightly increased or equal threshold and decoding success rate. To find out whether the intuition from Proposition \ref{prop:mw1} is true, we compare the matching weight $|\m{C}|$ for every implementation of the Union-Find decoder with the minimum weight obtained with the Minimum-Weight Perfect Matching decoder in Figure \ref{fig:mwcomp_uf_toric_2d}, for a toric code with independent noise on $p_X=0.098$. Similar figures for other configurations can be found in Section \ref{ap:figufcomp}. From these figures, we can conclude that dynamic forest does decrease the matching weight. This adds to the credibility to the intuition from Proposition \ref{prop:mw1}. We restate the proposition as the following:
-\begin{proposition}
+\begin{proposition}\label{prop:mw2}
   There is a intuition that a decreased weight is to some extend a heuristic for an increased threshold. 
 \end{proposition}
 
-\todo[inline]{add other figures in ap:figufcomp}
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{\textwidth}
+  \begin{subfigure}[t]{0.49\textwidth}
       \input{pgfplots/mwcomp_uf_toric_2d_p98_nnorm.pgf}
+      \caption{Absolute matching weight}
   \end{subfigure}
-  \begin{subfigure}[b]{\textwidth}
+  \begin{subfigure}[t]{0.49\textwidth}
       \input{pgfplots/mwcomp_uf_toric_2d_p98_norm.pgf}
+      \caption{Normalized matching weight}
   \end{subfigure}
-  \caption{<caption>}
+  \caption{The matching weight $|\m{C}|$ of the various implementations of the Union-Find decoder, compared with the minimum-weight for various lattice sizes on a toric code, with independent noise $p_X=0.098$.}
   \label{fig:mwcomp_uf_toric_2d}
 \end{figure}
 
+Finally, we compare the average running times for every implementation of the Union-Find decoder with independent noise in Figure \ref{fig:tcomp_uf_2d}. From this figure we can conclude that maintaining a dynamic forest reduces the running time slightly. This does not come unexpected, as the dynamic forest eliminates the necessity of calling \codefunc{Forest} (Algorithm \ref{algo:forest}). However, the gained performance is not substantial enough to advertise dynamic forest as a major improvement over static forest. Nevertheless, we remind the reader that maintaining a dynamic forest is crucial for our modification of the Union-Find decoder in the next chapter, while in this chapter, the concept of dynamic forest helped us formalize Proposition \ref{prop:mw2}. Similar figures under phenomenological noise show the same heuristic (Section \ref{ap:figufcomp}).\\
 
-\todo[inline]{running time comparison}
+In this chapter, we have fully described the Union-Find decoder, and provided implementations of this decoder with varying performance. Based on simulated results, we proposed an intuition that a decreased matching matching is a heuristic for an increased code threshold. In the next chapter, we continue to speculate on this intuition. With the goal of further reducing the matching weight within the Union-Find decoder, we propose a modification that has performs comparably with the Minimum-Weight Perfect Matching decoder in terms of code threshold. 
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+      \input{pgfplots/tcomp_uf_toric_2d_p98_norm.pgf}
+      \caption{Toric code}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \input{pgfplots/tcomp_uf_planar_2d_p98_norm.pgf}
+      \caption{Planar code}
+  \end{subfigure}
+  \caption{The average running time of the various implementations of the Union-Find decoder for various lattice sizes  with independent noise $p_X=0.098$.}
+  \label{fig:tcomp_uf_2d}
+\end{figure}

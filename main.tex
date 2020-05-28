@@ -5,7 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[hidelinks]{hyperref}
 \usepackage{physics}
-\usepackage{adjustbox}
+\usepackage[pgf, pgfmath]{adjustbox}
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{framed,enumitem} 
 \usepackage[mathscr]{euscript}
@@ -71,13 +71,18 @@
 \usepackage{listings}
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 
-\usepackage{tikz}
-\usetikzlibrary{quantikz,shapes,calc,math,patterns}
+\usepackage{tikz, pgfplots}
+\usepgfplotslibrary{groupplots,dateplot}
+\usetikzlibrary{quantikz,shapes,calc,math,patterns,arrows}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 \SetAlFnt{\footnotesize}
 \tikzset{bellstar/.style ={draw, star,star points = 8, star point height = 1em, star point ratio = 1.8, minimum size = 1em, inner sep = 0pt}}
 \tikzset{selection/.style={draw, signal, signal to =south, minimum size = 1em, inner sep = 0pt}}
 \tikzset{sel/.style={label position = below, yshift = 0.5cm}}
+
+\DeclareUnicodeCharacter{2212}{−}  
+\pgfplotsset{compat=newest}
+
 
 % Glossary
 \usepackage[symbols,nomain,automake]{glossaries-extra}
