@@ -20,24 +20,19 @@ We suspect that the error threshold of the Union-Find decoder can be increased b
 
 \section{A potential matching weight}\label{sec:PMW}
 
-The Minimum-Weight Perfect Matching decoder finds the minimum-weight subset of edges by constructing a fully connected graph between all vertices (Section \ref{sec:MWPMdecoder}). By computing on the entire lattice, we denote such decoder as a \emph{global} decoder. The Union-Find decoder is a \emph{local} decoder, as each cluster is grown individually, oblivious about its surrounding neighbors until it merges into them. We introduce in this section the concept of a \emph{potential matching weight} of an odd-parity cluster, and we show that its value is not constant across the vertices of a cluster.
+The Minimum-Weight Perfect Matching decoder finds the minimum-weight subset of edges by constructing a fully connected graph between all vertices (Section \ref{sec:MWPMdecoder}). By computing on the entire lattice, we denote such decoder as a \emph{global} decoder. The Union-Find decoder is a \emph{local} decoder, as each cluster is grown individually, oblivious about its surrounding neighbors until it merges into them. We introduce in this section the concept of a \emph{potential matching weight} of an odd-parity cluster, and we show that its value is not constant across the vertices of a cluster. Recall from Definition \ref{def:cluster} that a cluster with index $i$ is defined as a object $c_i$ with an edge set $\m{E}_i$ and vertex set $\m{V}_i$.
 
 \begin{definition}\label{def:pmw}
   Consider an odd-parity cluster $c_i$ containing a vertex $v$. The Potential Matching Weight (PMW) of the vertex $v$ is the matching weight in the subset of edges of an odd-parity cluster $c_i$ in a hypothetical union with another cluster $c_j$ in the next growth iteration, where the merging boundary edge is supported by $v$. 
   \begin{equation}
     PMW(v) = \abs{\m{C} \cap \m{E}_{i}} \text{ if } c_i, c_j \text{ merged by } \codefunc{Union}(v,u) | v \in \m{V}_{i}, u \in \m{V}_{j}, 
   \end{equation}
+  In other words, the potential matching weight is a vertex-specific predictive heuristic to the matching weight assuming an union in the next growth iteration. 
 \end{definition}
 
-Recall from Definition \ref{def:cluster} that a cluster with index $i$ is defined as a object $c_i$ with an edge set $\m{E}_i$ and vertex set $\m{V}_i$. 
+Let us first consider an example. Cluster $c_e$ is defined by vertex set $\vset_e = \{v_1, v_2, v_3\}$, where each vertex is a syndrome vertex $\{v_1, v_2, v_3\}=\{\sigma_1, \sigma_2, \sigma_3\}$ (Figure \ref{fig:PMW}). The vertices lie on a horizontal line, distance 1 from each other, where each vertex has grown a single iteration of half-edges. The cluster has odd parity and is queued for growth. Let us investigate the weights of a matching if an additional vertex $v_o$ is connected to the cluster. If $v_o$ is connected to $v_1$ or to $v_3$, then the resulting matchings have a total weight of 2: $\{(v_o,v_1), (v_2,v_3)\}$ or $\{(v_o,v_3),(v_1,v_2)\}$, respectively. However if $v_o$ is connected to vertex $v_2$, then the total weight is 3: $\{(v_o, v_2),(v_1, v_3)\}$, where $(v_1,v_3)$ has weight 2. 
 
-
-Let us first consider an example. Cluster $C_e$ is defined by vertex set $\vset_e = \{v_1, v_2, v_3\}$ (Figure \ref{fig:PMW}). The vertices lie on a horizontal line, distance 1 from each other, where each vertex has grown a single iteration of half-edges. Assume that each vertex in $\vset_e$ is a syndrome, it has odd parity and is selected for growth. As UF decoder performs on the cluster locally, it has no knowledge about the state of its surrounding vertices until the cluster grows and merges with them. 
-
-Now let us investigate the weights of a matching if an additional vertex $v'$ is connected to the cluster.
-If $v'$ is connected to $v_1$ or to $v_3$, then the resulting matchings have a total weight of 2: $(v',v_1)$ and $(v_2,v_3)$, or $(v',v_3)$ and $(v_1,v_2)$. However if $v'$ is connected to vertex $v_2$, then the total weight is 3: $(v', v_2)$ and $(v_1, v_3)$. This hypothetical weight after matching is the Potential Matching Weight (PMW) of a vertex.
-
-From the above example, we can see that even for a minimal size odd cluster that is not a single vertex, the PMW is not equal for all vertices in the cluster. It would therefore not be "fair" to grow all boundary edges simultaneously. The growth of boundary edges connected to vertices with a high PMW should thus be delayed for some iterations, such that PMW's in the cluster reach the same value. However, if the PMW is to be calculated for every vertex with boundary edges in all clusters in every growth iteration, the time complexity of the algorithm would increase dramatically. Luckily, we can reduce these calculations to be performed on a set of \emph{nodes} in each cluster, which we clarify in the next section.
+From the above example, we can see that even for a minimal size odd cluster that is not a single vertex, the PMW is not equal for all vertices in the cluster. It would therefore not be optimal to grow all boundary edges simultaneously, as boundaries connected to vertices with a high PNW potentially result in a higher matching weight. The growth these high PMV boundaries should thus be delayed for some iterations. When the PMV across the cluster reach an equilibrium, there is no benefit of growing some boundaries before others, and simultaneous growth is allowwed again.
 
 \begin{figure}
   \centering
@@ -50,22 +45,24 @@ From the above example, we can see that even for a minimal size odd cluster that
     \draw[l1] (2,1) -- (2,-1);
     \draw[l1] (4,1) -- (4,-1);
     \node[node] at (0,0) (1) {$v_1$};
-    \node[node, draw=green, dashed] at (0,2) (2) {$v_1'$};
+    \node[node, draw=mgreen, fill=mgreen, fill opacity=.2, text opacity=1, dashed] at (0,2) (2) {$v_o$};
     \node[node] at (2,0) (3){$v_2$};
-    \node[node, draw=cyan, dotted] at (2,2) (4) {$v_2'$};
+    \node[node, draw=mblue, fill=mblue, fill opacity=.2, text opacity=1,dotted] at (2,2) (4) {$v_o$};
     \node[node] at (4,0) (5) {$v_3$};
-    \node[node, draw=magenta, dashdotted] at (4,2) (6) {$v_3'$};
+    \node[node, draw=mred, fill=mred, fill opacity=.2, text opacity=1,dashdotted] at (4,2) (6) {$v_o$};
 
-    \draw[l1, dashed, green] (1) -- (2);
-    \draw[l1, dashed, green, transform canvas={yshift=3pt}] (3) -- (5);
-    \draw[l1, dotted, cyan] (3) -- (4);
-    \draw[l1, dotted, cyan, transform canvas={yshift=-3pt}] (1) -- (3) -- (5);
-    \draw[l1, dashdotted, magenta] (5) -- (6);
-    \draw[l1, dashdotted, magenta, transform canvas={yshift=3pt}] (3) -- (1);
+    \draw[l1, dashed, mgreen] (1) -- (2);
+    \draw[l1, dashed, mgreen, transform canvas={yshift=3pt}] (3) -- (5);
+    \draw[l1, dotted, mblue] (3) -- (4);
+    \draw[l1, dotted, mblue, transform canvas={yshift=-3pt}] (1) -- (3) -- (5);
+    \draw[l1, dashdotted, mred] (5) -- (6);
+    \draw[l1, dashdotted, mred, transform canvas={yshift=3pt}] (3) -- (1);
 
   \end{tikzpicture}
-  \caption{Unbalanced matching weight in cluster vertex set $\mathcal{V}$. The matching edges (dashed) correspond to the position of $v'$. If $v'$ is connected to $v_1$ or $v_3$, the resulting matchings have a weight of 2. IF $v'$ is connected to $v_2$, the resulting matching has a weight of 3.}\label{fig:PMW}
+  \caption{Unequal matching weight in cluster vertex set $\mathcal{V}$. The matching edges (dashed) correspond to the position of $v_o$. If $v_o$ is connected to $v_1$ or $v_3$, the resulting matchings have a weight of 2. IF $v_o$ is connected to $v_2$, the resulting matching has a weight of 3.}\label{fig:PMW}
 \end{figure}
+
+However, the calculation of the PMW is seemingly not as straight forward, especially for clusters if increasingly larger size. Furthermore, if the PMW is to be calculated for every vertex with boundary edges in all clusters in every growth iteration, the time complexity of the algorithm would increase dramatically. Luckily, we can reduce these calculations to be performed on a set of \emph{nodes} in each cluster, which we clarify in the next section.
 
 \section{Node set representation of cluster}\label{sec:nodeset}
 
@@ -81,10 +78,10 @@ Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous
  \centering
  \begin{tikzpicture}
  
-   \path[pattern=dots, pattern color=green] (0,3) arc (90:225:1) arc (45:-135:.4142) arc (45:315:1) arc (135:-45:.4142) arc (135:405:1) arc (225:135:.4142) arc (-45:45:1) arc (225:135:.4142) arc (-45:90:1) -- cycle;
-   \path[pattern=grid , pattern color=cyan] (2,1) arc (90:450:1);
-   \node[node, fill=white!70!green] at (0,0) (0) {$v_1$};
-   \node[node, fill=white!70!cyan] at (2,0) (1) {$v_2$};
+   \path[pattern=dots, pattern color=mgreen] (0,3) arc (90:225:1) arc (45:-135:.4142) arc (45:315:1) arc (135:-45:.4142) arc (135:405:1) arc (225:135:.4142) arc (-45:45:1) arc (225:135:.4142) arc (-45:90:1) -- cycle;
+   \path[pattern=grid , pattern color=mblue] (2,1) arc (90:450:1);
+   \node[node, fill=white!70!mgreen] at (0,0) (0) {$v_1$};
+   \node[node, fill=white!70!mblue] at (2,0) (1) {$v_2$};
    \node[node, fill=white!70!black, path fading=fade right] at (4,0) (5) {$v_3$};
    \node[node] at (-2,0) (2) {$v_4$};
    \node[node] at (0,2) (3) {$v_5$};
@@ -98,8 +95,8 @@ Let us call these seeds the \emph{nodes} $n_i$ of the cluster. From our previous
    \node at (-2, 2.5) {$\mathcal{V}_e$};
    \node at (7, 2.5) {$\mathcal{N}_e$};
 
-   \node[node, pattern=dots, pattern color=green] at (7,0) (d) {$\sigma_1$};
-   \node[node, pattern=grid , pattern color=cyan] at (9,0) (e) {$\sigma_2$};
+   \node[node, pattern=dots, pattern color=mgreen] at (7,0) (d) {$\sigma_1$};
+   \node[node, pattern=grid , pattern color=mblue] at (9,0) (e) {$\sigma_2$};
    \node[node, fill=white!70!black, path fading=fade right] at (11,0) (f) {$\sigma_3$};
    \draw[l1] (d) -- (e) -- (f);
   \end{tikzpicture}
@@ -135,21 +132,21 @@ Syndrome-nodes $\sigma$ are not the only type of nodes in the node set. Consider
     
     \node at (0,0) (0) {}; \node at (2,0) (1) {}; \node at (4,0) (2) {};
     
-    \path[pattern=horizontal lines, pattern color=green, rounded corners=10pt, rotate around={45:(0)}] (-1,-1) rectangle (1,1);
-    \path[pattern=vertical lines, pattern color=cyan, rounded corners=10pt, rotate around={45:(1)}] (1,-1) rectangle (3,1);
-    \path[pattern=horizontal lines, pattern color=magenta, rounded corners=10pt, rotate around={45:(2)}] (3,-1) rectangle (5,1);
+    \path[pattern=horizontal lines, pattern color=mgreen, rounded corners=10pt, rotate around={45:(0)}] (-1,-1) rectangle (1,1);
+    \path[pattern=vertical lines, pattern color=mblue, rounded corners=10pt, rotate around={45:(1)}] (1,-1) rectangle (3,1);
+    \path[pattern=horizontal lines, pattern color=mred, rounded corners=10pt, rotate around={45:(2)}] (3,-1) rectangle (5,1);
 
-    \node[nodel, fill=white!70!green] at (0) (v0) {\footnotesize$v_1$};
+    \node[nodel, fill=white!70!mgreen] at (0) (v0) {\footnotesize$v_1$};
     \node[nodel] at (-1,0) (v0l) {};
     \node[nodel] at (0,1) (v0u) {};
     \node[nodel] at (0,-1) (v0d) {};
 
-    \node[nodel, fill=white!70!cyan] at (1) (v1) {\footnotesize$v_2$};
+    \node[nodel, fill=white!70!mblue] at (1) (v1) {\footnotesize$v_2$};
     \node[nodel] at (1,0) (v1l) {\footnotesize$v_{12}$};
     \node[nodel] at (2,1) (v1u) {};
     \node[nodel] at (2,-1) (v1d) {};
 
-    \node[nodel, fill=white!70!magenta] at (2) (v2) {\footnotesize$v_3$};
+    \node[nodel, fill=white!70!mred] at (2) (v2) {\footnotesize$v_3$};
     \node[nodel] at (3,0) (v2l) {\footnotesize$v_{23}$};
     \node[nodel] at (5,0) (v2r) {};
     \node[nodel] at (4,1) (v2u) {};
@@ -161,11 +158,11 @@ Syndrome-nodes $\sigma$ are not the only type of nodes in the node set. Consider
     \draw[l1] (v2u) -- (v2) -- (v2d);
 
     \node at (7,1) {$\nset_e'$};
-    \node[nodel, pattern=horizontal lines, pattern color=green!25!white] at (7,0) (n0) {\footnotesize$\sigma_1$};
+    \node[nodel, pattern=horizontal lines, pattern color=mgreen!25!white] at (7,0) (n0) {\footnotesize$\sigma_1$};
     \node[nodel, pattern=grid, pattern color=teal!25!white, diamond] at (8,0) (j01) {\footnotesize$j_{12}$};
-    \node[nodel, pattern=vertical lines, pattern color=cyan] at (9,0) (n1) {\footnotesize$\sigma_2$};
+    \node[nodel, pattern=vertical lines, pattern color=mblue] at (9,0) (n1) {\footnotesize$\sigma_2$};
     \node[nodel, pattern=grid, pattern color=violet!25!white, diamond] at (10,0) (j12) {\footnotesize$j_{23}$};
-    \node[nodel, pattern=horizontal lines, pattern color=magenta!25!white] at (11,0) (n2) {\footnotesize$\sigma_3$};
+    \node[nodel, pattern=horizontal lines, pattern color=mred!25!white] at (11,0) (n2) {\footnotesize$\sigma_3$};
     \draw[l1] (n0) -- (j01) -- (n1) -- (j12) -- (n2);
 
   \end{tikzpicture}
@@ -495,18 +492,18 @@ With equation \eqref{eq:nodeparity} and \eqref{eq:delayequation}, we now finally
     \draw[l1] (c) -- (i);
     \draw[l1] (a) -- (g) -- (h);
 
-    \draw[l1, ->, dashed, color=cyan] (0, 1.3) -- +(45:0.85) arc (-45:0:.5) -- +(90:.6);
-    \draw[l1, ->, dashed, color=cyan] (0, 0.3) -- +(45:0.85) arc (-45:0:.5) -- +(90:.2);
-    \draw[l1, ->, dashed, color=cyan] (0.75,0.2) -- +(90:.3);
-    \draw[l1, ->, dashed, color=cyan] (1.5,0.2) -- +(135:.4);
-    \draw[l1, ->, dashed, color=cyan] (1.75,1.2) -- +(90:0.5) arc (0:45:.5) -- +(135:0.4);
-    \draw[l1, ->, color=magenta] (1.4, 3) -- +(-45:1.1) arc (45:0:0.5) -- +(-90:0.7);
-    \draw[l1, ->, color=magenta] (1.3, 2.1) -- +(-90:0.9) arc (180:225:.5) -- +(-45:0.7);
-    \draw[l1, ->, color=magenta] (0.6, 1.3) -- +(225:.3);
-    \draw[l1, ->, color=magenta] (0.6, 0.3) -- +(225:.3);
-    \draw[l1, ->, color=magenta] (1.3, 0.3) -- +(-90:.2);
-    \node[text=cyan] at (0,2.2) {Parity};
-    \node[text=magenta] at (2.6,2.8) {Delay};
+    \draw[l1, ->, dashed, color=mblue] (0, 1.3) -- +(45:0.85) arc (-45:0:.5) -- +(90:.6);
+    \draw[l1, ->, dashed, color=mblue] (0, 0.3) -- +(45:0.85) arc (-45:0:.5) -- +(90:.2);
+    \draw[l1, ->, dashed, color=mblue] (0.75,0.2) -- +(90:.3);
+    \draw[l1, ->, dashed, color=mblue] (1.5,0.2) -- +(135:.4);
+    \draw[l1, ->, dashed, color=mblue] (1.75,1.2) -- +(90:0.5) arc (0:45:.5) -- +(135:0.4);
+    \draw[l1, ->, color=mred] (1.4, 3) -- +(-45:1.1) arc (45:0:0.5) -- +(-90:0.7);
+    \draw[l1, ->, color=mred] (1.3, 2.1) -- +(-90:0.9) arc (180:225:.5) -- +(-45:0.7);
+    \draw[l1, ->, color=mred] (0.6, 1.3) -- +(225:.3);
+    \draw[l1, ->, color=mred] (0.6, 0.3) -- +(225:.3);
+    \draw[l1, ->, color=mred] (1.3, 0.3) -- +(-90:.2);
+    \node[text=mblue] at (0,2.2) {Parity};
+    \node[text=mred] at (2.6,2.8) {Delay};
     \node at (0,3) {$\mathcal{N}$};
   \end{tikzpicture}
   \caption{The parity and delay calculation (PDC) performed on a the root node $n_r$, which is equivalent to two depth-first searches on $\mathcal{N}$ to compute node parities (head recursively) and delays (tail recursively).}\label{fig:2dfs}
@@ -740,8 +737,8 @@ The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\be
   \node (e4) [undef] at (2,-2) {$n_4$};
   \node (e5) [undef] at (2,-1) {$n_5$};
   \draw[l1] (o2) -- (o1) -- (o3) -- (e5) -- (e4);
-  \draw[l1, ->, dashed, color=cyan] (e4) ++(-.7,0) -- + (0,1);
-  \draw[l1, ->, color=magenta] (o3) ++(.7,-.5) -- +(0,-1.5);
+  \draw[l1, ->, dashed, color=mblue] (e4) ++(-.7,0) -- + (0,1);
+  \draw[l1, ->, color=mred] (o3) ++(.7,-.5) -- +(0,-1.5);
   \end{scope}
 
   \begin{scope}[shift={(10,1.5)}]
@@ -751,10 +748,10 @@ The rules are thus very simple for the function $\codefunc{Join}(n^\alpha, n^\be
   \node (e4) [undef] at (1,1) {$n_4$};
   \node (e5) [undef] at (1,0) {$n_5$};
   \draw[l1] (o2) -- (o1) -- (o3) -- (e5) -- (e4);
-  \draw[l1, ->, dashed, color=cyan] (o3) ++(-.7,.5) -- +(0,1.5);
-  \draw[l1, ->, dashed, color=cyan] (o2) ++(-.7,0) -- +(0,2);
-  \draw[l1, ->, color=magenta] (e4) ++(.7,0) -- +(0,-1);
-  \draw[l1, ->, color=magenta](e5) ++(.7,-.5) -- + (0,-2.5);
+  \draw[l1, ->, dashed, color=mblue] (o3) ++(-.7,.5) -- +(0,1.5);
+  \draw[l1, ->, dashed, color=mblue] (o2) ++(-.7,0) -- +(0,2);
+  \draw[l1, ->, color=mred] (e4) ++(.7,0) -- +(0,-1);
+  \draw[l1, ->, color=mred](e5) ++(.7,-.5) -- + (0,-2.5);
   \end{scope}
 
   \node at (5,2) {A)};
@@ -783,8 +780,8 @@ Consider an example with 5 odd clusters $\nset_1, ...,  \nset_5$ (Figure \ref{fi
   \node (n1) [onset] at (0,0) {$\nset_1$};
   \node (n2) [onset] at (0,-1) {$\nset_2$};
   \draw[l1, dashed] (n3) -- (n1); \draw[l1] (n1) -- (n2);
-  \draw[l1, ->, dashed, color=cyan] (n2) ++(-.7,0) -- +(0,1);
-  \draw[l1, ->, color=magenta] (n1) ++(.7,0) -- +(0,-1);
+  \draw[l1, ->, dashed, color=mblue] (n2) ++(-.7,0) -- +(0,1);
+  \draw[l1, ->, color=mred] (n1) ++(.7,0) -- +(0,-1);
   \end{scope}
 
   \begin{scope}[shift={(6.5,-.5)}]
@@ -802,8 +799,8 @@ Consider an example with 5 odd clusters $\nset_1, ...,  \nset_5$ (Figure \ref{fi
   \node (n2) [onset] at (-.5,-1) {$\nset_2$};
   \node (n4) [onset] at (.5,-1) {$\nset_4$};
   \draw[l1, dashed] (n3) -- (n5); \draw[l1] (n3) -- (n1) -- (n2) (n1) -- (n4);
-  \draw[l1, ->, dashed, color=cyan] (n2) ++(-.7,0) -- +(0,2);
-  \draw[l1, ->, color=magenta] (n3) ++(1.2,0) -- +(0,-2);
+  \draw[l1, ->, dashed, color=mblue] (n2) ++(-.7,0) -- +(0,2);
+  \draw[l1, ->, color=mred] (n3) ++(1.2,0) -- +(0,-2);
   \end{scope}
 
   \node at (-1, 1) {a)};
@@ -1342,12 +1339,12 @@ To account for these erasures, we must construct the node sets for these initial
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{\textwidth}
-    \begin{adjustbox}{Clip=0 1em 0 0}
-    \input{pgfplots/threshold_ufbb_toric_2d_full.pgf}
-    \end{adjustbox}
-    \caption{All simulations.}
-  \end{subfigure}
+  % \begin{subfigure}[b]{\textwidth}
+  %   \begin{adjustbox}{Clip=0 1em 0 0}
+  %   \input{pgfplots/threshold_ufbb_toric_2d_full.pgf}
+  %   \end{adjustbox}
+  %   \caption{All simulations.}
+  % \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{adjustbox}{Clip=0 1em 0 0}
       \input{pgfplots/threshold_ufbb_toric_2d_short.pgf}
@@ -1359,6 +1356,12 @@ To account for these erasures, we must construct the node sets for these initial
       \input{pgfplots/threshold_ufbb_toric_2d_short_seq.pgf}
     \end{adjustbox}
     \caption{Sequential threshold fitting.}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_toric_2d_comp.pgf}
+    \end{adjustbox}
+    \caption{Comparison.}
   \end{subfigure}
   \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a toric code with independent noise.}
   \label{fig:thres_ufbb_toric_2d}

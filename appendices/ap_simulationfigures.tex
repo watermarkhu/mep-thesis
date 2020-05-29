@@ -215,12 +215,12 @@
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{\textwidth}
-    \begin{adjustbox}{Clip=0 1em 0 0}
-    \input{pgfplots/threshold_ufbb_planar_2d_full.pgf}
-    \end{adjustbox}
-    \caption{All simulations.}
-  \end{subfigure}
+  % \begin{subfigure}[b]{\textwidth}
+  %   \begin{adjustbox}{Clip=0 1em 0 0}
+  %   \input{pgfplots/threshold_ufbb_planar_2d_full.pgf}
+  %   \end{adjustbox}
+  %   \caption{All simulations.}
+  % \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{adjustbox}{Clip=0 1em 0 0}
       \input{pgfplots/threshold_ufbb_planar_2d_short.pgf}
@@ -233,6 +233,12 @@
     \end{adjustbox}
     \caption{Sequential threshold fitting.}
   \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_planar_2d_comp.pgf}
+    \end{adjustbox}
+    \caption{Comparison.}
+  \end{subfigure}
   \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a planar code with independent noise.}
   \label{fig:thres_ufbb_planar_2d}
 \end{figure}
@@ -240,12 +246,12 @@
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{\textwidth}
-    \begin{adjustbox}{Clip=0 1em 0 0}
-    \input{pgfplots/threshold_ufbb_toric_3d_full.pgf}
-    \end{adjustbox}
-    \caption{All simulations.}
-  \end{subfigure}
+  % \begin{subfigure}[b]{\textwidth}
+  %   \begin{adjustbox}{Clip=0 1em 0 0}
+  %   \input{pgfplots/threshold_ufbb_toric_3d_full.pgf}
+  %   \end{adjustbox}
+  %   \caption{All simulations.}
+  % \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{adjustbox}{Clip=0 1em 0 0}
       \input{pgfplots/threshold_ufbb_toric_3d_short.pgf}
@@ -258,18 +264,24 @@
     \end{adjustbox}
     \caption{Sequential threshold fitting.}
   \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_toric_3d_comp.pgf}
+    \end{adjustbox}
+    \caption{Comparison.}
+  \end{subfigure}
   \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a toric code with phenomenological noise.}
   \label{fig:thres_ufbb_toric_3d}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{\textwidth}
-    \begin{adjustbox}{Clip=0 1em 0 0}
-    \input{pgfplots/threshold_ufbb_planar_3d_full.pgf}
-    \end{adjustbox}
-    \caption{All simulations.}
-  \end{subfigure}
+  % \begin{subfigure}[b]{\textwidth}
+  %   \begin{adjustbox}{Clip=0 1em 0 0}
+  %   \input{pgfplots/threshold_ufbb_planar_3d_full.pgf}
+  %   \end{adjustbox}
+  %   \caption{All simulations.}
+  % \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
     \begin{adjustbox}{Clip=0 1em 0 0}
       \input{pgfplots/threshold_ufbb_planar_3d_short.pgf}
@@ -281,6 +293,12 @@
       \input{pgfplots/threshold_ufbb_planar_3d_short_seq.pgf}
     \end{adjustbox}
     \caption{Sequential threshold fitting.}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_planar_3d_comp.pgf}
+    \end{adjustbox}
+    \caption{Comparison.}
   \end{subfigure}
   \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a planar code with phenomenological noise.}
   \label{fig:thres_ufbb_planar_3d}
