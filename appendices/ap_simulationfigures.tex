@@ -2,67 +2,286 @@
 
 \section{Minimum-Weight Perfect Matching decoder}\label{ap:figmwpm}
 
-
-\begin{figure}[htb]
+\begin{figure}[htbp]
     \centering
-    \begin{subfigure}[b]{\textwidth}
-        \input{pgfplots/mwpm_toric_2d.pgf}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_toric_2d.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
     \end{subfigure}
-    \begin{subfigure}[b]{\textwidth}
-        \input{pgfplots/mwpm_planar_2d.pgf}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_planar_2d.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
     \end{subfigure}
-    \caption{<caption>}
-    \label{fig:thres_mwpm_2d}
-\end{figure}
-\begin{figure}[htb]
-    \centering
-    \begin{subfigure}[b]{\textwidth}
-        \input{pgfplots/mwpm_toric_3d.pgf}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_toric_3d.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
     \end{subfigure}
-    \begin{subfigure}[b]{\textwidth}
-        \input{pgfplots/mwpm_planar_3d.pgf}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_planar_3d.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
     \end{subfigure}
-    \caption{<caption>}
-    \label{fig:thres_mwpm_3d}
-\end{figure}
+    \caption{Monte Carlo simulations for the decoding success rate using the Minimum-Weight Perfect Matching decoder}
+    \label{fig:threshold_mwpm}
+  \end{figure}
 
 
 \section{Union-Find decoder}\label{ap:figuf}
 
-% \subsection{Static-Forest Union-Find}
-% \subsection{Dynamic-Forest Union-Find}
-% \subsection{Static-Forest Bucket Union-Find}
-% \subsection{Dynamic-Forest Bucket Union-Find}
+\subsection{Thresholds}\label{ap:figufthresholds}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_suf_toric_2d.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_suf_planar_2d.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_suf_toric_3d.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_suf_planar_3d.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Static-forest Union-Find decoder (Algorithm \ref{algo:suf})}
+  \label{fig:threshold_suf}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_duf_toric_2d.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_duf_planar_2d.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_duf_toric_3d.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_duf_planar_3d.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Dynamic-forest Union-Find decoder (Algorithm \ref{algo:duf})}
+  \label{fig:threshold_duf}
+\end{figure}
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_sbuf_toric_2d.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_sbuf_planar_2d.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_sbuf_toric_3d.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_sbuf_planar_3d.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Static-forest Bucket Union-Find decoder (Algorithm \ref{algo:sbuf})}
+  \label{fig:threshold_sbuf}
+\end{figure}
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_dbuf_toric_2d.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_dbuf_planar_2d.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_dbuf_toric_3d.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_dbuf_planar_3d.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Dynamic-forest Bucket Union-Find decoder (Algorithm \ref{algo:suf})}
+  \label{fig:threshold_dbuf}
+\end{figure}
+
 \subsection{Comparison}\label{ap:figufcomp}
 \todo[inline]{add other figures in ap:figufcomp}
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.49\textwidth}
-      \input{pgfplots/mwcomp_uf_toric_2d_p98_nnorm.pgf}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/mwcomp_uf_toric_2d_p98_norm.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
   \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
-      \input{pgfplots/mwcomp_uf_toric_2d_p98_norm.pgf}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/mwcomp_uf_planar_2d_p98_norm.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
   \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
-    \input{pgfplots/mwcomp_uf_toric_3d_p27_norm.pgf}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/mwcomp_uf_toric_3d_p27_norm.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
   \end{subfigure}
   \begin{subfigure}[b]{0.49\textwidth}
-    \input{pgfplots/mwcomp_uf_planar_3d_p27_norm.pgf}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/mwcomp_uf_planar_3d_p27_norm.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
   \end{subfigure}
   \caption{<caption>}
   \label{fig:mwcomp_uf}
 \end{figure}
 
 \begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
       \input{pgfplots/tcomp_uf_toric_3d_p27_norm.pgf}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
+    \end{adjustbox}
+    \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
       \input{pgfplots/tcomp_uf_planar_3d_p27_norm.pgf}
-    \end{subfigure}
-    \caption{<caption>}
-    \label{fig:tcomp_uf_3d}
-  \end{figure}
+    \end{adjustbox}
+    \caption{Planar code phenomenological noise.}
+  \end{subfigure}
+  \caption{<caption>}
+  \label{fig:tcomp_uf_3d}
+\end{figure}
+
+
 \section{Union-Find Balanced-Bloom decoder}\label{ap:figufbb}
 
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_planar_2d_full.pgf}
+    \end{adjustbox}
+    \caption{All simulations.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_planar_2d_short.pgf}
+    \end{adjustbox}
+    \caption{Simulations around threshold.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_planar_2d_short_seq.pgf}
+    \end{adjustbox}
+    \caption{Sequential threshold fitting.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a planar code with independent noise.}
+  \label{fig:thres_ufbb_planar_2d}
+\end{figure}
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_toric_3d_full.pgf}
+    \end{adjustbox}
+    \caption{All simulations.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_toric_3d_short.pgf}
+    \end{adjustbox}
+    \caption{Simulations around threshold.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_toric_3d_short_seq.pgf}
+    \end{adjustbox}
+    \caption{Sequential threshold fitting.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a toric code with phenomenological noise.}
+  \label{fig:thres_ufbb_toric_3d}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_planar_3d_full.pgf}
+    \end{adjustbox}
+    \caption{All simulations.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_planar_3d_short.pgf}
+    \end{adjustbox}
+    \caption{Simulations around threshold.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_planar_3d_short_seq.pgf}
+    \end{adjustbox}
+    \caption{Sequential threshold fitting.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a planar code with phenomenological noise.}
+  \label{fig:thres_ufbb_planar_3d}
+\end{figure}

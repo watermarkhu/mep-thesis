@@ -177,7 +177,7 @@ Any qubit can be subject to a combination of errors, each can be caused by a dif
   which can be interpreted as the state $\rho$ is left untouched with probability $p^*_D =\frac{3}{4}p_D$, and each Pauli gate is applied to it with probability $1-p^*_D$. Differently from the \emph{independent noise model}, to optimally decode, we need to take into account correlations between X and Z-errors.
 \end{definition}
 
-\begin{definition}\label{def:erasure}
+\begin{definition}\label{def:erasurenoise}
   In the \emph{erasure noise model}, a qubit is completely erased or lost from the system,
   \begin{equation}\label{qec:eq:erasure}
     \Phi_E(\rho) = (1-p_E)\rho + p_E\ket{e}\bra{e},

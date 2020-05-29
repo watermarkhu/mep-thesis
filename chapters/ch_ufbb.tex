@@ -834,51 +834,50 @@ This data structure dynamically saves the root of the undefined part of a cluste
 \section{Pseudo-code}
 Now we have the full description of the \emph{Balanced Bloom} alteration of the UF decoder, which we dub the \emph{Union-Find Balanced Bloom} (UFBB) decoder. We present its pseudo-code in algorithm \ref{al:ufbb}. The recursive \codefunc{Grow} function of algorithm \ref{al:bbgrow} has been added fully to the pseudo-code in lines 7-12, as it is a crucial part of the decoder. Note that the structure of the code is mostly identical to the BCS UF decoder, where we sort the clusters growth in buckets, and apply the merge, in this case the combination of \codefunc{Union} and \codefunc{Join}, after each bucket iteration.
 
-\begin{algo}[algotitle=Union-Find Balanced Bloom (UFBB), label=al:ufbb]
-\begin{algorithm}[H]
-\SetKwData{bucket}{bucket}\SetKwData{buckets}{buckets}
-\SetKwData{edge}{edge}\SetKwData{support}{support}
-\SetKwData{node}{node}
-\SetKwData{cluster}{cluster}
-\SetKwData{child}{child}
-\SetKwData{delay}{d}\SetKwData{waited}{w}
-\SetKwFunction{calcdelay}{CalcDelay}
-\SetKwFunction{calcparity}{CalcParity}
-\SetKwFunction{place}{Place}
-\SetKwFunction{bloom}{Bloom}
-\SetKwFunction{join}{Join}
-\SetKwFunction{union}{Union}
+\begin{algorithm}[htbp]
+  \SetKwData{bucket}{bucket}\SetKwData{buckets}{buckets}
+  \SetKwData{edge}{edge}\SetKwData{support}{support}
+  \SetKwData{node}{node}
+  \SetKwData{cluster}{cluster}
+  \SetKwData{child}{child}
+  \SetKwData{delay}{d}\SetKwData{waited}{w}
+  \SetKwFunction{calcdelay}{CalcDelay}
+  \SetKwFunction{calcparity}{CalcParity}
+  \SetKwFunction{place}{Place}
+  \SetKwFunction{bloom}{Bloom}
+  \SetKwFunction{join}{Join}
+  \SetKwFunction{union}{Union}
 
-\KwData{\buckets}
-\KwResult{Set of even clusters grown according to Balanced Bloom}
+  \KwData{\buckets}
+  \KwResult{Set of even clusters grown according to Balanced Bloom}
 
-\BlankLine
+  \BlankLine
 
-\For{\bucket in \buckets}{
+  \For{\bucket in \buckets}{
 
-  \For{\cluster in \bucket}{
-    check if \cluster belongs is current \bucket \;
-    \For{\node in \cluster.$\m{C}$}{
-      \calcparity{\node}\;
-      \calcdelay{\node, \cluster}
+    \For{\cluster in \bucket}{
+      check if \cluster belongs is current \bucket \;
+      \For{\node in \cluster.$\m{C}$}{
+        \calcparity{\node}\;
+        \calcdelay{\node, \cluster}
+      }
+      \eIf{\node.\waited $=$ \node.\delay $-$ \cluster.\delay}{
+        \bloom{\node}, add all edges \edge.\support $= 2$ to $\m{F}$
+      }{
+        \node.\waited $+=1$
+      }
+      \For{\child of \node}{
+        repeat lines 7-12 on \child
+      }
     }
-    \eIf{\node.\waited $=$ \node.\delay $-$ \cluster.\delay}{
-      \bloom{\node}, add all edges \edge.\support $= 2$ to $\m{F}$
-    }{
-      \node.\waited $+=1$
+    \For{\edge in $\m{F}$}{
+      \union{$v_1, v_2$} for \edge $= (v_1, v_2)$ \;
+      \join{$n_1, n_2$} for $v_1, v_2$ seeded in nodes $n_1, n_2$
     }
-    \For{\child of \node}{
-      repeat lines 7-12 on \child
-    }
+    \place{\cluster} $\forall$ odd clusters
   }
-  \For{\edge in $\m{F}$}{
-    \union{$v_1, v_2$} for \edge $= (v_1, v_2)$ \;
-    \join{$n_1, n_2$} for $v_1, v_2$ seeded in nodes $n_1, n_2$
-  }
-  \place{\cluster} $\forall$ odd clusters
-}
+  \caption{Union-Find Balanced Bloom decoder}\label{algo:ufbb}
 \end{algorithm}
-\end{algo}
 
 
 \section{Complexity of Balanced Bloom}\label{sec:ufbbcomplexity}
@@ -1339,3 +1338,28 @@ To account for these erasures, we must construct the node sets for these initial
   \end{tabularx}
   \caption{Sumulation results for the Union-Find Balanced-Bloom decoder $L = 72:8:96, L=28:4:44$}\label{tab:ufbbhigh}
 \end{table}
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+    \input{pgfplots/threshold_ufbb_toric_2d_full.pgf}
+    \end{adjustbox}
+    \caption{All simulations.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_toric_2d_short.pgf}
+    \end{adjustbox}
+    \caption{Simulations around threshold.}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_ufbb_toric_2d_short_seq.pgf}
+    \end{adjustbox}
+    \caption{Sequential threshold fitting.}
+  \end{subfigure}
+  \caption{Monte Carlo simulations for the decoding success rate using the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) on a toric code with independent noise.}
+  \label{fig:thres_ufbb_toric_2d}
+\end{figure}
