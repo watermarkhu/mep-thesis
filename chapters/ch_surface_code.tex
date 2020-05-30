@@ -1,7 +1,7 @@
 
 \chapter{The surface code}\label{ch:surfacecode}
 
-The variant of the stabilizer codes that we are going to explore in this thesis is Kitaev's \emph{surface code} \cite{kitaev2003fault}, which is of the category of \emph{topological codes}. Among this category, the surface code is preferable as it offers the highest error tolerance under realise noise channels and requires only local stabilizer measurements of physically neighboring qubits. Two variants of the surface code will be considered here, the \emph{toric code} in section \ref{sec:surface_toric} and the \emph{planar code} in section \ref{sec:surface_planar}, and various decoders are detailed in \ref{sec:surface_decoders}.
+The variant of the stabilizer codes that we are going to explore in this thesis is Kitaev's \emph{surface code} \cite{kitaev2003fault}, which is of the category of \emph{topological codes}. Among this category, the surface code is preferable as it offers the highest error tolerance under realise noise channels and requires only local stabilizer measurements of physically neighboring qubits. Two variants of the surface code will be considered here, the \emph{toric code} in Section \ref{sec:surface_toric} and the \emph{planar code} in Section \ref{sec:surface_planar}, and various decoders are detailed in \ref{sec:surface_decoders}.
 \begin{figure}
   \centering
   \begin{tikzpicture}[scale=0.8]
@@ -14,7 +14,7 @@ The variant of the stabilizer codes that we are going to explore in this thesis 
     \node [align=left, right] at (3*\s + .5, .5*\s) {periodic boundary};
 
   \end{tikzpicture}
-  \caption{The toric code is defined as a $L\times L$ lattice (here $L=3$) with periodic boundary conditions. The edges on the lattice, which represents the qubits, make up faces and vertices. (Figure inspired from \cite{browne})}\label{sf:fig_toriclattice}
+  \caption{The toric code is defined as a $L\times L$ lattice (here $L=3$) with periodic boundary conditions. The edges on the lattice, which represents the qubits, make up faces and vertices (inspired by \cite{browne}).}\label{sf:fig_toriclattice}
 \end{figure}
 
 \section{The toric code}\label{sec:surface_toric}
@@ -65,22 +65,24 @@ To define a stabilizer code, we need to specify the $m$ independent stabilizer g
     \end{tikzcd}
   \end{center}
 
-  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code. (Figure inspired by \cite{browne})}\label{sf:fig_stabilizers}
+  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code (inspired by \cite{browne}).}\label{sf:fig_stabilizers}
 \end{figure}
 
-\paragraph{Plaquette operators}
-For every face $f$ on our lattice, we define a plaquette operator $\hat{P}_f$, consisting of tensor product of Pauli Z operators on qubits on these edges (see Figure \ref{sf:fig_toriclattice}a),
-\begin{equation}\label{eq:sf_plaquette}
-  \gls{oplaquette} = \prod_{i\in Q(f)} \hat{Z}_i
-\end{equation}
-where $Q(f)$ is the set of qubits touching face $f$. On a $L\times L$ grid there are $L^2$ plaquettes.
+\begin{definition}
+  A plaquette operator $\hat{P}_f$ consists of the tensor product of Pauli Z operators on qubits on the edges connected to a face $f$ (see Figure \ref{sf:fig_toriclattice}a),
+  \begin{equation}\label{eq:sf_plaquette}
+    \gls{oplaquette} = \prod_{i\in Q(f)} \hat{Z}_i
+  \end{equation}
+  where $Q(f)$ is the set of qubits touching face $f$. On a $L\times L$ grid there are $L^2$ plaquettes.
+\end{definition}
 
-\paragraph{Star operators}
-Similarly, for every vertex $v$ on our lattice, we define a star operator $\hat{S}_v$, consisting of tensor product of Pauli X operators on qubits neighboring the vertex (see Figure \ref{sf:fig_toriclattice}b),
-\begin{equation}\label{eq:sf_star}
-  \gls{ostar} = \prod_{i\in Q(v)} \hat{X}_i
-\end{equation}
-where $Q(v)$ is the set of qubits neighboring vertex $v$. On a $L\times L$ grid there are $L^2$ plaquettes.
+\begin{definition}
+  A star operator $\hat{S}_v$ consists of the tensor product of Pauli X operators on qubits neighboring the vertex $v$ (see Figure \ref{sf:fig_toriclattice}b),
+  \begin{equation}\label{eq:sf_star}
+    \gls{ostar} = \prod_{i\in Q(v)} \hat{X}_i
+  \end{equation}
+  where $Q(v)$ is the set of qubits neighboring vertex $v$. On a $L\times L$ grid there are $L^2$ plaquettes.
+\end{definition}
 
 As each plaquette and star operator needs to be measured, an ancilla qubit is needed at the physical locations of each of these operators. The structure of the full lattice is now clear, as it just a simple square arrangement of alternating data and ancilla qubits in both x and y directions.
 
@@ -123,7 +125,7 @@ The multiplication of star operators follow the same properties as the plaquette
     \DRAWERROR{2}{1}{0}{x}
     \node[below of=Bx-1] {(b)};
   \end{tikzpicture}
-  \caption{Multiplication of (a) plaquette and (b) star operators will result in a operator that consists of the Pauli operators that reside on the overall boundary of the joint plaquettes or stars. (Figure inspired by \cite{browne})}\label{sf:fig_multistab}
+  \caption{Multiplication of (a) plaquette and (b) star operators will result in a operator that consists of the Pauli operators that reside on the overall boundary of the joint plaquettes or stars (inspired by \cite{browne}).}\label{sf:fig_multistab}
 \end{figure}
 
 \subsection{Dual lattice}
@@ -134,9 +136,9 @@ This interesting property of \emph{lattice duality} leads to the fact that plaqu
 \subsection{Encoded qubits}
 Since there are $n = L^2$ qubits and $n_S = 2L^2 - 2$ independent stabilizers, we must have $n_L = n - n_S = 2$ encoded qubits and therefore 4 logical operators $\hat{X}_{L1}, \hat{X}_{L2}, \hat{Z}_{L1}$ and $\hat{Z}_{L2}$.
 
-Recall the logical operators consists of the Pauli operators, and must commute with all stabilizer generators, but cannot be part of the stabilizer itself. We can construct the logical operators by starting with, for example, a single Pauli Z operator. It commutes with all plaquette operators trivially. In terms of the star operators, this single Pauli Z operator commutes with all but the two neighboring qubits, as all others apply to different qubits. Adding another Pauli Z operator will shift will of the anticommuting neighboring star operators. We know see that a closed loop of Z operators around the torus does not have neighboring star operators, and therefore commute with all stabilizers. As the torus has two directions we can loop over, these are the logical $\hat{Z}_L$ operators (see Figure \ref{sf:fig_logical}a-b). Analogously, we can construct the logical $\hat{X}_L$ operators in the same way (Figure \ref{sf:fig_logical}c-d).
+Recall the logical operators consists of the Pauli operators, and must commute with all stabilizer generators, but cannot be part of the stabilizer itself. We can construct the logical operators by starting with, for example, a single Pauli Z operator. It commutes with all plaquette operators trivially. In terms of the star operators, this single Pauli Z operator commutes with all but the two neighboring qubits, as all others apply to different qubits. Adding another Pauli Z operator will shift will of the neighboring star operators that anticommute. We know see that a closed loop of Z operators around the torus does not have neighboring star operators, and therefore commute with all stabilizers. As the torus has two directions we can loop over, these are the logical $\hat{Z}_L$ operators (see Figure \ref{sf:fig_logical}a-b). Analogously, we can construct the logical $\hat{X}_L$ operators in the same way (Figure \ref{sf:fig_logical}c-d).
 
-Note that these logical operators are not unique. As the logical operators commute with the stabilizers, these $\hat{X}_L$ and $\hat{Z}_L$ operators can be multiplied with e.g. a plaquette or star operator, respectively, which create a diversion from its original path. But as the path still loops around the torus, this is still a valid logical operator.
+Note that these logical operators are not unique. As the logical operators commute with the stabilizers, these $\hat{X}_L$ and $\hat{Z}_L$ operators can be multiplied with e.g.\ a plaquette or star operator, respectively, which create a diversion from its original path. But as the path still loops around the torus, this is still a valid logical operator.
 
 The logical operators have a minimum length of $L$ qubits, which is also the distance of the toric code (see Definition \ref{def:distance}). The toric code is therefore a $[L^2,2,L]$ in the [n,k,d] notation. This implies that the toric code might be more robust against errors if the size of the lattice is increased. Later we will see that this is also very much dependent on the type of decoder that is used, and that different decoders will lead to different regimes of error for which this reasoning is true.
 
@@ -184,7 +186,7 @@ The logical operators have a minimum length of $L$ qubits, which is also the dis
     \node[above=.25cm of N-3-4-0] {(c)};
     \node[right=.25cm of By-2] {(d)};
   \end{tikzpicture}
-  \caption{The logical (a) $\hat{X}_{L1}$, (b) $\hat{X}_{L2}$, (c) $\hat{Z}_{L1}$ and (d) $\hat{Z}_{L2}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus. (Figure inspired by \cite{browne})}\label{sf:fig_logical}
+  \caption{The logical (a) $\hat{X}_{L1}$, (b) $\hat{X}_{L2}$, (c) $\hat{Z}_{L1}$ and (d) $\hat{Z}_{L2}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus (inspired by \cite{browne}).}\label{sf:fig_logical}
 \end{figure}
 
 \subsection{Error detection}
@@ -275,13 +277,13 @@ Since Z and X-errors independently affect different types of stabilizer measurem
     \end{pgfonlayer}
     \node[below=.25cm of Bx-2] {(d)};
   \end{tikzpicture}
-  \caption{(a) Stabilizer generators that anticommute with the error will measure -1, which are (i) the neighboring star operators for a Z-error, (ii) the neighboring plaquette operators for an X-error, and (iii) both star and plaquette operators for a Y-error. In the case of a string of errors (iv), only the stabilizer generators at the end of these strings will anticommute with the error. Due to code degeneracy, the single Z-error in (a.i) $\hat{E}$ has the syndrome as (b) $\hat{E}\hat{Z}_{L1}$, (c) $\hat{E}\hat{Z}_{L2}$ and (d) $\hat{E}\hat{Z}_{L1}\hat{Z}_{L2}$. (Figure inspired by \cite{browne})}\label{sf:fig_degenerate}
+  \caption{(a) Stabilizer generators that anticommute with the error will measure -1, which are (i) the neighboring star operators for a Z-error, (ii) the neighboring plaquette operators for an X-error, and (iii) both star and plaquette operators for a Y-error. In the case of a string of errors (iv), only the stabilizer generators at the end of these strings will anticommute with the error. Due to code degeneracy, the single Z-error in (a.i) $\hat{E}$ has the syndrome as (b) $\hat{E}\hat{Z}_{L1}$, (c) $\hat{E}\hat{Z}_{L2}$ and (d) $\hat{E}\hat{Z}_{L1}\hat{Z}_{L2}$ (inspired by \cite{browne}).}\label{sf:fig_degenerate}
 \end{figure}
 
 \subsection{Error correction}
 An error can be corrected by applying it again to the lattice. However, the problem is that the error operator $\hat{E}$ is unknown. We must therefore try to identify the correct operator given the measured syndrome. As mentioned in the previous chapter, this relationship between error does not always map one-to-one, which it is not in the surface code. An error $\hat{E}$ can be multiplied with some operator $L$ that commutes with the stabilizer and they will result in the same syndrome.
 
-If $\hat{L}$ is in the stabilizer $\m{S}$, the product of the identified correction operator $\gls{ocorrection}=\hat{E}'$ with the real error operator $\hat{E}$ will leave the code invariant. The resulting operator $\hat{C}\hat{E}\hat{L}$ is a stabilizer operator $\hat{S}$. However, the encoded logical operators also commute with the stabilizer, which means that $\hat{E}$, $\hat{E}\hat{Z}_{L1}$, $\hat{E}\hat{Z}_{L2}$, $\hat{E}\hat{Z}_{L1}\hat{Z}_{L2}$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $\hat{C}$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (section \ref{sec:surface_decoders}).
+If $\hat{L}$ is in the stabilizer $\m{S}$, the product of the identified correction operator $\gls{ocorrection}=\hat{E}'$ with the real error operator $\hat{E}$ will leave the code invariant. The resulting operator $\hat{C}\hat{E}\hat{L}$ is a stabilizer operator $\hat{S}$. However, the encoded logical operators also commute with the stabilizer, which means that $\hat{E}$, $\hat{E}\hat{Z}_{L1}$, $\hat{E}\hat{Z}_{L2}$, $\hat{E}\hat{Z}_{L1}\hat{Z}_{L2}$ will all lead to the same syndrome (Fig \ref{sf:fig_degenerate}a-d). Any identified correction operator $\hat{C}$ can therefore be categorized into four classes of operators, of which only one includes the correct logical operator. The task of choosing most appropriate correction chain is up to the decoders (Section \ref{sec:surface_decoders}).
 
 \subsection{Graph picture}\label{sec:toricgraph}
 Since it is the combinatorial structure of the lattice that defines the surface code, such a surface by be also denoted by a graph $\gls{ngraph}$. The graph is constructed by $G(\gls{svertices}, \gls{sedges}, \gls{sfaces})$ by a vertex set $\m{V}$, edge set $\m{E}$ and face set $\m{F}$. Each edge $\gls{nedge}\in \m{E}$ is defined by a pair of distinct vertices $e=\{v_i, v_j\}$ where $\gls{nvertex}\in \m{V}$. Each face is a region that has the homology of a disk and is defined by the set of edges on its boundary. 
@@ -294,11 +296,11 @@ Since the distance $d$ of the toric code on a $L\times L$ is $L$, we would expec
 
 In practice, there is a trade-off between the positive effect of a larger code distance and the negative effect of larger number of errors. When the error rate $p$ is low, the positive effect outweighs the negative and increasing the lattice $L$ will increase the probability of successful error correction $\gls{zpcorrect}$. When the error rate is large, the negative effect outweighs the positive and increasing $p$ will decrease $k_C$. The point of transition in the error rate is called the \emph{code threshold} $\gls{zpthres}$.
 
-The code threshold is not the only parameter that determines the potential of a certain code for practical use. The behavior for error rates far below the threshold is also important, as is the number of physical qubits needed to achieve the sought after level of error suppression. Nevertheless, the code threshold provides us with a very easy and useful tool to benchmark different codes and different decoding algorithms, and to compare them with each other. Therefore, in this thesis we will heavily rely on the value of the code threshold. The value of the threshold is heavily dependent on the chosen error model and the physical conditions of the stabilizer measurements. To compare different decoding algorithms, we therefore will use independent and identically distributed errors (i.i.d. noise), which is the \emph{independent noise model} from section \ref{qec:sec_errormodels}.
+The code threshold is not the only parameter that determines the potential of a certain code for practical use. The behavior for error rates far below the threshold is also important, as is the number of physical qubits needed to achieve the sought after level of error suppression. Nevertheless, the code threshold provides us with a very easy and useful tool to benchmark different codes and different decoding algorithms, and to compare them with each other. Therefore, in this thesis we will heavily rely on the value of the code threshold. The value of the threshold is heavily dependent on the chosen error model and the physical conditions of the stabilizer measurements. To compare different decoding algorithms, we therefore will use independent and identically distributed errors (i.i.d. noise), which is the \emph{independent noise model} from Section \ref{qec:sec_errormodels}.
 
-For the toric code, when the only source of errors is i.i.d. noise under the independent noise model, and all measurements can be made perfectly, the \emph{optimal threshold} has been proven to be 10.9\% (see section \ref{sec:optimal_decoder}). However, to achieve this value, one needs to consider all possible error configurations on the lattice to identify the correction operator $C$ that is most likely to be equal to the error operator $E$. This is a computationally heavy task that scales exponentially with the lattice size. It is therefore an impractical approach in reality.
+For the toric code, when the only source of errors is i.i.d. noise under the independent noise model, and all measurements can be made perfectly, the \emph{optimal threshold} has been proven to be 10.9\% (see Section \ref{sec:optimal_decoder}). However, to achieve this value, one needs to consider all possible error configurations on the lattice to identify the correction operator $C$ that is most likely to be equal to the error operator $E$. This is a computationally heavy task that scales exponentially with the lattice size. It is therefore an impractical approach in reality.
 
-Luckily, there exists other decoding algorithms that can find a solution much faster, albeit at the cost of reducing the code threshold. Edmond's \emph{Minimum Weight Perfect Matching} (MWPM) decoder scales cubic with the system, which allows for faster decoding, and achieves a code threshold of 10.3\% (section \ref{sec:MWPMdecoder}). Including faulty measurements the threshold drops down to 2.9\%. The \emph{Union-Find} decoder is a relatively new addition to the set of decoders for the surface code. It scales \emph{almost} linearly with the system, and has a code threshold of 9.9\% (Chapter \ref{ch:UFdecoder}). In this thesis, we will try to combine certain properties of different decoders. In particular, we have created a heuristic for minimum weight which can be applied to the Union-Find decoder.
+Luckily, there exists other decoding algorithms that can find a solution much faster, albeit at the cost of reducing the code threshold. Edmond's \emph{Minimum Weight Perfect Matching} decoder scales cubic with the system, which allows for faster decoding, and achieves a code threshold of 10.3\% (Section \ref{sec:MWPMdecoder}). Including faulty measurements the threshold drops down to 2.9\%. The \emph{Union-Find} decoder is a relatively new addition to the set of decoders for the surface code. It scales \emph{almost} linearly with the system, and has a code threshold of 9.9\% (Chapter \ref{ch:UFdecoder}). In this thesis, we will try to combine certain properties of different decoders. In particular, we have created a heuristic for minimum weight which can be applied to the Union-Find decoder.
 
 \section{The planar code}\label{sec:surface_planar}
 
@@ -351,7 +353,7 @@ Another variant of the surface code is the \emph{planar code}, which disposes th
     \node[above=.25cm of N-4-5-0] {(f)};
     \node[left=.25cm of N-0-1-0] {(e)};
   \end{tikzpicture}
-  \caption{The planar code with lattice size $L=4$, which includes $n = 2L^2-2L+1$ qubits and $n_S = 2L^2-2L$ independent stabilizers. The boundary is defined by the (a) $\delta$-plaquette and (b) $\delta$-star operators, which exist next to the known (c) plaquette and (d) star operators, similar to the toric code. The planar codes encodes 1 logical qubit, which is represented by the logical (e) $\hat{Z}_L$ and (f) $\hat{X}_L$ operators. (Figure inspired by \cite{browne})}\label{sf:fig_planar}
+  \caption{The planar code with lattice size $L=4$, which includes $n = 2L^2-2L+1$ qubits and $n_S = 2L^2-2L$ independent stabilizers. The boundary is defined by the (a) $\delta$-plaquette and (b) $\delta$-star operators, which exist next to the known (c) plaquette and (d) star operators, similar to the toric code. The planar codes encodes 1 logical qubit, which is represented by the logical (e) $\hat{Z}_L$ and (f) $\hat{X}_L$ operators (inspired by \cite{browne}).}\label{sf:fig_planar}
 \end{figure}
 
 \paragraph{Stabilizer generators}
@@ -364,7 +366,8 @@ A second key difference is that now not all errors will cause two stabilizer vio
 Furthermore, we can inspect that a planar surface of dimension $L$ has $n = 2L^2-2L+1$ physical qubits. We can also find that there are $2L^2-2L$ stabilizer generators. As the boundary is now non-periodic, all generators are now independent, and therefore the number independent generators is $n_S = 2L^2-2L$. This means that the planar code encodes $n_L = n-n_S = 1$ a single logical qubit. The logical $\hat{X}_L$ and $\hat{Z}_L$ operators are pictured in Figure \ref{sf:fig_planar}e-f.
 
 \paragraph{Dual lattice and graph picture}
-Other properties of the planar code are very similar to the toric code. The \emph{dual lattice} also exists for the planar code, for example. But the dual lattice exists at a 90 angle compared to the primal lattice to account for the location of the boundary. The elements of the graph $G(\m{V},\m{E},\m{F})$ can now be separated into disjoint subsets due to the different properties of its vertices, edges and faces. The vertex set $\m{V}$ can now be divided into; the internal vertex set $\m{V}_\iota$ consisting of 4-Pauli-operator stabilizers; the boundary vertex set $\m{V}_{\delta}$ consisting of 3-Pauli-operator stabilizers; and the open vertex set $\m{V}_\omega$ consisting of non-stabilizer vertices that span edges on the boundary $\m{E}_{\delta}$ that connected to a single stabilizer vertex. Note that vertices of $\m{V}_\omega$ thus do not correspond to any physical stabilizer measurements. Edges connected to two stabilizer vertices belong to the internal edge set $\m{E}_\iota$. The graph for the primal lattice is hence $G(\m{V}_\iota\cup \m{V}_\delta \cup \m{V}_\omega, \m{E}_\iota\cup \m{E}_\delta)$. Elements of the graph for the dual graph can be separated into disjoint subsets in the same way.\\
+Other properties of the planar code are very similar to the toric code. The \emph{dual lattice} also exists for the planar code, for example. But the dual lattice exists at a 90 angle compared to the primal lattice to account for the location of the boundary. The elements of the graph $G(\m{V},\m{E},\m{F})$ can now be separated into disjoint subsets due to the different properties of its vertices, edges and faces. The vertex set $\m{V}$ can now be divided into; the internal vertex set $\m{V}_\iota$ consisting of 4-Pauli-operator stabilizers; the boundary vertex set $\m{V}_{\delta}$ consisting of 3-Pauli-operator stabilizers; and the open vertex set $\m{V}_\omega$ consisting of non-stabilizer vertices that span edges on the boundary $\m{E}_{\delta}$ that connected to a single stabilizer vertex. Note that vertices of $\m{V}_\omega$ thus do not correspond to any physical stabilizer measurements. Edges connected to two stabilizer vertices belong to the internal edge set $\m{E}_\iota$. The graph for the primal lattice is hence $G(\m{V}_\iota\cup \m{V}_\delta \cup \m{V}_\omega, \m{E}_\iota\cup \m{E}_\delta)$. Elements of the graph for the dual graph can be separated into disjoint subsets in the same way.
+
 
 The bulk of the planar code is similar to the toric code, where the stabilizer generators consists of 4 Pauli operators. This is especially true as the system size $n$ increases, as the internal elements scale with $n$ and the boundary elements scale with $\sqrt{n}$. Hence, the decoding algorithms for the planar code is very similar to the toric code, albeit some slight alterations will be needed. 
 
@@ -376,8 +379,6 @@ The bulk of the planar code is similar to the toric code, where the stabilizer g
 \subsection{Neural network decoders}
 
 \section{Threshold simulations}\label{sec:simthres}
-
-
 
 We simulate for the decoder success rate on toric and planar lattices for the independent noise model (Definition \ref{def:independent}), and on lattices for the phenomenal noise model (Definition \ref{def:pheno}). Under these conditions, the lattice can be separated into the primal lattice containing the star operator X parity check measurement, and the dual lattice containing the plaquette operator Z parity check measurements. Any simulation will be performed on the primal lattice with a single error rate $p_X$ for both bit-flips and noisy measurements. The dual lattice is under these conditions equivalent to the primal lattice. 
 

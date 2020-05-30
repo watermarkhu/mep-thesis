@@ -4,7 +4,7 @@ To build a real world quantum computer, or a quantum communications device, one 
 
 The theory of \emph{quantum error correction} has been developed to counteract this noise, by using a larger number of redundant \emph{physical qubits} to encode for a smaller number of \emph{logical qubits}. By adding extra redundant qubits in our \emph{error correcting code}, we can carefully encode the quantum state which we wish to protect, as long as the rate of errors on the physical errors is low enough \cite{calderbank1996good, steane1996multiple, preskill1998reliable}.
 
-In this chapter, we will introduce the principles of quantum error correction by the example of the \emph{three-bit repetition code}. In section \ref{sec:classical3bit}, we will first cover the classical variant, and the quantum variant in section \ref{sec:quantum3bit}. A more practical language to describe these codes is the \emph{stabilizer formalism}, in section \ref{sec:stabilizerformalism}. The set of tools and principles explained in these sections form the basis for higher level quantum codes that we will come later in this thesis.
+In this chapter, we will introduce the principles of quantum error correction by the example of the \emph{three-bit repetition code}. In Section \ref{sec:classical3bit}, we will first cover the classical variant, and the quantum variant in Section \ref{sec:quantum3bit}. A more practical language to describe these codes is the \emph{stabilizer formalism}, in Section \ref{sec:stabilizerformalism}. The set of tools and principles explained in these sections form the basis for higher level quantum codes that we will come later in this thesis.
 
 \section{Classical three-bit repetition code}\label{sec:classical3bit}
 To introduce some of the terms that we are going to use later, let us first start with a classical example the three-bit repetition code. This code encodes bits (a single bit in the example) by repeating them. Let the \emph{codewords} of the single logical bit be:
@@ -70,16 +70,16 @@ The distance of a quantum code is the minimal weight of any logical operators on
 
 \subsection{Error detection}
 
-To detect errors in our repetition code, we now cannot measure the states directly, as any measurement would collapse the encoded state, and therefore destroy the encoded information. Instead, we can now detect errors by measuring the \emph{parity} of two or more qubits rather than single qubits. For example, for two qubits, we can measure the parity by adding an \emph{ancillary} or \emph{ancilla} qubit prepared in $\ket{0}$ and measure it in the computational basis after connecting our quantum circuit as:
+To detect errors in our repetition code, we now cannot measure the states directly, as any measurement would collapse the encoded state, and therefore destroy the encoded information. Instead, we can now detect errors by measuring the \emph{parity} of two or more qubits rather than single qubits. For example, for two qubits, we can measure the parity by adding an \emph{ancillary} or \emph{ancilla} qubit prepared in $\ket{0}$ and measure it in the computational basis after connecting our quantum circuit as in Figure \ref{fig:2qubitparity}. 
 
-\begin{figure}
+\begin{figure}[htbp]
   \centering
     \begin{tikzcd}[row sep={0.65cm,between origins}]
     \lstick{$Q_1$} & \qw & \ctrl{2} & \qw & \qw &\\
     \lstick{$Q_2$} & \qw & \qw & \ctrl{1} & \qw &\\
     \lstick{$\ket{0}$} & \qw & \targ{} & \targ{} & \qw & \meter{}
   \end{tikzcd}
-  \caption{The quantum circuit for a parity measurement on two qubits, $Q_1$ and $Q_2$, which is measured on the ancilla qubit prepared in $\ket{0}$. }\label{fig:2qubitparity}
+  \caption{The quantum circuit for a parity measurement on two qubits, $Q_1$ and $Q_2$, which is measured on the ancilla qubit prepared in $\ket{0}$.}\label{fig:2qubitparity}
 \end{figure}
 
 Note that measuring the ancilla qubit in the computational basis will be equivalent to measuring $\hat{Z}\otimes \hat{Z}$ on the first two qubits, as
@@ -150,7 +150,7 @@ Errors on stabilizers codes are therefore detected by measuring the stabilizers,
 Any qubit can be subject to a combination of errors, each can be caused by a difference factor in our quantum system. To generalize these errors, we define certain \emph{error models} that constricts the errors that take place. Here, we list a few models that we will encounter in this thesis. 
 
 \begin{definition}\label{def:independent}
-  Let the \emph{independent noise model} or the \emph{uncorrelated noise model} be the combination of the \emph{bit-flip} and \emph{phase-flip} errors, introduced in section \ref{subsec:pauli}, where the bit-flip and phase-flip are \emph{uncorrelated}
+  Let the \emph{independent noise model} or the \emph{uncorrelated noise model} be the combination of the \emph{bit-flip} and \emph{phase-flip} errors, introduced in Section \ref{subsec:pauli}, where the bit-flip and phase-flip are \emph{uncorrelated}
 
   It can be generalized in the form of the density matrix $\rho$. Let $\Phi$ be a quantum channel that maps $\rho$ to $\Phi(\rho)$, and let the chance of a bit-flip error be $p_X$, the resulting state should be
   \begin{equation}\label{qec:eq:bitflip}
@@ -211,9 +211,9 @@ with the logical operators up to a stabilizer:
 \begin{align}
   & \hat{X}_L = \hat{X}\hat{X}\hat{X}\hat{X}\hat{X} && \hat{Z}_L = \hat{Z}\hat{I}\hat{I}\hat{I}\hat{I} &
 \end{align}
-This codes now has $n=5$ bits with $N_s = 4$ stabilizers, which means it still encodes for a single bit.\\
-\\
-\\
+This codes now has $n=5$ bits with $N_s = 4$ stabilizers, which means it still encodes for a single bit.
+
+\vspace{1em}
 With the principles of encoding and decoding in the quantum error correction in mind, we are now ready to move on to a more complicated variant of stabilizer codes, the \emph{surface code}. 
 
 
