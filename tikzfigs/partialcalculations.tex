@@ -1,0 +1,56 @@
+
+\tikzstyle{enset}=[node1, thick, double, font=\footnotesize]
+\tikzstyle{onset}=[node1, thick, dotted, double, font=\footnotesize]
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.95]
+  \node (n1) [onset] at (0,0) {$\nset_1$};
+  \node (n2) [onset] at (0,-1) {$\nset_2$};
+  \draw[l1, color=orange] (n1) -- (n2);
+
+  \begin{scope}[shift={(2.5,-.5)}]
+  \node (n3) [onset] at (0,1) {$\nset_3$};
+  \node (n1) [onset] at (0,0) {$\nset_1$};
+  \node (n2) [onset] at (0,-1) {$\nset_2$};
+  \draw[l1, color=orange] (n3) -- (n1); \draw[l1] (n1) -- (n2);
+  \draw[l1, ->, dashed, color=mblue] (n2) ++(-.7,0) -- +(0,1);
+  \draw[l1, ->, color=mred] (n1) ++(.7,0) -- +(0,-1);
+  \end{scope}
+
+  \begin{scope}[shift={(5.5,-.5)}]
+  \node (n3) [onset] at (0,1) {$\nset_3$};
+  \node (n1) [onset] at (0,0) {$\nset_1$};
+  \node (n2) [onset] at (-.5,-1) {$\nset_2$};
+  \node (n4) [onset] at (.5,-1) {$\nset_4$};
+  \draw[l1, color=orange] (n1) -- (n4); \draw[l1] (n3) -- (n1) -- (n2);
+  \end{scope}
+
+  \begin{scope}[shift={(8.5,-1)}]
+  \node (n5) [onset] at (0,2) {$\nset_5$};
+  \node (n3) [onset] at (0,1) {$\nset_3$};
+  \node (n1) [onset] at (0,0) {$\nset_1$};
+  \node (n2) [onset] at (-.5,-1) {$\nset_2$};
+  \node (n4) [onset] at (.5,-1) {$\nset_4$};
+  \draw[l1, color=orange] (n3) -- (n5); \draw[l1] (n3) -- (n1) -- (n2) (n1) -- (n4);
+  \draw[l1, ->, dashed, color=mblue] (n2) ++(-.7,0) -- +(0,2);
+  \draw[l1, ->, color=mred] (n3) ++(1.2,0) -- +(0,-2);
+  \end{scope}
+
+  \node at (-1, 1) {\emph{(a)}};
+  \node at (1.5, 1) {\emph{(b)}};
+  \node at (4.5, 1) {\emph{(c)}};
+  \node at (7.5, 1) {\emph{(d)}};
+
+  \begin{scope}[shift={(11,1)}]
+    \path (0,0)node[onset]{} -- +(.5,0)node[anchor=west]{odd node-tree};
+    \draw[l1, ->, color=mred] (-.25, -2) -- ++(0.5,0);
+    \node[color=mred, anchor=west] at (.5,-2) {Calcdelay};
+    \draw[l1, ->, color=mblue, dashed] (-.25, -1) -- ++(0.5,0);
+    \draw[l1, color=orange] (-.25, -3) -- ++(0.5,0);
+    \node[color=mblue, anchor=west] at (.5,-1) {Calcparity};
+    \node[anchor=west] at (.5,-3) {new edge};
+  \end{scope}
+\end{tikzpicture}
+\caption{If the partial parity and delay calculation is directly performed on the even sub-tree in an odd-join, there may be redundant partial calculations in a series of odd-joins and even-joins within the same growth iteration. Here we picture a series of join events between odd node-trees, where the odd-join in (b) initiates a redundant partial calculation. }\label{fig:redundantpdc}
+\end{figure}

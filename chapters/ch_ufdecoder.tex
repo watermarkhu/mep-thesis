@@ -294,7 +294,7 @@ Finally, in each round of growth, there may be many odd-parity clusters $\{c_{1}
   \BlankLine
 
   \For{$v$ in $\delta \m{V}_i$}{
-    \For{edges in $\{(u,v) | v \in \delta \m{V}_i, (u,v).support\neq 2$\}}{
+    \For{edges in $\{(u,v) | (u,v).support\neq 2$\}}{
       Add 1 to $(u,v).support$ \;
       If $(u,v).support=2$, add $(u,v)$ to $\m{L}_m$ \;
     }
