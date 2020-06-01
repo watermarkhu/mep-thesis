@@ -1,0 +1,89 @@
+\tikzstyle{edge}=[above,midway,font=\tiny]
+\newcommand\DLINE[4]{
+  \draw (#1, #2) ++ (-.3,-.9) node[inner sep=0] (lb) {} ++(#3,0) ++(.6,0) node[inner sep=0] (rb) {} ++(0,0.4) node[inner sep=0] (rt) {};;
+  \path[fill=white!80!black, rounded corners=2pt] (lb) rectangle (rt);
+  \ifnumequal{#4}{1}{\draw[thin] (lb) -- (rb);}{}
+}
+\begin{figure}[htbp]
+\centering
+    \begin{tikzpicture}[on grid, scale=1]
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{1}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (a\x) {1} ++(0,-.7) node (ad\x) {0};}
+      \foreach[count=\i] \x in {1,4,7}{      \draw (\x,0) node [odd]  (a\x) {1} ++(0,-.7) node (ad\x) {2};
+                                             \node at (\x,0.7) {$\nset_\i$};}
+      \foreach \x in {0.5,3.5,6.5}{\DSPECTRA{2}{0}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (a0) -- (a1) node[edge]{1} -- (a2) node[edge]{1} (a3) -- (a4) node[edge]{1} -- (a5) node[edge]{1} (a6) -- (a7) node[edge]{1} -- (a8) node[edge]{1};
+
+      \begin{scope}[shift={(0,-3)}]
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{0}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (e\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,4,7}{      \draw (\x,0) node [odd]  (e\x) {1} ++(0,-.7) node {1};}
+      \foreach \x in {0.5,3.5,6.5}{\DSPECTRA{2}{1}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (e0) -- (e1) node[edge]{1} -- (e2) node[edge]{1} (e3) -- (e4) node[edge]{1} -- (e5) node[edge]{1} (e6) -- (e7) node[edge]{1} -- (e8) node[edge]{1};
+      \draw[l1, dashed] (e2) -- (e3) (e5) -- (e6);
+      \end{scope}
+
+      \begin{scope}[shift={(0,-6)}]
+      \DLINE{0}{0}{8}{1}
+      \foreach \x in {0,2,6,8}{\draw (\x,0) node [even] (b\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,7}{    \draw (\x,0) node [odd]  (b\x) {1} ++(0,-.7) node {1};}
+      \foreach \x in {3,5}{    \draw (\x,0) node [odd]  (b\x) {2} ++(0,-.7) node {4};}
+                               \draw (4,0)  node [even] (b4)  {1} ++(0,-.7) node {1};
+      \DSPECTRA{4}{0}{3}{-1.5}{0.3}{0.5}
+      \draw[l1] (b0) -- (b1) node[edge]{1} -- (b2) node[edge]{1} -- (b3) node[edge]{2} -- (b4) node[edge]{1} -- (b5) node[edge]{1} -- (b6) node[edge]{2} -- (b7) node[edge]{1} -- (b8) node[edge]{1};
+      \end{scope}
+
+      \node at (-2,0) {$n_i.s$};
+      \node at (-2,-0.75) {$n_i.d$};
+      \node at (-2,-1.5) {$(M:I)$};
+      \draw[semithick, ->] (9,-.75) to [out=-60, in=60] ++(0,-2.5);
+      \draw[semithick, ->] (9,-3.75) to [out=-60, in=60] ++(0,-2.5);
+      \node at (10, -2) [align=right, text width = 3cm] {\underline{PDC}, \codefunc{Grow}};
+      \node at (10, -5) [align=right, text width = 3cm] {\codefunc{Join}, \underline{PDC}};
+
+%       \draw[l1, ->] (a8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \eqref{eq:2ddelay}};
+%       \draw[l1, ->] (c8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \eqref{eq:delayequation},\\ $K_{bloom} = 0.5$};
+    \end{tikzpicture}
+    \caption{The delay values $n_i.d$ and the equilibrium-states $(I:M)$ for 3 odd clusters $\{\nset_1, \nset_2, \nset_3\}$ of 3 nodes that grow and join into a size-9 cluster. Initially (top), parity and delay calculations (PDF) are performed with delay equation \eqref{eq:2ddelay} on each odd cluster which have equilibrium-states $(0:2)$, with delay $2$ in the middle node. The clusters are grown (middle), where the middle node is delayed, such that it's delay value decreases to $1$, and the clusters have equilibrium-states $(1:2)$. The clusters join (bottom) to a single odd cluster, which is selected for growth. Hence PDC is performed again, and the equilibrium-state is $(0:4)$, thus requiring 4 growth iterations before equal potential matching weight is reached in all nodes.}\label{fig:kbloom}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{1}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (c\x) {1} ++(0,-.7) node {0};}
+      \foreach[count=\i] \x in {1,4,7}{      \draw (\x,0) node [odd]  (c\x) {1} ++(0,-.7) node (cd\x) {2};
+                                             \node at (\x,0.7) {$\nset_\i$};}
+      \foreach \x in {.75,3.75,6.75}{\DSPECTRA{1}{0}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (c0) -- (c1) node[edge]{1} -- (c2) node[edge]{1} (c3) -- (c4) node[edge]{1} -- (c5) node[edge]{1} (c6) -- (c7) node[edge]{1} -- (c8) node[edge]{1};
+
+      \begin{scope}[shift={(0,-3)}]
+      \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{0}}
+      \foreach \x in {0,2,3,5,6,8}{\draw (\x,0) node [even] (c\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,4,7}{      \draw (\x,0) node [odd]  (c\x) {1} ++(0,-.7) node {0};}
+      \foreach \x in {.75,3.75,6.75}{\DSPECTRA{1}{1}{\x}{-1.5}{0.3}{0.5}}
+      \draw[l1] (c0) -- (c1) node[edge]{1} -- (c2) node[edge]{1} (c3) -- (c4) node[edge]{1} -- (c5) node[edge]{1} (c6) -- (c7) node[edge]{1} -- (c8) node[edge]{1};
+      \draw[l1, dashed] (e2) -- (e3) (e5) -- (e6);
+      \end{scope}
+
+      \begin{scope}[shift={(0,-6)}]
+      \DLINE{0}{0}{8}{1}
+      \foreach \x in {0,2,6,8}{\draw (\x,0) node [even] (d\x) {2} ++(0,-.7) node {0};}
+      \foreach \x in {1,7}{    \draw (\x,0) node [odd]  (d\x) {1} ++(0,-.7) node {0};}
+      \foreach \x in {3,5}{    \draw (\x,0) node [odd]  (d\x) {2} ++(0,-.7) node {2};}
+                               \draw (4,0)  node [even] (d4)  {1} ++(0,-.7) node {0};
+      \draw[l1] (d0) -- (d1) node[edge]{1} -- (d2) node[edge]{1} -- (d3) node[edge]{2} -- (d4) node[edge]{1} -- (d5) node[edge]{1} -- (d6) node[edge]{2} -- (d7) node[edge]{1} -- (d8) node[edge]{1};
+      \DSPECTRA{2}{0}{3.5}{-1.5}{0.3}{0.5}
+      \end{scope}
+
+      \node at (-2,0) {$n_i.s$};
+      \node at (-2,-0.75) {$n_i.d$};
+      \node at (-2,-1.5) {$(M:I)$};
+      \draw[semithick, ->] (9,-.75) to [out=-60, in=60] ++(0,-2.5);
+      \draw[semithick, ->] (9,-3.75) to [out=-60, in=60] ++(0,-2.5);
+      \node at (10, -2) [align=right, text width = 3cm] {\underline{PDC}, \codefunc{Grow}};
+      \node at (10, -5) [align=right, text width = 3cm] {\codefunc{Join}, \underline{PDC}};
+
+  \end{tikzpicture}
+  \caption{The same clusters, growths and joins as in Figure \ref{fig:kbloom}, but now with delay equation \eqref{eq:delayequation} for $f_{eq} = 1/2$. With the equilibrium factor, $(f_{eq}M:M)$ can be reached in fewer growth iterations; e.g. after 1 round (middle), $(1:1)$ is reached. Also after join to a single cluster (bottom), fewer iterations are needed (2 compared to 4 in Figure \ref{fig:kbloom}).}\label{fig:kbloom2}
+\end{figure}
