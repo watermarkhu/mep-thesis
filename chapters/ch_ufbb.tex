@@ -584,7 +584,7 @@ To find the worst-case complexity, we maximize $N_{PDC}$ or the cost of the part
 nodes. As the partial calculation is only executed on the even subtrees, $N_{PDC}$ is the sum of even node-trees sizes $|\pre{k}\nset^e|$, in all partial fragmentation sets $\m{F}^o_{k}$, during all fragmentation steps $k=[1,...,p]$, in the full fragmentation of $F(\pre{0}\nset^o)$. We add the factor 2 in Equation \eqref{eq:npdc} as both the parity calculation and delay calculations requires its own depth-first search. The sequence of fragmentations that maximizes the even node-tree sizes maximizes $N_{PDC}$.
 % The worst-case delay complexity is computed by maximizing $N_{PDC}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
 \begin{equation}\label{eq:npdc}
-  N_{PDC} = 2\sum_{k=1}^{p}{ \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } }
+  N_{PDC} = 2\sum_{k=1}^{p}{ \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \big| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } }
   \hspace{1em} \bigg| \hspace{1em} \m{F}_k^o \text{ during } F(\pre{0}\nset^o).
 \end{equation}
 
@@ -603,7 +603,7 @@ In $f_e$ there are a set of partial fragmentation ratios $\{r_{-1}, r_0\}$, and 
 The problem of finding the sequence of even ancestral node-tree sizes to maximize the value of $N_{PDC}$ now becomes finding the partial fragmentation number $k_f$ and the set of partial fragmentation ratios $\{r_{-1},..., r_{k_f}\}$.  
 
 \begin{lemma}\label{lem:sumevenkf}
-  For the same partial fragmentation ratios $\{r_{-1}, r_0\}$ in $f_o$, the sum of even ancestral node-tree sizes after a fragmentation step is not dependent on $k_f$. 
+  For the same partial fragmentation ratios $\{r_{-1}, r_0\}$ in $f_o$, the sum of even ancestral node-tree sizes after a fragmentation step is not dependent on $k_f$ (see Figure \ref{fig:fragcorrect}). 
 \end{lemma}
 \begin{proof}
   Let us consider an even node-tree $\pre{k}\nset^e$ that is first partially fragmented by $f_e$ to $\m{F}^e_k$. The fragmentation set $\m{F}^e_k$ is then partially fragmented by $f_o$ to $\m{F}_{k+1}^o$. Let us consider the two cases when $k_f=2$ and $k_f=4$. For $k_f=2$, the partial fragmentation $f_e$ splits $\pre{k}\nset^e$ into two odd ancestral node-trees in $\m{F}^e_k$ and four node-trees in $\m{F}_{k+1}^o$.
@@ -672,13 +672,13 @@ The problem of finding the sequence of even ancestral node-tree sizes to maximiz
   \begin{equation*}
     q_1 r_{-1} \abs{\pre{k}\nset^e} + q_2 r_{-1} \abs{\pre{k}\nset^e} + q_3 r_{-1} \abs{\pre{k}\nset^e} + q_4 r_{-1} \abs{\pre{k}\nset^e} = (q_1 + q_2 + q_3 + q_4 ) r_{-1} \abs{\pre{k}\nset^e} = r_{-1} \abs{\pre{k}\nset^e}. 
   \end{equation*}
-  This is true for any even $k_f \geq 2$. 
+  This is true for any $k_f = 2i, i\in \mathbb{N}^*$. 
 \end{proof}
 
 \begin{lemma}\label{lem:equalevensum}
   The sum of even node-tree sizes in every fragmentation step $k$ is only dependent on partial fragmentation ratios $\{r_{-1}, r_0\}$. 
   \begin{equation}\label{eq:equalevensum}
-    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } = \text{constant}
+    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \big| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } = \text{constant}
   \hspace{1em} \bigg| \hspace{1em} \forall \m{F}_k^o \text{ during } F(\pre{0}\nset^o).
   \end{equation}
 \end{lemma}
@@ -692,17 +692,17 @@ The problem of finding the sequence of even ancestral node-tree sizes to maximiz
 
   The sum of even node-tree sizes in $\m{F}^o_k$ is simply the size of $\pre{k}\nset^e_{-1}$ and is equal to
   \begin{equation*}
-    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } = \abs{\pre{k}\nset^e_{-1}} = r_{-1}\abs{\pre{k-1}\nset^o}. 
+    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \big| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } = \abs{\pre{k}\nset^e_{-1}} = r_{-1}\abs{\pre{k-1}\nset^o}. 
   \end{equation*}
 
   The sum of even node-tree sizes in $\m{F}^o_{k+1}$ can be divided into two parts. The first part is the partial fragmentations $f_e f_o$ of $\pre{k}\nset^e_{-1}$, which we know from Lemma \ref{lem:sumevenkf} is $r_{-1}|\pre{k}\nset^e_{-1}|$ regardless of the choice for $k_f$. The second part is the partial fragmentation $f_o$ of $\pre{k}\nset^o_0$, which is $r_{-1}|\pre{k}\nset^o_0|$. Hence the sum is
   \begin{equation*}
-    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_{k+1} \right\} } = r_{-1} \left( \abs{\pre{k}\nset^e_{-1}} + \abs{\pre{k}\nset^o_0} \right) = r_{-1}\abs{\pre{k-1}\nset^o}. 
+    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \big| \pre{k}\nset_j^e \in \m{F}^o_{k+1} \right\} } = r_{-1} \left( \abs{\pre{k}\nset^e_{-1}} + \abs{\pre{k}\nset^o_0} \right) = r_{-1}\abs{\pre{k-1}\nset^o}. 
   \end{equation*}
 \end{proof}
 
 \begin{theorem}\label{the:fragnumber}
-  For the fragmentation number $k_f=2$, $N_{PDC}$ of Definition \ref{def:npdc} and Equation \eqref{eq:npdc} is maximized. 
+  For the fragmentation number $k_f=2$, $N_{PDC}$ of Definition \ref{def:npdc} and Equation \eqref{eq:npdc} is maximized (see Figure \ref{fig:fragexamples}). 
 \end{theorem}
 \begin{proof}
   The sum of even node-tree sizes in each fragmentation step is constant per Lemma \ref{lem:equalevensum}. Thus \eqref{eq:npdc} is maximized by having as many fragmentations steps as possible, or a largest possible $p$.  As $k_f$ increases the number of odd node-trees in each fragmentation step $f_o$, the average size of these odd node-trees have decreased. Consequently, the node-tree size decreases faster towards the minimum size of 3 nodes as more fragmentation steps are applied (Equation \eqref{eq:fstep}). As the sum of even node-tree sizes in each fragmentation step is the same, increasing $k_f$ decreases the number of fragmentation steps: 
@@ -712,14 +712,14 @@ The problem of finding the sequence of even ancestral node-tree sizes to maximiz
    Hence $N_{PDC}$ is maximized for minimal value of $k_f$ which is $k_f = 2$.
 \end{proof}
 
-\input{tikzfigs/fragcorrect.tex}
 \input{tikzfigs/fragnumber.tex}
 
-Our search for the fragmentation ratios has now been reduced to finding $\{r_{-1}, r_0\}$ of $f_o$ and $\{r_1, r_2\}$ of $f_e$ since $k_f = 2$. A fragmentation step of an odd node-tree $\pre{k-1}\nset^o$ is now
-\begin{equation}
-  f(\pre{k-1}\nset^o) = \{\pre{k}\nset^o_0, \pre{k}\nset^o_1, \pre{k}\nset^o_1\}. 
-\end{equation}
-The sizes of the ancestral odd node-trees are 
+The search for the fragmentation ratios has now been reduced to finding $\{r_{-1}, r_0\}$ of $f_o$ and $\{r_1, r_2\}$ of $f_e$ since $k_f = 2$. A partial fragmentation $f_e$ of $\pre{k}\nset^e_{-1}$ and fragmentation step $f$ of $\pre{k-1}\nset^o$ are now
+\begin{eqnarray}
+  f_e(\pre{k}\nset^e_{-1})  &= \m{F}^e_k  &=\{\pre{k}\nset^{o}_1,\pre{k}\nset^o_2\} \label{eq:newpfe}\\
+  f(\pre{k-1}\nset^o)       &= \m{F}_k    &= \{\pre{k}\nset^o_0, \pre{k}\nset^o_1, \pre{k}\nset^o_1\}. \label{eq:newfstep}
+\end{eqnarray}
+The sizes of the ancestral odd node-trees in a fragmentation step $f$ are related to the joined node-tree by
 \begin{equation}
   \frac{\abs{\pre{k}\nset^o_0}}{\abs{\pre{k-1}\nset^o}} = R_0, \hspace{2em}
   \frac{\abs{\pre{k}\nset^o_1}}{\abs{\pre{k-1}\nset^o}} = R_1, \hspace{2em}
@@ -729,102 +729,100 @@ where
 \begin{align}
   \nonumber R_0 &= r_0\\
             R_1 &= r_{-1}r_1\\
-  \nonumber R_2 &= r_{-1}r_2. 
+  \nonumber R_2 &= r_{-1}r_2\\
+  R_0 + R_1 + R_2 &= 1. \label{eq:bigratios}
 \end{align}
 
-Recall from Lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this growth process, some $N_v$ vertices are added to the cluster and some clusters merge that also require the join of their respective node-trees. If no join operations occur, the node-tree stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:calconce}. We want to minimize $N_v$, as each added vertex here is not a node that can possibly count towards $N_{PDC}$. Thus in every growth iteration of a cluster a join operation must occur for the maximization of $N_{PDC}$.
+This fragmentation number does not come unexpected. If $k_f=2$, a fragmentation $f_e$ outputs two ancestral node-trees. This is equivalent to a single even-join. If $k_f>2$, the fragmentation $f_e$ will be equivalent to a number of even-joins and intermediate odd-joins. Recall from Lemma \ref{lem:delaywhengrown} that the partial calculation of every intermediate odd-join is skipped. Thus these partial calculations are "lost" in the maximization of $N_{PDC}$. 
 
-Take the first fragmentation sets $\m{F}^e_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of cluster $\pre{k-1}\nset^o$. These partial fragmentations correspond to 2 join operations, the E-join between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_e$, and the FO-join between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_o$. If we want to minimize $n_v$ in $f_e$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node-tree sizes. For $f_o$, the merge event is caused by growth of $\nset^o_0$ in either some larger or equal bucket $b_j \geq b_i$ where $ S_{\vset_0} \geq S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$. To maximize $N_{PDC}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_o$. Recall from equation \eqref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node-tree size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
+Let us now try to maximize $N_{PDC}$ of Equation \eqref{eq:npdc} not from the perspective of fragmentations, but from the perspective of cluster growth. During a growth iteration, some $N_v$ vertices are added to the cluster $c_j$ and some other clusters merge with $c_j$ that also require the join of their respective node-trees. If no join operations occur, the node-tree stays unchanged, and the cluster is allowed to continue to grow without delay calculations per Lemma \ref{lem:calconce}. To maximize $N_{PDC}$, $N_v$ must be minimized, as every added vertex here is one that could have been part of a node in some other node-tree, and thus does does not add to $N_{PDC}$. 
 
-\begin{lemma}\label{lem:thirdratio}
-  A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the value $R = \frac{1}{3}$.
-\end{lemma}
+\begin{theorem}\label{the:fragratio}
+  For the fragmentation ratios $R_0 = R_1 = R_2 = \frac{1}{3}$, $N_{PDC}$ of Definition \ref{def:npdc} and Equation \eqref{eq:npdc} is maximized in a Union-Find Balanced-Bloom decoder with weighted growth (see Section \ref{sec:bucketwg}). 
+\end{theorem}
+\begin{proof}
+  Take the partial fragmentation $f_o$ of $\pre{k-1}\nset^o$ of Equation \eqref{eq:pfo} and $f_e$ of Equation \eqref{eq:newpfe}, which are equivalent to a final odd-join between $\nset^e_{-1}, \nset^o_0$ and even-join between $\nset^o_1, \nset^o_2$, respectively. 
+  
+  For $f_e$ that is equivalent to the even-join to even-parity cluster $c_{-1}$ between the odd-parity clusters $c_1, c_2$ with node-trees $\nset^o_1, \nset^o_2$, the clusters must have relative equal vertex-tree sizes 
+  \begin{equation*}
+    \abs{\vset_1} \approx \abs{\vset_2}.
+  \end{equation*}
+  If not, clusters $c_1, c_2$ may be allowed to grow multiple iterations before merging, sorted by weighted growth. In each iteration some $N_v$ vertices are added tot the cluster. Let the growth iteration in which the even-join occurred be labeled as $i_e$
+  
+  For $f_o$ equivalent to the final odd-join between even $c_{-1}$ and odd $c_0$, the final odd-join must strictly occur after the even join of $f_e$. This odd-join can either by initiated by odd-parity $c_0$ in some growth iteration $i_o > i_e$, when $c_2$ is the only odd-parity cluster, or initiated by either $c_1$ or $c_2$ in growth iteration $i_o = i_e$ (see Figure \ref{fig:fragfratio}). Determined by weighted growth, the vertex-tree sizes are related as
+  \begin{equation*}
+    \abs{\vset_0} \geq \abs{\vset_1} \approx \abs{\vset_2}.
+  \end{equation*}
+  Recall from equation \eqref{eq:sets} that $|\nset| \leq |\vset|$. We assume the largest possible node-tree size $|\nset| = |\vset|$ to find that 
+  \begin{equation*}
+    \abs{\nset^o_0} \geq \abs{\nset^o_1} \approx \abs{\nset^o_2},
+  \end{equation*}
+  and hence
+  \begin{equation*}
+    R_0 \geq R_1 \approx R_2,
+  \end{equation*}
+  To maximize $N_{PDC}$, we want to maximize $\abs{\nset^e_{-1}} = \abs{\nset^o_1} + \abs{\nset^o_2}$ or $R_1 + R_2$. Since \eqref{eq:bigratios}, $R_0$ must be as small as possible, and thus $R_0 = R_1 = R_2 = \frac{1}{3}$. 
+\end{proof}
 
 \input{tikzfigs/fragratio.tex}
 
-\subsubsection{Time complexity}
-The last unknown parameter for the delay calculation is $p$, the number of fragmentation steps. If we assume that in each growth step not a single non-node vertex is added $n_v = 0$, the full fragmentation of some node-tree $\nset^o$ is just the continuous division of the set in 3 parts per lemma \ref{lem:thirdratio}, which can be calculated easily.
+The last unknown parameter for the maximization of $N_{PDC}$ in Equation \eqref{eq:npdc} is $p$, the total number of fragmentation steps. If we assume that in every growth step not a single non-node vertex is added $N_v = 0$, the full fragmentation of odd node-tree $\pre{0}nset^o$ is just the continuous division of the set in 3 parts per Theorem \ref{lem:fragratio}, which can be calculated easily.
 \begin{equation}\label{eq:numfrag}
-  p = \log_3(S_{\nset^o})
+  p \leq \log_3(\abs{\pre{0}\nset^o})
 \end{equation}
-In each fragmentation step $\m{F}^e_k$, $f_o$ is equivalent to the join operation of odd node-trees with even node-trees where the sum of odd sets sizes is
-\begin{equation}\label{eq:sumoddsetsize}
-  \sum_j \{ S_{\pre{k}\nset_j^o} | \pre{k}\nset_j^o \in \m{F}^e_k \} = \frac{1}{3}S_{\nset^o},
-\end{equation}
-and the sum of even node-tree of sizes is
+In every partial fragmentation set $\m{F}^o_k$, the sum of even node-tree sizes is 
 \begin{equation}\label{eq:sumevensetsize}
-  \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \} = \frac{2}{3}S_{\nset^o}.
+  \sum_j \left\{ \abs{\pre{k}\nset_j^e} \big| \pre{k}\nset_j^e \in \m{F}^o_k \right\} \leq \frac{2}{3}\abs{\pre{0}\nset^o},
 \end{equation}
-This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Filling in equation \eqref{eq:numfrag} and \eqref{eq:sumevensetsize} in \eqref{eq:npdc}, we find that
+as $R_1+R_2 = \frac{2}{3}$ per Theorem \ref{the:fragratio} and this value is constant for every fragmentation step is constant per Lemma \ref{lem:equalevensum}. This is an inequality as we have assumed $|\nset| = |\vset|$ and $N_v=0$ in Theorem \ref{the:fragratio}. Filling in equation \eqref{eq:numfrag} and \eqref{eq:sumevensetsize} in \eqref{eq:npdc}, we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-\nonumber  N_{PDC} &\leq& \sum_{k=1}^{p} \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \}. \\
-\nonumber   &=& \sum_{k=1}^{\log_3(S_{\nset^o})} \frac{2}{3}S_{\nset^o} \\
-   &=& \frac{2}{3}S_{\nset^o}\log_3(S_{\nset^o})
+\nonumber  N_{PDC}  &\leq& \sum_{k=1}^{p} \sum_j \left\{ \abs{\pre{k}\nset_j^e} \big| \pre{k}\nset_j^e \in \m{F}^o_k \right\}. \\
+\nonumber           &\leq& \sum_{k=1}^{\log_3(\abs{\pre{0}\nset^o})} \frac{2}{3}\abs{\pre{0}\nset^o} \\
+                    &\leq& \frac{2}{3}\abs{\pre{0}\nset^o}\log{\abs{\pre{0}\nset^o}}
 \end{eqnarray}
 
-The node-tree size of set is bounded by the lattice size $\nset^o \leq N$. The worst-case time complexity of the delay computation is thus bounded by $\m{O}(N\log_3(N))$. The average-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$.
+Recall from Equation \eqref{eq:limitnsetsize} that the node-tree size of set is bounded by the lattice size $|\pre{0}\nset^o| \leq N$. The worst-case time complexity of the delay computation is thus bounded by $\m{O}(N\log{N})$. The average-case complexity is even lower as it is quite certain that not all vertices are nodes such that $|\nset| < |\vset|$ and $N_v \neq 0$.
 
 \subsection{Bloom complexity}\label{sec:bloomcomplexity}
 
-To grow a cluster represented by a node-tree $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the nodes. Let's call the total number of times any node is traversed by \codefunc{Bloom} $N_{bloom}$.
+To grow a cluster represented by a node-tree $\nset$, a depth-first search is performed on the node-tree to iterate over each boundary list that are stored at the nodes. 
+\begin{definition}\label{def:nbloom}
+  Let the total number of times nodes are bloomed with \codefunc{Bloom} be $N_{bloom}$.
+\end{definition}
 
-Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $S_\nset = S_\vset$ and $n_v = 0$. Recall that every odd node-tree $\pre{k}N^o_j$ in each fragmentation set $\m{F}_k$ is subjected to growth in each partial fragmentation, and that we start with a maximum number of smallest cluster of size $S_{\pre{p}\nset} = S_{\pre{p}\vset} = 1$. Thus we are certain that with this assumption we have the upper bound in $N_{bloom}$.
+Similar to the previous section we make the assumption of a maximum number of nodes on the lattice where in each cluster $|\nset| = |\vset|$ and $V_v = 0$. For a fragmentation step of $f(\pre{k-1}\nset^o)$ to $\{\pre{k}\nset^o_0, \pre{k}\nset^o_1, \pre{k}\nset^o_2\}$, $N_{bloom}$ is maximized if all three ancestral node-trees are grown. As the growth of every set $\nset$ adds $|\nset|$ to $N_{bloom}$, the total number of bloom can be found similarly to $N_{PDC}$ in Equation \eqref{eq:npdc}. The sum is now on all odd node-tree sizes in all $p$ fragmentation steps $\m{F}_k$: 
 \begin{equation}\label{eq:nnode}
-  N_{bloom} \leq \sum^{p}_{k=1}\sum_j \{ S_{\pre{k}\nset_j} | \pre{k}\nset_j \in \m{F}_k \}
+  N_{bloom} \leq \sum^{p}_{k=1}\sum_j \left\{ \abs{\pre{k}\nset^o_j} \big| \pre{k}\nset^o_j \in \m{F}_k \right\}
 \end{equation}
 For a full fragmentation of $\nset$ of size $S_\nset$, the sum of all set sizes in each fragmentation set $\m{F}$ is
 \begin{equation}\label{eq:sumsetsfrag}
-  \sum_j \{S_{\pre{k}\nset_j} | \pre{k}\nset_j \in \m{F}_k \} = S_\nset.
+  \sum_j \left\{ \abs{\pre{k}\nset_j} \big| \pre{k}\nset^o_j \in \m{F}_k \right\} = \abs{\pre{0}\nset^o}.
 \end{equation}
-By filling in $p$ we find that
+By filling in $p$ from \eqref{eq:numfrag}, we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
-  \nonumber N_{bloom} &\leq& \sum^{p}_{k=1}\sum_j \{ S_{\pre{k}\nset_j} | \pre{k}\nset_j \in \m{F}_k \} \\
-  \nonumber &=& \sum_{k=1}^{\log_3(S_{\nset^o})} S_\nset \\
-   &=& S_{\nset^o}\log_3(S_{\nset^o}),
+  \nonumber N_{bloom} &\leq& \sum^{p}_{k=1}\sum_j \left\{ \abs{\pre{k}\nset^o_j} \big| \pre{k}\nset^o_j \in \m{F}_k \right\} \\
+  \nonumber           &\leq& \sum_{k=1}^{\log_3{\abs{\pre{0}\nset^o}}} \abs{\pre{0}\nset^o} \\
+                      &\leq& \abs{\pre{0}\nset^o}\log_3{\abs{\pre{0}\nset^o}},
 \end{eqnarray}
-which again corresponds to a worst-case time complexity that is bounded by $\m{O}(N\log_3(N))$.
+which again corresponds to a worst-case time complexity that is bounded by $\m{O}(N\log{N})$.
 
 \section{Boundaries}\label{sec:ufbbbound}
-For the UF decoder on surfaces with boundaries, we introduced the concept of \emph{boundary vertices} that in contrast to normal vertices are not equivalent to stabilizers generators, measurements or ancillary qubits. During formation of the spanning forest $F_C$ of a cluster, we must make sure that $F_C$ does not contain more than 1 element of the set of boundary vertices $\delta\vset$, as multiple elements of $\delta\vset$ is equivalent to a cycle.
-
-The addition of boundaries requires a new type of node element, the \emph{boundary node} $\beta$, that is exclusive to boundary vertices of $\delta\vset$, and are initiated on a boundary vertex if a cluster grows into the boundary. For a cluster, it is already defined in the vanilla UF decoder that there can be only 1 boundary vertex in $\vset$, and therefore only one boundary node in $\nset$. As a result, a boundary node will always be a trailing node in $\nset$ with no children, and will never be the root node. However, the always-trailing boundary node  always has parity 1, as a matching with the boundary is equally valid as a matching with another syndrome. The addition of boundary nodes just requires a small alteration to algorithm \ref{algo:calcparity}.
-
-\begin{algo}[algotitle=Calcparity for surfaces with boundaries, label=algo:calcparity2]
-\begin{algorithm}[H]
-\SetKwData{node}{node}
-\SetKwData{cluster}{cluster}
-\SetKwData{child}{child}
-\SetKwData{parity}{parity}
-\SetKwData{pary}{p}
-\SetKwFunction{cp}{Calcparity}
-\SetKwFunction{summation}{Sum}
-
-\KwData{\node}
-\KwResult{Defined parities for all children of \node}
-
-\BlankLine
-
-\parity $=$ \summation{$[1 - $ \cp{\child} $\forall$ \child of \node $]$} $\%2$\;
-\uIf{\node $\equiv \sigma$}{
-    \node.\pary $=$ \parity}
-\uElseIf{\node $\equiv j$}{
-    \node.\pary $= 1-$ \parity}
-\uElseIf{\node $\equiv \beta$}{
-    \node.\pary $= 1$}
-\KwRet{\node.\pary}
-\end{algorithm}
-\end{algo}
+For surfaces with boundaries, we introduced the concept of \emph{open vertices} $\vset_\omega$ that in contrast to normal vertices are not equivalent to stabilizers, measurements or ancillary qubits (Section \ref{sec:surface_planar}). During formation of the spanning forest $\m{T}_\m{R}$ of a cluster, we must make sure that $\m{T}_\m{R}$ does not contain more than 1 element of the set of boundary vertices $\vset_\omega$, as multiple elements of $\vset_\omega$ is equivalent to a cycle (Section \ref{sec:peelingbound}).
+\begin{definition}\label{def:boundarynode}
+  Let a boundary-node $b$ denote a node that is seeded in an open-vertex $v in \vset_\omega$. 
+\end{definition}
+The addition of boundaries requires a new type of node element, the \emph{boundary node} $n$, that is exclusive to boundary vertices of $\vset_\omega$, and are initiated on a boundary vertex if a cluster grows into the boundary. Recall from Section \ref{sec:peelingbound} that there can be only 1 boundary vertex in $\vset$. For this reason there can be only one boundary node in $\nset$. As a result, a boundary node will always be a trailing node in $\nset$ with no children, and will never be the root node. However, the always-trailing boundary node  always has parity 1, as a matching with the boundary is equally valid as a matching with another syndrome. The addition of boundary nodes just requires a small alteration to algorithm \ref{algo:calcparity}.
+\input{pseudocodes/calcparitybound.tex}
 
 For a surface containing $N$ qubits, the number of boundary elements scales with $\sqrt{N}$. The number of node elements is thus bounded by $N + \sqrt{N}$. The added complexity due to the boundary elements will therefore not exceed some linear factor and remains the same as previously computed.
 
+\section{Erasure noise}\label{sec:ufbberasure}
 
-\section{Erasure noise}
+The inspiration for the Union-Find decoder is the Peeling decoder (Section \ref{sec:peelingdecoder}), that only accounted for \emph{erasure} errors. As the Union-Find Balanced-Bloom decoder is a modification of the Union-Find decoder, we naturally needs to make sure that it can also solve erasure errors.
 
-The inspiration for the UF decoder is the Peeling decoder \cite{delfosse2017linear}, that only accounted for \emph{erasure} errors. As the UFBB decoder is a descendant of the original Peeling decoder, we naturally needs to make sure that it can also solve erasure errors. The UF decoder solves for Pauli errors by considering each non-trivial syndrome as an single vertex odd cluster, and growing odd cluster in size until only even clusters remain. Each even cluster can than be considered as an pseudo-erasure to be solved by the Peeling decoder. Real erasures undergo the same growth, but have larger initial sizes.
-
-To account for these erasures, we must construct the node-trees for these initial erasure clusters. We can easily check that for an erasure-cluster, the PMW for each neighboring vertex is different. Each vertex in the cluster is therefore a node in $\nset$, where each syndrome-vertex is a syndrome-node $\sigma$, and every other vertex is a linking-node $j$. Note that if the erasure is connected to the boundary, we need to make sure that only a single edge is connected to the boundary, where the single boundary vertex in the cluster naturally is a boundary node $\beta$. After constructing these initial clusters and node-trees, we can proceed to the UFBB algorithm.  
+To account for these erasures, we must construct the node-trees for these initial erasure clusters. We can easily check that for an erasure-cluster, the potential matching for every neighboring vertex is different. Every vertex in the cluster is therefore a node in $\nset$, where each syndrome-vertex is a syndrome-node $\sigma$, and every other vertex is a linking-node $l$. Note that if the erasure is connected to the boundary, we need to make sure that only a single edge is connected to the boundary, where the single boundary vertex in the cluster naturally is a boundary node $b$. After constructing these initial clusters and node-trees, we can proceed to the Union-Find Balanced Bloom decoder.  
 
 \section{Performance}
 
@@ -841,7 +839,7 @@ To account for these erasures, we must construct the node-trees for these initia
    Planar code  & $0.9927 \pm 0.0001$ & $0.8689$ & $0.02711 \pm 0.00006$ & $0.9480$ \\
   \hline
   \end{tabularx}
-  \caption{Sumulation results for the Union-Find Balanced-Bloom decoder. $L = 8:8:64, L=8:4:24$}\label{tab:ufbblow}
+  \caption{Simulation results for the Union-Find Balanced-Bloom decoder. $L = 8:8:64, L=8:4:24$}\label{tab:ufbblow}
 \end{table}
 
 \begin{table}[htpb]
@@ -858,7 +856,7 @@ To account for these erasures, we must construct the node-trees for these initia
    Planar code  & $0.9615 \pm 0.0004$ & $0.904$ &$0.02455 \pm 0.0004$ & $0.982$ \\
   \hline
   \end{tabularx}
-  \caption{Sumulation results for the Union-Find Balanced-Bloom decoder $L = 72:8:96, L=28:4:44$}\label{tab:ufbbhigh}
+  \caption{Simulation results for the Union-Find Balanced-Bloom decoder $L = 72:8:96, L=28:4:44$}\label{tab:ufbbhigh}
 \end{table}
 
 

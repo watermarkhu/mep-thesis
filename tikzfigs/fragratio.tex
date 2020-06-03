@@ -1,6 +1,6 @@
-\begin{figure}
+\begin{figure}[htbp]
   \centering
-    \begin{tikzpicture}[scale=0.4]
+    \begin{tikzpicture}[scale=0.45]
       \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
        \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
       }}
@@ -35,7 +35,15 @@
         \foreach \y in {4,...,8}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
       \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
       \draw[l1, dashed] (0,4) ++(-.5,-.5) -- ++(0,5) -- ++(3,0) -- +(0,-5);
+      \end{scope}
 
+      \begin{scope}[shift={(25,6)}]
+        \path[fill=white!80!black] (0,2) \Square{0.46cm};
+        \draw[l1] (0,2) ++(-.5,-.5) rectangle +(1,1);
+        \path[fill=white!50!black] (0,0) \Square{0.46cm};
+        \draw[l1,dashed] (0,0) ++(-.5,-.5) rectangle +(1,1);
+        \node[anchor=west] at (1,2) {odd node-tree};
+        \node[anchor=west] at (1,0) {even node-tree};
       \end{scope}
 
       \draw[l1, ->] (3,4) -- +(1,0) node[midway, above] {$f_o$};

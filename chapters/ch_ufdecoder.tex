@@ -127,26 +127,26 @@ Given a graph $G(\m{E},\m{V})$ that is subjected to pure pure erasure noise, $\m
   If the erasure $\m{R}$ is not a superset of edges $\tilde{\m{E}}$ such that $\n{P}(\tilde{\m{E}})=L$ some logical operator, a correction $\n{P}(\m{C})$ to some error $\m{E}_\m{R}$ cannot result in a logical error, as $\m{C}\cup \m{E}_\m{R}\subseteq \m{R}$. As $|L|\geq d$, this is the case for any erasure pattern up to $d-1$ qubits. Furthermore, on account of lemmas \ref{lem:peelinguni}, \ref{lem:anyforest} and \ref{lem:peelingfe}, any correction set $\m{C}\subseteq \m{T}_\m{R}$ is the most likely correction.
 \end{proof}
 
-\subsection{Bounded surfaces}
-For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Recall that the graph of the primal lattice is now denoted by $G = (\m{V}_\iota\cup \m{V}_{\delta} \cup \m{V}_{\omega}, \m{E}_\iota \cup \m{E}_{\delta})$. Syndrome measurements on such a graph are limited to $\sigma \subseteq \m{V}_\iota\cup \m{V}_\omega$, as $\m{V}_\delta$ are \emph{open} vertices that only exist to support boundary edges $\m{E}_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $\m{V}_\delta$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin \m{V}_\delta$. Furthermore, the construction of the forest $\m{T}_\m{R}$ requires an additional alteration.
+\subsection{Bounded surfaces}\label{sec:peelingbound}
+For bounded surfaces such as the planar code (sec \ref{sec:surface_planar}), the peeling decoder needs some small alterations. Recall that the graph of the primal lattice is now denoted by $G = (\m{V}_\iota\cup \m{V}_{\delta} \cup \m{V}_{\omega}, \m{E}_\iota \cup \m{E}_{\delta})$. Syndrome measurements on such a graph are limited to $\sigma \subseteq \m{V}_\iota\cup \m{V}_\delta$, as $\m{V}_\omega$ are \emph{open} vertices that only exist to support boundary edges $\m{E}_\delta$, and do not refer to some stabilizer generator or physical measurement. The missing information on $\m{V}_\omega$ makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex $u \notin \m{V}_\omega$. Furthermore, the construction of the forest $\m{T}_\m{R}$ requires an additional alteration.
 \begin{lemma}
-  Two vertices $u,v$ within a forest $\m{T}_\m{R}$ that satisfy $u\in \m{V}_\delta, v \in \m{V}_\delta$ is equivalent to a cycle in $\m{T}_\m{R}$.
+  Two vertices $u,v$ within a forest $\m{T}_\m{R}$ that satisfy $u\in \m{V}_\omega, v \in \m{V}_\omega$ is equivalent to a cycle in $\m{T}_\m{R}$.
 \end{lemma}
 \begin{proof}
-  If there are an even number of vertices in a forest $\m{T}_\m{R}$ that are in $\m{V}_\delta$, it means that there are a number of unique paths within $\m{T}_\m{R}$ that lead from a element of $\m{V}_\delta$ to another element of $\m{V}_\delta$. Such a path is equivalent to some $\delta$-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
+  If there are an even number of vertices in a forest $\m{T}_\m{R}$ that are in $\m{V}_\omega$, it means that there are a number of unique paths within $\m{T}_\m{R}$ that lead from a element of $\m{V}_\omega$ to another element of $\m{V}_\omega$. Such a path is equivalent to some $\delta$-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
 \end{proof}
 
-Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a maximum of 1 element of $\m{V}_\delta$. The forests are grown starting from vertices of the set $\m{V}_\delta$, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests $\{\m{T}_1, \m{T}_2,...\}$ that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma \ref{lem:anyforest}. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm \ref{algo:peelbound}.
+Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a maximum of 1 element of $\m{V}_\omega$. The forests are grown starting from vertices of the set $\m{V}_\omega$, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests $\{\m{T}_1, \m{T}_2,...\}$ that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma \ref{lem:anyforest}. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm \ref{algo:peelbound}.
 
 \begin{algorithm}[htpb]
   \BlankLine
-  \KwData{Graph $G = (\m{V}_{\iota\cup\omega}\cup \m{V}_\delta,E)$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}_{\iota\cup\omega}$}
+  \KwData{Graph $G = (\m{V}_{\iota\cup\delta}\cup \m{V}_\omega,E)$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}_{\iota\cup\delta}$}
   \KwResult{Correction set $\m{C}$}
   \BlankLine
-  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\delta$ (Alg. \ref{algo:forest})\;
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ with seed $\m{V}_\omega$ (Alg. \ref{algo:forest})\;
   initialize $\m{C} = {\emptyset}$\;
   \While{$\m{T}_\m{R} \neq \emptyset$}{
-    pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin \m{V}_\delta$, remove $e$ from $\m{T}_\m{R}$ \;
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u\notin \m{V}_\omega$, remove $e$ from $\m{T}_\m{R}$ \;
     \If{$u \in \sigma$}{
       add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
   }
