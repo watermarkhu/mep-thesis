@@ -1,0 +1,44 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=1.2]
+      \node at (-1,1) {$\vset_e$};
+      
+      \node at (0,0) (0) {}; \node at (2,0) (1) {}; \node at (4,0) (2) {};
+      
+      \path[pattern=horizontal lines, pattern color=mblue, rounded corners=10pt, rotate around={45:(0)}] (-1,-1) rectangle (1,1);
+      \path[pattern=vertical lines, pattern color=morange, rounded corners=10pt, rotate around={45:(1)}] (1,-1) rectangle (3,1);
+      \path[pattern=horizontal lines, pattern color=mgreen, rounded corners=10pt, rotate around={45:(2)}] (3,-1) rectangle (5,1);
+  
+      \node[nodel, minimum size=0.6cm, fill=white!70!mblue] at (0) (v0) {\small$v_1$};
+      \node[nodel, minimum size=0.6cm] at (-1,0) (v0l) {};
+      \node[nodel, minimum size=0.6cm] at (0,1) (v0u) {};
+      \node[nodel, minimum size=0.6cm] at (0,-1) (v0d) {};
+  
+      \node[nodel, minimum size=0.6cm, fill=white!70!morange] at (1) (v1) {\small$v_2$};
+      \node[nodel, minimum size=0.6cm] at (1,0) (v1l) {\small$v_{12}$};
+      \node[nodel, minimum size=0.6cm] at (2,1) (v1u) {};
+      \node[nodel, minimum size=0.6cm] at (2,-1) (v1d) {};
+  
+      \node[nodel, minimum size=0.6cm, fill=white!70!mgreen] at (2) (v2) {\small$v_3$};
+      \node[nodel, minimum size=0.6cm] at (3,0) (v2l) {\small$v_{23}$};
+      \node[nodel, minimum size=0.6cm] at (5,0) (v2r) {};
+      \node[nodel, minimum size=0.6cm] at (4,1) (v2u) {};
+      \node[nodel, minimum size=0.6cm] at (4,-1) (v2d) {};
+  
+      \draw[l1] (v0l) -- (v0) -- (v1l) -- (v1) -- (v2l) -- (v2) -- (v2r);
+      \draw[l1] (v0u) -- (v0) -- (v0d);
+      \draw[l1] (v1u) -- (v1) -- (v1d);
+      \draw[l1] (v2u) -- (v2) -- (v2d);
+  
+      \node at (7,1) {$\nset_e$};
+      \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mblue!50!white] at (7,0) (n0) {\small$s_1$};
+      \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mblue!50!white, line width=0] at (8,0) {};
+      \node[nodel, pattern=vertical lines,   minimum size=0.8cm, pattern color=morange!50!white] at (8,0) (j01) {\small$l_{12}$};
+      \node[nodel, pattern=vertical lines,   minimum size=0.8cm, pattern color=morange!50!white] at (9,0) (n1) {\small$s_2$};
+      \node[nodel, pattern=vertical lines,   minimum size=0.8cm, pattern color=morange!50!white, line width=0] at (10,0) {};
+      \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mgreen!50!white] at (10,0) (j12) {\small$l_{23}$};
+      \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mgreen!50!white] at (11,0) (n2) {\small$s_3$};
+      \draw[l1] (n0) -- (j01) -- (n1) -- (j12) -- (n2);
+    \end{tikzpicture}
+    \caption{Linking-vertices $v_{12}$ and $v_{23}$ are seeded in linking-nodes $l_{12}$ and $l_{23}$, respectively, as they lie in equal distance to more than a single syndrome-node.}\label{fig:linkingode}
+  \end{figure}

@@ -1,0 +1,21 @@
+\begin{algorithm}[htbp]
+    \KwData{Merging node $n_i, n_j$ of clusters $c_i, c_j$, merged cluster $c_{ij}$}
+    \KwResult{A jointed node tree}
+  
+    \BlankLine
+  
+    Merge node sets by initiating edge $(n_i, n_j)$\;
+    \uIf{$c_i$ even, $c_j$ odd}{
+      set $c_{ij}.n_r = c_j.n_r$\;
+      set $c_{ij}.n_u = c_i$
+    }
+    \uElseIf{$c_i$ odd, $c_j$ even}{
+      set $c_{ij}.n_r = c_i.n_r$\;
+      set $c_{ij}.n_u = c_j$
+    }
+    \Else(even-join){
+      set $c_{ij}.n_r = c_i.n_r$ or $c_{ij}.n_r = c_j.n_r$\;
+    }
+    \caption{\codefunc{Join}}\label{algo:join}
+  \end{algorithm}
+  

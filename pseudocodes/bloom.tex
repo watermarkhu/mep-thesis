@@ -1,0 +1,16 @@
+\begin{algorithm}[htbp]
+    \BlankLine
+    \KwData{Node $n$, merging list $\m{L}_m$}
+    \KwResult{Node with traced boundary edges and increased radius}
+    \BlankLine
+  
+    \For{$v$ in $n_i.\delta\vset$}{
+      \For{edges in $\{(u,v) | (u,v).support\neq 2$\}}{
+        Add 1 to $(u,v).support$ \;
+        If $(u,v).support=2$, add $(u,v)$ to $\m{L}_m$ \;
+      }
+    }
+    Add 1 to $n.r$
+    \BlankLine
+    \caption{\codefunc{Bloom}}\label{algo:bloom}
+  \end{algorithm}

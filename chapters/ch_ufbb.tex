@@ -1,11 +1,18 @@
 \chapter{Union-Find Balanced-Bloom decoder}\label{ch:ufbb}
 
-\tikzstyle{node}=[circle, draw=black, fill=white, minimum size=25pt, line width=1, inner sep= 5pt]
-\tikzstyle{nodel}=[circle, draw=black, fill=white, minimum size=15pt, line width=1, inner sep= 0pt]
-\tikzstyle{node1}=[circle, draw=black, fill=white, minimum size=15pt, line width=1, inner sep= 2pt]
-\tikzstyle{node2}=[circle, draw=black, fill=white, minimum size=8pt, line width=1, inner sep= 0pt, fill=white!70!black]
+\tikzstyle{node}=[circle, draw=black, minimum size=25pt, line width=1, inner sep= 5pt]
+\tikzstyle{nodel}=[circle, draw=black, minimum size=15pt, line width=1, inner sep= 0pt]
+\tikzstyle{node1}=[circle, draw=black, minimum size=15pt, line width=1, inner sep= 2pt]
+\tikzstyle{node2}=[circle, draw=black, minimum size=8pt, line width=1, inner sep= 0pt, fill=white!70!black]
 \tikzstyle{l1}=[line width=1]
 \tikzfading[name=fade right, left color=transparent!0, right color=transparent!100]
+\tikzstyle{odd}=[node1, dashed, pattern=dots, pattern color=mred!75!white]
+\tikzstyle{even}=[node1, pattern=dots, pattern color=mblue!75!white]
+\tikzstyle{lodd}=[odd, pattern = crosshatch dots]
+\tikzstyle{leven}=[even, pattern = crosshatch dots]
+\tikzstyle{enset}=[node1, thick, double, font=\footnotesize]
+\tikzstyle{onset}=[node1, thick, densely dashed, double, font=\footnotesize]
+\tikzstyle{subtree}=[node1, opacity=0.3,dotted, font=\footnotesize]
 
 % Recall that in the Union-Find decoder, each cluster represented by a set of vertices $C_i = |\{v_1, v_2, ...\}$ stored as a disjoint-set tree of the Union-Find data structure. To find the parent cluster of any given vertex, we follow subsequent parent pointers to the root vertex of the tree, which is the representative element of the cluster. Merges between clusters is done by simply pointing the root of one tree to another. By implementing additional rules \emph{path compression} and either \emph{union by weight} or \emph{union by rank}, the heights of the trees are dynamically kept low, such that the overall complexity of the algorithm for a system of $n$ qubits is $n\alpha(n)$, where $\alpha(n)\leq 4$ for all physical values of $n$. 
 
@@ -34,33 +41,7 @@ Note that the potential matching weight is thus not defined for a vertex that is
 
 From the above example, we can see that even for a minimal size odd cluster that is not a single vertex, the PMW is not equal for all vertices in the cluster. It would therefore not be optimal to grow all boundary edges simultaneously, as boundaries connected to vertices with a high PNW potentially result in a higher matching weight. The growth these high PMV boundaries should thus be delayed for some iterations. When the PMV across the cluster reach an equilibrium, there is no benefit of growing some boundaries before others, and simultaneous growth is allowed again.
 
-\begin{figure}
-  \centering
-  \vspace{1em}
-   \begin{tikzpicture}
-    \node at (-1, -1) {$\mathcal{V}_e$};
-    \draw[l1] (0, 0) -- (4,0);
-    \draw[l1] (-1,0) -- (5,0);
-    \draw[l1] (0,1) -- (0,-1);
-    \draw[l1] (2,1) -- (2,-1);
-    \draw[l1] (4,1) -- (4,-1);
-    \node[node] at (0,0) (1) {$v_1$};
-    \node[node, draw=mblue, fill=mblue, fill opacity=.2, text opacity=1, dashed] at (0,2) (2) {$v_o$};
-    \node[node] at (2,0) (3){$v_2$};
-    \node[node, draw=morange, fill=morange, fill opacity=.2, text opacity=1,dotted] at (2,2) (4) {$v_o$};
-    \node[node] at (4,0) (5) {$v_3$};
-    \node[node, draw=mgreen, fill=mgreen, fill opacity=.2, text opacity=1,dashdotted] at (4,2) (6) {$v_o$};
-
-    \draw[l1, dashed, mblue] (1) -- (2);
-    \draw[l1, dashed, mblue, transform canvas={yshift=3pt}] (3) -- (5);
-    \draw[l1, dotted, morange] (3) -- (4);
-    \draw[l1, dotted, morange, transform canvas={yshift=-3pt}] (1) -- (3) -- (5);
-    \draw[l1, dashdotted, mgreen] (5) -- (6);
-    \draw[l1, dashdotted, mgreen, transform canvas={yshift=3pt}] (3) -- (1);
-
-  \end{tikzpicture}
-  \caption{Unequal matching weight in cluster vertex-tree $\vset_e$. The matching edges (dashed) correspond to the position of $v_o$. If $v_o$ is connected to $v_1$ or $v_3$, the resulting matchings have a weight of 2. If $v_o$ is connected to $v_2$, the resulting matching has a weight of 3.}\label{fig:PMW}
-\end{figure}
+\input{tikzfigs/potentialmatchingweight.tex}
 
 However, the calculation of the PMW is seemingly not as straight forward, especially for clusters if increasingly larger size. Furthermore, if the PMW is to be calculated for every vertex with boundary edges in all clusters in every growth iteration, the time complexity of the algorithm would increase dramatically. Luckily, we can reduce these calculations to be performed on a set of \emph{nodes} in each cluster, which we clarify in the next section.
 
@@ -90,33 +71,7 @@ Per Theorem \ref{the:nodepmw} and Definition \ref{def:nodeset}, all boundary ver
 \begin{equation}\label{eq:sets}  
   \abs{\nset} \leq \abs{\vset} 
 \end{equation}
-
-\begin{figure}[htbp]
- \centering
- \begin{tikzpicture}
-   \path[pattern=dots, pattern color=mblue] (0,3) arc (90:225:1) arc (45:-135:.4142) arc (45:315:1) arc (135:-45:.4142) arc (135:405:1) arc (225:135:.4142) arc (-45:45:1) arc (225:135:.4142) arc (-45:90:1) -- cycle;
-   \path[pattern=grid , pattern color=morange] (2,1) arc (90:450:1);
-   \node[node, fill=white!70!mblue] at (0,0) (0) {$v_1$};
-   \node[node, fill=white!70!morange] at (2,0) (1) {$v_2$};
-   \node[node, fill=white!70!black, path fading=fade right] at (4,0) (5) {$v_3$};
-   \node[node] at (-2,0) (2) {$v_4$};
-   \node[node] at (0,2) (3) {$v_5$};
-   \node[node] at (0,-2) (4) {$v_6$};
-   \draw[l1] (1) -- (0) -- (3);
-   \draw[l1] (2) -- (0) -- (4);
-   \draw[l1, dotted] (2, 1.5) -- (1) -- (2,-1.5);
-   \draw[l1] (1) -- (5);
-  
-   \node at (-2, 2.5) {$\mathcal{V}_e$};
-   \node at (7, 2.5) {$\mathcal{N}_e$};
-
-   \node[node, pattern=dots, pattern color=mblue] at (7,0) (d) {$n_1$};
-   \node[node, pattern=grid , pattern color=morange] at (9,0) (e) {$n_2$};
-   \node[node, fill=white!70!black, path fading=fade right] at (11,0) (f) {$n_3$};
-   \draw[l1] (d) -- (e) -- (f);
-  \end{tikzpicture}
-  \caption{A vertex-tree $\vset_e$ compared to a node-tree $\nset_e$, both representing cluster $c_e$. Every shaded area in $\vset_e$ covers a set of vertices belonging to the same node in $\nset_e$. Edges connected to $v_3$ and $n_3$ are removed for illustration.}\label{fig:nodesetpmw}
-\end{figure}
+\input{tikzfigs/nodesetpmw.tex}
 
 \subsection{Node types}
 
@@ -135,55 +90,12 @@ The node type that we have described in the previous section is a syndrome-node.
 This problem is solved by initiating a linking-node $l$ with the vertex $v_l$ as its seed. By doing so, every boundary vertex of the nodes $s_1$ and $s_2$ is limited to have a single nearest syndrome-vertex, which are $v_1$ and $v_2$, respectively. For the linking-node, every boundary vertex in $l.\delta \vset$ is limited to have a single nearest \emph{linking-vertex} $v_l$, which is its seed. We can replace every instance of $v_\sigma$ in Theorem \ref{the:nodepmw} and its proof with $v_l$ to see that the theorem also holds for linking-nodes. Thus a linking-node also has the property that its boundary vertex set $l.\delta \vset$ has the same potential matching weight. Note that a linking-node initiated on a vertex that lies in equal distance to the seeds of \emph{any} node, thus including other linking-nodes. 
 
 Consider our example cluster $c_e$ of 3 nodes $\{n_1, n_2, n_3\}$ again. Now we slightly alter this cluster by increasing the distance between the seeds $v_1, v_2$ and $v_2, v_3$ to two edges. This means that cluster $c_e$ is only established after two growth iterations of the three previous separate cluster of node-trees $\{n_1\}, \{n_2\}, \{n_3\}$, and has a total size of 13 vertices (Figure \ref{fig:linkingode}). Now consider the vertices $v_{12}$ and $v_{23}$ that lie between $v_1, v_2$ and $v_2, v_3$, respectively. These are linking-vertices as they lie in equal distance to two seeds. Thus in the node-tree of the merged cluster $\nset_e$, linking-nodes $l_{12}$ and $l_{23}$ are initiated. 
+\input{tikzfigs/linkingnode.tex}
+
 % It is not clear in which nodes these vertices are seeded, as they lie in equal distance to two nodes. To solve this, a new type of node called \emph{linking-nodes} $j$ is initiated on the merging vertices, which lie on the linking of two flowers. All nodes $j$ have the same characteristics of syndrome-nodes $\sigma$; they have their own flowers and can thus be separately delayed during growth.
 % \begin{lemma}\label{lem:linkingode}
 %   On a merging vertex $v$ that lies in equal distance to two syndrome-nodes from two separate clusters merging into one, a linking-node $j$ is initiated in the joined node-tree $\nset$. A linking-node has the same properties as a syndrome-node.
 % \end{lemma}
-\begin{figure}[htbp]
-  \centering
-  \begin{tikzpicture}[scale=1.2]
-    \node at (-1,1) {$\vset_e$};
-    
-    \node at (0,0) (0) {}; \node at (2,0) (1) {}; \node at (4,0) (2) {};
-    
-    \path[pattern=horizontal lines, pattern color=mblue, rounded corners=10pt, rotate around={45:(0)}] (-1,-1) rectangle (1,1);
-    \path[pattern=vertical lines, pattern color=morange, rounded corners=10pt, rotate around={45:(1)}] (1,-1) rectangle (3,1);
-    \path[pattern=horizontal lines, pattern color=mgreen, rounded corners=10pt, rotate around={45:(2)}] (3,-1) rectangle (5,1);
-
-    \node[nodel, minimum size=0.6cm, fill=white!70!mblue] at (0) (v0) {\small$v_1$};
-    \node[nodel, minimum size=0.6cm] at (-1,0) (v0l) {};
-    \node[nodel, minimum size=0.6cm] at (0,1) (v0u) {};
-    \node[nodel, minimum size=0.6cm] at (0,-1) (v0d) {};
-
-    \node[nodel, minimum size=0.6cm, fill=white!70!morange] at (1) (v1) {\small$v_2$};
-    \node[nodel, minimum size=0.6cm] at (1,0) (v1l) {\small$v_{12}$};
-    \node[nodel, minimum size=0.6cm] at (2,1) (v1u) {};
-    \node[nodel, minimum size=0.6cm] at (2,-1) (v1d) {};
-
-    \node[nodel, minimum size=0.6cm, fill=white!70!mgreen] at (2) (v2) {\small$v_3$};
-    \node[nodel, minimum size=0.6cm] at (3,0) (v2l) {\small$v_{23}$};
-    \node[nodel, minimum size=0.6cm] at (5,0) (v2r) {};
-    \node[nodel, minimum size=0.6cm] at (4,1) (v2u) {};
-    \node[nodel, minimum size=0.6cm] at (4,-1) (v2d) {};
-
-    \draw[l1] (v0l) -- (v0) -- (v1l) -- (v1) -- (v2l) -- (v2) -- (v2r);
-    \draw[l1] (v0u) -- (v0) -- (v0d);
-    \draw[l1] (v1u) -- (v1) -- (v1d);
-    \draw[l1] (v2u) -- (v2) -- (v2d);
-
-    \node at (7,1) {$\nset_e$};
-    \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mblue!50!white] at (7,0) (n0) {\small$s_1$};
-    \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mblue!50!white, line width=0] at (8,0) {};
-    \node[nodel, pattern=vertical lines,   minimum size=0.8cm, pattern color=morange!50!white] at (8,0) (j01) {\small$l_{12}$};
-    \node[nodel, pattern=vertical lines,   minimum size=0.8cm, pattern color=morange!50!white] at (9,0) (n1) {\small$s_2$};
-    \node[nodel, pattern=vertical lines,   minimum size=0.8cm, pattern color=morange!50!white, line width=0] at (10,0) {};
-    \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mgreen!50!white] at (10,0) (j12) {\small$l_{23}$};
-    \node[nodel, pattern=horizontal lines, minimum size=0.8cm, pattern color=mgreen!50!white] at (11,0) (n2) {\small$s_3$};
-    \draw[l1] (n0) -- (j01) -- (n1) -- (j12) -- (n2);
-
-  \end{tikzpicture}
-  \caption{Linking-vertices $v_{12}$ and $v_{23}$ are seeded in linking-nodes $l_{12}$ and $l_{23}$, respectively, as they lie in equal distance to more than a single syndrome-node.}\label{fig:linkingode}
-\end{figure}
 
 % The union of the set of linking-nodes $\m{J}$ and set of syndrome-nodes (syndromes) $\sigma$ is equal to the node-tree $\m{N}$. A vertex can either be a node in the syndrome-node-tree, a node in the linking-node-tree, or not a node at all, but never both $\sigma$ and $\m{J}$ as these sets are mutually exclusive. The node-tree size $S_\nset$, is therefore upper-bounded by the cluster size or vertex-tree size $S_\vset$, as all nodes are vertices, but not all vertices are nodes.
 % \begin{eqnarray}
@@ -241,9 +153,7 @@ To finalize, the node-tree $\nset_j$ of a cluster $c_j$ is a reduced tree of the
 
 
 \section{Node parity and delay}\label{sec:nodedelay}
-
 The node-tree data structure allows for a reduction in the calculation of the potential matching weight, as the value for boundary vertices within the node are equal. However, if this calculation is done naively by calculating the potential matching weight for each node individually, where in each calculation the entire node-tree is traversed, the full calculation runs in quadratic time. Luckily, as we will explore in this section, the node-tree data structure allows us to calculate several values that relate closely to the potential matching weight; the \emph{node parity} and \emph{node delay}, by two depth-first searches from the root node. 
-
 
 \begin{definition}\label{def:nodedelay}
   Let the \emph{node delay} $n.d$ be the the difference in the number of bloom delay iterations of a node $n$ and the root node $n_r$ in the node-tree of an odd-parity cluster.
@@ -277,29 +187,7 @@ The node-tree data structure allows for a reduction in the calculation of the po
 We will prove Theorem \ref{the:delayequation} throughout the following sections. In Section \ref{sec:1dnodetree}, we introduce the concept of node delays and parities on syndrome-nodes through an example of a one-dimensional node-tree. In Section \ref{sec:realisticnodetree}, the same concept is applied to realistic node-trees, which is the dimension of the surface code that applies to realistic node-trees. These concepts are extended to linking-nodes in Section \ref{sec:linkparitydelay}. In Section \ref{sec:bbstate}, we introduce the concept of the \emph{equilibrium-state} of a node-tree that optimizes the minimal weight behavior through the $f_{eq}$ parameter. Finally, the pseudo-codes for the calculation of node delays are listed in Section \ref{sec:pdccalc}.
 
 \subsection{One-dimensional node-tree parity and delay}\label{sec:1dnodetree}
-\begin{figure}[htbp]
-  \centering
-  \tikzstyle{nodea}=[node, minimum size=20, pattern=dots, pattern color=black!50!white]
-  \tikzstyle{nodeb}=[nodel, solid, pattern=dots, pattern color=black!50!white]
-  \begin{tikzpicture}
-    \node at (-1,1) {$\nset_{1D}$};
-    \node[nodea] at (0,0) (n1) {$s_1$};
-    \node[nodea] at (1.5,0) (n2) {$s_2$};
-    \node[nodea] at (3,0) (n3) {$s_3$};
-    \node[nodea] at (4.5,0) (n8) {$s_4$};
-    \node[nodeb] at (6,0) (n4) {};
-    \node[nodeb] at (7,0) (n5) {};
-    \node[nodeb] at (8,0) (n6) {};
-    \node[nodeb] at (9,0) (n7) {};
-    \draw[l1]  (n1) -- (n2) -- (n3) -- (n8) -- (n4);
-    \draw[l1, dotted] (n4) -- (n5) -- (n6) -- (n7);
-    \draw[l1, decorate, decoration={brace, amplitude=5}] (n4.west) ++(0,-.4) node[inner sep=0] (r1) {} (n7.east) ++(0,-.4) -- (r1) node[midway, below=4pt] {$\abs{\nset_{1D}} - 4$ nodes};
-    \draw[l1, decorate, decoration={brace, amplitude=5}] (n7.west) ++ (0,.4) node[inner sep=0] (r2) {} (n4.east) ++ (0.,.4) -- (r2) node[midway, above=4pt] {$\abs{(s_4, s_{|\nset_{1D}|})} = k$};
-
-    \path (10, 1) node[nodeb]{} -- +(.5,0) node[anchor=west] {syndrome-node};
-  \end{tikzpicture}
-  \caption{The one-dimensional node-tree $\nset_{1D}$, consisting of only syndrome-nodes $s_i$. The first 4 nodes $s_1, s_2, s_3, s_4$ are labelled. The distance of the edges between $s_4$ and $s_{|\nset_{1D}|}$ is $k$.}\label{fig:1dnodetree}
-\end{figure}
+\input{tikzfigs/onedimensialtree.tex}
 We introduce the concepts of node parity and node delay from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} through a one-dimensional node-tree $\nset_{1D}$ of exclusively syndrome-nodes. In this simplification, all nodes lie on a horizontal line from $s_1$ to $s_{|\nset_{1D}|}$ (Figure \ref{fig:1dnodetree}). Let us calculate the potential matching weights (PMW) for the nodes in this cluster. Recall from Definition \ref{def:bloom} that the radius of the node $s.r$ is equal to number of bloom iterations, one half-edge on the boundaries per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $s$, the weight of the matchings edges within the node $s$ is equal to $\floor{s.r/2}+1$ or. For a merge on $s_1$, the matching weight $|\m{C}|$ is the the sum of $\floor{s.r/2}+1$, the length of edges $(s_2,s_3), (s_4,s_5)$, and some value $k$ corresponding to the weight of matching edges in the remainder of the cluster. This calculation can be continued for other nodes:
 \begin{eqnarray*}
 % \nonumber % Remove numbering (before each equation)
@@ -320,8 +208,6 @@ There is a trend in which contribution of the edge length the difference in the 
 \begin{equation}\label{eq:pmwdiff}
   PMW(s_i) - PMW(s_{i-1}) = \floor{\frac{s_i.r}{2}} - \floor{\frac{s_{i-1}.r}{2}} + (-1)^{i}\abs{(s_i,s_{i-1})} \hspace{1em} | \hspace{1em} i\geq 2.
 \end{equation}
-
-
 
 \begin{lemma}
   The difference in delay between a node $s_i$ and its parent $s_{i-1}$ is related to the difference in potential matching weight by 
@@ -420,61 +306,7 @@ Note that this definition of the node parity is identical as in a one-dimensiona
 \end{multline}
 where $n_\beta$ is the node of interest and $n_\alpha$ is an parent of $n_\beta$, and the sign of the edge component is now dependent on the node parity $s.p$.
 
-\tikzstyle{odd}=[node1, dashed, pattern=dots, pattern color=mred!75!white]
-\tikzstyle{even}=[node1, pattern=dots, pattern color=mblue!75!white]
-\begin{figure}[htbp]
-  \centering
-  \begin{tikzpicture}
-    \node at (1,-1) {\emph{a)} $s_r = s_0$};
-    \node[even] (0) at (1, 3) {$s_0$};
-    \node[odd] (1) at (1, 2) {$s_1$};
-    \node[odd] (2) at (1, 1) {$s_2$};
-    \node[even] (3) at (1, 0) {$s_3$};
-    \node[even] (4) at (0, 1) {$s_4$};
-    \node[even] (5) at (0, 0) {$s_5$};
-    \node[odd] (6) at (2, 2) {$s_6$};
-    \node[even] (7) at (2, 1) {$s_7$};
-    \node[even] (8) at (2, 0) {$s_8$};
-    \draw[l1] (0) -- (1) -- (2) -- (3);
-    \draw[l1] (1) -- (4); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
-    \draw[l1] (0) -- (6) -- (7);
-
-    \begin{scope}[shift={(3.5,0)}]
-      \node at (1,-1) {\emph{b)} $s_r = s_1$};
-      \node[even] (1) at (1,3) {$s_1$};
-      \node[even] (4) at (0, 2) {$s_4$};
-      \node[odd] (2) at (1, 2) {$s_2$};
-      \node[even] (3) at (1, 1) {$s_3$};
-      \node[even] (5) at (0, 1) {$s_5$};
-      \node[even] (8) at (2, 1) {$s_8$};
-      \node[even] (0) at (2, 2) {$s_0$};
-      \node[odd] (6) at (3, 1) {$s_6$};
-      \node[even] (7) at (3, 0) {$s_7$};
-      \draw[l1] (3) -- (2) -- (1) -- (0) -- (6) -- (7);
-      \draw[l1] (4) -- (1); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
-    \end{scope}
-
-    \begin{scope}[shift={(8,0)}]
-      \node at (1,-1) {\emph{c)} $s_r = s_4$};
-      \node[even] (4) at (1, 3) {$s_4$};
-      \node[odd]  (1) at (1, 2) {$s_1$};
-      \node[odd] (2) at (1, 1) {$s_2$};
-      \node[even] (5) at (0, 0) {$s_5$};
-      \node[even] (3) at (1, 0) {$s_3$};
-      \node[even] (8) at (2, 0) {$s_8$};
-      \node[even] (0) at (2, 1) {$s_0$};
-      \node[odd] (6) at (3, 0) {$s_6$};
-      \node[even] (7) at (3, -1) {$s_7$};
-      \draw[l1] (7) -- (6) -- (0) -- (1) -- (2) -- (3);
-      \draw[l1] (4) -- (1); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
-
-      \path (4,3) node[even]{} -- +(.5,0) node[anchor=west] {$s.p$ even}; 
-      \path (4,2) node[odd]{} -- +(.5,0) node[anchor=west] {$s.p$ odd}; 
-    \end{scope}
-  \end{tikzpicture}
-  \caption{The nodes in a node-tree can have even or odd  parities. The node parities are dependent on which node is set as root $n_r$. Here the same node-tree $\nset$ is illustrated with different roots.}\label{fig:parities}
-\end{figure}
-
+\input{tikzfigs/parities.tex}
 
 \subsection{linking-node parity and delay}\label{sec:linkparitydelay}
 
@@ -482,35 +314,9 @@ Up until now, the existence of linking-nodes has been neglected in the node pari
 \begin{equation*}
   s_4.d^* = s_3.d^* + 2(s_3, s_4).
 \end{equation*}
-\tikzstyle{lodd}=[odd, pattern = crosshatch dots]
-\tikzstyle{leven}=[even, pattern = crosshatch dots]
-\begin{figure}[htbp]
-  \centering
-  \begin{tikzpicture}
-    \node[even] at (0,5) (0) {$s_1$};
-    \node[odd] at (0,4) (1) {$s_2$};
-    \node[even] at (0,3) (2) {$s_3$};
-    \node[odd] at (0,2) (3) {$s_4$};
-    \node[even] at (0,1) (4) {$s_5$};
-    \draw[l1] (0) -- (1) -- (2) -- (3) -- (4);
-    \node[left=.5 of 0] {$\nset_s$};
-      \begin{scope}[shift={(4,0)}]
-        \node[even] at (0,5) (0) {$s_1$};
-        \node[lodd] at (0,4) (1) {$l_2$};
-        \node[odd] at (0,3) (2) {$s_3$};
-        \node[leven] at (0,2) (3) {$l_4$};
-        \node[even] at (0,1) (4) {$s_5$};
-        \draw[l1] (0) -- (1) -- (2) -- (3) -- (4);
-        \node[left=.5 of 0] {$\nset_l$};
 
-        \path (3,5) node[even]{} -- +(.5,0) node[anchor=west] {$s.p$ even}; 
-        \path (3,4) node[odd]{} -- +(.5,0) node[anchor=west] {$s.p$ odd}; 
-        \path (3,3) node[leven]{} -- +(.5,0) node[anchor=west] {$l.p$ even}; 
-        \path (3,2) node[lodd]{} -- +(.5,0) node[anchor=west] {$l.p$ odd}; 
-      \end{scope}
-  \end{tikzpicture}
-  \caption{Two example node-trees $\nset_s$ and $\nset_l$ each containing 5 nodes, where syndrome-nodes $s_i$ are circles and linking-nodes $l_i$ are diamonds. Their appropriate parities are calculated where an even parity correspond to continuous lines and odd to dashed lines. }\label{fig:linkingparity}
-\end{figure}
+\input{tikzfigs/linkingparity.tex}
+
 Consider now a second example node-tree $\nset_l$ with 3 syndrome-nodes and 2 linking-nodes $\{s_1, l_2, s_3, l_4, s_5\}$ (Figure \ref{fig:linkingparity}b). Recall that a linking-node does not have a syndrome-vertex as seed, and thus matchings must occur between seeds of the syndrome-nodes. The potential matching weights without the radius component $PMW^*$ in $\nset_l$ are
 \begin{align*}
   PMW^*(s_1) &= \abs{(s_1, l_2)} + \abs{(l_1, s_3)} + \abs{(l_3, l_4)} + \abs{(l_4, s_5)} \\
@@ -554,7 +360,7 @@ Recall from the last paragraph of Section \ref{sec:nodeset} that the edges of th
   Since the node parities are calculated from the descendants to the root, and the node delays are subjected to an arbitrarily chosen delay for the root $n_r.d$, any node in $\nset$ can be chosen as the root. Recall from Definition \ref{def:nodeparity} that the node parity is only defined for an odd-parity cluster. For a node-tree of exclusively syndrome-nodes, this means that $n_r$ must have an even number of descendant nodes, and thus per Lemma \ref{lem:nodeparitypart} it must be that $s_r.p=0$. From a node-tree of mixed syndrome-nodes and linking-nodes, recall from Lemma \ref{lem:nodeparity} that linking-nodes always copies the parity of the nearest descendant syndrome-node, thus $n_r.p=0$. Choosing which node $n_i \in \nset$ is the root node $n_r$ for this reason determines the parities in the node-tree (see Figure \ref{fig:parities}). 
 \end{proof}
 
-The node-tree has undirected edges, such that it is not set in stone which node is the root. When to clusters merge into one, their respective node trees need to be merged too. As the edges in the node-tree reflect one or many physical edges on the lattice, the merge of node-trees can not be applied by simply pointing one root to another, such as in the Union-Find data structure. In stead, the node-trees $\nset_i, \nset_j$ are joined on the nodes $n_i \in \nset_i, n_j\in \nset_j$ containing the boundary vertices that support the newly grown edge that links the clusters. This can be done by setting one of the nodes $n_i$ or $n_j$ as the \emph{sub-root} if its tree and connecting it with the other. This motivates the use of undirected edges. New roots can be chosen that allows for the union of node-trees. More on the union of node-trees is described in Section \ref{sec:jointnodesets}. 
+The node-tree has undirected edges, such that it is not set in stone which node is the root. When to clusters merge into one, their respective node trees need to be merged too. As the edges in the node-tree reflect one or many physical edges on the lattice, the merge of node-trees can not be applied by simply pointing one root to another, such as in the Union-Find data structure. In stead, the node-trees $\nset_i, \nset_j$ are joined on the nodes $n_i \in \nset_i, n_j\in \nset_j$ containing the boundary vertices that support the newly grown edge that links the clusters. This can be done by setting one of the nodes $n_i$ or $n_j$ as the \emph{subroot} if its tree and connecting it with the other. This motivates the use of undirected edges. New roots can be chosen that allows for the union of node-trees. More on the union of node-trees is described in Section \ref{sec:nodejoin}. 
 
 \begin{lemma}\label{lem:nodecalc_ancestrypath}
   The calculated node delays $n_i.d$ are only valid while node parities have been calculated with the same root node $n_r$. The absolute delay $n_i.D$ is independent on the selected root node. 
@@ -568,9 +374,9 @@ The node-tree has undirected edges, such that it is not set in stone which node 
 
 \subsection{Equilibrium optimization}\label{sec:bbstate}
 
-In this section, we alter the delay equation \eqref{eq:2ddelay} with an extra parameter $f_{eq}$ to optimize a trade-off in this algorithm. This trade-off occurs in about $50\%$ of the node-tree unions in an event that we dub \emph{parity-inversion}. Recall from Lemma \ref{lem:calconce} that after an union, the potential matching weight within the node-tree changes, and the parities and delays may have to be recalculated. Note that we will describe in Section \ref{sec:growingcluster} necessary steps to actually grow a cluster with the node-tree data structure, and in Section \ref{sec:jointnodesets} we describe how to actually merge node-trees. In this section, the focus is on what happens to the potential matching weight and the subsequent required recalculation of the node parities and delays. 
+In this section, we alter the delay equation \eqref{eq:2ddelay} with an extra parameter $f_{eq}$ to optimize a trade-off in this algorithm. This trade-off occurs in about $50\%$ of the node-tree unions in an event that we dub \emph{parity-inversion}. Recall from Lemma \ref{lem:calconce} that after an union, the potential matching weight within the node-tree changes, and the parities and delays may have to be recalculated. Note that we will describe in Section \ref{sec:growingcluster} necessary steps to actually grow a cluster with the node-tree data structure, and in Section \ref{sec:nodejoin} we describe how to actually merge node-trees. In this section, the focus is on what happens to the potential matching weight and the subsequent required recalculation of the node parities and delays. 
 
-% Consider the case of an union between an even-parity node-tree $\nset^e$ on the node $n_e\in\nset^e$ and an odd-parity node-tree $\nset^o$ on node $n_o\in \nset^o$. The merged tree is an odd-parity with tree $\nset^o_m$ with the sub-trees $'\nset^e$ and $'\nset^o$. The trees are merged by making $n_o$ the new sub-root of $'\nset^O$ and connecting $n_o$ with $n_e$. As an 
+% Consider the case of an union between an even-parity node-tree $\nset^e$ on the node $n_e\in\nset^e$ and an odd-parity node-tree $\nset^o$ on node $n_o\in \nset^o$. The merged tree is an odd-parity with tree $\nset^o_m$ with the subtrees $'\nset^e$ and $'\nset^o$. The trees are merged by making $n_o$ the new subroot of $'\nset^O$ and connecting $n_o$ with $n_e$. As an 
 % If some odd number of nodes $\nset^o$ is attached to $n_e$ of $\nset^e$ during an union of the two node-trees, node parities for nodes in subset $'\nset^e= \{n_i \in \nset^e | n_i \mbox{ ancestor of } n^e\}$ are flipped, where odd nodes become even and even become odd, which is called \emph{parity inversion}. Per lemma \ref{lem:anynoderoot} and \ref{lem:nodecalc_ancestrypath}, the delays in $'\nset^e$ are now undefined and need to be recalculated. Before the union, the cluster of $'\nset^e$ is grown according to Balanced-Bloom, where the odd nodes are delayed and consequently the even nodes will have some node sizes larger than the odd node sizes $n^e_{even}.s > n^e_{odd}.s$.
 % After the union, the parities for nodes in $'\nset^e$ flip, and the pre-union even nodes are now odd and have some positive delay. As $n^e_{even}.s > n^e_{odd}.s$, the absolute delays (equation \eqref{eq:ad}) of these nodes are larger than the absolute delays of the pre-union odd nodes per equation \eqref{eq:2ddelay}. Subsequent parity inversions further increases the absolute delays in the post-union odd nodes.
 When clusters grow in size, their nodes are delayed such that the equilibrium in the potential matching weight can be reached. Because of this, the prioritized nodes have larger radii than the delayed nodes. As clusters merge, their node-trees are also joined on the nodes that contain the vertices supporting the connecting edge. Due to the merges, the parities of nodes in parts of the joined node-tree may flip, which we dub parity inversions. This means that the previously prioritized nodes become the nodes to be delayed, and the previously delayed nodes are to be prioritized. As these nodes have already grown in different radii, the parity inversion causes that after the flip in priority, it takes twice as many iterations to reach the equilibrium in potential matching weight. As more and more unions occur, the number of parity inversions increases and so does the number of iterations needed to reach equilibrium. 
@@ -620,125 +426,25 @@ The optimal value of $f_{eq}$ is dependent on the number of parity inversions, a
 
 With equation \eqref{eq:nodeparity} and \eqref{eq:delayequation}, we now finally have the tools to formulate the algorithms to calculate the node parities and delays. For a node-tree with root $n_r$, we can calculate the parities by calling the \emph{head recursive} function \codefunc{Calcparity} on $n_r$ in algorithm \ref{algo:calcparity}, where we do a reverse DFS of the node-tree. The node delays are calculated by calling the \emph{tail recursive} function \codefunc{Calcdelay} in algorithm \ref{algo:calcdelay}, where we perform a second DFS of the node-tree. These Parity and Delay Calculation will from this point be referred to as the PDC. A schematic of the directions of these calculations in an example node-tree is included in Figure \ref{fig:2dfs}.
 
-\begin{algorithm}[htbp]
-  \SetKwFunction{cp}{Calcparity}
-  \SetKwFunction{summation}{Sum}
-  \KwData{Node $n$}
-  \KwResult{Calculated parities for $n$ and all its descendent nodes}
-  \BlankLine
-  parity $=$ \summation{$[1 - $ \cp{$n_\gamma$} $\forall$ children $n_\gamma$ of $n]$} $\bmod 2$\;
-  \uIf{$n \equiv s$}{
-      $n.p =$ parity}
-  \uElseIf{$n \equiv l$}{
-      $n.p= 1-$ parity}
-  \KwRet{$n.p$}
-  \caption{\codefunc{Calcparity}}\label{algo:calcparity}
-\end{algorithm}
-
-
-\begin{algorithm}[htbp]
-  \SetKwFunction{cdelay}{Calcdelay}
-  \KwData{Node $n$, cluster $c$}
-  \KwResult{Calculated delays for $n$ and all its descendent nodes}
-
-  \BlankLine
-  \If{$n$ has a parent}{
-    calculate $n.d$ with equation \eqref{eq:delayequation} using $n$ and $n.parent$\;
-    \If{$n.d < c.d$}{
-      $c.d=n.d$
-      }
-    }
-  \For{children $n_\gamma$ of $n$}{
-    \cdelay{$n_\gamma, c$}
-  }
-  \caption{\codefunc{Calcdelay}}\label{algo:calcdelay}
-  \end{algorithm}
-
-
-\begin{figure}
-  \centering
-  \begin{tikzpicture}[x=1.5cm,y=1.5cm]
-    \node[node1,even] (a) at (1, 3) {$n_r$};
-    \node[node1,odd]  (b) at (1, 2) {};
-    \node[node1,odd]  (c) at (1, 1) {};
-    \node[node1,even] (d) at (1, 0) {};
-    \node[node1,even] (e) at (0, 1) {};
-    \node[node1,even] (f) at (0, 0) {};
-    \node[node1,odd]  (g) at (2, 2) {};
-    \node[node1,even] (h) at (2, 1) {};
-    \node[node1,even] (i) at (2, 0) {};
-    \draw[l1] (a) -- (b) -- (c) -- (d);
-    \draw[l1] (b) -- (e);
-    \draw[l1] (c) -- (f);
-    \draw[l1] (c) -- (i);
-    \draw[l1] (a) -- (g) -- (h);
-
-    \draw[l1, ->, dashed, color=mblue] (0, 1.3) -- +(45:0.85) arc (-45:0:.5) -- +(90:.6);
-    \draw[l1, ->, dashed, color=mblue] (0, 0.3) -- +(45:0.85) arc (-45:0:.5) -- +(90:.2);
-    \draw[l1, ->, dashed, color=mblue] (0.75,0.2) -- +(90:.3);
-    \draw[l1, ->, dashed, color=mblue] (1.5,0.2) -- +(135:.4);
-    \draw[l1, ->, dashed, color=mblue] (1.75,1.2) -- +(90:0.5) arc (0:45:.5) -- +(135:0.4);
-    \draw[l1, ->, color=mred] (1.4, 3) -- +(-45:1.1) arc (45:0:0.5) -- +(-90:0.7);
-    \draw[l1, ->, color=mred] (1.3, 2.1) -- +(-90:0.9) arc (180:225:.5) -- +(-45:0.7);
-    \draw[l1, ->, color=mred] (0.6, 1.3) -- +(225:.3);
-    \draw[l1, ->, color=mred] (0.6, 0.3) -- +(225:.3);
-    \draw[l1, ->, color=mred] (1.3, 0.3) -- +(-90:.2);
-    \node[text=mblue] at (0,2.2) {Parity};
-    \node[text=mred] at (2.6,2.8) {Delay};
-    \node at (0,3) {$\mathcal{N}$};
-  \end{tikzpicture}
-  \caption{The parity and delay calculation (PDC) performed on a the root node $n_r$, which is equivalent to two depth-first searches on $\mathcal{N}$ to compute node parities (head recursively) and delays (tail recursively).}\label{fig:2dfs}
-\end{figure}
-
+\input{pseudocodes/calcparity.tex}
+\input{pseudocodes/calcdelay.tex}
+\input{tikzfigs/paritydelay.tex}
 
 \section{Growing a cluster}\label{sec:growingcluster}
 With the knowledge of previous section, we now have the equations and algorithms available to describe the steps to grow a cluster in the context of Union-Find Balanced-Bloom. Previously, in the Union-Find decoder, a cluster is grown with $\codefunc{Grow}(c_j, \m{L}_m)$ (Algorithm \ref{algo:ufgrow}). Here, the boundary edges connected to the vertices in $c_j.\delta\vset$ are grown by increasing the value of $e.support$. If $e.support = 2$, $e$ is added to the merging list $\m{L}_m$ to merge the vertex-trees at some later moment. 
 
-In the node-tree data structure, the growth of a cluster is equivalent to a depth-first search of the node-tree, which will now be performed by $\codefunc{Ngrow}$ (Algorithm \ref{algo:bbgrow}). The boundary list for each cluster is not stored at the cluster $c_j$, but separately stored at each of the nodes $n_i$ in $\m{N}_j$ by $n_i.\delta\vset$. We travel to all $n_i \in \m{N}_j$ from the root $n_r$ and apply $\codefunc{Bloom}(n_i)$ (Algorithm \ref{algo:bloom}), which grows the boundaries for each node individually. Again, if an edge on the boundary are grown to $e.support = 2$, $e$ is added to the merging list $\m{L}_m$ to merge the vertex-trees and node-trees at some later moment. The merging of node-trees is considered in Section \ref{sec:jointnodesets}. 
+In the node-tree data structure, the growth of a cluster is equivalent to a depth-first search of the node-tree, which will now be performed by $\codefunc{Ngrow}$ (Algorithm \ref{algo:bbgrow}). The boundary list for each cluster is not stored at the cluster $c_j$, but separately stored at each of the nodes $n_i$ in $\m{N}_j$ by $n_i.\delta\vset$. We travel to all $n_i \in \m{N}_j$ from the root $n_r$ and apply $\codefunc{Bloom}(n_i)$ (Algorithm \ref{algo:bloom}), which grows the boundaries for each node individually. Again, if an edge on the boundary are grown to $e.support = 2$, $e$ is added to the merging list $\m{L}_m$ to merge the vertex-trees and node-trees at some later moment. The merging of node-trees is considered in Section \ref{sec:nodejoin}. 
 
 Recall from Theorem \ref{def:balancedbloom} that with Balanced-Bloom, the bloom of node with the lowest potential matching weight in the cluster are prioritized, whereas the bloom of of other nodes are delayed. Also, from Lemma \ref{lem:calconce}, in the absence of unions the delays are not recalculated after every growth iteration, but stored in memory at the nodes. Definition \ref{def:absolutedelay} introduced the absolute delay $n_i.D$, where the actual number of iterations to delay is updated via the minimal delay value $c_j.d$ in the cluster and the number of iterations already waited $n.w$. Thus when performing the depth-first search in \codefunc{Ngrow}, a node should be conditionally bloomed if only $n_i.D = 0$ is satisfied. If not, node $n_i$ is skipped, the wait $n.w$ is increased and search continues recursively on its children nodes. 
 
-\begin{algorithm}[htbp]
-  \BlankLine
-  \KwData{Node $n$, merging list $\m{L}_m$}
-  \KwResult{Node with traced boundary edges and increased radius}
-  \BlankLine
-
-  \For{$v$ in $n_i.\delta\vset$}{
-    \For{edges in $\{(u,v) | (u,v).support\neq 2$\}}{
-      Add 1 to $(u,v).support$ \;
-      If $(u,v).support=2$, add $(u,v)$ to $\m{L}_m$ \;
-    }
-  }
-  Add 1 to $n.r$
-  \BlankLine
-  \caption{\codefunc{Bloom}}\label{algo:bloom}
-\end{algorithm}
-
-\begin{algorithm}[htbp]
-  \SetKwFunction{grow}{Ngrow}
-
-  \KwData{Node $n$, cluster $c_j$, merging list $\m{L}_m$}
-  \KwResult{A node that has either grown or waited one iteration.}
-
-  \BlankLine
-
-  \eIf{$n.d-n.w-c_j.d=0$}{
-    \codefunc{Bloom}$(n, \m{L}_m)$ (Alg. \ref{algo:bloom})\; 
-  }{
-    Add 1 to $n.w$\;
-  }
-  \For{child node $n_\gamma$ of $n$}{
-    \grow{$n_\gamma$}
-  }
-  \caption{\codefunc{Ngrow}}\label{algo:bbgrow}
-\end{algorithm}
+\input{pseudocodes/bloom.tex}
+\input{pseudocodes/ngrow.tex}
 
 \section{Joining node-trees}\label{sec:nodejoin}
 Within the vertex-tree $\m{V}$, which utilizes the Union-Find data structure, \emph{path compression} and \emph{union by weight} or \emph{union by rank} are applied to minimize the depth of the tree and therefore minimizing the calls to the \codefunc{Find} function. Similarly, in the node-tree $\m{N}$, we would also like to apply a set of rules to minimize the calls to \codefunc{Calcparity} and \codefunc{Calcdelay}, which we will dub the parity and delay calculation minimization.
 
 \begin{definition}\label{def:partialpdc}
-  A partial parity or partial delay calculation is one associated with a depth-first search that is not initiated from the root node $n_r$, but some descendent node of $n_r$ in the node-tree. 
+  A partial parity or partial delay calculation, which will be often abbreviated to a partial calculation, is one associated with a depth-first search that is not initiated from the root node $n_r$, but some descendent node of $n_r$ in the node-tree. 
 \end{definition}
 
 This minimization is achieved by preserving the node parities and delays in subsets of the merged node-tree after union, and applying a partial calculation of the parities and delays in the remaining subsets if required. The recursiveness of both \codefunc{Calcparity} and \codefunc{Calcdelay} (Algorithms \ref{algo:calcparity} and \ref{algo:calcdelay}) ensures that this is possible. The tail-recursive parity calculation stops at the node where the depth-first search is started, and the head-recursive delay calculation now has a non-arbitrarily node delay. 
@@ -758,34 +464,35 @@ With the addition of the node-tree data structure, during merge of clusters $c_\
   If node-trees merge into an even node-tree $\nset^e$, all node parities and delays within $\nset^e$ become invalid or \emph{undefined}. 
 \end{lemma}
 \begin{proof}
-  Recall from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} that the node parity and delay are only defined for odd-parity clusters. An even-parity cluster does not have a potential matching weight, as the matchings within the cluster are already defined. However, $\nset^e$ merge with another odd-parity cluster with node-tree $\nset^o$ in a larger odd-join. In that case, we might think about "reusing" some of the node parities and delays that were already calculated in $\nset^e$. To reuse prior calculated parities and delays, a depth-first search on $\nset^e$ is needed to find which sections are still valid, and which sections are not. This is especially the case when the clusters in the E-join are the results of joins within the same growth iteration. Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the calculation of parity and delays over the sub-tree $\nset^e$. Hence the node parities and delays in the joined set after an E-join are \emph{undefined}.
+  Recall from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} that the node parity and delay are only defined for odd-parity clusters. An even-parity cluster does not have a potential matching weight, as the matchings within the cluster are already defined. However, $\nset^e$ merge with another odd-parity cluster with node-tree $\nset^o$ in a larger odd-join. In that case, we might think about "reusing" some of the node parities and delays that were already calculated in $\nset^e$. To reuse prior calculated parities and delays, a depth-first search on $\nset^e$ is needed to find which sections are still valid, and which sections are not. This is especially the case when the clusters in the E-join are the results of joins within the same growth iteration. Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the calculation of parity and delays over the subtree $\nset^e$. Hence the node parities and delays in the joined set after an E-join are \emph{undefined}.
 \end{proof}
 
 \begin{lemma}\label{lem:nodecalc_odd}
   Consider an odd-join on nodes $n_j^e \in \nset^e, n_j^o\in \nset^o$, belonging to an even and an odd node-tree, respectively. Parity and delay calculations are minimized during if the node-trees are always joined by setting $n_j^e$ as the child of $n_j^o$. 
 \end{lemma}
 \begin{proof}
-  If $n_j^e$ is made a child of $n_j^o$, $n_j^e$ is the new sub-root of sub-tree $\nset^e$, and an even number of syndrome-nodes are now descendants of $n_j^o$, and parities within $\nset^o$ and its root are unchanged. Recall from Lemma \ref{lem:nodecalc_ancestrypath} that thus the delays in $\nset^o$ are also unchanged. A partial parity and delay calculation can now be initiated from $n_j^e$ and is proportional to $|\nset^e|$ (Figure \ref{fig:joinrules}b). If $n_j^o$ is made a child of $n_j^e$, an odd number of syndrome-nodes are descendants of $n_j^e$ and changes the parities in the ancestors of $n_j^o$ up to the root of the joined tree. The parities and delays now need to be recalculated in the entire tree, which is proportional to $|\nset^e| + |\nset^o|$ (Figure \ref{fig:joinrules}c). 
+  If $n_j^e$ is made a child of $n_j^o$, $n_j^e$ is the new subroot of subtree $\nset^e$, and an even number of syndrome-nodes are now descendants of $n_j^o$, and parities within $\nset^o$ and its root are unchanged. Recall from Lemma \ref{lem:nodecalc_ancestrypath} that thus the delays in $\nset^o$ are also unchanged. A partial parity and delay calculation can now be initiated from $n_j^e$ and is proportional to $|\nset^e|$ (Figure \ref{fig:joinrules}b). If $n_j^o$ is made a child of $n_j^e$, an odd number of syndrome-nodes are descendants of $n_j^e$ and changes the parities in the ancestors of $n_j^o$ up to the root of the joined tree. The parities and delays now need to be recalculated in the entire tree, which is proportional to $|\nset^e| + |\nset^o|$ (Figure \ref{fig:joinrules}c). 
 \end{proof}
 
 \input{tikzfigs/oddevenjoin.tex}
 % \subsection{O-joins}\label{sec:ojoin}
 
-% Consider now an O-join between an even node-tree $\m{N}^e$ and an odd node-tree $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this join is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The join of these two sets produces a new odd node-tree $\m{N}_{new}^o$ with subsets $'\nset^e$ and $'\nset^o$, referring to the original node-trees. We are provided with two choices, A) make $n^e$ child of $n^o$, or B) make $n^o$ child of $n^e$. The ancestry in the parent node-tree stays unchanged, but the ancestry in the child subset is changed by setting the joining node in the child set $n^c$ as the sub-root of the child subset $'\m{N}^c$. This is allowed per lemma \ref{lem:anynoderoot}, but removes any calculated parities or delays per lemma \ref{lem:anynoderoot} and \ref{lem:nodecalc_ancestrypath}.
+% Consider now an O-join between an even node-tree $\m{N}^e$ and an odd node-tree $\m{N}^o$ in nodes $n^e, n^o$ respectively, and assume that this join is due to the growth of odd cluster $\m{N}^o$ onto an "idle" $\m{N}^e$. The join of these two sets produces a new odd node-tree $\m{N}_{new}^o$ with subsets $'\nset^e$ and $'\nset^o$, referring to the original node-trees. We are provided with two choices, A) make $n^e$ child of $n^o$, or B) make $n^o$ child of $n^e$. The ancestry in the parent node-tree stays unchanged, but the ancestry in the child subset is changed by setting the joining node in the child set $n^c$ as the subroot of the child subset $'\m{N}^c$. This is allowed per lemma \ref{lem:anynoderoot}, but removes any calculated parities or delays per lemma \ref{lem:anynoderoot} and \ref{lem:nodecalc_ancestrypath}.
 
-% For option A, an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. The parities and delays in $'\m{N}^o$ stay valid and can be reused. From $n^e$, which is now the sub-root of  $'\m{N}^e$, a partial PDC is applied, where the relative delay of $n^e$ is calculated with respect to its parent $n^o$ (Figure \ref{fig:joinrules}A). This is efficient as the parities and delays in $'\m{N}^e$ are already undefined per lemma \ref{lem:nodecalc_even}. For option B, we need to redo the PDC in both $'\m{N}^o$ and $'\m{N}^e$ (Figure \ref{fig:joinrules}B), as $'\m{N}^o$ has a changed ancestry and  $'\m{N}^e$ is even. The PDC is thus minimized if option A is always chosen. \\
+% For option A, an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. The parities and delays in $'\m{N}^o$ stay valid and can be reused. From $n^e$, which is now the subroot of  $'\m{N}^e$, a partial PDC is applied, where the relative delay of $n^e$ is calculated with respect to its parent $n^o$ (Figure \ref{fig:joinrules}A). This is efficient as the parities and delays in $'\m{N}^e$ are already undefined per lemma \ref{lem:nodecalc_even}. For option B, we need to redo the PDC in both $'\m{N}^o$ and $'\m{N}^e$ (Figure \ref{fig:joinrules}B), as $'\m{N}^o$ has a changed ancestry and  $'\m{N}^e$ is even. The PDC is thus minimized if option A is always chosen. \\
 
-% If the subset $'\m{N}^e$ consists of only two odd node sub-subsets $''\m{N}^o_0, ''\m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $''\m{N}^o_0$ is preserved and $n_1$ is the sub-root of $''\m{N}^o_1$. We see that the parities in all ancestors of $n_0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $'\m{N}^{e}$.
+% If the subset $'\m{N}^e$ consists of only two odd node sub-subsets $''\m{N}^o_0, ''\m{N}^o_1$, where $n_0, n_1$ are the joining nodes, the ancestry in $''\m{N}^o_0$ is preserved and $n_1$ is the subroot of $''\m{N}^o_1$. We see that the parities in all ancestors of $n_0$ are flipped. Let's consider the cases and find whether we can minimize the parity and delay calculation in $'\m{N}^{e}$.
 %
-% For case a), an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. This means that the parities in $'\m{N}^o$ do not change per lemma \ref{lem:anynoderoot}, and the delays in $'\m{N}^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $'\m{N}^e$, as the ancestry path has changed, we are certain to traverse $'\m{N}^e$ from the sub-root $n^e$ to calculate the delays in this subset which is in the order of $S_{'\m{N}^e}$.
+% For case a), an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. This means that the parities in $'\m{N}^o$ do not change per lemma \ref{lem:anynoderoot}, and the delays in $'\m{N}^o$ are still valid as per lemma \ref{lem:nodecalc_ancestrypath}. In $'\m{N}^e$, as the ancestry path has changed, we are certain to traverse $'\m{N}^e$ from the subroot $n^e$ to calculate the delays in this subset which is in the order of $S_{'\m{N}^e}$.
 %
-% In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the sub-root $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node parity changes in $'\m{N}^e$ will be dependent on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
+% In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the subroot $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node parity changes in $'\m{N}^e$ will be dependent on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
 %
 % For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify, we always choose case a.
 
-From Lemmas \ref{lem:nodecalc_even} and \ref{lem:nodecalc_odd}, we can define a simple rule that determines how node-trees are joined. 
+From Lemmas \ref{lem:nodecalc_even} and \ref{lem:nodecalc_odd}, we can define a simple rule that determines how node-trees are joined.
+
 \begin{definition}\label{def:joinbyparity}
-  Let the \emph{join by parity} rule govern how to join node-trees in the event of clusters merging. For even-joins between two even or two odd node-trees, the parent and child node-trees can be picked at random. For odd-joins between nodes $n_j^e \in \nset^e, n_j^o \in \nset^o$, always make the even node-tree a child of the even node-tree, where $n_j^e$ is now the sub-root of the sub-tree $\nset^e$.
+  Let the \emph{join by parity} rule govern how to join node-trees in the event of clusters merging. For even-joins between two even or two odd node-trees, the parent and child node-trees can be picked at random. For odd-joins between nodes $n_j^e \in \nset^e, n_j^o \in \nset^o$, always make the even node-tree a child of the even node-tree, where $n_j^e$ is now the subroot of the subtree $\nset^e$.
 \end{definition}
 The \emph{join by parity} rule ensures that the parities and delays in $\nset^o$ are preserved and that only a partial calculation is needed related to the depth-first search from node $n_j^e$. Note the concept of a \emph{partial} calculation is rather redundant. Using these rules for the joins of node-trees, the parity and delay calculations are never calculated on a full node-tree except for the initial round. 
 
@@ -799,495 +506,248 @@ Recall from Definition \ref{def:nodeset} that the node-tree $\nset_j$ of cluster
 \end{definition}
 
 \begin{lemma}\label{lem:delaywhengrown}
-  Redundant partial parity and delay calculations over even sub-trees in intermediate odd-joins are prevented by applying the calculation directly before the growth of the cluster. 
+  Redundant partial parity and delay calculations over even subtrees in intermediate odd-joins are prevented by applying the calculation directly before the growth of the cluster. 
 \end{lemma}
 \begin{proof}
-  Consider the case when partial delay and parity calculations are initiated from a node $n_j^e \in \nset^e \subset \nset$ directly after the join of $\nset^e$ and $\nset^o$ to the joined node-tree $\nset$ while applying the \emph{join by parity} rule of Definition \ref{def:joinbyparity}. If there are many odd-joins (and even-joins) within the same round of growth, that at the end of round all joins to a single cluster with node-tree $\nset$, every odd-join will require the partial calculation over the even sub-tree. There may thus be many even sub-trees where multiple partial calculations are performed within the same round before the final cluster $\nset$ is constructed. All but the final calculation will lead to the correct parities and delays in $\nset$. To circumvent any redundant calculations on the even sub-trees of intermediate odd-joins, the partial calculation is suspended as much as possible, until just before a cluster is grown.
+  Consider the case when partial delay and parity calculations are initiated from a node $n_j^e \in \nset^e \subset \nset$ directly after the join of $\nset^e$ and $\nset^o$ to the joined node-tree $\nset$ while applying the \emph{join by parity} rule of Definition \ref{def:joinbyparity}. If there are many odd-joins (and even-joins) within the same round of growth, that at the end of round all joins to a single cluster with node-tree $\nset$, every odd-join will require the partial calculation over the even subtree. There may thus be many even subtrees where multiple partial calculations are performed within the same round before the final cluster $\nset$ is constructed. All but the final calculation will lead to the correct parities and delays in $\nset$. To circumvent any redundant calculations on the even subtrees of intermediate odd-joins, the partial calculation is suspended as much as possible, until just before a cluster is grown.
 \end{proof}
 
 Consider an example with 5 odd node-trees $\nset_1, ...,  \nset_5$ (Figure \ref{fig:redundantpdc}) that join to a single node-tree, where the partial calculation is applied directly after each join. The join of $\nset_1$ and $\nset_2$ to $\nset_{12}$ is an even-join and requires no partial calculation. The join of $\nset_{12}$ and $\nset_3$ is an odd-join, and we apply partial calculations in $\nset_{12}$. The join of $\nset_{123}$ and $\nset_4$ is an even-join and the join of $\nset_{1234}$ and $\nset_5$ is an odd-join, with partial calculations in $\nset_{1234}$. The earlier computation in $\nset_{12}$ is thus redundant. 
 
 \input{tikzfigs/partialcalculations.tex}
 % \begin{lemma}\label{lem:oddisevenodd}
-%   An odd- node-tree $\nset$ that is the result of some joins must consist of an odd- sub-tree $'\nset^o$ and an even sub-tree $'\nset^e$, where the even sub-tree $'\nset^e$ may consist of smaller sub-subsets $''\nset$.
+%   An odd- node-tree $\nset$ that is the result of some joins must consist of an odd- subtree $'\nset^o$ and an even subtree $'\nset^e$, where the even subtree $'\nset^e$ may consist of smaller sub-subsets $''\nset$.
 % \end{lemma}
 % \begin{proof}
 %   Just like some odd integer $z$ that is the sum of integers $x$ and $y$. If $x$ is odd, then $y$ must be even. This sum can also be of the odd integer $x$ and a set of even integers $\{y_1, y_1, ...\}$. 
 % \end{proof}
 
-The only task now is to store the sub-root of the even sub-tree $n_j^e \in '\nset^e$ of the of the final odd-join, as this sub-root is the starting point of the depth-first searches of the partial parity and delay calculation. For every odd-join between odd node-tree $'\m{N}^o$ and even node-tree $'\m{N}^e$ on nodes $'n_j^o, 'n_j^e$ to a cluster $c_j$, store the sub-root $'n^e_j$ at the cluster as the \emph{undefined node sub-root} $c_j.u$ (Algorithm \ref{algo:join}). If $c_j$ is selected for growth and it has an undefined node sub-root $c_j.n_u$, we apply $\codefunc{Calcparity}(c_j.n_u)$ and $\codefunc{Calcdelay}(c_j.n_u)$ (Algorithms \ref{algo:calcparity}, \ref{algo:calcdelay}) to calculate parities and delays in undefined sub-trees. We then call $\codefunc{Bloom}(c_j.n_r)$ (Algorithm \ref{algo:bloom}) to grow the cluster. 
+The only task now is to store the subroot of the even subtree $n_j^e \in '\nset^e$ of the of the final odd-join, as this subroot is the starting point of the depth-first searches of the partial parity and delay calculation. For every odd-join between odd node-tree $'\m{N}^o$ and even node-tree $'\m{N}^e$ on nodes $'n_j^o, 'n_j^e$ to a cluster $c_j$, store the subroot $'n^e_j$ at the cluster as the \emph{undefined node subroot} $c_j.u$ (Algorithm \ref{algo:join}). If $c_j$ is selected for growth and it has an undefined node subroot $c_j.n_u$, we apply $\codefunc{Calcparity}(c_j.n_u)$ and $\codefunc{Calcdelay}(c_j.n_u)$ (Algorithms \ref{algo:calcparity}, \ref{algo:calcdelay}) to calculate parities and delays in undefined subtrees. We then call $\codefunc{Bloom}(c_j.n_r)$ (Algorithm \ref{algo:bloom}) to grow the cluster. 
 
-% This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any IO-join, we don't know yet whether another O-join will occur, thus each IO-join to cluster $''\nset^o$ is treated as a FO-join. For a IO-join, we thus also store the undefined sub-root $u_1$ at the root $r_1=''n_r^o$. If $''\nset^o$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and lastly the "real final" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined sub-root $u_2='n_r^e$ at the new root of $r_2='n_r^o$. Due to Lemma \ref{lem:nodecalc_odd}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions of the set.
+% This data structure dynamically saves the root of the undefined part of a cluster to the root node. For any IO-join, we don't know yet whether another O-join will occur, thus each IO-join to cluster $''\nset^o$ is treated as a FO-join. For a IO-join, we thus also store the undefined subroot $u_1$ at the root $r_1=''n_r_{-1}$. If $''\nset^o$ joins with other clusters in subsequent E-join to cluster $'\nset^e$ and lastly the "real final" FO-join with $'\nset^o$ to $\nset^o$, we again store the undefined subroot $u_2='n_r^e$ at the new root of $r_2='n_r_{-1}$. Due to Lemma \ref{lem:nodecalc_odd}, it is certain that $u_2$ is an ancestor of $u_1$, and the PDC will traverse over all undefined regions of the set.
 
 % \begin{theorem}\label{the:delayonce}
-%   Undefined region of an odd cluster $\nset^o$ is defined as the sub-root $u$ for which all children nodes including $u$ have undefined parities and delays, and is stored at root node $n^o_r$. PDC is performed for $n^o_r.u$ and its children before cluster $\nset^o$ is grown.
+%   Undefined region of an odd cluster $\nset^o$ is defined as the subroot $u$ for which all children nodes including $u$ have undefined parities and delays, and is stored at root node $n^o_r$. PDC is performed for $n^o_r.u$ and its children before cluster $\nset^o$ is grown.
 % \end{theorem}
-\begin{algorithm}[htbp]
-  \KwData{Merging node $n_i, n_j$ of clusters $c_i, c_j$, merged cluster $c_{ij}$}
-  \KwResult{A jointed node tree}
-
-  \BlankLine
-
-  Merge node sets by initiating edge $(n_i, n_j)$\;
-  \uIf{$c_i$ even, $c_j$ odd}{
-    set $c_{ij}.n_r = c_j.n_r$\;
-    set $c_{ij}.n_u = c_i$
-  }
-  \uElseIf{$c_i$ odd, $c_j$ even}{
-    set $c_{ij}.n_r = c_i.n_r$\;
-    set $c_{ij}.n_u = c_j$
-  }
-  \Else(even-join){
-    set $c_{ij}.n_r = c_i.n_r$ or $c_{ij}.n_r = c_j.n_r$\;
-  }
-  \caption{\codefunc{Join}}\label{algo:join}
-\end{algorithm}
+\input{pseudocodes/join.tex}
 
 \section{Pseudo-code}
-Now we have the full description of the \emph{Balanced-Bloom} alteration of the UF decoder, which we dub the \emph{Union-Find Balanced-Bloom} (UFBB) decoder. We present its pseudo-code in algorithm \ref{algo:ufbb}. Note that the structure of the code is mostly identical to the BCS UF decoder, where we sort the clusters growth in buckets, and apply the merge, in this case the combination of \codefunc{Union} and \codefunc{Join}, after each bucket iteration.
-\begin{algorithm}[htbp]
-  \BlankLine
-  \KwData{A graph $G=(\m{V},\m{E})$, an erasure $\m{R} \subseteq \m{E}$ and syndrome $\sigma \subseteq \m{V}$}
-  \KwResult{Correction set $\m{C}$}
-  \BlankLine
-  \tcp{Syndrome validation}
-  Initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$, node-trees $\nset_i$ and boundaries at the nodes\;
-  Initialize $\m{L}_b$\tcp*{Ensures weighted growth}
-  \codefunc{Place} odd-parity clusters in $\m{L}_b$ (Alg. \ref{algo:place})\;
-  \For{bucket $b_k$ in $\m{L}_b$}{
-    Initialize $\m{L}_m=\emptyset, \m{L}_p=\emptyset$\;
-    \For{$c_i$ in $b_k$}{
-      \If{$c_i.bucket$ is $k$}{
+Now we have the full description of the alteration of the Union-Find decoder, which we dub the \emph{Union-Find Balanced-Bloom} decoder. Recall from Theorem \ref{the:nodepmw} that the potential matching weight is only defined if a dynamic forest of clusters is maintained, and Recall from Section \ref{sec:ufperformance} that weighted growth improves the code threshold of the Union-Find Decoder. Thus the modification will be applied to the Dynamic-forest Bucket Union-Find decoder \ref{algo:dbuf}. 
 
-        \If{$c_i.r_u$ exists\tcp*{There is a undefined node sub-root}}{
-          \codefunc{Calcparity}$(c_i.n_u)$ (Alg. \ref{algo:calcparity})\;
-          \codefunc{Calcdelay}$(c_i.n_u, c_i)$ (Alg. \ref{algo:calcdelay})\;
-        }
-        \codefunc{Ngrow}$(c_i.n_r, c_i, \m{L}_m)$ (Alg. \ref{algo:bbgrow}) \tcp*{Recursively applied descendants}
-        add $c_i$ to $\m{L}_p$\;
-      }
-    }
-    \For{$(u,v)$ in $\m{L}_m$}{
-      get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Alg. \ref{algo:find})\;
-      \eIf{$r_u \neq r_v$}{
-        apply $\codefunc{Union}(r_u,r_v)$ (Alg. \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+In the Union-Find Balanced-Bloom decoder of Algorithm \ref{algo:ufbb}, partial parity and delay calculations are applied if a cluster $c_i$ has an undefined node subroot $c_i.n_u$, and \codefunc{Grow} (Algorithm \ref{algo:ufgrow}) is replaced with \codefunc{Ngrow} (Algorithm \ref{algo:bbgrow}). Futhermore, when iterating over the edges of the merging list $\m{L}_m$, if the vertex-tree roots of the supporting vertices do not belong to the same cluster, it either means that a new vertex is added to the cluster, or that two clusters are merged. In the first case, the new vertex is added to the node, whereas in the second case, two node-trees are joined. To be able to differentiate between these cases, we need to additionally store the node $n$ containing the vertex $v\in v.\vset$ at the vertex as $v.n$. With this data structure, two node-trees have to be joined on $v.n$ and $u.n$ if they both exist. Otherwise, the node is to be saved to the newly added vertex. 
 
-        \eIf{$u.n$ exists and $v.n$ exists}{
-          get clusters $c_u, c_v$ and merged cluster $c_{uv}$\;
-          \codefunc{Join}$(u.n, v.n, c_u, c_v, c_{uv})$ (Alg. \ref{algo:join})\tcp*{Merge node-trees}
-        }{
-          save node $n$ to new vertex\tcp*{Save node to new vertex}
-        }
-      }{
-        Subtract 1 from $(u,v).support$\tcp*{Maintains dynamic tree}
-      }
-    }
-    \For{cluster $c_i$ in $\m{L}_p$}{
-      $\codefunc{Place}(c_i, \m{L}_b)$ (Alg. \ref{algo:place})\;
-    }
-  }
-  \KwRet{Validated erasure forest $\bar{\m{F}}$}
-  \BlankLine
-  \tcp{Peeling decoder}
-  Run Peeling decoder (Alg. \ref{algo:peel} or \ref{algo:peelbound}) with forests $\bar{\m{F}}$
-  \BlankLine
-  \caption{Union-Find Balanced-Bloom decoder}\label{algo:ufbb}
-\end{algorithm}
-
-
-
-% \begin{algorithm}[htbp]
-%   \SetKwData{bucket}{bucket}\SetKwData{buckets}{buckets}
-%   \SetKwData{edge}{edge}\SetKwData{support}{support}
-%   \SetKwData{node}{node}
-%   \SetKwData{cluster}{cluster}
-%   \SetKwData{child}{child}
-%   \SetKwData{delay}{d}\SetKwData{waited}{w}
-%   \SetKwFunction{calcdelay}{Calcdelay}
-%   \SetKwFunction{Calcparity}{Calcparity}
-%   \SetKwFunction{place}{Place}
-%   \SetKwFunction{bloom}{Bloom}
-%   \SetKwFunction{join}{Join}
-%   \SetKwFunction{union}{Union}
-
-%   \KwData{\buckets}
-%   \KwResult{Set of even clusters grown according to Balanced-Bloom}
-
-%   \BlankLine
-
-%   \For{\bucket in \buckets}{
-
-%     \For{\cluster in \bucket}{
-%       check if \cluster belongs is current \bucket \;
-%       \For{\node in \cluster.$\m{C}$}{
-%         \Calcparity{\node}\;
-%         \calcdelay{\node, \cluster}
-%       }
-%       \eIf{\node.\waited $=$ \node.\delay $-$ \cluster.\delay}{
-%         \bloom{\node}, add all edges \edge.\support $= 2$ to $\m{F}$
-%       }{
-%         \node.\waited $+=1$
-%       }
-%       \For{\child of \node}{
-%         repeat lines 7-12 on \child
-%       }
-%     }
-%     \For{\edge in $\m{F}$}{
-%       \union{$v_1, v_2$} for \edge $= (v_1, v_2)$ \;
-%       \join{$n_1, n_2$} for $v_1, v_2$ seeded in nodes $n_1, n_2$
-%     }
-%     \place{\cluster} $\forall$ odd clusters
-%   }
-%   \caption{Union-Find Balanced-Bloom decoder}\label{algo:ufbb}
-% \end{algorithm}
-
+\input{pseudocodes/ufbb.tex}
 
 \section{Complexity of Balanced-Bloom}\label{sec:ufbbcomplexity}
 
-The contribution to the time complexity of the UF-EG decoder compared to the UF decoder can be divided into two parts. First is the contribution by \codefunc{Calcparity} and \codefunc{Calcdelay}, the parity and delay calculations (PDC), which is called \emph{PDC complexity}. The second contribution will be caused by \codefunc{Grow} of algorithm \ref{algo:bbgrow}, as now we have to additionally traverse the node-tree tree's of each cluster to access its boundary edges and grow them with \codefunc{Bloom} as compared to a single boundary list per cluster. We call this second contribution the \emph{bloom complexity}.
+In this section, we will find the time complexity of the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) through using an analytic approach. As the Union-Find Balanced-Bloom decoder is modification of the Dynamic-forest Bucket Union-Find decoder (Algorithm \ref{algo:dbuf}), which is known to have a time complexity of $\m{O}(n\alpha(n))$ (Section \ref{sec:ufcomplexity}), we will only consider the added complexity that is made by the modification. The additional contribution to the complexity to the Dynamic-forest Bucket Union-Find decoder can be divided into two parts. First is the contribution by the depth-first searches of \codefunc{Calcparity} and \codefunc{Calcdelay}, the parity and delay calculations, which we dub the \emph{PDC complexity}, treated in Section \ref{sec:pdfcomplexity}. The second contribution will be caused the replacement of \codefunc{Grow} with \codefunc{Ngrow}, where now an additional depth-first search of the node-tree of every cluster needs to be performed to access its boundary edges stored at the nodes and grow them with \codefunc{Bloom}. We call this second contribution the \emph{bloom complexity}, which is detailed in Section \ref{sec:bloomcomplexity}.
 
-\subsection{PDC complexity}
-As per lemma \ref{lem:nodecalc_ancestrypath} and \ref{lem:nodecalc_even}, the total cost of the PDC is increased when the ancestries within subtrees change due to join operations, and node parities and delays have to be recalculated by traversal of the subtree. Per Lemmas \ref{lem:nodecalc_odd}, these calculations can be limited to the even subtrees in FO-joins. The size of the even subtrees in FO-joins, multiplied by the number of join operations thus estimates the count of these calculations. We will take a top-down approach to find these estimates, where we retrace the ancestor node-trees in their join operations in what we call the \emph{fragmentation} of $\nset$.
+\subsection{PDC complexity}\label{sec:pdfcomplexity}
+Recall from Lemmas \ref{lem:nodecalc_even} and \ref{lem:nodecalc_odd} that the node parities and delays within become undefined in the entire node-tree after an even-join, and that partial parity and delay calculations are to be performed in the even subtree after an odd-join. Lemma \ref{lem:delaywhengrown} proves that these calculations can be limited to the even subtrees in \emph{final odd-joins}. The size of the even subtrees in these final odd-joins, multiplied by the number of final odd-join operations thus estimates the cost of the parity and delay calculations. 
+%We will take a top-down approach to find these estimates, where we retrace the ancestor node-trees in their join operations in what we call the \emph{fragmentation} of $\nset$.
+\begin{definition}\label{def:npdc}
+  Let $N_{PDC}$ of Equation \eqref{eq:npdc} be the total number of nodes travelled during depth-first searches of the parity and delay calculations.
+\end{definition}
 
-\subsubsection{Fragmentation of a node-tree}
+For every odd node-tree $\nset^o$, it may be the result by many joins of smaller \emph{ancestral} node-trees in some previous growth iteration. Before $\nset^o$ is grown, a partial calculation is performed on the even subtree $'\nset^e$ of the final odd-join of its ancestral node-trees. This calculation is related to two depth-first searches of the subtree from undefined node subroot $r_u$. The cost of the calculation is thus proportional to $|'\nset^e|$, and counts towards $N_{PDC}$. Subtree $'\nset^e$ may itself be the result of many intermediate odd-joins and even-joins in some previous growth iteration. But as these joins do not add towards $N_{PDC}$, it is not crucial to know which joins have occurred. What matters to the $N_{PDC}$ count is to know the entire set of odd subsets $''\nset^o$ that constructs $'\nset^e$, as each of $''\nset^o$ is subjected to a partial calculation from their undefined node subroots or in their even subtrees when they are grown.
 
-\begin{figure}
-  \centering
-  \begin{tikzpicture}[node distance=1cm, on grid]
-
-    \node (a) at (0,0) {};
-    \node (b) [right = 4cm of a] {};
-    \node (c) [right = 5cm of b] {};
-
-    \node (b1l) [below left = 1cm and 2cm of a] {};
-    \node (b1r) [above right = 3.5cm and 2cm of b] {};
-    \path[fill=black!10!white, rounded corners=0.5cm] (b1l) rectangle (b1r);
-    \node (b1t) at ($(a)!0.5!(b)$) {}; \node [above=3cm of b1t] {generation $k$};
-    \node (b2l) [below left = 1cm and 2cm of c] {};
-    \node (b2r) [above right = 3.5cm and 2cm of c] {};
-    \path[fill=black!10!white, rounded corners=0.5cm] (b2l) rectangle (b2r);
-    \node [above=3cm of c] {generation $k-1$};
-
-    \foreach \i in {0,1,2}{
-        \node (a\i) [above = \i cm of a] {\footnotesize $\pre{k}\nset^o_\i$};
-        \draw[densely dashed, thick, double] (a\i) circle[radius=.4cm];
-    }
-
-    \foreach \i in {0,1,2}{
-        \node (b\i) [above = \i cm of b] {};
-    }
-    \node at (b2) {\footnotesize $\pre{k}\nset^o_0$};
-    \node at ($(b0)!0.5!(b1)$) {\footnotesize $\pre{k}\nset^e$};
-    \draw[densely dashed, thick, double] (b2) circle[radius=0.4cm];
-    \draw[l1,opacity=0.3,dotted] (b1) circle[radius=.4cm];
-    \draw[l1,opacity=0.3,dotted] (b0) circle[radius=.4cm];
-    \node[right = 0.5cm of b] (bc) {};
-    \draw[thick, double] (bc) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
-
-    \foreach \i in {0,1,2}{
-      \node (c\i) [above =\i cm of c] {};
-      \draw[l1,opacity=0.3,dotted] (c\i) circle[radius=.4cm];
-    }
-    \node[right = 0.5cm of c] (cc1) {}; \node[right = 0.6cm of c] (cc2) {};
-    \draw[l1, opacity=0.3, dotted] (cc1) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
-    \draw[densely dashed, thick, double] (cc2) -- +(0, 2) arc (0:180:0.6) -- +(0, -2) arc (180:360:0.6) -- cycle;
-    \node at (c1) {\footnotesize $\pre{k-1}\nset^o$};
-
-    \node (f1a) [below left = 0.4cm and 0.4cm of c] {}; \node (f1b) [below right = 0.4cm and 0.4cm of b] {};
-    \node (f2a) [below left = 0.4cm and 0.4cm of b] {}; \node (f2b) [below right = 0.4cm and 0.4cm of a] {};
-    \node (fa) [below = 0.6cm of c] {}; \node (fb) [below = 0.6cm of a] {};
-    \draw[l1, ->, dashed] (f1a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f1b);
-    \draw[l1, ->, dashed] (f2a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f2b);
-    \draw[l1, ->, dashed] (fa)  .. controls +(210:1cm) and +(330:1cm) .. (fb);
-
-    \node (ca) at ($(c)!0.5!(a)$) {}; \node [below = 1.5cm of ca] {$f$};
-    \node (cb) at ($(c)!0.5!(b)$) {}; \node [below = 0.4cm of cb] {$f_e$};
-    \node [below = 0.4cm of b1t] {$f_o$};
-
-    \node (u1lt) at ($(a0)!0.5!(a1)$) {}; \node(u1l) [right=1cm of u1lt] {};
-    \node (u1rt) at ($(b0)!0.5!(b1)$) {}; \node(u1r) [left=1cm of u1rt] {};
-    \node (u2lt) at ($(b1)!0.5!(b2)$) {}; \node(u2l) [right=1cm of u2lt] {};
-    \node (u2rt) at ($(c1)!0.5!(c2)$) {}; \node(u2r) [left=1cm of u2rt] {};
-    \draw[l1, ->] (u1l) -- (u1r) node[midway,above] {join};
-    \draw[l1, ->] (u2l) -- (u2r) node[midway,above] {join};
-
-  \end{tikzpicture}
-  \caption{In the fragmentation of cluster $\pre{k+1}\nset^o$ that belongs to ancestral generation $k-1$, we find the clusters $\pre{k}\nset_j$ of which the joins constructed cluster $\pre{k+1}\nset^o$. Any odd cluster can be fragmented into an odd (double dashed) and even (double continuous) cluster.}\label{fig:generation}
-\end{figure}
-
-For each odd node-tree $\nset^o$ that is grown, it may have constructed by many joins of smaller ancestral node-trees in some previous growth iteration. Before $\nset^o$ is grown, PDC is performed on the even sub-tree $'\nset^e$ of the FO-join of its ancestral node-trees, where its size is proportional to the \emph{PDC count} $N_{PDC}$, the number of calculations performed during PDC. sub-tree $'\nset^e$ may itself be the result of many IO-joins and E-joins in some previous growth iteration $i$. But as these joins do not add towards the PDC count, it is not crucial to know which joins have occurred. What matters to the PDC count is to know the entire set of odd subsets $''\nset^o$ that spans $'\nset^e$, as each of $''\nset^o$ is subjected to PDC the first time it is grown.
-
-We introduce a function that is called the \emph{fragmentation} of a node-tree $\pre{k-1}\nset^o$, that splits $\pre{k-1}\nset^o$ into its ancestral node-trees $\{\pre{k}\nset_j\}$, and resembles the inverse of a join operation. Here the prefix $k$ indicates the \emph{ancestral generation}, where a larger $k$ is equivalent to a more distant ancestor set of smaller subsets. As the size of the even node-tree in the FO-join is crucial for the PDC count, we make the distinction of \emph{partial fragmentations} $f_e$ and $f_o$. Partial fragmentation $f_e$ is equivalent to the inverse of the FO-join to $\pre{k-1}\nset^o$, where
-\begin{equation}\label{eq:pfe}
-  f_e(\pre{k-1}\nset^o) = \m{F}^e_k = \{\pre{k}\nset^o_0, \pre{k}\nset^e\}.
-\end{equation}
-Partial fragmentation $f_o$ is equivalent to the combination of all IO-joins and E-joins that spans $\pre{k}\nset^e$, with
-\begin{equation}\label{eq:pfo}
-  f_e(\pre{k}\nset^e) = \m{F}^o_k=\{\pre{k}\nset^{o}_1,...,\pre{k}\nset^o_{N_f}\},
-\end{equation}
-with the \emph{partial fragmentation number} $N_f$ indicating the total number of odd ancestral sets of $\pre{k}\nset^e$. Let us call the 2 fragmentations $f_e, f_o$ of $\pre{k-1}\nset^o$ into a set of node-trees $\m{F}_k = \{\pre{k}\nset^o_0,..., \pre{k}\nset^{o}_{N_f}\}$ a \emph{fragmentation step} $f$. Note that a node-tree $\nset^o$ can only be fragmented if $S_{\nset^o} \geq 3$, in which case the resulting subsets have size 1.
-\begin{equation}\label{eq:fstep}
-  f(\pre{k-1}\nset^o) = \m{F}_k = f_o(f_e(\pre{k-1}\nset^o)) = \{\pre{k}\nset^o_0,...,\pre{k}\nset^{o}_{N_f}\} \hspace{.3cm} | \hspace{.3cm} S_{\pre{k}\nset^o_j} \geq 3
-\end{equation}
-
-
-\begin{lemma}\label{lem:partialfrag}
-  Let the separation of an odd node-tree $\pre{k-1}\nset^o$ into subsets $\m{F}_k^o=\{\pre{k}\nset^o_0, \pre{k}\nset^e\}$ be the partial fragmentation $f_e$ and subsequently $\pre{k}\nset^e$ into  $\m{F}_k^o=\{\pre{k}\nset^{o}_1,...,\pre{k}\nset^o_{N_f}\}$ be $f_o$. The combination of the two is a fragmentation step $f$.
-\end{lemma}
-
-If partial fragmentation function $f_e$ is called on a set of node-trees $f_e(\{\nset^o, \nset^e, ...\})$, it fragments all odd node-trees in the set, and $f_o$ fragments all even node-trees. Accordingly, the entire set of odd node-trees $\m{F}_k$ can undergo the same fragmentation step into odd subsets, resulting in a second set of node subsets $\m{F}_{k+1}$. We can do this some $p$ times on $\pre{0}\nset^o$, where we have set $k-1=0$, until our resulting set of node-trees $\m{F}_{p}$ consists only of smallest possible node subsets $\pre{p}\nset^o$ where $S_{\pre{p}\nset^o}=1$. Let us call the series of all $p$ fragmentation steps on $\pre{0}\nset^o$ the \emph{full fragmentation} $F$, with
-
-\begin{equation}\label{eq:fullfrag}
-    F(\pre{0}\nset^o) = \underbrace{f(f(...f(\pre{0}\nset^o)))}_\text{p times} = \{\pre{p}\nset^{o}_1, \pre{p}\nset^{o}_2,...,\pre{p}\nset^{o}_{N_\sigma} \} \hspace{.3cm} | \hspace{.3cm} S_{\pre{p}\nset^{o}_i} = 1.
+\begin{definition}\label{def:fragmentation}
+  Let the \emph{fragmentation} of a node-tree $\pre{k-1}\nset^o$ split $\pre{k-1}\nset^o$ into a set of its ancestral node-trees $\m{F}_k = \{\pre{k}\nset_1, \pre{k}\nset_2, ...\}$, and resembles the inverse of a join operation. Here the prefix $k$ indicates the \emph{ancestral generation}, where a larger $k$ is equivalent to a more distant ancestor set of smaller subtrees. As the size of the even node-tree in the final odd-join counts towards $N_{PDC}$, we make the distinction between \emph{partial fragmentations} $f_e$ and $f_o$. Partial fragmentation $f_o$ on an odd node-tree is equivalent to the inverse of the final odd-join to node-tree $\pre{k-1}\nset^o$, where
+  \begin{equation}\label{eq:pfe}
+    f_o(\pre{k-1}\nset^o) = \m{F}^o_k = \{\pre{k}\nset^e_{-1}, \pre{k}\nset^o_0 \}.
   \end{equation}
+  Partial fragmentation $f_e$ on an even node-tree is equivalent to the combination of all intermediate odd-joins and even-joins that join to $\pre{k}\nset^e_{-1}$, with
+  \begin{equation}\label{eq:pfo}
+    f_e(\pre{k}\nset^e_{-1}) = \m{F}^e_k=\{\pre{k}\nset^{o}_1,...,\pre{k}\nset^o_{k_f}\} \hspace{1em} | \hspace{1em} k_f = 2i, i \in \mathbb{N}^*,
+  \end{equation}
+  where $\pre{k}\nset^e_{-1}$ is split into $k_f$ odd ancestral subtrees within the same ancestral generation. Let $k_f$ be the \emph{partial fragmentation number}. Let us call the 2 fragmentations $f_o, f_e$ of a odd node-tree$\pre{k-1}\nset^o$ into a set of odd node-trees $\m{F}_k = \{\pre{k}\nset^o_0,..., \pre{k}\nset^{o}_{k_f}\}$ a \emph{fragmentation step} $f$. Note that a fragmentation step is only possible on a node-tree $\nset^o$ with $|{\nset^o}| \geq 3$, in which case the resulting subsets have size 1.
+  \begin{equation}\label{eq:fstep}
+    f(\pre{k-1}\nset^o) = \m{F}_k = f_e(f_o(\pre{k-1}\nset^o)) = \{\pre{k}\nset^o_0,...,\pre{k}\nset^{o}_{k_f}\} \hspace{.3cm} | \hspace{.3cm} \abs{{\pre{k}\nset^o_j}} \geq 3
+  \end{equation}
+\end{definition}
 
-To find the worst case complexity, we want to maximize $N_{PDC}$ during the construction of all the final clusters on the lattice. Let us assume that the final clusters are a single odd cluster $\pre{0}\nset^o$ of size $N/2-1$, which is the largest odd cluster that can be grown. As the PDC is only executed on the even subsets, the sequence of join operations that maximizes the sum of even node-trees sizes $S_{\pre{k}\nset^e}$, in the partial fragmentations $\m{F}^e_{k}$ in all fragmentation steps $k=[1,...,p]$ in $F(\pre{0}\nset^o)$, maximizes $N_{PDC}$.
-\begin{equation}\label{eq:maxdelay}
-  N_{PDC} = \sum_{k=1}^{p} \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \}.
+\input{tikzfigs/fragmentation.tex}
+
+If partial fragmentation function $f_o$ is called on a set of node-trees $f_o(\{\nset^o, \nset^e, ...\})$, it fragments all odd node-trees in the set, and $f_e$ fragments all even node-trees. Along these lines, the entire set of odd node-trees $\m{F}_k$ can undergo the another fragmentation step into odd subsets, resulting in a second set ancestral node-trees $\m{F}_{k+1}$. We can do this some $p$ times on $\pre{0}\nset^o$, where we have set $k-1=0$, until our resulting set of node-trees $\m{F}_{p}$ consists only of smallest possible node subsets $\pre{p}\nset^o$ where $S|\pre{p}\nset^o|=1$. 
+
+\begin{definition}\label{def:fullfrag}
+  Let the series of all $p$ fragmentation steps $f$ on $\pre{0}\nset^o$ be the \emph{full fragmentation} $F$, with
+  \begin{equation}\label{eq:fullfrag}
+    F(\pre{0}\nset^o) = \underbrace{f(f(...f(\pre{0}\nset^o)))}_\text{p times} = \{\pre{p}\nset^{o}_1, \pre{p}\nset^{o}_2,...,\pre{p}\nset^{o}_{N_\sigma} \} \hspace{.3cm} | \hspace{.3cm} \abs{\pre{p}\nset^{o}_i} = 1.
+  \end{equation}
+\end{definition}
+
+To find the worst-case complexity, we maximize $N_{PDC}$ or the cost of the partial calculations during the construction the node-trees on the lattice. Let us assume the worst-case when there are a maximal number of nodes in the node-trees just before the last round of growth. As the lattice is maximally occupied, this is a single odd node-tree $\pre{0}\nset^o$ in which a partial calculation is performed as part of the last round of growth. Node-tree $\pre{0}\nset^o$ has a maximal number of nodes if $|n.\vset=1$ for all nodes $n$ in $\pre{0}\nset^o$. Thus on a lattice of $N=|\vset|$ vertices, the node-tree $\pre{0}\nset^o$ has a maximal 
+\begin{equation}\label{eq:limitnsetsize}
+  \abs{\pre{0}\nset^o} \leq N
+\end{equation}
+nodes. As the partial calculation is only executed on the even subtrees, $N_{PDC}$ is the sum of even node-trees sizes $|\pre{k}\nset^e|$, in all partial fragmentation sets $\m{F}^o_{k}$, during all fragmentation steps $k=[1,...,p]$, in the full fragmentation of $F(\pre{0}\nset^o)$. We add the factor 2 in Equation \eqref{eq:npdc} as both the parity calculation and delay calculations requires its own depth-first search. The sequence of fragmentations that maximizes the even node-tree sizes maximizes $N_{PDC}$.
+% The worst-case delay complexity is computed by maximizing $N_{PDC}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
+\begin{equation}\label{eq:npdc}
+  N_{PDC} = 2\sum_{k=1}^{p}{ \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } }
+  \hspace{1em} \bigg| \hspace{1em} \m{F}_k^o \text{ during } F(\pre{0}\nset^o).
 \end{equation}
 
-\begin{proposition}
-  The worst-case delay complexity is computed by maximizing $N_{PDC}$ of the full fragmentation of $\pre{0}\nset^o$ with $S_{\pre{0}\nset^o} = N/2-1$.
-\end{proposition}
-
-\newcommand\Square[1]{+(-#1,-#1) rectangle +(#1,#1)}
-\begin{figure}
-  \centering
-    \begin{tikzpicture}[scale=0.4, on grid]
-      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
-
-      \begin{scope}[shift={(5,0)}]
-      \foreach \x in {0,...,2}{
-        \foreach \y in {0,...,5}{
-          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-        \foreach \y in {6,...,8}{
-          \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
-
-      \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
-      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
-      \end{scope}
-
-      \begin{scope}[shift={(10,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,3);
-      \draw[l1] (0,3) ++(-.5,-.5) rectangle +(3,3);
-      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
-      \end{scope}
-
-      \begin{scope}[shift={(15,0)}]
-      \foreach \x in {0,...,2}{
-       \foreach \y in {0,1,3,4,6,7}{
-       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-       \foreach \y in {2,5,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
-
-      \foreach \y in {0,3,6}{
-       \draw[l1] (0,\y) ++(-.5,1.5) rectangle + (3,1);
-       \draw[l1, dashed] (0,\y) ++(-.5,-.5) -- +(0,2) (3,\y) ++(-.5,-.5) -- +(0,2);}
-      \draw[l1, dashed] (0,0) ++(-.5,-.5) -- +(3,0);
-      \end{scope}
-
-      \begin{scope}[shift={(20,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \foreach \y in {0,...,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
-      \end{scope}
-
-      \begin{scope}[shift={(25,0)}]
-       \foreach \y in {0,...,8}{\foreach \x in {1,2}{
-       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
-       \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
-
-       \foreach \y in {0,...,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
-       \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,9);
-      \end{scope}
-
-      \begin{scope}[shift={(30,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-       \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
-      }}
-      \end{scope}
-
-      \foreach \x in {3,13,23}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_e$};}
-      \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
-      \node at (1,4) {$\nset^o$};
-    \end{tikzpicture}
-  \caption{The full fragmentation of $\nset^o$ per equation \eqref{eq:fullfrag}. Each odd node-tree in the fragmentation is a rectangle with continuous lines, and even node-tree has dashed lines. Each square is equivalent to a node, where the sum of all dark shaded squares is $N_{PDC}$. Here, $N_{PDC}$ is maximized as $N_{f_e} = N_{f} = 2$ and $R_j = \frac{1}{2}$. }\label{fig:fragcorrect}
-\end{figure}
-
-\subsubsection{Partial fragmentation number}
-For the partial fragmentation $f_o$, an even set $\pre{k}\nset^e$ can be separated in $2n_o$ odd and $n_e$ even subsets, where $n_o\geq 1$ and $n_e \geq 0$. The fragmentation number is thus $N_f = 2n_o + n_e$. But any even sub-tree will be subjected to the same partial fragmentation $f_o$ in the full fragmentation. Thus we can set $n_e=0$. To find $n_o$, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node-tree $\pre{k-1}\nset^e$ is fragmented with $N_{f}=2$, a fragmentation step $f(\pre{k-1}\nset^e)=f_e(f_o(\pre{k-1}\nset^e))$ produces the following partial fragmentation sets:
-\begin{eqnarray*}
-% \nonumber % Remove numbering (before each equation)
-  \m{F}^o_{k-1} &=& \{ \pre{k-1} \nset^{o}_1, \pre{k-1} \nset^{o}_2\},  \\
-  \m{F}^e_{k} &=& \{\pre{k}\nset^{o,o}_{1,0}, \pre{k}\nset^{o,e}_1, \pre{k}\nset^{o,o}_{2,0}, \pre{k}\nset^{o,e}_2 \}.
-\end{eqnarray*}
-For $N_{f} = 4$, the partial fragmentation sets are
-\begin{eqnarray*}
-% \nonumber % Remove numbering (before each equation)
-  \m{F}^e_{k-1} &=& \{ \pre{k-1}\nset^{o}_1, \pre{k-1}\nset^{o}_2,  \pre{k-1}\nset^{o}_3, \pre{k-1}\nset^{o}_4\},  \\
-  \m{F}'^e_{k} &=& \{\pre{k}\nset^{o,o}_{1,0}, \pre{k}\nset^{o,e}_1,  \pre{k}\nset^{o,o}_{2,0}, \pre{k}\nset^{o,e}_2,  \pre{k}\nset^{o,o}_{3,0}, \pre{k}\nset^{o,e}_3, \pre{k}\nset^{o,o}_{4,0}, \pre{k}\nset^{o,e}_4 \}.
-\end{eqnarray*}
-
-If the size of $S_{\nset^e}$ is large enough, and we fragment in the same ratio (see next paragraph), the sum of even node-tree sizes in these two kinds of fragmentations will be the same. However, the number of subsets in each fragmentation step has increased by a factor of 2, which means that the average size of subsets have decreased by 2. Consequently, the node-tree size decreases faster towards the minimum size of 3 nodes as more fragmentation steps are applied. As the sum of even node-tree sizes in each fragmentation step is the same, increasing $n_o$ will decrease the number of fragmentation steps and consequently the PDC count $N_{PDC}$ per equation \eqref{eq:maxdelay}. Hence $N_{PDC}$ is maximized for minimal $n_o = 1$, and we find that $N_f=2$.
-
-\begin{figure}
-  \centering
-    \begin{tikzpicture}[scale=0.4]
-      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
-
-      \begin{scope}[shift={(5,0)}]
-      \foreach \x in {0,...,2}{
-        \foreach \y in {0,...,5}{
-          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-        \foreach \y in {6,...,8}{
-          \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
-
-      \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
-      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
-      \end{scope}
-
-      \begin{scope}[shift={(10,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \foreach \y in {0,...,5}{\draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
-      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
-      \end{scope}
-
-      \begin{scope}[shift={(15,0)}]
-      \foreach \y in {0,...,5}{
-       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
-       \foreach \x in {1,2}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
-      \foreach \x in {0,1,2}{
-       \path[fill=white!50!black] (\x,6) \Square{0.46cm};
-       \path[fill=white!50!black] (\x,7) \Square{0.46cm};
-       \path[fill=white!80!black] (\x,8) \Square{0.46cm};}
-      \foreach \y in {0,...,5}{\draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
-      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
-      \foreach \y in {0,...,6}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
-      \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,8) (0,6) ++(-.5,-.5) -- +(0,2);
-      \end{scope}
-
-      \begin{scope}[shift={(20,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \foreach \y in {6,7,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
-      \foreach \y in {0,...,5}{
-       \draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);
-       \foreach \x in {0,1,2}{\draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);}}
-      \end{scope}
-
-      \begin{scope}[shift={(25,0)}]
-       \foreach \y in {6,7,8}{\foreach \x in {1,2}{
-       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
-       \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
-       \foreach \y in {7,8,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
-       \draw[l1,dashed] (3,6) ++(-.5,-.5) -- +(0,3);
-
-       \foreach \y in {0,...,5}{\foreach \x in {0,1,2}{
-        \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-        \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);}}
-      \end{scope}
-
-      \begin{scope}[shift={(30,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-       \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
-      }}
-      \end{scope}
-
-      \foreach \x in {3,13,23}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_e$};}
-      \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
-      \node at (1,4) {$\nset^o$};
-    \end{tikzpicture}
-  \caption{A full fragmentation of $\nset^o$ where in the first $f_0$, the fragmentation number is increased to $N_{f_o} = 6$. The number of dark shaded squares or $N_{PDC}$ has decreased from the fragmentation with optimal settings (Figure \ref{fig:fragcorrect}). }\label{fig:fragfnumber}
-\end{figure}
-
-\subsubsection{Partial fragmentation ratio}
-To complete the fragmentation formalism, we will need to find the \emph{fragmentation ratios} $R_0, R_1, R_2$ of a fragmentation step. The fragmentation ratios determine the node-tree sizes of the subsets in $\m{F}_{k}$ with respect to the size of $\pre{k-1}\nset^o$, where $R_i S_{\pre{k-1}\nset^o}$ is the size of sub-tree $\pre{k}\nset^o_i$. Note that $R_0$ corresponds to the odd sub-tree from $f_e$, and $R_1, R_2$ to the odd subsets in $f_o$.
-
-\begin{lemma}\label{lem:fragratio}
-  Let the fragmentation ratios $R_0, R_2, R_2$ be the relative set sizes of the odd subsets in the fragmentation set $\m{F}_{k} = \{\pre{k}\nset^o_0, \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2 \}$ with respect to set $\pre{k-1}\nset^o$, where
+\begin{definition}\label{lem:fragratio}
+  Let the partial fragmentation ratio $R$ be the relative sizes of a ancestral node-tree $\nset_i$ and the fragmented node-tree $\nset$.
   \begin{equation}\label{eq:fragratio}
-    R_i = \frac{S_{\pre{k}\nset^o_i}}{S_{\pre{k-1}\nset^o}}
+    R_i = \frac{\abs{\nset_f}}{\abs{\nset}}
+  \end{equation}
+\end{definition}
+In $f_e$ there are a set of partial fragmentation ratios $\{r_{-1}, r_0\}$, and in $f_o$ are a set of partial fragmentation ratios $\{r_1,...,r_{k_f}\}$, where
+\begin{align}
+  r_{-1} +  r_0 &= 1 \\
+ \sum_{i=1}^{k_f}{r_i} &= 1. 
+\end{align}
+
+The problem of finding the sequence of even ancestral node-tree sizes to maximize the value of $N_{PDC}$ now becomes finding the partial fragmentation number $k_f$ and the set of partial fragmentation ratios $\{r_{-1},..., r_{k_f}\}$.  
+
+\begin{lemma}\label{lem:sumevenkf}
+  For the same partial fragmentation ratios $\{r_{-1}, r_0\}$ in $f_o$, the sum of even ancestral node-tree sizes after a fragmentation step is not dependent on $k_f$. 
+\end{lemma}
+\begin{proof}
+  Let us consider an even node-tree $\pre{k}\nset^e$ that is first partially fragmented by $f_e$ to $\m{F}^e_k$. The fragmentation set $\m{F}^e_k$ is then partially fragmented by $f_o$ to $\m{F}_{k+1}^o$. Let us consider the two cases when $k_f=2$ and $k_f=4$. For $k_f=2$, the partial fragmentation $f_e$ splits $\pre{k}\nset^e$ into two odd ancestral node-trees in $\m{F}^e_k$ and four node-trees in $\m{F}_{k+1}^o$.
+  % Let the size of $\pre{k-1}\nset^e$ be $|\pre{k-1}\nset^e| = K$. To find $n_o$, let us consider two cases where $n_o = 1$ or $n_o=2$. If an even node-tree $\pre{k-1}\nset^e$ is fragmented with $k_f=2$, a fragmentation step $f(\pre{k-1}\nset^e)=f_o(f_e(\pre{k-1}\nset^e))$ produces the following partial fragmentation sets:
+  \begin{eqnarray*}
+  % \nonumber % Remove numbering (before each equation)
+    f_e(\pre{k}\nset^e)_{k_f = 2} 
+    =& \m{F}^e_{k}|_{k_f = 2} 
+    =& \{ \pre{k} \nset^{o}_1, \pre{k} \nset^{o}_2\}  \\
+    f_o(\m{F}^e_{k}|_{k_f = 2}) 
+    =& \m{F}^o_{k+1}|_{k_f = 2} 
+    =& \left\{ \{\pre{k+1}\nset^{o}_{0}, \pre{k+1}\nset^{e}\}^o_1 , \{\pre{k+1}\nset^{o}_{0}, \pre{k+1}\nset^{e} \}^o_2 \right\}
+  \end{eqnarray*}
+  The ratios of the sizes of fragmented node-trees in $f_e$ are
+  \begin{equation*}
+    \frac{\abs{\pre{k} \nset^{o}_1}}{\abs{\pre{k}\nset^e}} = r_1, \hspace{2em}
+    \frac{\abs{\pre{k} \nset^{o}_2}}{\abs{\pre{k}\nset^e}} = r_2, 
+  \end{equation*}
+  where $ r_1 + r_2 = 1$. The ratios of the sizes of fragmented node-trees in $f_o$ are
+  \begin{equation*}
+    \frac{\abs{\pre{k+1}\nset^{o}_0|^o_1}}{\abs{\pre{k} \nset^{o}_1}} = 
+    \frac{\abs{\pre{k+1}\nset^{o}_0|^o_2}}{\abs{\pre{k} \nset^{o}_2}} = r_0, \hspace{2em}
+    \frac{\abs{\pre{k+1}\nset^{e}  |^o_1}}{\abs{\pre{k} \nset^{o}_1}} = 
+    \frac{\abs{\pre{k+1}\nset^{e}  |^o_2}}{\abs{\pre{k} \nset^{o}_2}} = r_{-1},  
+  \end{equation*}
+  where $r_0 + r_{-1} = 1$. The sum of the sizes of even node-trees in the odd partial fragmentation set $\m{F}^o_{k+1}$ is thus
+  \begin{equation*}
+    r_1 r_{-1} \abs{\pre{k}\nset^e} + r_2 r_{-1} \abs{\pre{k}\nset^e} = (r_1 + r_2) r_{-1} \abs{\pre{k}\nset^e} = r_{-1} \abs{\pre{k}\nset^e}
+  \end{equation*}
+
+  For $k_f = 4$, the partial fragmentation sets are
+  \begin{eqnarray*}
+  % \nonumber % Remove numbering (before each equation)
+    f_e(\pre{k}\nset^e)_{k_f = 4} 
+    =& \m{F}^e_{k}|_{k_f = 4} 
+    =&\{ \pre{k}\nset^{o}_1, \pre{k}\nset^{o}_2,  \pre{k}\nset^{o}_3, \pre{k}\nset^{o}_4\},  \\
+    f_o(\m{F}^e_{k}|_{k_f = 4}) 
+    =& \m{F}^o_{k+1} |_{k_f = 4} 
+    =& \big\{      \{ \pre{k+1}\nset^{o}_0, \pre{k+1}\nset^e\}^o_1, 
+                    \{ \pre{k+1}\nset^{o}_0, \pre{k+1}\nset^e\}^o_2, \\
+    && \hspace{3em} \{ \pre{k+1}\nset^{o}_0, \pre{k+1}\nset^e\}^o_2,
+                    \{ \pre{k+1}\nset^{o}_0, \pre{k+1}\nset^e\}^o_4 \big\}.
+  \end{eqnarray*}
+  The ratios of the sizes of fragmented node-trees in $f_e$ are
+  \begin{equation*}
+    \frac{\abs{\pre{k} \nset^{o}_1}}{\abs{\pre{k}\nset^e}} = q_1, \hspace{2em}
+    \frac{\abs{\pre{k} \nset^{o}_2}}{\abs{\pre{k}\nset^e}} = q_2, \hspace{2em}
+    \frac{\abs{\pre{k} \nset^{o}_3}}{\abs{\pre{k}\nset^e}} = q_3, \hspace{2em}
+    \frac{\abs{\pre{k} \nset^{o}_4}}{\abs{\pre{k}\nset^e}} = q_4, 
+  \end{equation*}
+  where $ q_1 + q_2 + q_3 + q_4 = 1$. The ratios of the sizes of fragmented node-trees in $f_o$ are
+  \begin{equation*}
+    \frac{\abs{\pre{k+1}\nset^o_0|^o_1}}{\abs{\pre{k} \nset^{o}_1}} = 
+    \frac{\abs{\pre{k+1}\nset^o_0|^o_2}}{\abs{\pre{k} \nset^{o}_2}} = 
+    \frac{\abs{\pre{k+1}\nset^o_0|^o_3}}{\abs{\pre{k} \nset^{o}_3}} = 
+    \frac{\abs{\pre{k+1}\nset^o_0|^o_4}}{\abs{\pre{k} \nset^{o}_4}} = r_0,
+  \end{equation*}
+  and 
+  \begin{equation*}
+    \frac{\abs{\pre{k+1}\nset^e|^o_1}}{\abs{\pre{k} \nset^{o}_1}} = 
+    \frac{\abs{\pre{k+1}\nset^e|^o_2}}{\abs{\pre{k} \nset^{o}_2}} = 
+    \frac{\abs{\pre{k+1}\nset^e|^o_3}}{\abs{\pre{k} \nset^{o}_3}} = 
+    \frac{\abs{\pre{k+1}\nset^e|^o_4}}{\abs{\pre{k} \nset^{o}_4}} = r_{-1},  
+  \end{equation*}
+  where $r_0 + r_{-1} = 1$. The sum of the sizes of even node-trees in  the odd partial fragmentation set $\m{F}^o_{k+1}$ is thus
+  \begin{equation*}
+    q_1 r_{-1} \abs{\pre{k}\nset^e} + q_2 r_{-1} \abs{\pre{k}\nset^e} + q_3 r_{-1} \abs{\pre{k}\nset^e} + q_4 r_{-1} \abs{\pre{k}\nset^e} = (q_1 + q_2 + q_3 + q_4 ) r_{-1} \abs{\pre{k}\nset^e} = r_{-1} \abs{\pre{k}\nset^e}. 
+  \end{equation*}
+  This is true for any even $k_f \geq 2$. 
+\end{proof}
+
+\begin{lemma}\label{lem:equalevensum}
+  The sum of even node-tree sizes in every fragmentation step $k$ is only dependent on partial fragmentation ratios $\{r_{-1}, r_0\}$. 
+  \begin{equation}\label{eq:equalevensum}
+    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } = \text{constant}
+  \hspace{1em} \bigg| \hspace{1em} \forall \m{F}_k^o \text{ during } F(\pre{0}\nset^o).
   \end{equation}
 \end{lemma}
+\begin{proof}
+  Consider an odd node-tree $\pre{k-1}\nset^o$ that is partially fragmented as 
+  \begin{eqnarray*}
+    f_o(\pre{k-1}\nset^o) &= \m{F}^o_k      &= \{\pre{k}\nset^e_{-1}, \pre{k}\nset^o_0 \} \\
+    f_e(\m{F}^o_k)        &= \m{F}^e_k      &= \left\{ \{\pre{k}\nset^o_i\ | i \in [1,..,k_f] \}^e_{-1}, \pre{k}\nset^{o}_0 \right\} \\
+    f_o(\m{F}^e_k )       &= \m{F}^o_{k+1}  &= \left\{ \left\{ \{\pre{k+1}\nset^e_{-1}, \pre{k+1}\nset^o_0\}_i^o | i \in [1,..,k_f] \right\}^e_{-1}, \left\{\pre{k}\nset^e_{-1}, \pre{k}\nset^o_0 \right\}^{o}_0 \right\}
+  \end{eqnarray*}
 
-Recall lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this grow process, some $n_v$ vertices are added to the cluster, and some join operations can occur. If no join operations occur, the node-tree stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:calconce}. We want to minimize $n_v$, as each added vertex here is not a node that can possibly count towards $N_{PDC}$. Thus in each growth iteration of a cluster, some join operation must occur for the maximization of $N_{PDC}$.
+  The sum of even node-tree sizes in $\m{F}^o_k$ is simply the size of $\pre{k}\nset^e_{-1}$ and is equal to
+  \begin{equation*}
+    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_k \right\} } = \abs{\pre{k}\nset^e_{-1}} = r_{-1}\abs{\pre{k-1}\nset^o}. 
+  \end{equation*}
 
-Take the first fragmentation sets $\m{F}^e_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of cluster $\pre{k-1}\nset^o$. These partial fragmentations correspond to 2 join operations, the E-join between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_o$, and the FO-join between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_e$. If we want to minimize $n_v$ in $f_o$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node-tree sizes. For $f_e$, the merge event is caused by growth of $\nset^o_0$ in either some larger or equal bucket $b_j \geq b_i$ where $ S_{\vset_0} \geq S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$. To maximize $N_{PDC}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_e$. Recall from equation \eqref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node-tree size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
+  The sum of even node-tree sizes in $\m{F}^o_{k+1}$ can be divided into two parts. The first part is the partial fragmentations $f_e f_o$ of $\pre{k}\nset^e_{-1}$, which we know from Lemma \ref{lem:sumevenkf} is $r_{-1}|\pre{k}\nset^e_{-1}|$ regardless of the choice for $k_f$. The second part is the partial fragmentation $f_o$ of $\pre{k}\nset^o_0$, which is $r_{-1}|\pre{k}\nset^o_0|$. Hence the sum is
+  \begin{equation*}
+    \sum_j{ \left\{ \abs{\pre{k}\nset_j^e} \bigg| \pre{k}\nset_j^e \in \m{F}^o_{k+1} \right\} } = r_{-1} \left( \abs{\pre{k}\nset^e_{-1}} + \abs{\pre{k}\nset^o_0} \right) = r_{-1}\abs{\pre{k-1}\nset^o}. 
+  \end{equation*}
+\end{proof}
+
+\begin{theorem}\label{the:fragnumber}
+  For the fragmentation number $k_f=2$, $N_{PDC}$ of Definition \ref{def:npdc} and Equation \eqref{eq:npdc} is maximized. 
+\end{theorem}
+\begin{proof}
+  The sum of even node-tree sizes in each fragmentation step is constant per Lemma \ref{lem:equalevensum}. Thus \eqref{eq:npdc} is maximized by having as many fragmentations steps as possible, or a largest possible $p$.  As $k_f$ increases the number of odd node-trees in each fragmentation step $f_o$, the average size of these odd node-trees have decreased. Consequently, the node-tree size decreases faster towards the minimum size of 3 nodes as more fragmentation steps are applied (Equation \eqref{eq:fstep}). As the sum of even node-tree sizes in each fragmentation step is the same, increasing $k_f$ decreases the number of fragmentation steps: 
+  \begin{equation}
+    p \propto \frac{1}{k_f}.
+  \end{equation}
+   Hence $N_{PDC}$ is maximized for minimal value of $k_f$ which is $k_f = 2$.
+\end{proof}
+
+\input{tikzfigs/fragcorrect.tex}
+\input{tikzfigs/fragnumber.tex}
+
+Our search for the fragmentation ratios has now been reduced to finding $\{r_{-1}, r_0\}$ of $f_o$ and $\{r_1, r_2\}$ of $f_e$ since $k_f = 2$. A fragmentation step of an odd node-tree $\pre{k-1}\nset^o$ is now
+\begin{equation}
+  f(\pre{k-1}\nset^o) = \{\pre{k}\nset^o_0, \pre{k}\nset^o_1, \pre{k}\nset^o_1\}. 
+\end{equation}
+The sizes of the ancestral odd node-trees are 
+\begin{equation}
+  \frac{\abs{\pre{k}\nset^o_0}}{\abs{\pre{k-1}\nset^o}} = R_0, \hspace{2em}
+  \frac{\abs{\pre{k}\nset^o_1}}{\abs{\pre{k-1}\nset^o}} = R_1, \hspace{2em}
+  \frac{\abs{\pre{k}\nset^o_2}}{\abs{\pre{k-1}\nset^o}} = R_2,
+\end{equation}
+where
+\begin{align}
+  \nonumber R_0 &= r_0\\
+            R_1 &= r_{-1}r_1\\
+  \nonumber R_2 &= r_{-1}r_2. 
+\end{align}
+
+Recall from Lemma \ref{lem:delaywhengrown} that the delay calculations are only done before a cluster is grown. During this growth process, some $N_v$ vertices are added to the cluster and some clusters merge that also require the join of their respective node-trees. If no join operations occur, the node-tree stays unchanged, and the cluster is allowed to continue growth without delay calculations per lemma \ref{lem:calconce}. We want to minimize $N_v$, as each added vertex here is not a node that can possibly count towards $N_{PDC}$. Thus in every growth iteration of a cluster a join operation must occur for the maximization of $N_{PDC}$.
+
+Take the first fragmentation sets $\m{F}^e_{k} = \{\nset^o_0, \nset^{e} \}$ and $\m{F}_{k} = \{\nset^o_0, \nset^{o}_1, \nset^{o}_2 \}$ of cluster $\pre{k-1}\nset^o$. These partial fragmentations correspond to 2 join operations, the E-join between two odd clusters $ \nset^{o}_1, \nset^{o}_2 $ in $f_e$, and the FO-join between odd and even clusters $\nset^o_0, \nset^{e} $ in $f_o$. If we want to minimize $n_v$ in $f_e$, these odd clusters must grow within the same bucket $b_i$, which means that $S_{\vset_1} = S_{\vset_2}$. Note that these are the cluster sizes and not node-tree sizes. For $f_o$, the merge event is caused by growth of $\nset^o_0$ in either some larger or equal bucket $b_j \geq b_i$ where $ S_{\vset_0} \geq S_{\vset_1} $. This leaves us with $S_{\vset_0} \geq S_{\vset_1} = S_{\vset_2}$. To maximize $N_{PDC}$, we want to maximize $S_{\nset^e} = S_{\nset^o_1} + S_{\nset^o_2}$ in $f_o$. Recall from equation \eqref{eq:sets} that $S_\nset \leq S_\vset$. We assume the largest possible node-tree size $S_\nset = S_\vset$ to find that $ S_{\nset^e} $ is largest if $S_{\vset_0} = S_{\vset_1}$. We can therefore conclude that $S_{\nset^o_0} = S_{\nset^o_1} = S_{\nset^o_2}$ and $R_0 = R_1 = R_2 = \frac{1}{3}$
 
 \begin{lemma}\label{lem:thirdratio}
   A fragmentation step of $\pre{k-1}\nset^o$ is maximized in $S_{\pre{k}\nset^e}$ if the fragmentation ratios take the value $R = \frac{1}{3}$.
 \end{lemma}
 
-\begin{figure}
-  \centering
-    \begin{tikzpicture}[scale=0.4]
-      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
-
-      \begin{scope}[shift={(5,0)}]
-      \foreach \x in {0,...,2}{
-        \foreach \y in {0,...,7}{
-          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
-        \path[fill=white!80!black] (\x,8) \Square{0.46cm};}
-
-      \draw[l1,dashed] (-.5,-.5) ++(0,8) -- ++(0,-8) -- ++(3,0) -- +(0,8);
-      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
-      \end{scope}
-
-      \begin{scope}[shift={(10,0)}]
-        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
-       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
-      }}
-      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
-      \draw[l1] (0,4) ++(-.5,-.5) rectangle +(3,4);
-      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
-
-      \draw[l1, decorate, decoration={brace, amplitude=5}] (3,9) ++(0,-.5) -- +(0,-5);
-      \draw[l1, ->] (4,4.5) -- +(5,0) node [midway, above, text width = 5cm, align=center] {\codefunc{Grow} top, \\union};
-      \draw[l1, decorate, decoration={brace, amplitude=5}] (3,0) ++(0,-1) -- +(-4,0) node[midway, below=4pt] {$\m{F}_k$};
-      \end{scope}
-
-      \begin{scope}[shift={(20,0)}]
-        \foreach \x in {0,...,2}{
-        \foreach \y in {0,...,3}{\path[fill=white!80!black] (\x,\y) \Square{0.46cm};}
-        \foreach \y in {4,...,8}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
-      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
-      \draw[l1, dashed] (0,4) ++(-.5,-.5) -- ++(0,5) -- ++(3,0) -- +(0,-5);
-
-      \end{scope}
-
-      \draw[l1, ->] (3,4) -- +(1,0) node[midway, above] {$f_e$};
-      \draw[l1, ->] (8,4) -- +(1,0) node[midway, above] {$f_o$};
-      \node at (1,4) {$\nset^o$};
-    \end{tikzpicture}
-  \caption{A fragmentation step $f$ of $\nset^o$, where the fragmentation ratios are not optimal $R_i \neq \frac{1}{3}$. This fragmentation is not possible, as the clusters in $\m{F}_k$ will grow and join in a different path according to the rules of weighted growth.}\label{fig:fragfratio}
-\end{figure}
+\input{tikzfigs/fragratio.tex}
 
 \subsubsection{Time complexity}
 The last unknown parameter for the delay calculation is $p$, the number of fragmentation steps. If we assume that in each growth step not a single non-node vertex is added $n_v = 0$, the full fragmentation of some node-tree $\nset^o$ is just the continuous division of the set in 3 parts per lemma \ref{lem:thirdratio}, which can be calculated easily.
 \begin{equation}\label{eq:numfrag}
   p = \log_3(S_{\nset^o})
 \end{equation}
-In each fragmentation step $\m{F}^e_k$, $f_e$ is equivalent to the join operation of odd node-trees with even node-trees where the sum of odd sets sizes is
+In each fragmentation step $\m{F}^e_k$, $f_o$ is equivalent to the join operation of odd node-trees with even node-trees where the sum of odd sets sizes is
 \begin{equation}\label{eq:sumoddsetsize}
   \sum_j \{ S_{\pre{k}\nset_j^o} | \pre{k}\nset_j^o \in \m{F}^e_k \} = \frac{1}{3}S_{\nset^o},
 \end{equation}
@@ -1295,7 +755,7 @@ and the sum of even node-tree of sizes is
 \begin{equation}\label{eq:sumevensetsize}
   \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \} = \frac{2}{3}S_{\nset^o}.
 \end{equation}
-This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Filling in equation \eqref{eq:numfrag} and \eqref{eq:sumevensetsize} in \eqref{eq:maxdelay}, we find that
+This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Filling in equation \eqref{eq:numfrag} and \eqref{eq:sumevensetsize} in \eqref{eq:npdc}, we find that
 \begin{eqnarray}
 % \nonumber % Remove numbering (before each equation)
 \nonumber  N_{PDC} &\leq& \sum_{k=1}^{p} \sum_j \{ S_{\pre{k}\nset_j^e} | \pre{k}\nset_j^e \in \m{F}^e_k \}. \\
@@ -1303,9 +763,9 @@ This approximation is true as we have taken $S_\nset = S_\vset$ and $n_v=0$. Fil
    &=& \frac{2}{3}S_{\nset^o}\log_3(S_{\nset^o})
 \end{eqnarray}
 
-The node-tree size of set is bounded by the lattice size $\nset^o \leq N$. The worst case time complexity of the delay computation is thus bounded by $\m{O}(N\log_3(N))$. The average-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$.
+The node-tree size of set is bounded by the lattice size $\nset^o \leq N$. The worst-case time complexity of the delay computation is thus bounded by $\m{O}(N\log_3(N))$. The average-case complexity is even lower as it is quite certain that not all vertices are nodes such that $S_\nset < S_\vset$ and $n_v > 0$.
 
-\subsection{Bloom complexity}
+\subsection{Bloom complexity}\label{sec:bloomcomplexity}
 
 To grow a cluster represented by a node-tree $\nset$, we have to traverse the entire set from root to stem to iterate over each boundary list that are stored at the nodes. Let's call the total number of times any node is traversed by \codefunc{Bloom} $N_{bloom}$.
 
@@ -1324,7 +784,7 @@ By filling in $p$ we find that
   \nonumber &=& \sum_{k=1}^{\log_3(S_{\nset^o})} S_\nset \\
    &=& S_{\nset^o}\log_3(S_{\nset^o}),
 \end{eqnarray}
-which again corresponds to a worst case time complexity that is bounded by $\m{O}(N\log_3(N))$.
+which again corresponds to a worst-case time complexity that is bounded by $\m{O}(N\log_3(N))$.
 
 \section{Boundaries}\label{sec:ufbbbound}
 For the UF decoder on surfaces with boundaries, we introduced the concept of \emph{boundary vertices} that in contrast to normal vertices are not equivalent to stabilizers generators, measurements or ancillary qubits. During formation of the spanning forest $F_C$ of a cluster, we must make sure that $F_C$ does not contain more than 1 element of the set of boundary vertices $\delta\vset$, as multiple elements of $\delta\vset$ is equivalent to a cycle.
@@ -1368,7 +828,7 @@ To account for these erasures, we must construct the node-trees for these initia
 
 \section{Performance}
 
-\begin{table}[htb]
+\begin{table}[htpb]
   \centering
   \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
    \hline
@@ -1384,7 +844,7 @@ To account for these erasures, we must construct the node-trees for these initia
   \caption{Sumulation results for the Union-Find Balanced-Bloom decoder. $L = 8:8:64, L=8:4:24$}\label{tab:ufbblow}
 \end{table}
 
-\begin{table}[htb]
+\begin{table}[htpb]
   \centering
   \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
 

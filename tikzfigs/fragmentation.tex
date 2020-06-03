@@ -1,0 +1,73 @@
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=1cm, on grid]
+
+    \node (a) at (0,0) {};
+    \node (b) [right = 4cm of a] {};
+    \node (c) [right = 4cm of b] {};
+    \node (d) [right = 3cm of c] {};
+
+    \node (b1l) [below left = 1cm and 1.2cm of a] {};
+    \node (b1r) [above right = 3.5cm and 1.2cm of b] {};
+    \path[fill=black!10!white, rounded corners=0.5cm] (b1l) rectangle (b1r);
+    \node (b1t) at ($(a)!0.5!(b)$) {}; \node [above=3cm of b1t] {generation $k$};
+    \node (b2l) [below left = 1cm and 1.2cm of c] {};
+    \node (b2r) [above right = 3.5cm and 1.2cm of c] {};
+    \path[fill=black!10!white, rounded corners=0.5cm] (b2l) rectangle (b2r);
+    \node [above=3cm of c] {$k-1$};
+
+    \begin{scope}[shift={(10.5,0)}]
+      \path (0,2) node[onset]{} -- +(.5,0)node[anchor=west]{odd node-tree};
+      \path (0,1) node[enset]{} -- +(.5,0)node[anchor=west]{even node-tree};
+      \path (0,0) node[subtree]{} -- +(.5,0)node[anchor=west]{subtree};
+    \end{scope}
+
+    \node (a0) [above = 0 cm of a] {\footnotesize $\pre{k}\nset^o_2$};
+    \node (a1) [above = 1 cm of a] {\footnotesize $\pre{k}\nset^o_1$};
+    \node (a2) [above = 2 cm of a] {\footnotesize $\pre{k}\nset^o_0$};
+    \draw[onset] (a0) circle[radius=.4cm];
+    \draw[onset] (a1) circle[radius=.4cm];
+    \draw[onset] (a2) circle[radius=.4cm];
+
+    \foreach \i in {0,1,2}{
+        \node (b\i) [above = \i cm of b] {};
+    }
+    \node at (b2) {\footnotesize $\pre{k}\nset^o_0$};
+    \node at ($(b0)!0.5!(b1)$) {\footnotesize $\pre{k}\nset^e_{-1}$};
+    \draw[onset] (b2) circle[radius=0.4cm];
+    \draw[subtree] (b1) circle[radius=.4cm];
+    \draw[subtree] (b0) circle[radius=.4cm];
+    \node[right = 0.5cm of b] (bc) {};
+    \draw[enset] (bc) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
+
+    \foreach \i in {0,1,2}{
+      \node (c\i) [above =\i cm of c] {};
+      \draw[subtree] (c\i) circle[radius=.4cm];
+    }
+    \node[right = 0.5cm of c] (cc1) {}; \node[right = 0.6cm of c] (cc2) {};
+    \draw[subtree] (cc1) -- +(0, 1) arc (0:180:0.5) -- +(0, -1) arc (180:360:0.5) -- cycle;
+    \draw[onset] (cc2) -- +(0, 2) arc (0:180:0.6) -- +(0, -2) arc (180:360:0.6) -- cycle;
+    \node at (c1) {\footnotesize $\pre{k-1}\nset^o$};
+
+    \node (f1a) [below left = 0.4cm and 0.4cm of c] {}; \node (f1b) [below right = 0.4cm and 0.4cm of b] {};
+    \node (f2a) [below left = 0.4cm and 0.4cm of b] {}; \node (f2b) [below right = 0.4cm and 0.4cm of a] {};
+    \node (fa) [below = 0.6cm of c] {}; \node (fb) [below = 0.6cm of a] {};
+    \draw[l1, ->, dashed] (f1a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f1b);
+    \draw[l1, ->, dashed] (f2a) .. controls +(225:0.5cm) and +(315:0.5cm) .. (f2b);
+    \draw[l1, ->, dashed] (fa)  .. controls +(210:1cm) and +(330:1cm) .. (fb);
+
+    \node (ca) at ($(c)!0.5!(a)$) {}; \node [below = 1.5cm of ca] {$f$};
+    \node (cb) at ($(c)!0.5!(b)$) {}; \node [below = 0.4cm of cb] {$f_o$};
+    \node [below = 0.4cm of b1t] {$f_e$};
+
+    \node (u1lt) at ($(a0)!0.5!(a1)$) {}; \node(u1l) [right=1cm of u1lt] {};
+    \node (u1rt) at ($(b0)!0.5!(b1)$) {}; \node(u1r) [left=1cm of u1rt] {};
+    \node (u2lt) at ($(b1)!0.5!(b2)$) {}; \node(u2l) [right=1cm of u2lt] {};
+    \node (u2rt) at ($(c1)!0.5!(c2)$) {}; \node(u2r) [left=1cm of u2rt] {};
+    \draw[l1, ->] (u1l) -- (u1r) node[midway,above] {even-join};
+    \draw[l1, ->] (u2l) -- (u2r) node[midway,above, text width = 2cm, align=center] {(final)\\odd-join};
+
+  \end{tikzpicture}
+  \caption{In the fragmentation of node-tree $\pre{k-1}\nset^o$ of generation $k-1$, we find the clusters $\pre{k}\nset_j$ of which the joins constructed node-tree $\pre{k-1}\nset^o$. A partial fragmentation $f_o$ splits $\pre{k+1}\nset^o$ into an even ancestor node-tree $\pre{k}\nset^e_{-1}$ and odd ancestor node-tree $\pre{k}\nset^o_0$. A partial fragmentation $f_e$ further splits $\pre{k}\nset^e_{-1}$ into a set of odd ancestor node-trees $\{\pre{k}\nset^o_1, \pre{k}\nset^o_2\}$. The combination of partial fragmentations $f_o$ and $f_e$ is a fragmentation step $f$.}\label{fig:generation}
+\end{figure}

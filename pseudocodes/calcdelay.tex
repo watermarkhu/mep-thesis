@@ -1,0 +1,17 @@
+\begin{algorithm}[htbp]
+    \SetKwFunction{cdelay}{Calcdelay}
+    \KwData{Node $n$, cluster $c$}
+    \KwResult{Calculated delays for $n$ and all its descendent nodes}
+
+    \BlankLine
+    \If{$n$ has a parent}{
+        calculate $n.d$ with equation \eqref{eq:delayequation} using $n$ and $n.parent$\;
+        \If{$n.d < c.d$}{
+            $c.d=n.d$
+        }
+    }
+    \For{children $n_\gamma$ of $n$}{
+        \cdelay{$n_\gamma, c$}
+    }
+    \caption{\codefunc{Calcdelay}}\label{algo:calcdelay}
+\end{algorithm}

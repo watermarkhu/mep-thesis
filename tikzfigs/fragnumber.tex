@@ -1,0 +1,78 @@
+
+\begin{figure}
+  \centering
+    \begin{tikzpicture}[scale=0.4]
+      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
+
+      \begin{scope}[shift={(5,0)}]
+      \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,5}{
+          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+        \foreach \y in {6,...,8}{
+          \path[fill=white!80!black] (\x,\y) \Square{0.46cm};}}
+
+      \draw[l1,dashed] (-.5,-.5) ++(0,6) -- ++(0,-6) -- ++(3,0) -- +(0,6);
+      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+      \end{scope}
+
+      \begin{scope}[shift={(10,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \foreach \y in {0,...,5}{\draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
+      \draw[l1] (0,6) ++(-.5,-.5) rectangle +(3,3);
+      \end{scope}
+
+      \begin{scope}[shift={(15,0)}]
+      \foreach \y in {0,...,5}{
+       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
+       \foreach \x in {1,2}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
+      \foreach \x in {0,1,2}{
+       \path[fill=white!50!black] (\x,6) \Square{0.46cm};
+       \path[fill=white!50!black] (\x,7) \Square{0.46cm};
+       \path[fill=white!80!black] (\x,8) \Square{0.46cm};}
+      \foreach \y in {0,...,5}{\draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
+      \foreach \y in {0,...,6}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
+      \draw[l1,dashed] (3,0) ++(-.5,-.5) -- +(0,8) (0,6) ++(-.5,-.5) -- +(0,2);
+      \end{scope}
+
+      \begin{scope}[shift={(20,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \foreach \y in {6,7,8}{ \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(3,1);}
+      \foreach \y in {0,...,5}{
+       \draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);
+       \foreach \x in {0,1,2}{\draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);}}
+      \end{scope}
+
+      \begin{scope}[shift={(25,0)}]
+       \foreach \y in {6,7,8}{\foreach \x in {1,2}{
+       \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+       \path[fill=white!80!black] (0,\y) \Square{0.46cm};
+       \draw[l1] (0,\y) ++(-.5,-.5) rectangle +(1,1);}
+       \foreach \y in {7,8,9}{\draw[l1,dashed] (3,\y) ++(-.5,-.5) -- +(-2,0);}
+       \draw[l1,dashed] (3,6) ++(-.5,-.5) -- +(0,3);
+
+       \foreach \y in {0,...,5}{\foreach \x in {0,1,2}{
+        \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+        \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);}}
+      \end{scope}
+
+      \begin{scope}[shift={(30,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+       \draw[l1] (\x,\y) ++(-.5,-.5) rectangle +(1,1);
+      }}
+      \end{scope}
+
+      \foreach \x in {3,13,23}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_o$};}
+      \foreach \x in {8,18,28}{ \draw[l1, ->] (\x,4) -- +(1,0) node[midway, above] {$f_e$};}
+      \node at (1,4) {$\nset^o$};
+    \end{tikzpicture}
+  \caption{A full fragmentation of $\nset^o$ where in the first $f_0$, the fragmentation number is increased to $N_{f_e} = 6$. The number of dark shaded squares or $N_{PDC}$ has decreased from the fragmentation with optimal settings (Figure \ref{fig:fragcorrect}). }\label{fig:fragfnumber}
+\end{figure}

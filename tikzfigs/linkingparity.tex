@@ -1,0 +1,27 @@
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[even] at (0,5) (0) {$s_1$};
+    \node[odd] at (0,4) (1) {$s_2$};
+    \node[even] at (0,3) (2) {$s_3$};
+    \node[odd] at (0,2) (3) {$s_4$};
+    \node[even] at (0,1) (4) {$s_5$};
+    \draw[l1] (0) -- (1) -- (2) -- (3) -- (4);
+    \node[left=.5 of 0] {$\nset_s$};
+      \begin{scope}[shift={(4,0)}]
+        \node[even] at (0,5) (0) {$s_1$};
+        \node[lodd] at (0,4) (1) {$l_2$};
+        \node[odd] at (0,3) (2) {$s_3$};
+        \node[leven] at (0,2) (3) {$l_4$};
+        \node[even] at (0,1) (4) {$s_5$};
+        \draw[l1] (0) -- (1) -- (2) -- (3) -- (4);
+        \node[left=.5 of 0] {$\nset_l$};
+
+        \path (3,5) node[even]{} -- +(.5,0) node[anchor=west] {$s.p$ even}; 
+        \path (3,4) node[odd]{} -- +(.5,0) node[anchor=west] {$s.p$ odd}; 
+        \path (3,3) node[leven]{} -- +(.5,0) node[anchor=west] {$l.p$ even}; 
+        \path (3,2) node[lodd]{} -- +(.5,0) node[anchor=west] {$l.p$ odd}; 
+      \end{scope}
+  \end{tikzpicture}
+  \caption{Two example node-trees $\nset_s$ and $\nset_l$ each containing 5 nodes, where syndrome-nodes $s_i$ are circles and linking-nodes $l_i$ are diamonds. Their appropriate parities are calculated where an even parity correspond to continuous lines and odd to dashed lines. }\label{fig:linkingparity}
+\end{figure}

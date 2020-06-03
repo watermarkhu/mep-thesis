@@ -1,0 +1,23 @@
+\begin{figure}[htbp]
+  \centering
+  \tikzstyle{nodea}=[node, minimum size=20, pattern=dots, pattern color=black!50!white]
+  \tikzstyle{nodeb}=[nodel, solid, pattern=dots, pattern color=black!50!white]
+  \begin{tikzpicture}
+    \node at (-1,1) {$\nset_{1D}$};
+    \node[nodea] at (0,0) (n1) {$s_1$};
+    \node[nodea] at (1.5,0) (n2) {$s_2$};
+    \node[nodea] at (3,0) (n3) {$s_3$};
+    \node[nodea] at (4.5,0) (n8) {$s_4$};
+    \node[nodeb] at (6,0) (n4) {};
+    \node[nodeb] at (7,0) (n5) {};
+    \node[nodeb] at (8,0) (n6) {};
+    \node[nodeb] at (9,0) (n7) {};
+    \draw[l1]  (n1) -- (n2) -- (n3) -- (n8) -- (n4);
+    \draw[l1, dotted] (n4) -- (n5) -- (n6) -- (n7);
+    \draw[l1, decorate, decoration={brace, amplitude=5}] (n4.west) ++(0,-.4) node[inner sep=0] (r1) {} (n7.east) ++(0,-.4) -- (r1) node[midway, below=4pt] {$\abs{\nset_{1D}} - 4$ nodes};
+    \draw[l1, decorate, decoration={brace, amplitude=5}] (n7.west) ++ (0,.4) node[inner sep=0] (r2) {} (n4.east) ++ (0.,.4) -- (r2) node[midway, above=4pt] {$\abs{(s_4, s_{|\nset_{1D}|})} = k$};
+
+    \path (10, 1) node[nodeb]{} -- +(.5,0) node[anchor=west] {syndrome-node};
+  \end{tikzpicture}
+  \caption{The one-dimensional node-tree $\nset_{1D}$, consisting of only syndrome-nodes $s_i$. The first 4 nodes $s_1, s_2, s_3, s_4$ are labelled. The distance of the edges between $s_4$ and $s_{|\nset_{1D}|}$ is $k$.}\label{fig:1dnodetree}
+\end{figure}

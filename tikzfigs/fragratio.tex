@@ -1,0 +1,46 @@
+\begin{figure}
+  \centering
+    \begin{tikzpicture}[scale=0.4]
+      \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,9);
+
+      \begin{scope}[shift={(5,0)}]
+      \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,7}{
+          \path[fill=white!50!black] (\x,\y) \Square{0.46cm};}
+        \path[fill=white!80!black] (\x,8) \Square{0.46cm};}
+
+      \draw[l1,dashed] (-.5,-.5) ++(0,8) -- ++(0,-8) -- ++(3,0) -- +(0,8);
+      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
+      \end{scope}
+
+      \begin{scope}[shift={(10,0)}]
+        \foreach \x in {0,...,2}{\foreach \y in {0,...,8}{
+       \path[fill=white!80!black] (\x,\y) \Square{0.46cm};
+      }}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
+      \draw[l1] (0,4) ++(-.5,-.5) rectangle +(3,4);
+      \draw[l1] (0,8) ++(-.5,-.5) rectangle +(3,1);
+
+      \draw[l1, decorate, decoration={brace, amplitude=5}] (3,9) ++(0,-.5) -- +(0,-5);
+      \draw[l1, ->] (4,4.5) -- +(5,0) node [midway, above, text width = 5cm, align=center] {\codefunc{Grow} top, \\union};
+      \draw[l1, decorate, decoration={brace, amplitude=5}] (3,0) ++(0,-1) -- +(-4,0) node[midway, below=4pt] {$\m{F}_k$};
+      \end{scope}
+
+      \begin{scope}[shift={(20,0)}]
+        \foreach \x in {0,...,2}{
+        \foreach \y in {0,...,3}{\path[fill=white!80!black] (\x,\y) \Square{0.46cm};}
+        \foreach \y in {4,...,8}{\path[fill=white!50!black] (\x,\y) \Square{0.46cm};}}
+      \draw[l1] (0,0) ++(-.5,-.5) rectangle +(3,4);
+      \draw[l1, dashed] (0,4) ++(-.5,-.5) -- ++(0,5) -- ++(3,0) -- +(0,-5);
+
+      \end{scope}
+
+      \draw[l1, ->] (3,4) -- +(1,0) node[midway, above] {$f_o$};
+      \draw[l1, ->] (8,4) -- +(1,0) node[midway, above] {$f_e$};
+      \node at (1,4) {$\nset^o$};
+    \end{tikzpicture}
+  \caption{A fragmentation step $f$ of $\nset^o$, where the fragmentation ratios are not optimal $R_i \neq \frac{1}{3}$. This fragmentation is not possible, as the clusters in $\m{F}_k$ will grow and join in a different path according to the rules of weighted growth.}\label{fig:fragfratio}
+\end{figure}

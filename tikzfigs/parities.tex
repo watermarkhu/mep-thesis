@@ -1,0 +1,52 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+      \node at (1,-1) {\emph{a)} $s_r = s_0$};
+      \node[even] (0) at (1, 3) {$s_0$};
+      \node[odd] (1) at (1, 2) {$s_1$};
+      \node[odd] (2) at (1, 1) {$s_2$};
+      \node[even] (3) at (1, 0) {$s_3$};
+      \node[even] (4) at (0, 1) {$s_4$};
+      \node[even] (5) at (0, 0) {$s_5$};
+      \node[odd] (6) at (2, 2) {$s_6$};
+      \node[even] (7) at (2, 1) {$s_7$};
+      \node[even] (8) at (2, 0) {$s_8$};
+      \draw[l1] (0) -- (1) -- (2) -- (3);
+      \draw[l1] (1) -- (4); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
+      \draw[l1] (0) -- (6) -- (7);
+  
+      \begin{scope}[shift={(3.5,0)}]
+        \node at (1,-1) {\emph{b)} $s_r = s_1$};
+        \node[even] (1) at (1,3) {$s_1$};
+        \node[even] (4) at (0, 2) {$s_4$};
+        \node[odd] (2) at (1, 2) {$s_2$};
+        \node[even] (3) at (1, 1) {$s_3$};
+        \node[even] (5) at (0, 1) {$s_5$};
+        \node[even] (8) at (2, 1) {$s_8$};
+        \node[even] (0) at (2, 2) {$s_0$};
+        \node[odd] (6) at (3, 1) {$s_6$};
+        \node[even] (7) at (3, 0) {$s_7$};
+        \draw[l1] (3) -- (2) -- (1) -- (0) -- (6) -- (7);
+        \draw[l1] (4) -- (1); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
+      \end{scope}
+  
+      \begin{scope}[shift={(8,0)}]
+        \node at (1,-1) {\emph{c)} $s_r = s_4$};
+        \node[even] (4) at (1, 3) {$s_4$};
+        \node[odd]  (1) at (1, 2) {$s_1$};
+        \node[odd] (2) at (1, 1) {$s_2$};
+        \node[even] (5) at (0, 0) {$s_5$};
+        \node[even] (3) at (1, 0) {$s_3$};
+        \node[even] (8) at (2, 0) {$s_8$};
+        \node[even] (0) at (2, 1) {$s_0$};
+        \node[odd] (6) at (3, 0) {$s_6$};
+        \node[even] (7) at (3, -1) {$s_7$};
+        \draw[l1] (7) -- (6) -- (0) -- (1) -- (2) -- (3);
+        \draw[l1] (4) -- (1); \draw[l1] (2) -- (5); \draw[l1] (2) -- (8);
+  
+        \path (4,3) node[even]{} -- +(.5,0) node[anchor=west] {$s.p$ even}; 
+        \path (4,2) node[odd]{} -- +(.5,0) node[anchor=west] {$s.p$ odd}; 
+      \end{scope}
+    \end{tikzpicture}
+    \caption{The nodes in a node-tree can have even or odd  parities. The node parities are dependent on which node is set as root $n_r$. Here the same node-tree $\nset$ is illustrated with different roots.}\label{fig:parities}
+\end{figure}

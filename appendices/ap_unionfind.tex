@@ -16,7 +16,7 @@ A simple implementation of the instructions would be to store for each set $X$ a
 where each \codefunc{Union} operation has on average $\m{O}(n)$ updates. 
 
 \section{Union by weight}
-In the above case, we assume in each \codefunc{Union} the worst case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule to always append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(n \log n)$. 
+In the above case, we assume in each \codefunc{Union} the worst-case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule to always append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(n \log n)$. 
 
 \begin{theorem}
   A sequence of \codefunc{Union} and \codefunc{Find} operations on $n$ initial single element disjoint sets using the weighted union rule takes $\m{O}(n \log n)$ time. 
@@ -31,7 +31,7 @@ The pointer update in each set during a \codefunc{Union} can be minimized by a d
 \tikzstyle{lw1}=[line width=1]
 \tikzstyle{fnode}=[draw, circle, minimum size=0.55cm, inner sep=0, lw1]
 
-\begin{figure}[htb]
+\begin{figure}[htpb]
   \centering
   \begin{tikzpicture}[on grid]
     \node at (1.5,-1) {\emph{(a)}};
@@ -143,7 +143,7 @@ The \emph{path compression} rule for the \codefunc{Find} function is also very s
   \node[fnode] at (#1,#2) (#3) {$#3$};
   \draw[lw1, fill=white!80!black] (#3.south) -- +(0.3,-1) -- +(-0.3,-1) -- cycle;
 }
-\begin{figure}[htb]
+\begin{figure}[htpb]
   \centering
   \begin{tikzpicture}
     \DRAWTREE{0}{0}{e}
