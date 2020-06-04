@@ -9,21 +9,21 @@
       \path[pattern=vertical lines, pattern color=morange, rounded corners=10pt, rotate around={45:(1)}] (1,-1) rectangle (3,1);
       \path[pattern=horizontal lines, pattern color=mgreen, rounded corners=10pt, rotate around={45:(2)}] (3,-1) rectangle (5,1);
   
-      \node[nodel, minimum size=0.6cm, fill=white!70!mblue] at (0) (v0) {\small$v_1$};
-      \node[nodel, minimum size=0.6cm] at (-1,0) (v0l) {};
-      \node[nodel, minimum size=0.6cm] at (0,1) (v0u) {};
-      \node[nodel, minimum size=0.6cm] at (0,-1) (v0d) {};
+      \node[tnode, fill=white!70!mblue] at (0) (v0) {\small$v_1$};
+      \node[tnode] at (-1,0) (v0l) {};
+      \node[tnode] at (0,1) (v0u) {};
+      \node[tnode] at (0,-1) (v0d) {};
   
-      \node[nodel, minimum size=0.6cm, fill=white!70!morange] at (1) (v1) {\small$v_2$};
-      \node[nodel, minimum size=0.6cm] at (1,0) (v1l) {\small$v_{12}$};
-      \node[nodel, minimum size=0.6cm] at (2,1) (v1u) {};
-      \node[nodel, minimum size=0.6cm] at (2,-1) (v1d) {};
+      \node[tnode, fill=white!70!morange] at (1) (v1) {\small$v_2$};
+      \node[tnode] at (1,0) (v1l) {\small$v_{12}$};
+      \node[tnode] at (2,1) (v1u) {};
+      \node[tnode] at (2,-1) (v1d) {};
   
-      \node[nodel, minimum size=0.6cm, fill=white!70!mgreen] at (2) (v2) {\small$v_3$};
-      \node[nodel, minimum size=0.6cm] at (3,0) (v2l) {\small$v_{23}$};
-      \node[nodel, minimum size=0.6cm] at (5,0) (v2r) {};
-      \node[nodel, minimum size=0.6cm] at (4,1) (v2u) {};
-      \node[nodel, minimum size=0.6cm] at (4,-1) (v2d) {};
+      \node[tnode, fill=white!70!mgreen] at (2) (v2) {\small$v_3$};
+      \node[tnode] at (3,0) (v2l) {\small$v_{23}$};
+      \node[tnode] at (5,0) (v2r) {};
+      \node[tnode] at (4,1) (v2u) {};
+      \node[tnode] at (4,-1) (v2d) {};
   
       \draw[l1] (v0l) -- (v0) -- (v1l) -- (v1) -- (v2l) -- (v2) -- (v2r);
       \draw[l1] (v0u) -- (v0) -- (v0d);

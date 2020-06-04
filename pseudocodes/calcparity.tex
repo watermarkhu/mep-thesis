@@ -5,9 +5,9 @@
   \KwResult{Calculated parities for $n$ and all its descendent nodes}
   \BlankLine
   parity $=$ \summation{$[1 - $ \cp{$n_\gamma$} $\forall$ children $n_\gamma$ of $n]$} $\bmod 2$\;
-  \uIf{$n \equiv s$}{
+  \uIf(Syndrome-node){$n \equiv s$}{
       $n.p =$ parity}
-  \ElseIf{$n \equiv l$}{
+  \ElseIf(Linking-node){$n \equiv l$}{
       $n.p= 1-$ parity}
   \KwRet{$n.p$}
   \caption{\codefunc{Calcparity}}\label{algo:calcparity}

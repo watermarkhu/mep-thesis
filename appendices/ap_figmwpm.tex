@@ -1,0 +1,32 @@
+\chapter{Supplementary figures to Chapter \ref{ch:mwpm}}\label{ap:figmwpm}
+
+% MWPM
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_toric_2d.pgf}
+      \end{adjustbox}
+      \caption{Toric code independent noise.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_planar_2d.pgf}
+      \end{adjustbox}
+      \caption{Planar code independent noise.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_toric_3d.pgf}
+      \end{adjustbox}
+      \caption{Toric code phenomenological noise.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+      \begin{adjustbox}{Clip=0 1em 0 0}
+        \input{pgfplots/threshold_mwpm_planar_3d.pgf}
+      \end{adjustbox}
+      \caption{Planar code phenomenological noise.}
+    \end{subfigure}
+    \caption{Monte Carlo simulations for the decoding success rate using the Minimum-Weight Perfect Matching decoder}
+    \label{fig:threshold_mwpm}
+  \end{figure}

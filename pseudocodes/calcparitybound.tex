@@ -5,11 +5,11 @@
   \KwResult{Calculated parities for $n$ and all its descendent nodes}
   \BlankLine
   parity $=$ \summation{$[1 - $ \cp{$n_\gamma$} $\forall$ children $n_\gamma$ of $n]$} $\bmod 2$\;
-  \uIf{$n \equiv s$}(syndrome-node){
+  \uIf(syndrome-node){$n \equiv s$}{
       $n.p =$ parity}
-  \uElseIf{$n \equiv l$}(linking-node){
+  \uElseIf(linking-node){$n \equiv l$}{
       $n.p= 1-$ parity}
-  \ElseIf{$n \equiv b$}(boundary-node){
+  \ElseIf(boundary-node){$n \equiv b$}{
     $n.p= 1$}
   \KwRet{$n.p$}
   \caption{\codefunc{Calcparity} for surfaces with boundaries}\label{algo:calcparitybound}

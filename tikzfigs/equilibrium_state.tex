@@ -4,7 +4,7 @@
   \path[fill=white!80!black, rounded corners=2pt] (lb) rectangle (rt);
   \ifnumequal{#4}{1}{\draw[thin] (lb) -- (rb);}{}
 }
-\begin{figure}[htbp]
+\begin{figure}[p]
 \centering
     \begin{tikzpicture}[on grid, scale=1]
       \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{1}}
@@ -46,10 +46,10 @@
 %       \draw[l1, ->] (a8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \eqref{eq:2ddelay}};
 %       \draw[l1, ->] (c8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \eqref{eq:delayequation},\\ $K_{bloom} = 0.5$};
     \end{tikzpicture}
-    \caption{The delay values $n_i.d$ and the equilibrium-states $(I:M)$ for 3 odd clusters $\{\nset_1, \nset_2, \nset_3\}$ of 3 nodes that grow and join into a size-9 cluster. Initially (top), parity and delay calculations (PDC) are performed with delay equation \eqref{eq:2ddelay} on each odd cluster which have equilibrium-states $(0:2)$, with delay $2$ in the middle node. The clusters are grown (middle), where the middle node is delayed, such that it's delay value decreases to $1$, and the clusters have equilibrium-states $(1:2)$. The clusters join (bottom) to a single odd cluster, which is selected for growth. Hence PDC is performed again, and the equilibrium-state is $(0:4)$, thus requiring 4 growth iterations before equal potential matching weight is reached in all nodes.}\label{fig:kbloom}
+    \caption{The delay values $n_i.d$ and the equilibrium-states $(I:M)$ for 3 odd clusters $\{\nset_1, \nset_2, \nset_3\}$ of 3 nodes that grow and join into a size-9 cluster. Initially (top), parity and delay calculations  are performed with delay equation \eqref{eq:2ddelay} on each odd cluster which have equilibrium-states $(0:2)$, with delay $2$ in the middle node. The clusters are grown (middle), where the middle node is delayed, such that it's delay value decreases to $1$, and the clusters have equilibrium-states $(1:2)$. The clusters join (bottom) to a single odd cluster, which is selected for growth. Hence parity and delay calculation is performed again, and the equilibrium-state is $(0:4)$, thus requiring 4 growth iterations before equal potential matching weight is reached in all nodes.}\label{fig:kbloom}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
   \begin{tikzpicture}
       \foreach \x in {0,3,6}{\DLINE{\x}{0}{2}{1}}

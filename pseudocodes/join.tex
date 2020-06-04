@@ -5,11 +5,11 @@
     \BlankLine
   
     Merge node sets by initiating edge $(n_i, n_j)$\;
-    \uIf{$c_i$ even, $c_j$ odd}{
+    \uIf($\nset_i$ descendant of $\nset_j$){$c_i$ even, $c_j$ odd}{
       set $c_{ij}.n_r = c_j.n_r$\;
       set $c_{ij}.n_u = c_i$
     }
-    \uElseIf{$c_i$ odd, $c_j$ even}{
+    \uElseIf($\nset_j$ descendant of $\nset_i$){$c_i$ odd, $c_j$ even}{
       set $c_{ij}.n_r = c_i.n_r$\;
       set $c_{ij}.n_u = c_j$
     }

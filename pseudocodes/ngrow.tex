@@ -9,10 +9,10 @@
     \eIf{$n.d-n.w-c_j.d=0$}{
       \codefunc{Bloom}$(n, \m{L}_m)$ (Alg. \ref{algo:bloom})\; 
     }{
-      Add 1 to $n.w$\;
+      Add 1 to $n.w$ \tcp*{Let the node be delayed for one iteration}
     }
     \For{child node $n_\gamma$ of $n$}{
-      \grow{$n_\gamma$}
+      \grow{$n_\gamma$} \tcp*{Recursively applies to all descendant nodes}
     }
     \caption{\codefunc{Ngrow}}\label{algo:bbgrow}
   \end{algorithm}

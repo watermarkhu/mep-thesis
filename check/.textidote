@@ -1,0 +1,4 @@
+--output html 
+--read-all
+--dict .textidote_dict.txt
+--check en

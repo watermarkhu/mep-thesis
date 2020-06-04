@@ -4,13 +4,13 @@
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
 \usepackage[hidelinks]{hyperref}
-\usepackage{physics}
-\usepackage{adjustbox}
+\usepackage[mathscr]{euscript}
+\usepackage[table]{xcolor}
+\usepackage{physics, adjustbox}
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{framed,enumitem} 
-\usepackage[mathscr]{euscript}
-\usepackage{xcolor, xparse, todonotes}
-
+\usepackage{xparse, todonotes}
+\usepackage{titlesec}
 
 % Define colors
 \definecolor{mblue}{HTML}{1F77B4}
@@ -103,47 +103,7 @@
 \usepackage{glossary-mcols}
 
 \makeglossaries
-\glsxtrnewsymbol[description={Pauli group}]{spauligroup}{\ensuremath{\m{P}}}
-\glsxtrnewsymbol[description={Pauli X operator}]{oX}{\ensuremath{\hat{X}}}
-\glsxtrnewsymbol[description={Pauli Y operator}]{oY}{\ensuremath{\hat{Y}}}
-\glsxtrnewsymbol[description={Pauli Z operator}]{oZ}{\ensuremath{\hat{Z}}}
-\glsxtrnewsymbol[description={Identity operator}]{oI}{\ensuremath{\hat{I}}}
-\glsxtrnewsymbol[description={Logical X operator}]{oXlogical}{\ensuremath{\hat{X}_L}}
-\glsxtrnewsymbol[description={Logical Z operator}]{oZlogical}{\ensuremath{\hat{Z}_L}}
-\glsxtrnewsymbol[description={Stabilizer group}]{sstabilizergroup}{\ensuremath{\m{S}}}
-\glsxtrnewsymbol[description={Stabilizer, element of $\m{S}$}]{ostabilizer}{\ensuremath{\hat{S}}}
-\glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{sstabilizergenset}{\ensuremath{\mathfrak{s}}}
-\glsxtrnewsymbol[description={Stabilizer generator, generates $\m{S}$}]{ostabilizergenerator}{\ensuremath{\hat{s}}}
-\glsxtrnewsymbol[description={Syndrome set}]{ssyndrome}{\ensuremath{\sigma}}
-\glsxtrnewsymbol[description={Plaquette operator}]{oplaquette}{\ensuremath{\hat{P}_f}}
-\glsxtrnewsymbol[description={Star operator}]{ostar}{\ensuremath{\hat{S}_v}}
-\glsxtrnewsymbol[description={Graph of a surface code}]{ngraph}{\ensuremath{G}}
-\glsxtrnewsymbol[description={Vertex set}]{svertices}{\ensuremath{\m{V}}}
-\glsxtrnewsymbol[description={vertex, element of $V$}]{nvertex}{\ensuremath{v}}
-\glsxtrnewsymbol[description={Edge set}]{sedges}{\ensuremath{\m{E}}}
-\glsxtrnewsymbol[description={edge, element of $E$}]{nedge}{\ensuremath{e}}
-\glsxtrnewsymbol[description={Face set}]{sfaces}{\ensuremath{\m{F}}}
-\glsxtrnewsymbol[description={Face, element of $F$}]{nface}{\ensuremath{f}}
-\glsxtrnewsymbol[description={Probability of error correction}]{zpcorrect}{\ensuremath{k_C}}
-\glsxtrnewsymbol[description={Threshold probability}]{zpthres}{\ensuremath{p_{th}}}
-\glsxtrnewsymbol[description={Error operator}]{operror}{\ensuremath{\hat{E}}}
-\glsxtrnewsymbol[description={Correction operator}]{ocorrection}{\ensuremath{\hat{C}}}
-\glsxtrnewsymbol[description={Erasure, subset of $E$}]{serasure}{\ensuremath{\m{R}}}
-\glsxtrnewsymbol[description={Forest of erasure $\m{R}$}]{sforest}{\ensuremath{\m{T}_\m{R}}}
-\glsxtrnewsymbol[description={Pauli product of set of edges}]{ppauliproduct}{\ensuremath{\mathscr{P}}}
-\glsxtrnewsymbol[description={Correction set, subset of $E$}]{scorrectionset}{\ensuremath{\m{C}}}
-\glsxtrnewsymbol[description={Boundary of an edge set}]{pboundary}{\ensuremath{\mathscr{B}}}
-\glsxtrnewsymbol[description={Cluster, subgraph of $G$}]{ncluster}{\ensuremath{c}}
-\glsxtrnewsymbol[description={Disjoint-set tree of vertices}]{zuftree}{\ensuremath{T}}
-\glsxtrnewsymbol[description={List of odd clusters}]{sloddlist}{\ensuremath{\m{L}_o}}
-\glsxtrnewsymbol[description={List of merging edges}]{slmerging}{\ensuremath{\m{L}_m}}
-\glsxtrnewsymbol[description={List of buckets}]{slbuckets}{\ensuremath{\m{L}_b}}
-\glsxtrnewsymbol[description={Bucket with number $k$}]{zbucket}{\ensuremath{b_k}}
-\glsxtrnewsymbol[description={List of clusters for placement}]{slplace}{\ensuremath{\m{L}_p}}
-\glsxtrnewsymbol[description={Node set}]{snodeset}{\ensuremath{\nset}}
-\glsxtrnewsymbol[description={Node, element of $\nset$}]{nnode}{\ensuremath{n}}
-\glsxtrnewsymbol[description={Syndrome-node}]{nsyndromenode}{\ensuremath{s}}
-\glsxtrnewsymbol[description={Linking-node}]{nlinkingnode}{\ensuremath{l}}
+\input{gls_symbols.tex}
 
 \renewcommand*{\glossarypreamble}{\vspace{-\baselineskip}}
 \newcommand*{\Ngroupname}{Objects, elements of sets}
@@ -161,6 +121,7 @@
 \newcolumntype{L}[1]{>{\hsize=#1\hsize\raggedright\arraybackslash}X}%
 \newcolumntype{R}[1]{>{\hsize=#1\hsize\raggedleft\arraybackslash}X}%
 \newcolumntype{C}[1]{>{\hsize=#1\hsize\centering\arraybackslash}X}%
+\newcommand{\gc}{\cellcolor[gray]{0.9}}
 
 \title{mep-thesis}
 \author{Shui Hu}
@@ -178,27 +139,35 @@
   \printglossary[type=symbols, style={mcoltreegroup}]
   \clearpage
 
-  \input{tikzfigs/function_draw_lattices}
+  \input{tikzfigs/function_draw_lattices.tex}
 
   \pagenumbering{arabic} 
-  % \include{preliminary_report}
+  % \include{chapters/preliminary_report}
   \include{chapters/ch_introduction}
   \include{chapters/ch_qec_basics}
   \include{chapters/ch_surface_code}
   \include{chapters/ch_mwpmdecoder}
   \include{chapters/ch_ufdecoder}
   \include{chapters/ch_ufbb}
-  \include{chapters/ch_ufmodifications}
+  \include{chapters/ch_conclusions}
+  % \include{chapters/ch_ufmodifications}
 
   % \include{chapters/ch_threshold_results}
   \include{peeling_objects_1}
 
   \begin{appendices}
+    \titleformat{\chapter}[display]
+      {\normalfont\Large\bfseries}% <- font for label "Appendix A", default \huge
+      {\chaptertitlename\ \thechapter}{10pt}
+      {\LARGE}% <- font for title, default \Huge
+    \titlespacing*{\chapter}{0pt}{0pt}{15pt}
+    % \include{appendices/ap_bucket_sort}
     \include{appendices/ap_unionfind}
     \include{appendices/ap_ackermann}
-    \include{appendices/ap_bucket_sort}
+    \include{appendices/ap_figmwpm}
     \include{appendices/ap_ufpseudocodes}
-    \include{appendices/ap_simulationfigures}
+    \include{appendices/ap_figuf}
+    \include{appendices/ap_figufbb}
     \include{appendices/ap_oopsurfacecode}
   \end{appendices}
 
