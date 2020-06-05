@@ -348,7 +348,7 @@ We now describe the pre-processing step of syndrome validation. A round of growt
 
 \subsection{Time complexity of the Union-Find decoder}\label{sec:ufcomplexity}
 
-For a system of $n$ qubits, the initialization of the cluster $\m{V}_i$ and its boundaries $\delta \m{V}_i$ and the odd parity cluster list $\m{L}_o$ all take $\m{O}(n)$ time. Each edge can be traced a maximum of 2 iterations, thus tracing also takes $\m{O}(n)$. Maintaining $\m{L}_o$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a "Almost-linear time decoding algorithm" \cite{delfosse2017almost}. 
+For a system of $n$ qubits, the initialization of the cluster $\m{V}_i$ and its boundaries $\delta \m{V}_i$ and the odd parity cluster list $\m{L}_o$ all take $\m{O}(n)$ time. Each edge can be traced a maximum of 2 iterations, thus tracing also takes $\m{O}(n)$. Maintaining $\m{L}_o$ is proportional to the number of unions, which is limited to $n-1$. As we already know that the Peeling decoder takes $\m{O}(n)$ time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is $\m{O}(n\alpha(n))$. Here $\alpha(n)$ denotes the inverse of Ackermann's function (see appendix \ref{ap:ackermann}), which is \emph{very} slow growing, such that for any physical values of $n$, $\alpha(n) \leq 4$. This certifies the proclaim that the Union-Find decoder is a ``Almost-linear time decoding algorithm'' \cite{delfosse2017almost}. 
 
 \section{Implementations of the Union-Find decoder}\label{sec:ufimplementations}
 
@@ -374,9 +374,9 @@ If there are only two clusters $c_i, c_j$ on the lattice with different cluster 
 
 
 \subsubsection{Sorting method}
-% Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more "incorrect" edges will be added during growth of a larger cluster.
+% Let us now first look at what weighted growth for the Union-Find decoder exactly does. When a cluster is odd, there exists at least one path of errors connecting this cluster to a generator outside of this cluster. When the cluster grows, a number of edges $k$ that is proportional to the size $S$ of the cluster is added to the cluster. If $k \propto S$ new edges are added, only $1/k$ of these edges will correctly connect the cluster with the generator. Therefore, more ``incorrect'' edges will be added during growth of a larger cluster.
 
-% Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $\m{V}_\alpha, \m{V}_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $\m{V}_\beta$ will add $\sim k_{\beta}/2$ "incorrect" edges on average, whereas growth of cluster $\m{V}_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added "incorrect" edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
+% Note however, that the benefit of growing a smaller cluster is not substantial if the clusters are of similar size. Take two clusters $\m{V}_\alpha, \m{V}_\beta$ with size $S_\alpha <<S_\beta$, growth of cluster $\m{V}_\beta$ will add $\sim k_{\beta}/2$ ``incorrect'' edges on average, whereas growth of cluster $\m{V}_\alpha$ will add $\sim k_{\alpha}/2 << k_{\beta}/2$ edges as $k_{\alpha} \propto S_\alpha$ and $k_{\beta} \propto S_\beta$. However, if $S_\alpha \simeq S_\beta$, the number of added ``incorrect'' edges for both clusters will also be similar, and it is the same when $S_\alpha = S_\beta$.
 The challenging aspect to weighted growth is that the sizes of clusters change as they grow and merge. For $n_c\propto n$ clusters on a lattice at time $t$, where $n$ denotes the number of vertices, sorting these $n_c$ clusters using any \emph{comparison sort} methods such as \emph{Quicksort}, \emph{Merge sort}, \emph{Heapsort} has a worst-case complexity of $n_c \log n_c$ at best. Here, any time the size of a clusters changes, we need to compare its new size with all other clusters sizes. For a total of $n_c \propto 1/n_c$ clusters growths, the total number of operations needed to sort these $n_c$ clusters $n_c$ times may lead to a complexity that is worst than $\m{O}(n\alpha(n))$. Luckily, as the sizes of clusters can only take on integer values and is limited to $n$, we can utilize a \emph{non-comparison} sorting algorithm. Now, as the size of a cluster changes, we need not to compare it with the other clusters. Specifically, we will be using \emph{Bucket sort}. 
 \begin{definition}\label{def:buckets}
   Bucket sort is a non-comparison sorting algorithm that distributes $n$ elements into $N_b$ buckets, whereafter each bucket is sorted individually. Bucket sort has average-case performance $\m{O}(n + n^2/N_b + N_b)$. The worst-case complexity for Bucket sort is $\m{O}(n^2)$, when all the elements are placed into a single bucket. Each bucket is labelled as $\gls{zbucket}$ and the list of all buckets is labelled as $\gls{slbuckets}=[b_1, b_2, ...,b_{N_b}]$. 
@@ -422,9 +422,9 @@ As we trace the boundary edges per half-edge, a single round of growth does not 
 %              \end{cases}
 % \end{equation}
 
-% In the case of no merge event, clusters grown from even bucket $b_i$ must be placed in odd bucket $b_{i + 1}$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $b_{j + 2k + 1}$ with $k \in \mathbb{N}_0$ the number of added vertices. Also in the case of a union event of clusters $C_\alpha$ and $C_\beta$, the new cluster $\codefunc{union}(C_\alpha, C_\beta) = C_{\alpha\beta}$ must be placed in a bucket $b_{\alpha\beta} > b_{\alpha}, b_{\alpha\beta} > b_{\beta}$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already "emptied". This ensures that for two clusters $C_\alpha$ and $C_\beta$ with $S_\alpha < S_\beta$, cluster A will be grown first, adding a fewer amount of "incorrect" edges as per lemma \ref{lem:incorrectedges}. Clusters of the same size $S_\alpha=S_\beta$ are placed in the same bucket and their order of growth is dependent on their order of placements.
+% In the case of no merge event, clusters grown from even bucket $b_i$ must be placed in odd bucket $b_{i + 1}$, as it does not increase in size, and clusters grown from odd bucket $j$ must be placed in even bucket $b_{j + 2k + 1}$ with $k \in \mathbb{N}_0$ the number of added vertices. Also in the case of a union event of clusters $C_\alpha$ and $C_\beta$, the new cluster $\codefunc{union}(C_\alpha, C_\beta) = C_{\alpha\beta}$ must be placed in a bucket $b_{\alpha\beta} > b_{\alpha}, b_{\alpha\beta} > b_{\beta}$. Thus we can grow the buckets sequentially, and need not to worry about bucket that have been already ``emptied". This ensures that for two clusters $C_\alpha$ and $C_\beta$ with $S_\alpha < S_\beta$, cluster A will be grown first, adding a fewer amount of ``incorrect'' edges as per lemma \ref{lem:incorrectedges}. Clusters of the same size $S_\alpha=S_\beta$ are placed in the same bucket and their order of growth is dependent on their order of placements.
 
-% All clusters within the same bucket are grown "together"; we first grow all the boundary edges of the clusters in the bucket by half, adding all fully grown edges to the fusion list $\m{A}$ and check for the union and new boundary edges for all clusters together per algorithm \ref{algo:suf}. The order of growth within the bucket is dependent on the order of cluster placement into the bucket.
+% All clusters within the same bucket are grown ``together"; we first grow all the boundary edges of the clusters in the bucket by half, adding all fully grown edges to the fusion list $\m{A}$ and check for the union and new boundary edges for all clusters together per algorithm \ref{algo:suf}. The order of growth within the bucket is dependent on the order of cluster placement into the bucket.
 
 % \begin{theorem}\label{the:bucket_order}
 %   Weighted growth is achieved by growing the odd clusters sequentially starting from bucket $b_0$. Grown odd clusters from bucket $b_c$ are added back to the bucket list using the \codefunc{Place} subroutine, in a bucket $b_{g}$ where $g > c$. Clusters $C_\alpha$ and $C_\beta$ with $S_\alpha = S_\beta$ are placed int the same bucket $b_{S_\alpha}$, and are grown together. However, their growing order is dependent on the order of placement within the bucket.
@@ -564,7 +564,7 @@ With the application of weighted growth through bucket sort and the maintenance 
   \begin{tabularx}{\textwidth} { | R{0.6} || C{1.2} | C{1.2} | }
     \hline
     & No weighted growth &  Bucket weighted growth \\
-    \hhline{|=||=|=|}
+    \hhline{|=::=|=|}
     Static forest & SUF decoder (Alg. \ref{algo:suf}) & SBUF decoder (Alg. \ref{algo:sbuf})\\
     \hline
     Dynamic forest & DUF decoder (Alg. \ref{algo:duf}) & DBUF decoder (Alg. \ref{algo:dbuf})\\
@@ -576,7 +576,7 @@ With the application of weighted growth through bucket sort and the maintenance 
 
 \section{Performance}\label{sec:ufperformance}
 
-We benchmark the performance of each of the implementations of the Union-Find decoder (Table \ref{tab:uftable}) as described in Section \ref{sec:simthres}. We simulate for the decoder success rate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ for the independent noise model (Definition \ref{def:independent}), and on lattice sizes $[8,12,16,20,24,28,32,36]$ for the phenomenal noise model (Definition \ref{def:pheno}). To obtain the code threshold $p_th$, we simulate for a minimum of $9$ error rates $p_X$ around the suspected threshold value for a minimum of $96.000$ samples. For the exact simulation configuration for each lattice and decoder combination, we refer to the figures of the threshold-fits included in Appendix \ref{ap:figuf}. 
+We benchmark the performance of each of the implementations of the Union-Find decoder in Table \ref{tab:uftable}. This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold as described in Section \ref{sec:simthres}. We simulate for the decoder success rate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ for the independent noise model (Definition \ref{def:independent}), and on lattice sizes $[8,12,16,20,24,28,32,36]$ for the phenomenal noise model (Definition \ref{def:pheno}) with a minium of $96.000$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:uftable}. 
 
 \begin{table}[htpb]
   \centering
@@ -585,7 +585,7 @@ We benchmark the performance of each of the implementations of the Union-Find de
     \multicolumn{2}{|c|}{\multirow{2}{*}{}} & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenological noise} \\
     \cline{3-6}
     \multicolumn{2}{|c|}{}                & $p_{th}$ & $k_C$ & $p_{th}$ & $k_C$ \\
-    \hhline{|=|=||=|=|=|=|}
+    \hhline{|=|=#=|=|=|=|}
     \multirow{4}{*}{Toric}    & SUF & $0.09716 \pm 0.00003$ & $0.7336$ & $ 0.02531 \pm 0.00005$ & $0.9239$ \\
                             \cline{2-6}
                             & DUF & $0.09789 \pm 0.00003$ & $0.7432$ & $0.2563 \pm 0.00004$ & $0.9364$ \\
@@ -593,7 +593,7 @@ We benchmark the performance of each of the implementations of the Union-Find de
                             & SBUF & $0.09984 \pm 0.00003$ & $0.7286$ & $0.02681 \pm 0.00002$ & $0.9132$ \\
                             \cline{2-6}
                             & DBUF & $0.10014 \pm 0.00003$ & $0.7271$ & $0.02685 \pm 0.00001$ & $0.9208$ \\
-    \hhline{|=|=||=|=|=|=|}
+    \hhline{|=|=#=|=|=|=|}
     \multirow{4}{*}{Planar} & SUF & $0.09782 \pm 0.00005$ & $0.8578$ & $0.02570 \pm 0.00003$ & $0.9410$\\
                             \cline{2-6}        
                             & DUF & $0.09775 \pm 0.00003$ & $0.8591$ & $0.2572 \pm 0.00003$ & $0.9400$\\
@@ -603,50 +603,49 @@ We benchmark the performance of each of the implementations of the Union-Find de
                             & DBUF & $0.09974 \pm 0.00004$ & $0.8480$ & $0.02660 \pm 0.00001$ & $0.9322$\\
                             \hline
   \end{tabularx}
-  \caption{Threshold error rates $p_{th}$ and decoding success rates $k_C$ for the implementations of the  Union-Find decoder.}\label{tab:ufndfwug}
+  \caption{Threshold error rates $p_{th}$ and decoding success rates $k_C$ for the implementations of the  Union-Find decoder of Table \ref{tab:ufndfwug}. The results of the Monte Carlo simulations for the each of the implementation are included in Figures \ref{fig:threshold_suf}, \ref{fig:threshold_duf}, \ref{fig:threshold_sbuf} and \ref{fig:threshold_dbuf}. }\label{tab:ufndfwug}
 \end{table}
 
-From the literature, the vanilla unweighted Union-Find decoder is reported to have a threshold of $p_{th}=0.092$ for independent noise and $p_{th}=0.024$ for phenomenological noise. The weighted variant, for which no description was provided and led to our implementation using bucket sort, is reported to have a threshold of $p_{th}=0.099$ for independent noise and $p_{th}=0.026$ for phenomenological noise \cite{delfosse2017almost}. The SUF decoder should be equivalent to the vanilla unweighted Union-Find decoder. However, the threshold values of these implementations clear do not match. This points towards other differences in implementations that is unfortunately unknown to us. For better or worse, we have not been able to further reduce the threshold of our implementation. 
-The SBUF decoder should be equivalent to the vanilla weighted variant. The threshold values differ within a range of about $0.001$, or $0.1\%$. While this may seem as they are within range to conclude that they match, note that the threshold of the Minimum-Weight Perfect Matching decoder is only $0.4\%$ higher at $p_{th}=10.3\%$. As the threshold for the unweighted variant already pointed to other differences in implementations, we speculate that our implementation improves upon the original. 
+From the literature, the vanilla unweighted Union-Find decoder is reported to have a threshold of $p_{th}=0.092$ for independent noise and $p_{th}=0.024$ for phenomenological noise. The weighted variant, for which no description was provided and led to our implementation using bucket sort, is reported to have a threshold of $p_{th}=0.099$ for independent noise and $p_{th}=0.026$ for phenomenological noise \cite{delfosse2017almost}. The SUF decoder should be equivalent to the vanilla unweighted Union-Find decoder. However, the threshold values of these implementations clear do not match. This points towards other differences in implementation that is unfortunately unknown to us. For better or worse, we have not been able to further reduce the threshold of our implementation. The SBUF decoder should be equivalent to the vanilla weighted variant. The threshold values differ within a range of about $0.001$, or $0.1\%$. While this may seem as they are within range to conclude that they match, note that the threshold of the Minimum-Weight Perfect Matching decoder is only $0.4\%$ higher at $p_{th}=10.3\%$. As the threshold for the unweighted variant already pointed to other differences in implementations, we speculate that our implementation improves upon the original. 
 
-Furthermore, it can be concluded from Table \ref{tab:uftable} that the dynamic forest variants of the decoders have a slightly increased or equal threshold and decoding success rate. To find out whether the intuition from Proposition \ref{prop:mw1} is true, we compare the matching weight $|\m{C}|$ for every implementation of the Union-Find decoder with the minimum weight obtained with the Minimum-Weight Perfect Matching decoder in Figure \ref{fig:mwcomp_uf_toric_2d}, for a toric code with independent noise on $p_X=0.098$. Similar figures for other configurations can be found in Section \ref{ap:figuf}. From these figures, we can conclude that dynamic forest does decrease the matching weight. This adds to the credibility to the intuition from Proposition \ref{prop:mw1}. We restate the proposition as the following:
+Furthermore, it can be concluded from Table \ref{tab:uftable} that the dynamic forest variants of the decoders have a slightly increased or equal threshold and decoding success rate. To find out whether the intuition from Proposition \ref{prop:mw1} is true, we compare the matching weight $|\m{C}|$ for every implementation of the Union-Find decoder with the minimum weight obtained with the Minimum-Weight Perfect Matching decoder in Figures \ref{fig:comp_uf_toric_2d_mw} and \ref{fig:comp_uf_toric_2d_nmw}, for a toric code with independent noise on $p_X=0.098$. Similar comparisons for simulations on the planar code and with phenomenological noise are included in Figure \ref{fig:mwcomp_uf}. From these figures, we can conclude that dynamic forest does decrease the matching weight. This adds to the credibility to the intuition from Proposition \ref{prop:mw1}. We restate the proposition as the following:
 \begin{proposition}\label{prop:mw2}
-  There is an intuition that a decreased weight is to some extend a heuristic for an increased threshold. 
+  There is an intuition that a decreased weight is to some extent a heuristic for an increased threshold. 
 \end{proposition}
 
-\begin{figure}[htbp]
-  \centering
-  \begin{subfigure}[t]{0.49\textwidth}
-      \input{pgfplots/mwcomp_uf_toric_2d_p98_nnorm.pgf}
-      \caption{Absolute matching weight}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.49\textwidth}
-      \input{pgfplots/mwcomp_uf_toric_2d_p98_norm.pgf}
-      \caption{Normalized matching weight}
-  \end{subfigure}
-  \caption{The matching weight $|\m{C}|$ of the various implementations of the Union-Find decoder, compared with the minimum-weight for various lattice sizes on a toric code, with independent noise $p_X=0.098$.}
-  \label{fig:mwcomp_uf_toric_2d}
-\end{figure}
 
-Finally, we compare the average running times for every implementation of the Union-Find decoder with independent noise in Figure \ref{fig:tcomp_uf_2d}. From this figure we can conclude that maintaining a dynamic forest reduces the running time slightly. This does not come unexpected, as the dynamic forest eliminates the necessity of calling \codefunc{Forest} (Algorithm \ref{algo:forest}). However, the gained performance is not substantial enough to advertise dynamic forest as a major improvement over static forest. Nevertheless, we remind the reader that maintaining a dynamic forest is crucial for our modification of the Union-Find decoder in the next chapter, while in this chapter, the concept of dynamic forest helped us formalize Proposition \ref{prop:mw2}. Similar figures under phenomenological noise show the same heuristic (Section \ref{ap:figuf}).
+Finally, we compare the average running times for every implementation of the Union-Find decoder with independent noise in Figures \ref{fig:comp_uf_toric_2d_tm} and \ref{fig:comp_uf_toric_2d_t}. Similar comparisons for simulations on the planar code and with phenomenological noise are included in Figure \ref{fig:tcomp_uf}. From these figures we can conclude that maintaining a dynamic forest reduces the running time slightly. This does not come unexpected, as the dynamic forest eliminates the necessity of calling \codefunc{Forest} (Algorithm \ref{algo:forest}). However, the gained performance is not substantial enough to advertise dynamic forest as a major improvement over static forest. Nevertheless, we remind the reader that maintaining a dynamic forest is crucial for our modification of the Union-Find decoder in the next chapter, while in this chapter, the concept of dynamic forest helped us formalize Proposition \ref{prop:mw2}. Similar figures under phenomenological noise show the same heuristic (Section \ref{ap:figuf}).
 
 \vspace{1em}
-In this chapter, we have fully described the Union-Find decoder, and provided implementations of this decoder with varying performance. Based on simulated results, we proposed an intuition that a decreased matching matching is a heuristic for an increased code threshold. In the next chapter, we continue to speculate on this intuition. With the goal of further reducing the matching weight within the Union-Find decoder, we propose a modification that has performs comparably with the Minimum-Weight Perfect Matching decoder in terms of code threshold. 
+In this chapter, we have fully described the Union-Find decoder, and provided implementations of this decoder with varying performance. Based on simulated results, we proposed an intuition that a decreased matching is a heuristic for an increased code threshold. In the next chapter, we continue to speculate on this intuition. With the goal of further reducing the matching weight within the Union-Find decoder, we propose a modification that has performs comparably with the Minimum-Weight Perfect Matching decoder in terms of code threshold. 
+
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{0.49\textwidth}
-    \input{pgfplots/tcomp_ufmwpm_toric_2d_p98_norm.pgf}
-    \caption{Toric code}
-  \end{subfigure} 
-  \begin{subfigure}[b]{0.49\textwidth}
-      \input{pgfplots/tcomp_uf_toric_2d_p98_norm.pgf}
-      \caption{Toric code}
+  \begin{subfigure}[t]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/mwcomp_uf_toric_2d_p98_nnorm.pgf}
+    \end{adjustbox}
+    \caption{Absolute matching weight.}\label{fig:comp_uf_toric_2d_mw}
   \end{subfigure}
-  % \begin{subfigure}[b]{0.49\textwidth}
-  %     \input{pgfplots/tcomp_uf_planar_2d_p98_norm.pgf}
-  %     \caption{Planar code}
-  % \end{subfigure}
-  \caption{The average running time of the various implementations of the Union-Find decoder for various lattice sizes  with independent noise $p_X=0.098$.}
-  \label{fig:tcomp_uf_2d}
+  \begin{subfigure}[t]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/mwcomp_uf_toric_2d_p98_norm.pgf}
+    \end{adjustbox}
+    \caption{Matching weight normalized to minimum-weight.}\label{fig:comp_uf_toric_2d_nmw}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/tcomp_ufmwpm_toric_2d_p98_norm.pgf}
+    \end{adjustbox}
+    \caption{Averaged running time of the Union-Find decoders and the MWPM decoder.}\label{fig:comp_uf_toric_2d_tm}
+  \end{subfigure} 
+  \begin{subfigure}[t]{0.49\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/tcomp_uf_toric_2d_p98_norm.pgf}
+    \end{adjustbox}
+    \caption{Averaged running time of the Union-Find decoders.}\label{fig:comp_uf_toric_2d_t}
+  \end{subfigure}
+  \caption{A comparison between the matching weight and averaged running time between the various implementations of the Union-Find decoder listed in Table \ref{tab:ufndfwug}, and the Minimum-Weight Perfect Matching (MWPM) decoder. The specific data is taken from the Monte Carlo simulations of the decoding success rate of each of the decoders on a toric code for independent noise with $p_X = 0.098$. Similar comparisons of (c) and (d) for simulations on the planar code and with phenomenological noise are included in Figures \ref{fig:mwcomp_uf} and \ref{fig:tcomp_uf}.}
+  \label{fig:comp_uf_toric_2d}
 \end{figure}
