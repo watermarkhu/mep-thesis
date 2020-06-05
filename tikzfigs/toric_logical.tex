@@ -1,0 +1,46 @@
+\def\QS{10}
+\def\s{1}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \DRAWTORIC{5}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{1}{2}{0}{z}
+    \DRAWERROR{2}{2}{0}{z}
+    \DRAWERROR{3}{2}{0}{z}
+    \DRAWERROR{4}{2}{0}{z}
+    \DRAWERROR{3}{0}{1}{z}
+    \DRAWERROR{3}{1}{1}{z}
+    \DRAWERROR{3}{2}{1}{z}
+    \DRAWERROR{3}{3}{1}{z}
+    \DRAWERROR{3}{4}{1}{z}
+    \begin{pgfonlayer}{edges}
+      \draw[synz] (S-0-2) -- (S-5-2);
+      \draw[synz] (S-3-4) -- (S-3-5);
+    \end{pgfonlayer}
+    \node[above=.25cm of S-3-4] {(a)};
+    \node[left=.25cm of S-0-2] {(b)};
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \DRAWTORIC{5}
+    \DRAWERROR{0}{2}{1}{x}
+    \DRAWERROR{1}{2}{1}{x}
+    \DRAWERROR{2}{2}{1}{x}
+    \DRAWERROR{3}{2}{1}{x}
+    \DRAWERROR{4}{2}{1}{x}
+    \DRAWERROR{3}{0}{0}{x}
+    \DRAWERROR{3}{1}{0}{x}
+    \DRAWERROR{3}{2}{0}{x}
+    \DRAWERROR{3}{3}{0}{x}
+    \DRAWERROR{3}{4}{0}{x}
+    \begin{pgfonlayer}{edges}
+      \draw[synx] (N-0-2-1) -- (By-2);
+      \draw[synx] (Bx-3) -- (N-3-4-0);
+    \end{pgfonlayer}
+    \node[above=.25cm of N-3-4-0] {(c)};
+    \node[right=.25cm of By-2] {(d)};
+  \end{tikzpicture}
+  \caption{The logical (a) $\hat{X}_{L1}$, (b) $\hat{X}_{L2}$, (c) $\hat{Z}_{L1}$ and (d) $\hat{Z}_{L2}$ operators are the closed loop of $X$ and $Z$ operators, respectively, that go around the two boundaries of the torus (inspired by \cite{browne}).}\label{sf:fig_logical}
+\end{figure}

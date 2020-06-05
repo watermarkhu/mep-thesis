@@ -1,0 +1,14 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+      \DRAWTORIC{3}
+      \draw [arrow] (-1,0 |- N-0-2-1) node [align=right, left] {qubit/edge} -- (N-0-2-1);
+      \node (plaquette) at ($(N-0-1-0)!0.5!(N-0-0-0)$) {};
+      \node (star) at ($(N-1-0-1)!0.5!(N-1-1-1)$) {};
+      \draw [arrow] (-1,0 |- plaquette)  node [align=right, left] {face} -- (plaquette);
+      \draw [arrow] (-1,0 |- N-1-0-1) node [align=right, left] {vertex} to [out=0, in=225] (star);
+      \node [align=left, right] at (3*\s + .5, .5*\s) {periodic boundary};
+  
+    \end{tikzpicture}
+    \caption{The toric code is defined as a $L\times L$ lattice (here $L=3$) with periodic boundary conditions. The edges on the lattice, which represents the qubits, make up faces and vertices (inspired by \cite{browne}).}\label{sf:fig_toriclattice}
+  \end{figure}

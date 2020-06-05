@@ -1,0 +1,36 @@
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \DRAWTORIC{3}
+    \DRAWPLAQ{1}{1}
+    \DRAWPLAQ{0}{1}
+    \DRAWPLAQ{0}{2}
+    \DRAWERROR{1}{1}{0}{z}
+    \DRAWERROR{1}{0}{0}{z}
+    \DRAWERROR{2}{1}{1}{z}
+    \DRAWERROR{0}{0}{0}{z}
+    \DRAWERROR{0}{1}{1}{z}
+    \DRAWERROR{0}{2}{1}{z}
+    \DRAWERROR{0}{2}{0}{z}
+    \DRAWERROR{1}{2}{1}{z}
+    \node[below of=Bx-1] {(a)};
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \DRAWTORIC{3}
+    \DRAWSTAR{1}{1}{3}
+    \DRAWSTAR{2}{0}{3}
+    \DRAWSTAR{2}{1}{3}
+    \DRAWERROR{1}{2}{1}{x}
+    \DRAWERROR{0}{1}{0}{x}
+    \DRAWERROR{2}{2}{1}{x}
+    \DRAWERROR{1}{1}{1}{x}
+    \DRAWERROR{1}{0}{0}{x}
+    \DRAWERROR{2}{0}{1}{x}
+    \DRAWERROR{2}{0}{0}{x}
+    \DRAWERROR{2}{1}{0}{x}
+    \node[below of=Bx-1] {(b)};
+  \end{tikzpicture}
+  \caption{Multiplication of (a) plaquette and (b) star operators will result in a operator that consists of the Pauli operators that reside on the overall boundary of the joint plaquettes or stars (inspired by \cite{browne}).}\label{sf:fig_multistab}
+\end{figure}

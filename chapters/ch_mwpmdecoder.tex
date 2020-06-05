@@ -1,17 +1,37 @@
 
-\chapter{Minimum Weight Perfect Matching}\label{ch:mwpm}
+\chapter{Minimum-Weight Perfect Matching decoder}\label{ch:mwpm}
 
+In this chapter, we will give a short description of the most commonly used decoder for surface codes: the Minimum-Weight Perfect Matching decoder. This decoder was actually the first decoder for surface code, first introduced in \cite{dennis2002topological}. The Minimum-Weight Perfect Matching decoder has a worst-case complexity of between $\m{O}(n^3)$ and $\m{O}(n^7)$, depending on the implementation \cite{edmonds1965paths, kolmogorov2009blossom}, but has a relatively high decoder threshold. Many have improved upon the decoder to extend it to more general noise models or to optimize its performance \cite{fowler2012towards, fowler2012surface, fowler2013optimal, stace2009thresholds, stace2010error}. Most notably, at the cost of space complexity, the average-case complexity of the decoder has been reduced to $\m{O}(1)$ time \cite{fowler2013minimum}. We will outline the idea of the Minimum-Weight Perfect Matching decoder in Section \ref{sec:mwpm} and show its performance on a simulated lattice in Section \ref{sec:mwpmperformance}.
 
-\section{Quasiparticle picture}
-The processes of error detection and correction can alternatively be presented in the \emph{quasiparticle picture}, where the anticommuting stabilizer measurements act like excitations on the lattice, which behave like the quasiparticles \emph{anyons}. A single error creates a pair of anyons, and a chain of errors causes movement of the anyon on the lattice. A pair of anyons can also annihilate each other when two error chains merge. The correction of errors can thus be viewed of movement of the correction chains until all anyons are annihilated. The quasiparticle picture removes the distracting underlying lattice from the problem, and decoding becomes simply identifying the right pairing between anyons to minimize the chance of a logical error.
-\input{tikzfigs/quasiparticle_picture}
-Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the errors suffered in Figure \ref{sf:fig_degenerate}a, which has suffered Z (blue lines) and X errors (red lines). The corresponding anyons can either be of the star type (red circle) or plaquette type (blue circle). Figure \ref{fig:quasiparticle}b shows a successful decoding. Note that here not all pairs are correctly identified, but the resulting loop still is in the same class of operators. In Figure \ref{fig:quasiparticle}c the correction has failed as the resulting loop in the correction is in a difference class compared to the error. As the loop still commutes with the stabilizer, no error can be detected, but the encoded qubit has acquired a logical error.
+\section{Minimum-weight perfect matching}\label{sec:mwpm}
+
+Recall from Section \ref{sec:quasiparticle} that decoding a surface code can be simply performed by pairing anyons in the syndrome. The challenge for the decoder is choosing a pairing that is not likely to result in a logical error. 
+
+The basic principle behind the minimum-weight perfect matching approach is to identify the \emph{lowest weight} error configuration that can produce the observed syndrome $\sigma$. If independent errors occur on a lattice of $N$ qubits with probability $p$, then the probability of some error operator $\hat{E}$ with $|\hat{E}|$ errors has a probability of occurring
+\begin{equation}
+  P(\hat{E}) = p^{\abs{\hat{E}}}(1-p)^{N-\abs{\hat{E}}},
+\end{equation}
+and therefore
+\begin{equation}
+  P(\hat{E})\propto \left(\frac{p}{1-p}\right)^\abs{\hat{E}}.
+\end{equation}
+As $0<p/(1-p)<1$, the probability of $\hat{E}$ occurring is maximized when $|\hat{E}|$ is minimized. This means that the error configuration with the smallest amount of errors is the most probable one. 
+
+Recall from Section \ref{sec:correction} that to correct an error, the goal is to find the correction operator $\hat{C}$ that is most likely to return the code to the codespace. Finding the lowest weight configuration does not correspond to this problem. To find the correction that is most likely, one would have to consider \emph{all} possible error configuration that could produce the observed syndrome $\sigma$, find to which class they belong and weigh each class accordingly to find the most likely correction. The lowest weight configuration is in general a good approximation of the decoding problem, but not in all cases. It is due to this discrepancy that the error threshold of the Minimum-Weight Perfect Matching decoder is lower than the optimal value. 
+
+For a set of anyons in the quasiparticle representation, finding the minimum-weighted pairs is equivalent to finding the minimal distances between the particles. The distance between two anyons is the shortest path between them, where a path consists of a number of qubits that is equal to the weight. This problem can be efficiently solved by mapping the quasiparticles into a graph matching problem, where every anyon is a node in a completely connected graph. The edges in the graph are now assigned a weight corresponding to the distance between the anyons (Figure \ref{fig:mwpm}). This graphing problem can now be solved in polynomial time using Edmonds' blossom algorithm \cite{edmonds1965paths}. 
 
 \input{tikzfigs/mwpm}
 
-\section{Performance}
+\section{Boundaries}\label{sec:mwpmboundaries}
 
+For surfaces with boundaries such as the planar code (Section \ref{sec:surface_planar}), the number of anyons in the syndrome is now not guaranteed to be even. In the graph representation, an error on an edge in $\m{E}_delta$ will cause only a non-trivial syndrome measurement on one of its supporting vertices. The other vertex is in the open vertex set $\m{V}_\omega$, which are not equivalent to ancilla qubits or stabilizer measurements. Thus, the concept of pairing must include the possibility of an anyon to pair with the code boundary, in addition to paring with other anyons. 
 
+The procedure of mapping anyons to a graph matching problem must now be modified to include this extra pairing possibility. This is done by creating for every anyon an extra ``virtual'' node in the graph that is located at the boundary of the code as described by \cite{wang2011surface}. The node corresponding to the anyon is connected by an edge with its virtual pair. Furthermore, the set of virtual nodes are all connected by edges of weight 0. This allows a node to pair with the virtual node at the boundary, and all ``unused'' virtual nodes to pair with each other such that they are efficiently removed. 
+
+\section{Performance}\label{sec:mwpmperformance}
+
+We benchmark the performance of the Minimum-Weight Perfect Matching decoder using our own implementation in Python3 (see Appendix \ref{ap:oopsurfacecode}) for a simulated lattice and the BlossomV algorithm, which is implemented in C, for finding the minimum-weight matching \cite{kolmogorov2009blossom}. This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold as described in Section \ref{sec:simthres}. For the independent noise model (Definition \ref{def:independent}), we simulate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ with a minimum of $52.800$ samples. For the phenomenological noise model (Definition \ref{def:pheno}), we simulate on lattice sizes $L_{small}=[8,10,12,14,16,18,20,22]$ with a minimum of $52.800$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:mwpm}.
 
 \begin{table}[htpb]
   \centering
@@ -26,5 +46,7 @@ Figure \ref{fig:quasiparticle}a shows the quasiparticle representation of the er
    Planar code  & $0.10292 \pm 0.00005$ & $0.8478$ & $0.02928 \pm 0.00003$ & $0.928$ \\
   \hline
   \end{tabularx}
-  \caption{Simulation results for the Minimum-Weight Perfect Matching decoder $L = 8:8:64, L=8:2:22$}\label{tab:mwpm}
+  \caption{Error thresholds for the Minimum-Weight Perfect Matching decoder utilizing the BlossomV algorithm \cite{kolmogorov2009blossom} on both the toric and planar lattices with independent and phenomenological noise. The results of the Monte Carlo simulations used to calculate the thresholds are included in Figure \ref{fig:threshold_mwpm}.}\label{tab:mwpm}
 \end{table}
+
+These obtained values for the decoder threshold $p_{th}$ correspond with the values reported in the literature \cite{dennis2002topological, naomi2016thesis, wang2009threshold, wang2003confinement}. In de Monte Carlo simulations, some metadata are also acquired that will be useful when comparing the performance of the Minimum-Weight Perfect Matching decoder with other decoders. Most notably, the average running time of the simulation and the actual weight of the matching are used as metrics in the upcoming chapters. 

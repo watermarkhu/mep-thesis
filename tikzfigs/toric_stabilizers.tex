@@ -1,0 +1,44 @@
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \DRAWTORIC{3}
+    \DRAWPLAQ{1}{1}
+    \DRAWERROR{1}{1}{0}{z}
+    \DRAWERROR{1}{1}{1}{z}
+    \DRAWERROR{1}{0}{0}{z}
+    \DRAWERROR{2}{1}{1}{z}
+    \node[below of=Bx-1] {(a)};
+  \end{tikzpicture}
+  \hspace{1cm}
+  \begin{tikzpicture}
+    \DRAWTORIC{3}
+    \DRAWSTAR{1}{1}{3}
+    \DRAWERROR{1}{1}{1}{x}
+    \DRAWERROR{1}{1}{0}{x}
+    \DRAWERROR{1}{2}{1}{x}
+    \DRAWERROR{0}{1}{0}{x}
+    \node[below of=Bx-1] {(b)};
+  \end{tikzpicture}
+
+  \begin{center}
+    \hspace{1cm}
+    \begin{tikzcd}[row sep={0.5cm,between origins}]
+      \lstick{$Q_1$} & \qw & \qw & \qw & \ctrl{5} & \qw \\
+      \lstick{$Q_2$}& \qw & \qw & \ctrl{4} & \qw & \qw \\
+      \lstick{$Q_3$} & \qw & \ctrl{3} & \qw & \qw & \qw \\
+      \lstick{$Q_4$} & \ctrl{2} & \qw & \qw & \qw & \qw \\
+      &&&&&&&\\
+      \lstick{$\hat{P}_f$} & \ctrl{} & \ctrl{} & \ctrl{} & \ctrl{} & \meter{}
+    \end{tikzcd}
+    \begin{tikzcd}[row sep={0.5cm,between origins}]
+      \lstick{$Q_1$} & \qw & \qw & \qw & \targ{} & \qw \\
+      \lstick{$Q_2$} & \qw & \qw & \targ{} & \qw & \qw \\
+      \lstick{$Q_3$} & \qw & \targ{} & \qw & \qw & \qw \\
+      \lstick{$Q_4$} & \targ{} & \qw & \qw & \qw & \qw \\
+      &&&&&&&\\
+      \lstick{$\hat{S}_v$} & \ctrl{-2} & \ctrl{-3} & \ctrl{-4} & \ctrl{-5} & \meter{}
+    \end{tikzcd}
+  \end{center}
+
+  \caption{Each face (a) and vertex (b) on the lattice represents a plaquette and star operator, respectively. The non-identity single qubit operators on which they act are indicated. The set of all (but one) plaquettes and vertices make up the stabilizers of the code (inspired by \cite{browne}).}\label{sf:fig_stabilizers}
+\end{figure}

@@ -1,0 +1,82 @@
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+      \DRAWTORIC{5}
+      \DRAWERROR{1}{2}{0}{z}
+      \DRAWERROR{2}{4}{1}{x}
+      \DRAWERROR{3}{1}{0}{y}
+      \DRAWERROR{1}{0}{0}{z}
+      \DRAWERROR{0}{0}{0}{z}
+      \DRAWPLAQ{1}{4}
+      \DRAWPLAQ{2}{4}
+      \DRAWSTAR{1}{2}{5}
+      \DRAWSTAR{2}{2}{5}
+      \DRAWSTAR{0}{0}{5}
+      \DRAWSTAR{2}{0}{5}
+      \DRAWPLAQ{3}{1}
+      \DRAWPLAQ{3}{2}
+      \DRAWSTAR{3}{1}{5}
+      \DRAWSTAR{4}{1}{5}
+      \begin{pgfonlayer}{edges}
+        \draw[synz] (N-0-0-0) -- (N-1-0-0);
+      \end{pgfonlayer}
+      \node[below=.25cm of Bx-2] {(a)};
+      \node[script] at (P-1-2) {\textit{(i)}};
+      \node[script] at (P-1-4) {\textit{(ii)}};
+      \node[script] at (P-3-1) {\textit{(iii)}};
+      \node[script] at (P-1-0) {\textit{(iv)}};
+  
+    \end{tikzpicture}
+    \hspace{1cm}
+    \begin{tikzpicture}
+      \DRAWTORIC{5}
+      \DRAWERROR{0}{2}{0}{z}
+      \DRAWERROR{2}{2}{0}{z}
+      \DRAWERROR{3}{2}{0}{z}
+      \DRAWERROR{4}{2}{0}{z}
+      \DRAWSTAR{1}{2}{5}
+      \DRAWSTAR{2}{2}{5}
+      \begin{pgfonlayer}{edges}
+        \draw[synz] (N-0-2-0) -- (S-0-2) (N-2-2-0) -- (S-5-2);
+      \end{pgfonlayer}
+      \node[below=.25cm of Bx-2] {(b)};
+    \end{tikzpicture}
+  
+    \begin{tikzpicture}
+      \DRAWTORIC{5}
+      \DRAWERROR{1}{2}{1}{z}
+      \DRAWERROR{1}{1}{1}{z}
+      \DRAWERROR{1}{0}{0}{z}
+      \DRAWERROR{2}{0}{1}{z}
+      \DRAWERROR{2}{4}{1}{z}
+      \DRAWERROR{2}{3}{1}{z}
+      \DRAWSTAR{1}{2}{5}
+      \DRAWSTAR{2}{2}{5}
+      \begin{pgfonlayer}{edges}
+        \draw[synz] (N-1-2-1) -- (S-1-0) -- (S-2-0) -- (S-2-5) (S-2-4) -- (N-2-3-1);
+      \end{pgfonlayer}
+      \node[below=.25cm of Bx-2] {(c)};
+    \end{tikzpicture}
+    \hspace{1cm}
+    \begin{tikzpicture}
+      \DRAWTORIC{5}
+      \DRAWERROR{0}{2}{0}{z}
+      \DRAWERROR{4}{2}{0}{z}
+      \DRAWERROR{4}{2}{1}{z}
+      \DRAWERROR{4}{1}{1}{z}
+      \DRAWERROR{3}{0}{0}{z}
+      \DRAWERROR{3}{0}{1}{z}
+      \DRAWERROR{3}{4}{1}{z}
+      \DRAWERROR{3}{3}{1}{z}
+      \DRAWERROR{2}{2}{0}{z}
+      \DRAWSTAR{1}{2}{5}
+      \DRAWSTAR{2}{2}{5}
+      \begin{pgfonlayer}{edges}
+        \draw[synz] (N-0-2-0) -- (S-0-2) (N-2-2-0) -- (S-3-2) -- (S-3-4);
+        \draw[synz] (S-3-5) -- (S-3-0) -- (S-4-0) -- (S-4-2) -- (S-5-2);
+      \end{pgfonlayer}
+      \node[below=.25cm of Bx-2] {(d)};
+    \end{tikzpicture}
+    \caption{(a) Stabilizer generators that anticommute with the error will measure -1, which are (i) the neighboring star operators for a Z-error, (ii) the neighboring plaquette operators for an X-error, and (iii) both star and plaquette operators for a Y-error. In the case of a string of errors (iv), only the stabilizer generators at the end of these strings will anticommute with the error. Due to code degeneracy, the single Z-error in (a.i) $\hat{E}$ has the syndrome as (b) $\hat{E}\hat{Z}_{L1}$, (c) $\hat{E}\hat{Z}_{L2}$ and (d) $\hat{E}\hat{Z}_{L1}\hat{Z}_{L2}$ (inspired by \cite{browne}).}\label{sf:fig_degenerate}
+  \end{figure}

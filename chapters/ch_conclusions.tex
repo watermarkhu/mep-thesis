@@ -8,3 +8,20 @@
   \item The matching weight of the Union-Find Balanced-Bloom decoder is decreased from the matching weight of the Dynamic-forest Bucket Union-Find decoder by a factor of ?
   \item For a constant value of the equilibrium factor, $k_{eq}=\frac{1}{2}$ results in the best performance in the Union-Find Balanced-Bloom decoder.  
 \end{itemize}
+
+
+\begin{figure}[htbp]
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_delfosse_2d.pgf}
+    \end{adjustbox}
+    \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \begin{adjustbox}{Clip=0 1em 0 0}
+      \input{pgfplots/threshold_delfosse_3d.pgf}
+    \end{adjustbox}
+    \caption{Toric code phenomenological noise.}
+  \end{subfigure}
+  \caption{Direct comparison of the performance of various decoders covered in this thesis. The data of the original Union-Find decoder is taken from its publication \cite{delfosse2017almost}. Using the same range of lattice sizes and error rates, we simulate and plot also for our implementation of the Union-Find decoder, the Dynamic-forest Bucket Union-Find (DBUF) decoder and the Union-Find Balanced-Bloom decoder (UFBB), and the Minimum-Weight Perfect Matching (MWPM) decoder.}
+\end{figure}

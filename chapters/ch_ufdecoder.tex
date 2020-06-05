@@ -575,8 +575,7 @@ With the application of weighted growth through bucket sort and the maintenance 
 
 
 \section{Performance}\label{sec:ufperformance}
-
-We benchmark the performance of each of the implementations of the Union-Find decoder in Table \ref{tab:uftable}. This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold as described in Section \ref{sec:simthres}. We simulate for the decoder success rate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ for the independent noise model (Definition \ref{def:independent}), and on lattice sizes $[8,12,16,20,24,28,32,36]$ for the phenomenal noise model (Definition \ref{def:pheno}) with a minium of $96.000$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:uftable}. 
+We benchmark the performance of each of the implementations of the Union-Find decoder in Table \ref{tab:uftable} using our own implementation in Python3 (see Appendix \ref{ap:oopsurfacecode}). This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold as described in Section \ref{sec:simthres}. We simulate for the decoder success rate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ for the independent noise model (Definition \ref{def:independent}), and on lattice sizes $[8,12,16,20,24,28,32,36]$ for the phenomenal noise model (Definition \ref{def:pheno}) with a minium of $96.000$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:uftable}. 
 
 \begin{table}[htpb]
   \centering

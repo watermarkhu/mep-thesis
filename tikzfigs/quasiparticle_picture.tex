@@ -23,7 +23,7 @@
   \draw[redline] (N7) to[in=160, out=15] (N8);
   \draw[redline] (N9) to[in=90, out=250] (N10);
 }
-\begin{figure}
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[scale=0.9]
       \drawquasigrid
@@ -65,6 +65,6 @@
       \draw[yellow, line width=6, opacity=.3] (4.6,.5) -- +(0.3,0);
       \path (5,3.5) node[legend] {star} ++(0,-.5) node[legend] {plaquette} ++(0,-.5) node[legend] {$X$ errors} ++(0,-.5) node[legend] {$X$ correction} ++(0,-.5) node[legend] {$Z$ errors} ++(0,-.5) node[legend] {$Z$ correction} ++(0,-.5) node[legend] {logical error} ;
     \end{tikzpicture}
-    \caption{The quasiparticle picture of stabilizer measurements. Anticommuting stabilizers behave as anyons (circles), where a chain of errors (lines) creates a pair of anyons. Figure (b) shows a successful decoding of (a). Figure (c) shows a pairing that resulted in a correction operator that is in a different class as the error operator, which acquires a logical error. (Figure inspired by \cite{naomi})}\label{fig:quasiparticle}
+    \caption{The quasiparticle picture of stabilizer measurements. Anticommuting stabilizers behave as anyons (circles), where a chain of errors (lines) creates a pair of anyons. Figure (b) shows a successful decoding of (a). Figure (c) shows a pairing that resulted in a correction operator that is in a different class as the error operator, which acquires a logical error. (Figure inspired by \cite{naomi2016thesis})}\label{fig:quasiparticle}
   \end{figure}
   
