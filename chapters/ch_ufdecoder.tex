@@ -437,14 +437,7 @@ In the original algorithm, we keep iterating over $\m{L}_o$ whilst there are odd
 With weighted grow, the list of odd clusters $\m{L}_o$ from algorithm \ref{algo:suf} is replaced with the list of buckets $\m{L}_b$. Growing each bucket $b_k$ is now equivalent to a round of growth. In each round $k$, we grow all clusters $c_i$ in $b_k$ with $\codefunc{Grow}(c_i$). However, it is now possible for an odd-parity cluster $c_i$ to be grown and placed in bucket $b_m$ in round $k$, merged with some other odd-parity cluster to an even parity cluster in round $k+1$, and merged with another odd-parity cluster in round $k+2$ and placed in bucket $b_{m'}$. Thus in round $k+1$, the placement of $c_i$ in $b_m$ is invalid as its parity is even, and in round $k+1$ the placement is equally invalid as it is placed in both $b_m$ and $b_{m'}$. The placement is $b_m$ is thus a \emph{redundant placement} (see Figure \ref{3.fig.clustermergeB}).
 
 To avoid the growth of a redundantly placed cluster $c_i$, we check before $\codefunc{Grow}(c_i$) that the cluster $c_i$ still belongs to the bucket $b_k$. To facilitate this check, at the end of the function \codefunc{Place} (Algorithm \ref{algo:place}), which is called immediately after a cluster is grown, we additionally store the bucket number at the cluster object $c_i.bucket = k$. When iterating over the bucket $b_k$, a cluster $c_i$ is conditionally grown only if $c_i.bucket = k$. When a cluster is merged to have even parity, its bucket number is updated to $c_i.bucket=0$, such that it will not be grown.  
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{cluster_merge_A.pdf}
-  \caption{Faulty entries of clusters can occur in the buckets, a) cluster that should not be there due to a merge event. Situation a can be solved by checking the parity of the cluster. Checking the parity of the root cluster solves a) and b). Checking the bucket number of the root cluster solves all.}\label{3.fig.clustermergeB}
-  \todo[inline]{Figure text not fitting thesis} 
-\end{figure}
-
+\input{tikzfigs/buckets.tex}
 
 \begin{lemma}\label{lem:numbuckets}
   To apply Bucket sort for weighted growth on a lattice of $n$ vertices, a total of $N_b = n$ buckets are needed. 

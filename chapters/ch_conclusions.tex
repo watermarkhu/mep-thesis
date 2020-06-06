@@ -9,6 +9,9 @@
   \item For a constant value of the equilibrium factor, $k_{eq}=\frac{1}{2}$ results in the best performance in the Union-Find Balanced-Bloom decoder.  
 \end{itemize}
 
+Recent work that include the Union-Find decoder focuses on bringing the decoder algorithm to the hardware level. Most notably, a scalable decoder micro-architecture has been proposed with a fully pipelined hardware implementation \cite{das2020scalable}. Related work has shown that a reduction in bandwidth is possible provided qubits with a low physical error rate \cite{delfosse2020hierarchical}. 
+
+Finally, another variant of the decoder dubbed the \emph{Weighted Union-Find} decoder, not to be confused with \emph{weighted growth}, promises to increase the code threshold under circuit level noise \cite{huang2020fault}. This application relies on adopting the decoder to a \emph{weighted} graph, where every edge $e\in\m{E}$ may have a different length value, and edges are not limited to growth of half-edges per growth iteration. We believe that Union-Find Balanced-Bloom decoder and the Weighted Union-Find decoder to be compatible, where in the combined decoder boundary edges in each node are grown with respect to their weights in the weighted graph. 
 
 \begin{figure}[htbp]
   \begin{subfigure}[b]{\textwidth}

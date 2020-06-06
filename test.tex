@@ -1,0 +1,87 @@
+
+\documentclass{article}
+
+\usepackage{tikz}
+\usetikzlibrary{quantikz,shapes,calc,math,patterns,arrows,positioning}
+\begin{document}
+    
+
+\tikzstyle{cluster}=[circle, line width=1, fill=white, text=black, inner sep=1, minimum size=12]
+\tikzstyle{ocluster}=[cluster, draw=orange, minimum size=12, font=\small]
+\tikzstyle{ec}=[line width=1, fill=white, text=black, inner sep=3, minimum size=12, font=\small, draw=green, rounded corners=6pt]
+\tikzstyle{oc}=[line width=1, fill=white, text=black, inner sep=3, minimum size=12, font=\small, draw=orange, rounded corners=6pt]
+\tikzstyle{arrow}=[-latex, line width=1]
+\tikzstyle{lefttext} = [align=left, anchor=west]
+
+\newcommand{\DRAWBUCKET}[3]{
+    \path[line width=3, draw=black!50!white, fill=black!20!white] (#1,#2) ++(-1,1) -- ++(0,-2) -- ++(2,0) -- ++(0,2);
+    \path[fill=black!50!white] (#1,#2) ++ (-1,-1) rectangle ++(2,.5);
+    \draw (#1,#2) ++(0,-.75) node[align=center, text=white]{$b_#3$};
+}
+
+
+    \begin{tikzpicture}
+        \DRAWBUCKET{0}{-.25}{0}
+        \DRAWBUCKET{2.5}{-.25}{1}
+
+        \node[ocluster] at (0,.25) {$c_1$};
+        \node[ocluster] at (-.3,-.25) {$c_2$};
+        \node[ocluster] at (.3,-.25) {$c_3$};
+
+        \draw[arrow] (-.75,-1.5) -- +(0,-1.5);
+        \draw[arrow] (3.25,-1.5) -- +(0,-1.5);
+        \node[lefttext]                 (a1) at (.25,-2)    {Grow};
+        \node[right=0pt of a1, oc]                          {$c_1$};
+        \node[lefttext]                  at (.25, -2.5)      {Place in $b_1$};
+        \node[ocluster]                 (a2) at (4.5,.25)   {};
+        \node[lefttext, right=1pt of a2]                    {odd cluster};
+        \node[ocluster, draw=green] (a3) at (4.5,-.25)  {};
+        \node[lefttext, right=1pt of a3]                    {even cluster};
+
+        \begin{scope}[shift={(0,-4)}]
+            \DRAWBUCKET{0}{-.25}{0}
+            \DRAWBUCKET{2.5}{-.25}{1}
+            \node[ocluster]     at (2.5,0)          {$c_1$};
+            \node[ocluster]     at (-.3,0)          {$c_2$};
+            \node[ocluster]     at (.3,0)           {$c_3$};
+            \draw[arrow] (-.75,-1.5) -- +(0,-1.5);
+            \node[lefttext]     (b1) at (-.5,-2)    {Grow};
+            \node[right=0pt of b1, oc] (b2)         {$c_2$};
+            \node[right=0pt of b2]                  {, merge};
+            \node[lefttext]     (b3) at (-.5, -2.5) {with};
+            \node[right=0pt of b3, oc] (b4)         {$c_1$};
+            \node[right=0pt of b4]     (b5)         {to};
+            \node[right=0pt of b5, ec]              {$c_{12}$}; 
+            \draw[arrow] (-.75,-1.5) -- +(0,-1.5);
+            \draw[arrow] (3.25,-1.5) -- +(0,-1.5);
+            
+        \end{scope}
+
+        \begin{scope}[shift={(0,-8)}]
+            \DRAWBUCKET{0}{-.25}{0}
+            \DRAWBUCKET{2.5}{-.25}{1}
+            \node[ocluster, opacity=.5] at (2.5,0)  {$c_1$};
+            \draw[arrow] (-.75,-1.5) -- +(0,-2);
+            \draw[arrow] (3.25,-1.5) -- +(0,-2);
+
+            \node[lefttext]             (c1) at (-.5,-2)    {Grow};
+            \node[right=0pt of c1, oc]  (c2)                {$c_3$};
+            \node[right=0pt of c2]                          {, merge};
+            \node[lefttext]             (c3) at (-.5, -2.5) {with};
+            \node[right=0pt of c3, ec]  (c4) at (0, -2.5)   {$c_{12}$}; 
+            \node[right=0pt of c4]      (c5)                {to}; 
+            \node[right=0pt of c5, oc]                      {$c_{123}$};
+            \node[lefttext]             at (-.5, -3)        {Place in $b_k$};
+        \end{scope}
+
+
+        \begin{scope}[shift={(0,-12.5)}]
+            \DRAWBUCKET{0}{-.25}{0}
+            \DRAWBUCKET{2.5}{-.25}{1}
+            \node[ocluster, opacity=.5] at (2.5,0) {$c_1$};
+        \end{scope}
+
+
+    \end{tikzpicture}
+
+\end{document}
