@@ -155,7 +155,7 @@ Due to this, we ensure that each forest $\m{T}_\m{R}$ can only be supported by a
   \caption{Peeling decoder for bounded surfaces \cite{delfosse2017linear}}\label{algo:peelbound}
 \end{algorithm}
 
-\input{tikzfigs/peeling_bound.tex}
+\input{tikzfigs/peeling_bound}
 
 
 % To keep track of the vertices of a cluster, it will be represented as a \emph{cluster tree}, where an arbitrary vertex of the cluster will be the root, and any other vertex will be a child of the root. Whenever an edge $(u,v)$ is fully grown, we will need to traverse the trees of the two vertices $u$ and $v$, and check whether they have the same root; whether they belong to the same cluster. If not, a merge is initiated by making the root of smaller cluster a child of the bigger cluster. These functions, \codefunc{find} and \codefunc{union} respectively, are part of the Union-Find algorithm (not to be confused with the Union-Find decoder) \cite{tarjan1975efficiency}.
@@ -306,7 +306,7 @@ Finally, in each round of growth, there may be many odd-parity clusters $\{c_{1}
 \subsection{Syndrome validation}
 We now describe the pre-processing step of syndrome validation. A round of growth at time $t$ is initiated by collecting a list $\m{L}_o = \{c_{0,t}, c_{1,t}, ...\}$ of odd-parity clusters. A cluster $\m{V}_{i,t}$ is grown by $\codefunc{Grow}(\delta \m{V}_{i,t})$, during which all edges with $e.support=2$ are added to merging list $\m{L}_m$. After all clusters are grown, for each edge $e=(u,v) \in \m{L}_m$, apply $r_u=\codefunc{Find}(u)$ and $r_v=\codefunc{Find}(v)$. If $r_u\neq r_v$, the trees of both clusters are merged by $\codefunc{Union}(r_u,r_v)$. At time same time, we find new boundary vertices $\delta \m{V}_{i,t+1}$ that consists of the newly added vertices $v$ and merge the new boundary lists $\delta \m{V}_{u,t+1}$ and $\delta \m{V}_{v,t+1}$ during $\codefunc{Union}(r_u,r_v)$. We remove all even cluster from $\m{L}_o$ and remove any duplicate elements. The process can be repeated until $\m{L}_o=\emptyset$, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure $\bar{\m{R}}$, can be decoded by the Peeling decoder (see Figure \ref{fig:ufdecoder}f). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm \ref{algo:suf}. This algorithm fulfills Proposition \ref{prop:ufdecoder}.
 
-\input{tikzfigs/ufdecoder.tex}
+\input{tikzfigs/ufdecoder}
 % \paragraph{Data structure}
 % Now it is clear what information is exactly needed to grow the clusters using the Union-Find algorithm. We will need to store the cluster in a sort of cluster-tree. At the root of each tree we store the size and parity of that cluster in order to facilitate weighted union and to select the odd clusters. We will need to store the state of each edge (empty, half-grown, or fully grown) in a table called \codeword{support}. And we need to keep track of the boundary of each cluster in a \codeword{boundary} list.
 
@@ -437,7 +437,7 @@ In the original algorithm, we keep iterating over $\m{L}_o$ whilst there are odd
 With weighted grow, the list of odd clusters $\m{L}_o$ from algorithm \ref{algo:suf} is replaced with the list of buckets $\m{L}_b$. Growing each bucket $b_k$ is now equivalent to a round of growth. In each round $k$, we grow all clusters $c_i$ in $b_k$ with $\codefunc{Grow}(c_i$). However, it is now possible for an odd-parity cluster $c_i$ to be grown and placed in bucket $b_m$ in round $k$, merged with some other odd-parity cluster to an even parity cluster in round $k+1$, and merged with another odd-parity cluster in round $k+2$ and placed in bucket $b_{m'}$. Thus in round $k+1$, the placement of $c_i$ in $b_m$ is invalid as its parity is even, and in round $k+1$ the placement is equally invalid as it is placed in both $b_m$ and $b_{m'}$. The placement is $b_m$ is thus a \emph{redundant placement} (see Figure \ref{3.fig.clustermergeB}).
 
 To avoid the growth of a redundantly placed cluster $c_i$, we check before $\codefunc{Grow}(c_i$) that the cluster $c_i$ still belongs to the bucket $b_k$. To facilitate this check, at the end of the function \codefunc{Place} (Algorithm \ref{algo:place}), which is called immediately after a cluster is grown, we additionally store the bucket number at the cluster object $c_i.bucket = k$. When iterating over the bucket $b_k$, a cluster $c_i$ is conditionally grown only if $c_i.bucket = k$. When a cluster is merged to have even parity, its bucket number is updated to $c_i.bucket=0$, such that it will not be grown.  
-\input{tikzfigs/buckets.tex}
+\input{tikzfigs/buckets}
 
 \begin{lemma}\label{lem:numbuckets}
   To apply Bucket sort for weighted growth on a lattice of $n$ vertices, a total of $N_b = n$ buckets are needed. 

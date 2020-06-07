@@ -1,0 +1,162 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mblue{HTML{1F77B4
+morange{HTML{FF7F0E
+mgreen{HTML{2CA02C
+mred{HTML{D62728
+mpurple{HTML{9467BD
+mbrown{HTML{8C564B
+mpink{HTML{E377C2
+mgrey{HTML{7F7F7F
+mlime{HTML{BCBD22
+mcyan{HTML{17BECF
+
+
+\parindent{24pt
+definition{Definition[chapter]
+lemma{Lemma[chapter]
+theorem{Theorem[chapter]
+proposition{Proposition[chapter]
+
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"/home/watermarkhu/links/onedriveuni/MEP - thesis Mark/Figures/ch_toric_code/"}
+
+
+centerline
+\algoheightrule{1pt
+\algotitleheightrule{1pt
+\interspacetitleboxruled{.5em
+ {{
+Fn{def{\string:{
+KwTo{in
+For{for{\string:{
+If{ElseIf{Else{if{ then{else if{else{
+While{while{ do{
+\SetAlgoNoEnd\DontPrintSemicolon
+
+
+algotitle/.style=title= \strut Algorithm \thetcbcounter#1{\ignorespaces{: #1}}
+\newtcolorbox[auto counter]algo[1][]
+    colback=white, colframe=black, boxrule=0.5pt,
+    titlerule=0pt, sharp corners, colbacktitle=white,enhanced,
+    attach boxed title to top center=yshift=-10pt,
+    boxed title style=boxrule=-1pt,
+    fonttitle=\bfseries, coltitle=black, algotitle=}, #1
+
+
+
+language=C,keywordstyle=\bfseries blue}
+
+
+quantikz,shapes,calc,math,patterns,arrows,positioning
+
+groupplots,dateplot
+\def\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;
+
+bellstar/.style =draw, star,star points = 8, star point height = 1em, star point ratio = 1.8, minimum size = 1em, inner sep = 0pt}
+selection/.style=draw, signal, signal to =south, minimum size = 1em, inner sep = 0pt}
+sel/.style=label position = below, yshift = 0.5cm}
+
+2212{−  
+compat=newest
+
+
+
+
+
+\makeglossaries
+
+
+
+
+
+
+
+
+
+
+cit.bib
+
+
+L[1]>\hsize=#1\hsize\raggedright\arraybackslashX
+R[1]>\hsize=#1\hsize\raggedleft\arraybackslashX
+C[1]>\hsize=#1\hsize\centering\arraybackslashX
+
+
+mep-thesis
+Shui Hu
+April 2019
+
+
+
+
+  roman 
+
+  
+  tocdepth{1
+  \tableofcontents
+  
+  \printglossary[type=symbols, style=mcoltreegroup]
+  \clearpage
+
+  
+
+  arabic 
+  
+  
+  
+  
+  
+  
+  
+
+  
+
+  appendices
+    \chapter[display]
+      \normalfont\bfseries
+      \chaptertitlename\ \thechapter{10pt
+      }
+    \titlespacing*\chapter{0pt{0pt{15pt
+    
+    
+    
+    
+    
+    
+    
+  appendices
+
+  
+

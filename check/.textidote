@@ -2,3 +2,4 @@
 --read-all
 --dict .textidote_dict.txt
 --check en
+--remove tikzpicture

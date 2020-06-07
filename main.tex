@@ -86,9 +86,10 @@
 \usepackage{listings}
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 
-\usepackage{tikz, pgfplots}
-\usepgfplotslibrary{groupplots,dateplot}
+\usepackage{tikz}
 \usetikzlibrary{quantikz,shapes,calc,math,patterns,arrows,positioning}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots,dateplot}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 \SetAlFnt{\footnotesize}
 \tikzset{bellstar/.style ={draw, star,star points = 8, star point height = 1em, star point ratio = 1.8, minimum size = 1em, inner sep = 0pt}}
@@ -104,7 +105,7 @@
 \usepackage{glossary-mcols}
 
 \makeglossaries
-\input{gls_symbols.tex}
+\input{gls_symbols}
 
 \renewcommand*{\glossarypreamble}{\vspace{-\baselineskip}}
 \newcommand*{\Ngroupname}{Objects, elements of sets}
@@ -140,7 +141,7 @@
   \printglossary[type=symbols, style={mcoltreegroup}]
   \clearpage
 
-  \input{tikzfigs/function_draw_lattices.tex}
+  \input{tikzfigs/function_draw_lattices}
 
   \pagenumbering{arabic} 
   % \include{chapters/preliminary_report}

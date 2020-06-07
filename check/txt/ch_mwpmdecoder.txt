@@ -1,0 +1,31 @@
+
+Minimum-Weight Perfect Matching decoder
+
+In this chapter, we will give a short description of the most commonly used decoder for surface codes: the Minimum-Weight Perfect Matching decoder. This decoder was actually the first decoder for surface code [0]. The Minimum-Weight Perfect Matching decoder has a worst-case complexity of between X and X, depending on the implementation [0], but has a relatively high decoder threshold. Many have improved upon the decoder to extend it to more general noise models or to optimize its performance [0]. Most notably, at the cost of space complexity, the average-case complexity of the decoder has been reduced to X time [0]. We will outline the idea of the Minimum-Weight Perfect Matching decoder in Section X and show its performance on a simulated lattice in Section X.
+
+Minimum-weight perfect matching
+
+Recall from Section X that decoding a surface code can be simply performed by pairing anyons in the syndrome. The challenge for the decoder is choosing a pairing that is not likely to result in a logical error. 
+
+The basic principle behind the minimum-weight perfect matching approach is to identify the lowest weight error configuration that can produce the observed syndrome X. If independent errors occur on a lattice of N qubits with probability p, then the probability of some error operator X with X errors has a probability of occurring
+and therefore
+As X, the probability of X occurring is maximized when X is minimized. This means that the error configuration with the smallest amount of errors is the most probable one. 
+
+Recall from Section X that to correct an error, the goal is to find the correction operator X that is most likely to return the code to the codespace. Finding the lowest weight configuration does not correspond to this problem. To find the correction that is most likely, one would have to consider all possible error configuration that could produce the observed syndrome X, find to which class they belong and weigh each class accordingly to find the most likely correction. The lowest weight configuration is in general a good approximation of the decoding problem, but not in all cases. It is due to this discrepancy that the error threshold of the Minimum-Weight Perfect Matching decoder is lower than the optimal value. 
+
+For a set of anyons in the quasiparticle representation, finding the minimum-weighted pairs is equivalent to finding the minimal distances between the particles. The distance between two anyons is the shortest path between them, where a path consists of a number of qubits that is equal to the weight. This problem can be efficiently solved by mapping the quasiparticles into a graph matching problem, where every anyon is a node in a completely connected graph. The edges in the graph are now assigned a weight corresponding to the distance between the anyons (Figure X). This graphing problem can now be solved in polynomial time using Edmonds' blossom algorithm [0]. 
+
+
+
+Boundaries
+
+For surfaces with boundaries such as the planar code (Section X), the number of anyons in the syndrome is now not guaranteed to be even. In the graph representation, an error on an edge in X will cause only a non-trivial syndrome measurement on one of its supporting vertices. The other vertex is in the open vertex set X, which are not equivalent to ancilla qubits or stabilizer measurements. Thus, the concept of pairing must include the possibility of an anyon to pair with the code boundary, in addition to paring with other anyons. 
+
+The procedure of mapping anyons to a graph matching problem must now be modified to include this extra pairing possibility. This is done by creating for every anyon an extra ``virtual'' node in the graph that is located at the boundary of the code [0]. The node corresponding to the anyon is connected by an edge with its virtual pair. Furthermore, the set of virtual nodes are all connected by edges of weight 0. This allows a node to pair with the virtual node at the boundary, and all ``unused'' virtual nodes to pair with each other such that they are efficiently removed. 
+
+Performance
+
+We benchmark the performance of the Minimum-Weight Perfect Matching decoder using our own implementation in Python3 (see Appendix X) for a simulated lattice and the BlossomV algorithm, which is implemented in C, for finding the minimum-weight matching [0]. This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold as described in Section X. For the independent noise model (Definition X), we simulate on lattice sizes X with a minimum of 52.800 samples. For the phenomenological noise model (Definition X), we simulate on lattice sizes X with a minimum of 52.800 samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table X.
+
+
+These obtained values for the decoder threshold X correspond with the values reported in the literature [0]. In the Monte Carlo simulations, some metadata are also acquired that will be useful when comparing the performance of the Minimum-Weight Perfect Matching decoder with other decoders. Most notably, the average running time of the simulation and the actual weight of the matching are used as metrics in the upcoming chapters. 
