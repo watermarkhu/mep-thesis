@@ -1,0 +1,24 @@
+Open surface code simulations
+
+Object-oriented programming is a class of programming based on the concept of objects. Each object can contain data in the form of object attributes, and code in the form of object methods. A major feature of these objects is that they can interact with themselves or other object, modifying their own or other object's attributes with their methods. More often than not, these objects are class-based, which means every object are instances of classes. With the purpose of analyzing the various types of decoders in the thesis, we have created an object-oriented programming package for simulating, decoding and visualizing a surface code, written in Python3, dubbed OpenSurfaceSim. The package consists of the base classes qubit and stabilizer which are the base physical elements of a surface code, and several main classes that constructs, simulates and decoders the surface code. 
+
+Within the graph representation X (Section X), elements X and X are now instances of sub-classes of the stabilizer class. A subclass is a class that inherits all methods and attributes of the parent class, while also new attributes and methods can be defined. Recall that vertices are equivalent to ancillary qubits with star operators measurements and faces are equivalent to ancillary qubits with plaquette operators measurements. For boundary vertex elements X and non stabilizer vertex elements X, a different subclass can be defined in the same way. Attributes var of a vertex v, an instance of a (sub)class of the stabilizer class are denoted with v.var. For the primal and dual graphs X, an instance of the qubit class are equivalent to an edge in both X and X. Attributes var of an edge e, an instance of a (sub)class of the qubit class are denoted with e.var. 
+
+Using these base classes, we can construct a surface code and do operations on them to simulate errors and decoders. The main class types necessary for such a simulation are:
+
+    Graph: Classes containing the geometrical information necessary to construct a surface code in the graph representation, by creating instances of the qubit and stabilizer classes and linking them appropriately.
+    Error: Classes containing the methods and attributes affiliated with the error models that are applied to the elements of the graph during a simulation.
+    Decoder: Classes containing the methods or algorithms that can decode a given graph with some error. 
+
+Each main class type can define new attributes or methods at the qubit and stabilizer classes, such that variables which a specific to a graph type, error model or decoder are available at the base object level. This allows for any attribute required for a certain type of lattice, error model or decoder to be directly stored at the qubit's or stabilizer's object level. 
+
+For new users, OpenSurfaceSim provides an interactive GUI for guided step-by-step visualization of the simulated surface code itself and the used decoder. The user can quickly get a detailed understanding of the underlying mechanics of the code and the decoder. For advanced users, the package can serve as a tool to analyze and benchmark decoders. The package contains tools for code threshold simulations, which is the numeric used to compare different decoders. Scripts for batched processes on a computation cluster are included as well. Furthermore, heuristics and results from different simulations can be compared easily. Finally, the class-based structure of the package decreases the complexity of creating new types of Graph, Error or Decoder classes, which should allow for contributions in an open-sourced environment. 
+
+The repository of OpenSurfaceSim can be found at https://github.com/OpenSurfaceSim{GitHub. 
+
+
+
+
+
+
+

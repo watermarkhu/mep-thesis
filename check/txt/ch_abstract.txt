@@ -1,0 +1,7 @@
+\chapter*Abstract
+
+Quantum computing has the potential to transcend the information technology as we know it. Small scale quantum systems are already possible today and the goal is to scale up these quantum architectures to build practical quantum devices. A major limiting factor in quantum computing is the accumulation of errors that may be caused by a large number sources. A solution is to encode the logical information in a larger amount of physical qubits to increase resilience and to decode the information with a decoder. 
+
+In this thesis, we inspect the surface code, a topological quantum error-correcting code, and a decoder for the surface code dubbed the Union-Find decoder that has the advantage in low running time, high scalability and simplicity compared to other decoders. We provide various implementations of the original Union-Find decoder and find via numerical simulations that a decreased weight of the correction operator is a heuristic for an increased error threshold. 
+
+With this heuristic in mind, we introduce a modification of the Union-Find decoder that selectively grows regions of with the goal of minimizing the weight. The modified decoder, dubbed the Union-Find Balanced-Bloom decoder, manages to have an increased error threshold compared to the Union-Find decoder of any lattice size. For small lattice sizes, the Union-Find Balanced-Bloom decoder performs near the code threshold of the Minimum-Weight Matching decoder. We manage to maintain a quasilinear worst-case time complexity of X. 

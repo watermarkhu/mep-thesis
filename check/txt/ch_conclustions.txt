@@ -1,0 +1,15 @@
+Conclusions
+
+In this thesis, we have thoroughly inspected the Union-Find decoder that has the advantage in running time and simplicity compared to other decoders. We have provided various implementations of the original Union-Find decoder with the bucket sort method for weighed growth and the dynamic forest variant of the decoder. Furthermore, we have introduced a modification of the original decoder that selectively grows regions of clusters based on the concept of a potential matching weight. The modified decoder, dubbed the Union-Find Balanced-Bloom (UFBB) decoder, relies on an additional node-tree data structure to facilitate the calculation of the potential matching weight. A direct comparison of the decoding performance of our decoder, the Union-Find decoder (with original data [0]), and the Minimum-Weight Perfect Decoder in Figure X. We summarize our results in short:
+
+
+  The UFBB decoder has an improved decoder threshold compared with the Union-Find decoder for all lattice sizes and a comparable threshold to the Minimum-Weight Perfect Matching decoder for small lattices.
+  The UFBB decoder has an improved decoding rate at the threshold error rate compared with the Union-Find decoder for all lattice sizes. 
+  The UFBB decoder has a worst-case time complexity of X. 
+
+
+
+Many of the work on recent decoders have focused on increasing the code threshold via for example the use of neural networks. However, these decoders has the disadvantage that they have a tremendous running time and bad scalability. The Union-Find decoder however manages to decode fast and scale almost-linearly with the input system size, and may for this reason be a great candidate for physical applications in the near future. We manage to find a middle ground between the two objectives as the Union-Find Balanced-Bloom decoder has an improved decoding performance at the cost of a slight increase in complexity. 
+
+Recent work that include the Union-Find decoder focuses on bringing the decoder algorithm to the hardware level. Most notably, a scalable decoder micro-architecture has been proposed with a fully pipelined hardware implementation [0]. Related work has shown that a reduction in bandwidth is possible provided qubits with a low physical error rate [0]. Furthermore, another variant of the decoder dubbed the Weighted Union-Find decoder, not to be confused with weighted growth, promises to increase the code threshold under circuit level noise [0]. This application relies on adopting the decoder to a weighted graph, where every edge X may have a different length value, and edges are not limited to growth of half-edges per growth iteration. We believe that Union-Find Balanced-Bloom decoder and the Weighted Union-Find decoder to be compatible, where in the combined decoder boundary edges in each node are grown with respect to their weights in the weighted graph. 
+

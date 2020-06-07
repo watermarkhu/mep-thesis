@@ -1,0 +1,133 @@
+Union-Find data structure
+The Union-Find data structure, also known as the disjoint-set data structure [0], is the data structure that is crucial for the near linear complexity of the Union-Find decoder. In this section, we describe the data structure and analyze its complexity. 
+
+The disjoint-set data structure consists of two types of instructions for manipulating a set of elements partitioned into a number of disjoint subsets, which are non-overlapping. These instructions provide near-constant-time operations to determine whether elements are in the same set, and to merge sets if that is not the case. 
+
+  X computes the unique set containing the element x
+  X combines sets A and B into a new combined set
+
+We first show that a very simple implementation runs in X time. Applying the union by weight rule, this is reduced to X. Combined with the Path compression rule, the overall complexity is X, where X is the inverse of Ackermann's function. The original proof [0] was further reinforced by subsequent publications [0] and was proven to be optimal [0]. In this thesis, we will follow a simplified approach, where the union by weight rule is replaced by a different by similar union by rank rule [0]. Later Tarjan and also other sources used this to cast this analysis in terms of potential functions [0]. Another approach is provided by Seidel and Sharir [0], where the upper bound is computed via a top-down method. 
+
+Simple implementation
+A simple implementation of the instructions would be to store for each set X a list X of all the elements it contains, and a pointer to X at all elements X, which is called the linked-list representation. The function X simply returns the list X, which represents the set. After a call to X, all elements of X are appended to X, and the pointers of all elements X are updated. This takes X operations, where X the number of elements. In a system of n elements, there may be a maximum of X calls to Union. As the ith call involves sets X and X, the number of updates is 
+where each Union operation has on average X updates. 
+
+Union by weight
+In the above case, we assume in each Union the worst-case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list X additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule to always append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to X. 
+
+theorem
+  A sequence of Union and Find operations on n initial single element disjoint sets using the weighted union rule takes X time. 
+theorem
+proof
+  Consider a set X with list X that undergoes a sequence of Union and Find operations. The first time all pointers in X are updated, the resulting set must have at least 2 elements. Similarly, the next time all pointers are updated, the resulting set must have at least 4 elements due to the weighted union rule. With system size n, any initial set X can be updated at most X times, where the update size is proportional to n. Hence, the sequence takes X time. 
+proof
+
+Disjoint-set trees
+The pointer update in each set during a Union can be minimized by a different representation of the Union-Find data structure, where each set is represented by a rooted tree. Each member has a pointer to its parent, and the root of the tree points to itself, and is the representative element of the cluster. Function Find is now performed by following the parent pointers until the root of the tree, and X points one root towards another, such that there is only one single root that is the representative element. Each call to X is preceded by calls to X and X to find their respective roots and to link their trees if X. 
+
+lw1=[line width=1]
+fnode=[draw, circle, minimum size=0.55cm, inner sep=0, lw1]
+
+
+Union by rank
+The union by weight rule from the previous section can be implemented without any alteration. However, in the disjoint-set tree structure, a slightly different rule, union by rank, can be implemented behaves similarly, but allows for an easier analysis of the complexity when combined with the path compression rule, which is introduced in the next section. 
+
+definition
+  Let X denote (sub)tree rooted in element x at time t, and let X denote the number of elements in the (sub)tree. The tree X rooted at X is equivalent to the full set X.
+definition
+definition
+  The rank of an element x is the maximum height of a (sub)tree X. Let X denote the rank of element x at time t. 
+definition
+
+The union by rank rule is then as follows: to merge sets X and Y, apply X by pointing the smaller-ranked root X to the larger; in case of a tie, also increase the rank of the new root by one. As long as an element y has no parent, its rank can increase as other trees as pointed to itself. But as y becomes a child of element x, the subtree rooted at y becomes fixed and so does its rank. Any descendant y of ancestor x must thus always comply to X. The following lemmas give the intuition that the union by rank rule supports disjoint-set trees that are relatively balanced.
+
+lemma
+  For any subtree X at time t rooted at x with rank X, if the union by rank rule is implemented, it must be true that 
+lemma
+proof
+  Initially, each set contains only a single element X, with rank X and X. Thus, equality X holds at time 0. If the equality for x holds at some time t and the rank does not increase in the next step X, it is either the case that the tree is unchanged, or some other tree X with X is pointed to x, hence X and the equality holds. 
+  
+  If X, then at time t a union occurred that merged X and X by pointing y to x, where
+  Therefore,
+  and the equality must hold for all t and x. 
+proof
+lemma
+    The maximum rank in all disjoint-set trees after a sequence calls to Find and Union in a system of n elements is at most X, where X denotes the floor function. 
+lemma
+proof
+    By the previous Lemma X, 
+    Which leads to 
+proof
+We see that as the rank of the trees are bounded by X, this results to an overall complexity of X with X unions. This is the same complexity achieved with the union by weight rule. We will introduce one more lemma that further improves the intuition of balanced trees. 
+
+lemma
+  The total number of elements with the same rank r is limited by 
+lemma
+proof
+proof
+
+Path compression
+The path compression rule for the Find function is also very simple but highly effective. It operates by pointing all elements during a traversal of parent pointers until the root towards the root. Path compression thus partially decreases the height of the tree every time it is operated on an element in the tree. Note that path compression does not update the ranks of elements in the tree. For this reason, it is possible for a tree with root r to have X. It still holds that for any element x that once it has a parent X, its rank X is set. 
+
+
+  \node[fnode] at (#1,#2) (#3) X;
+  \draw[lw1, fill=white!80!black] (#3.south) -- +(0.3,-1) -- +(-0.3,-1) -- cycle;
+
+
+To find the complexity of a sequence of Union and Find operations when path compression is applied, we use a version of Ackermann's function X [0], which is very fast growing, and its inverse slow-growing X. For any system of practical size n, the inverse Ackermann's function satisfies X (see appendix X for the full definition). 
+
+Let x.p denote the parent of an element x. With path compression, the parent x.p can change over time. Nevertheless, it must still always be the case that X, as path compression does not switch children with parents, but only points elements X along the path from to the root X, where X. The value X can hence only increase over time. Especially, we consider the conditions for every k the equality:
+definition
+  The level of an element X is the largest value of k for which equality X holds: 
+definition
+The level of an element X is time-dependent and can only increase in time due to path compression and the consequent increase in difference between ranks of x and x.p. Furthermore, for minimal difference in ranks with X and X the equality X holds:
+where X (see appendix X) and the level is thus at least X. 
+
+Disjoint-set tree complexity
+Using the disjoint-set tree data structure, each Union is preceded by two Finds to traverse the paths of each of the merging elements to their respective roots, while applying path compression. If the roots are different, the Union operation takes constant time by making one root point to another, while applying union by rank. If the roots are the same, the trees will not be merged, but the Find operations that preceded it were not in vain. Path compression decreases the length of the paths to roots such that any future calls to Find in the same trees take less time.
+
+Each Union operation thus requires constant time, and X unions runs in X time. For the cost of the Find function, we introduce here the concept of charge assignment. The cost of each Find function is equivalent to the number of elements along the path of the root, where each element x takes one time unit. This time unit is then charged as follows:
+
+  If x has only one ancestor which is the root of the tree, FindX is trivial and no time unit is charged. 
+  If x has an ancestor a on the path to root X such that X, the charge of x' time unit is assigned to element x itself.
+  If x has no such ancestor, the charge of x's time unit is assigned to the Find function.
+
+Using this charge assignment method, we can (a) sum over all charged vertices and available levels and (b) sum over all charged Find operations that satisfy the condition to find the total number of charge time units. First, we find an upper bound for level X. 
+
+lemma
+  When path compression and union by rank is applied, for a system of size X, the level of a node is upper bounded X, where X is the inverse of Ackermann's function. 
+lemma
+proof
+  For X, we find the following inequalities:
+  where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns X, which gives us the upper bound of X. 
+proof
+
+First, we find the time units assigned to charged Find functions. Since no charge is assigned to FindX if x's parent is the root, which is the case after path compression, the total number of charged Finds is proportional to X Unions. For each FindX, on the path from x to the root r there may be at most X cases in which an ancestor a satisfies X per Lemma X. Hence, the total number of time units charges assigned to the Find function is X. 
+
+Next, we count the charges to a particular element x over the entire sequence of operations. 
+lemma
+  Any element x of rank X can be charged r times before the charge is assigned to the Find function.
+lemma
+proof
+  For a charged time unit to be assigned to x at time t, x must have some ancestor a such that X for some value of k (see Figure Xa. Hence, per equality X
+  where X is a modified Ackermann's function with 
+  Let r be the root of x, which is the last element on the path, then at some time X,
+  where X denotes the i-fold composition of X on the second argument. After applying FindX at time t, r is the new parent of x at time X, and 
+  At this point x.p is the root of the tree, and calls to FindX will not result in a charge assignment. Suppose now that at some time X the subtree at X has a new root X due to some union operations, and x has new ancestor X on the path to X that satisfies X (see Figure Xb. The same steps as before can be repeated. 
+  At time step X, X becomes x's parent and
+  This can be repeated at most X times before
+  at which point the level X, for which the time unit is charged to the Find function. 
+proof
+
+
+  \draw[lw1] (#1) -- (X) (#2) -- (X);
+  \draw[lw1, dotted] (X) -- (X);
+
+
+The above lemmas provide us with the necessary information to proof the overall complexity of the disjoint-set tree data structure. 
+theorem
+  The Union-Find data structure of a sequence of Union and Find operations runs in X time, where X) is the inverse of Ackermann's function.
+theorem
+proof
+  All charges assigned to the Find function account to X time units. For charges assigned to elements of the disjoint-set trees, we bring together lemmas X, X, X and X to find 
+proof

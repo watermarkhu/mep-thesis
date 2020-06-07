@@ -1,9 +1,9 @@
-\documentclass[11pt, a4paper, twoside, titlepage, dvipsnames, draft]{report}
+\documentclass[11pt, a4paper, twoside, titlepage, dvipsnames]{report}
 \usepackage[page, toc]{appendix}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
-\usepackage[hidelinks]{hyperref}
+\usepackage[colorlinks]{hyperref}
 \usepackage[mathscr]{euscript}
 \usepackage[table]{xcolor}
 \usepackage{physics, adjustbox}
@@ -11,7 +11,7 @@
 \usepackage{framed,enumitem} 
 \usepackage{xparse, todonotes}
 \usepackage{titlesec}
-\usepackage{cleveref}
+
 
 % Define colors
 \definecolor{mblue}{HTML}{1F77B4}
@@ -24,6 +24,13 @@
 \definecolor{mgrey}{HTML}{7F7F7F}
 \definecolor{mlime}{HTML}{BCBD22}
 \definecolor{mcyan}{HTML}{17BECF}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={mblue},
+    citecolor={mgreen},
+    urlcolor={mcyan}
+}
 
 
 % Set math environments
@@ -115,7 +122,7 @@
 \newcommand*{\Zgroupname}{Others}
 
 % Referencing
-\usepackage[style=numeric-comp, sorting=none]{biblatex}
+\usepackage[style=numeric-comp, sorting=nyt]{biblatex}
 \addbibresource{cit.bib}
 
 % Tables
@@ -135,6 +142,10 @@
   \pagenumbering{roman} 
 
   \include{_titlepage}
+  
+  \addcontentsline{toc}{chapter}{Abstract}
+  \include{chapters/ch_abstract}
+
   \setcounter{tocdepth}{1}
   \tableofcontents
   \include{chapters/ch_notations}
@@ -173,5 +184,6 @@
     \include{appendices/ap_oopsurfacecode}
   \end{appendices}
 
+  \addcontentsline{toc}{chapter}{Bibliography}
   \printbibliography
 \end{document}

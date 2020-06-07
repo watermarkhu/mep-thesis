@@ -1,0 +1,15 @@
+Ackermann's function
+When computing the complexity of the Union-Find data structure [0] with the union by rank and path compression rules, the Ackermann's function was used. In chapter, we will show that this function is very fast growing, and its inverse thus very slowly growing. After the initial publication by Ackermann [0], many authors have modified the function to suit to their own purposes. For example, the Ackermann's function used for the Union-Find data structure by Tarjan [0] is defined by the following relations:
+with the inverse defined as
+while the original function had three non-negative integer arguments. Tarjan himself used a different definition in a later publication [0]. In this thesis, we will take the definition by Kozen [0] in his simplified proof of the Union-Find complexity, with X and X:
+where X is the i-fold composition of X with itself on the second argument:
+In other words, to compute X, we start with x and apply X recursively for x times, where X itself may be the composition of many functions of X. It is obvious that the function is strictly rising, and that for any x, X. 
+
+For low values of x, we find that X stays constant:
+But for X, as the value for k increases, the Ackermann's function grows extremely fast,
+where X is the Knuth up-arrow notation for very large integers [0], denoted by the recursive relations
+
+For the case of X, the Ackermann's function as a function of k already grows at such speed, such that for X the value X is already so incomprehensible large such it exceeds the number of atoms in  the known, observable universe. 
+We define t inverse Ackermann's function X that focuses on this X:
+
+For any system of physical size n, the inverse of Ackermann's function thus satisfies X. This Ackermann's function grows at roughly the same rate as in the proof of the complexity of the Union-Find data structure by Tarjan [0], and thus its inverse is also similar.

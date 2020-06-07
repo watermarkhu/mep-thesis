@@ -44,10 +44,10 @@ The complexity of the UF decoder is driven by the merging between clusters. For 
 In the following we give some intuition into how the UFBB decoder works. Consider the cluster of vertices $\mathcal{V}=\{v_0,v_1,v_2\}$ in Figure \ref{fig1}. Now let us investigate the weights of a matching if an additional vertex $v'$ is connected to the cluster. 
 If $v'$ is connected to $v_0$ or to $v_2$, then the resulting matchings have a total weight of 2: $(v',v_0)$ and $(v_1,v_2)$, or $(v_0,v_1)$ and $(v_2,v')$. However if $v'$ is connected to vertex $v_2$, then the total weight is 3: $(v', v_1)$ and $(v_0, v_2)$. Inspired by this idea, we introduce the concept of potential matching weight (PMW) of a vertex. 
 
-The calculation of the PMW requires to introduce a new data structure that we call the node set of a cluster. The node set of a cluster is a partition of the cluster such that each element of the partition consists of a set of adjacent vertices that are either interior elements in the associated graph or have equal PMW (Figure \ref{fig2}). The calculation of the PMW is performed by two depth-first searches of the node set (Figure \ref{fig3}), where the PMW is translated into a node delay that determines the priority for cluster growth, such that the growth of a cluster moves towards equal PMW in the cluster (Balanced Bloom).
+The calculation of the PMW requires to introduce a new data structure that we call the node-set of a cluster. The node-set of a cluster is a partition of the cluster such that each element of the partition consists of a set of adjacent vertices that are either interior elements in the associated graph or have equal PMW (Figure \ref{fig2}). The calculation of the PMW is performed by two depth-first searches of the node-set (Figure \ref{fig3}), where the PMW is translated into a node delay that determines the priority for cluster growth, such that the growth of a cluster moves towards equal PMW in the cluster (Balanced Bloom).
 %The decoder follows the heuristic of 1) growing first smaller clusters (UF) and 2) growing first vertices with zero delay to minimize the weight of the matchings (BB). 
 
-The UFBB decoder has a higher complexity than the UF decoder. Due to the merges of clusters, the PMW values in a cluster change and need to be recalculated, which in turn requires to join the associated node sets. These join operations are more complex than those of the UF (union of vertex sets). However, we can show that the worst-case time complexity of UFBB is $\mathcal{O}(n \log n)$, which is still quasilinear.
+The UFBB decoder has a higher complexity than the UF decoder. Due to the merges of clusters, the PMW values in a cluster change and need to be recalculated, which in turn requires to join the associated node-sets. These join operations are more complex than those of the UF (union of vertex sets). However, we can show that the worst-case time complexity of UFBB is $\mathcal{O}(n \log n)$, which is still quasilinear.
 
 Our numerical results show that the error threshold of the UFBB decoder (Figure \ref{fig4}) is $p_{th} = 10.25\%$ compared to $10.02\%$ for our implementation of the UF decoder and near the threshold of MWPM $10.35\%$ (thresholds differ from reported value due to changes in cluster sorting, fitting parameters, etc.). Including measurement errors, the UFBB decoder achieves a threshold of $2.86\%$, compared to $2.70\%$ (UF) and $2.98\%$ (MWPM). We also find that the numeric average-case time complexity (for a range of error rates in Figure \ref{fig5}) matches the complexity of the UF decoder up to a constant factor.
 
@@ -115,7 +115,7 @@ Our numerical results show that the error threshold of the UFBB decoder (Figure 
            \draw[l1] (d) -- (e) -- (f);
            \draw[l1, path fading=fade right] (f) -- (4.3, -2.55);
          \end{tikzpicture}
-         \captionof{figure}{A node set $\mathcal{N}$ vs. a vertex set $\mathcal{V}$, both representing the same cluster. Each shaded area covers the vertices of a different  node.}\label{fig2}
+         \captionof{figure}{A node-set $\mathcal{N}$ vs. a vertex set $\mathcal{V}$, both representing the same cluster. Each shaded area covers the vertices of a different  node.}\label{fig2}
      \end{minipage}
      \hfill
      \begin{minipage}[b]{0.3\textwidth}
