@@ -1,0 +1,16 @@
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{Graph $G = (\m{V},\m{E})$, erasure $\m{R} \subseteq \m{E}$, syndrome $\sigma \subseteq \m{V}$}
+  \KwResult{Correction set $m{C}$}
+  \BlankLine
+  construct $\m{T}_\m{R} = \codefunc{Forest}(\m{R})$ (Algorithm \ref{algo:forest})\;
+  initialize $\m{C} = {\emptyset}$\;
+  \While{$\m{T}_\m{R} \neq \emptyset$}{
+    pick a leaf edge $e = {u,v}$ with pendant vertex $u$, remove $e$ from $\m{T}_\m{R}$ \;
+    \If{$u \in \sigma$}{
+      add $e$ to $\m{C}$, remove $u$ from $\sigma$ and flip $v$ in $\sigma$}
+  }
+  \KwRet{$\m{C}$}
+  \BlankLine
+  \caption{Peeling decoder \cite{delfosse2017linear}}\label{algo:peel}
+\end{algorithm}

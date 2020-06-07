@@ -92,7 +92,7 @@ The union by rank rule is then as follows: to merge sets $X$ and $Y$, apply $\co
 \begin{proof}
   Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus equality \eqref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is is either the case that the tree is unchanged, or some other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$, hence $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
   
-  If $R_{t+1}(x) = R_t(x) + 1$, then at time $t$ an union occurred that merged $T_t(x)$ and $T_t(y)$ by pointing $y$ to $x$, where
+  If $R_{t+1}(x) = R_t(x) + 1$, then at time $t$ a union occurred that merged $T_t(x)$ and $T_t(y)$ by pointing $y$ to $x$, where
   \begin{equation*}
     R_t(y) = R_t(x) = R_{t+1}(y) = R_{t+1}(x) - 1.
   \end{equation*}
@@ -110,7 +110,7 @@ The union by rank rule is then as follows: to merge sets $X$ and $Y$, apply $\co
     The maximum rank in all disjoint-set trees after a sequence calls to \codefunc{Find} and \codefunc{Union} in a system of $n$ elements is at most $\lfloor \log n \rfloor$, where $\lfloor \rfloor$ denotes the floor function. 
 \end{lemma}
 \begin{proof}
-    By the previous lemma \ref{lem:rank}, 
+    By the previous Lemma \ref{lem:rank}, 
     \begin{equation*}
         n \geq \abs{T(x)} \geq 2^{R(x)}, 
     \end{equation*}
@@ -131,7 +131,7 @@ We see that as the rank of the trees are bounded by $\m{O}(\log n)$, this result
     \begin{align*}
         n &\geq \Bigg| \underset{R(x)=r}{\bigcup} T(x) \Bigg| \\
         &= \sum_{R(x)=r} \abs{T(x)} \\
-        &\geq \sum_{R(x)=r} 2^r \text{ by lemma \ref{lem:rank}}\\
+        &\geq \sum_{R(x)=r} 2^r \text{ by Lemma \ref{lem:rank}}\\
         &= \abs{\{x | R(u)=r\}}\cdot 2^r
     \end{align*}
 \end{proof}
@@ -208,14 +208,14 @@ Using this charge assignment method, we can (a) sum over all charged vertices an
   For $n\geq 5$, we find the following inequalities:
   \begin{align*}
     n &> \lfloor \log n \rfloor + 2 \\
-    &\geq R(x.p) + 2 \text{ by lemma \ref{lem:maxrank}}\\
+    &\geq R(x.p) + 2 \text{ by Lemma \ref{lem:maxrank}}\\
     &\geq \akker(k,R(x)+2) \text{ by equation \eqref{eq:rankakker}}\\
     &\geq \akker(k,2),
   \end{align*}
   where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns $\alpha(n) > k$, which gives us the upper bound of $K(x)$. 
 \end{proof}
 
-First, we find find the time units assigned to charged \codefunc{Find} functions. Since no charge is assigned to \codefunc{Find}$(x)$ if $x$'s parent is the root, which is the case after path compression, the total number of charged \codefunc{Find}s is proportional to $m\leq n-1$ \codefunc{Union}s. For each \codefunc{Find}$(x)$, on the path from $x$ to the root $r$ there may be at most $\alpha(n)$ cases in which an ancestor $a$ satisfies $K(a)\neq K(x)$ per lemma \ref{lem:maxakker}. Hence, the total number of time units charges assigned to the \codefunc{Find} function is $\m{O}(n\alpha(n))$. 
+First, we find find the time units assigned to charged \codefunc{Find} functions. Since no charge is assigned to \codefunc{Find}$(x)$ if $x$'s parent is the root, which is the case after path compression, the total number of charged \codefunc{Find}s is proportional to $m\leq n-1$ \codefunc{Union}s. For each \codefunc{Find}$(x)$, on the path from $x$ to the root $r$ there may be at most $\alpha(n)$ cases in which an ancestor $a$ satisfies $K(a)\neq K(x)$ per Lemma \ref{lem:maxakker}. Hence, the total number of time units charges assigned to the \codefunc{Find} function is $\m{O}(n\alpha(n))$. 
 
 Next, we count the charges to a particular element $x$ over the entire sequence of operations. 
 \begin{lemma}\label{lem:xcharge}
@@ -312,7 +312,7 @@ Next, we count the charges to a particular element $x$ over the entire sequence 
       \node[anchor=west] at (0,2) {$t'+1$};
     \end{scope}
   \end{tikzpicture}
-  \caption{Visualization of the proof of lemma \ref{lem:xcharge}. (a) Suppose that at time $t$ element $x$ has an ancestor $a$ such that $K(x)=K(a)=k$, then root $r$ satisfies $R_t(r)\geq A^2(k, R_{t}(x))$. Path compression points $x$ to $r$, thus at time $t+1$ it must be true that $R_{t+1}(x.p) \geq A^2(k, R_{t+1}(x))$. (b) At some time $t'$, some unions now caused element $x$ to have new ancestor $a'$ and new root $r'$ on which the same steps can be applied, such that $ R_{t'+1}(x.p) \geq A^3(k, R_{t'+1}(x))$.}
+  \caption{Visualization of the proof of Lemma \ref{lem:xcharge}. (a) Suppose that at time $t$ element $x$ has an ancestor $a$ such that $K(x)=K(a)=k$, then root $r$ satisfies $R_t(r)\geq A^2(k, R_{t}(x))$. Path compression points $x$ to $r$, thus at time $t+1$ it must be true that $R_{t+1}(x.p) \geq A^2(k, R_{t+1}(x))$. (b) At some time $t'$, some unions now caused element $x$ to have new ancestor $a'$ and new root $r'$ on which the same steps can be applied, such that $ R_{t'+1}(x.p) \geq A^3(k, R_{t'+1}(x))$.}
   \label{fig:xcharge}
 \end{figure}
 

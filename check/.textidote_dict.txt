@@ -1,3 +1,5 @@
+Abelian
+Ackermann
 Ackermann's
 ancilla
 anticommute
@@ -12,9 +14,9 @@ Cartesius
 codespace
 codeword
 codewords
-DBUF
 delfosse
 eigenstate
+et
 Heapsort
 Ising
 Kitaev
@@ -31,7 +33,16 @@ quasiparticle
 quasiparticles
 qubit
 qubits
+Quicksort
 Recursiveness
 SBUF
+SUF
+DUF
+DBUF
+UFBB
+superset
 toric
+untraced
 Xeon
+acyclic
+preprocessing

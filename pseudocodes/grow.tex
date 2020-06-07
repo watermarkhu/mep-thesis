@@ -1,0 +1,15 @@
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{Cluster $c_i$ with boundary $\delta \m{V}_i$, $\m{L}_m$}
+  \KwResult{Cluster with traced boundary edges}
+  \BlankLine
+
+  \For{$v$ in $\delta \m{V}_i$}{
+    \For{edges in $\{(u,v) | (u,v).support\neq 2$\}}{
+      add 1 to $(u,v).support$ \;
+      if $(u,v).support=2$, add $(u,v)$ to $\m{L}_m$ \;
+    }
+  }
+  \BlankLine
+  \caption{\codefunc{Grow}}\label{algo:ufgrow}
+\end{algorithm}

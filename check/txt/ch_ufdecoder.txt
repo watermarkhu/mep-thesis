@@ -1,0 +1,270 @@
+Union-Find decoder
+The Union-Find decoder is a new fast decoding algorithm for topological codes to correct for Pauli errors, erasure errors, and the combination of both errors. The worst-case complexity of the algorithm is X, where n is the number of physical qubits and X is the inverse of Ackermann's function, which is very slowly growing, and is proven that X for any practical amount of qubits.
+
+Many types of decoding algorithms have been developed for the surface code, including the optimal decoder and the Minimum-Weight Perfect Matching decoder. Most of these decoders run at best in polynomial time, which is often considered efficient, but in practice even quadratic or cubic complexity is likely too slow to correct errors faster than they accumulate in a quantum device. Furthermore, any speed-up of the decoder will indirectly lead to a reduction of the noise strength, as a shorter time between two rounds of correction allows for fewer errors to appear. To this end, a new decoding algorithm named the Peeling decoder has been developed that can solve errors over the erasure channel with a linear time complexity. The Union-Find decoder is an extension that additionally solves for Pauli errors. We will explore both algorithms in Sections X-X and perform analyses on their complexities. In Section X, we present two of our altered implementations of the Union-Find decoder. We simulate and compare the performances of each implementation in Section X.
+
+Peeling decoder
+The Peeling decoder acquired its name by the nature of its behavior of sequentially peeling from some tree of edges equivalent to qubits until the correction operator is left [0]. The scope of this decoder is limited to erasure errors, or errors suffered through the erasure channel. Recall from equation X that in an erasure, each qubit is erased from the system independently with probability X. Such a loss can be detected and the missing qubit is replaced by a totally mixed state of equation X, which can be interpreted as the original state that suffers from a Pauli error X, X, X or X chosen uniformly at random.
+theorem
+  For erasure noise of equation X, where a qubit is erased and replaced with a totally mixed state equivalent to a qubit that suffers from uniformly chosen X, the primal and dual lattices of the surface code can be decoded independently of each other.
+theorem
+proof
+  Pauli-X errors exclusively trigger nontrivial star operator measurement on the vertices of the primal lattice. Pauli-Z errors exclusively trigger nontrivial plaquette measurements on the vertices of the dual lattice, or faces of the primal lattice. Recall from Section X that a graph X can be separated into sub-graphs X and X. A uniformly distributed X on X is hence equivalent to uniformly distributed X and X that simultaneously and separately apply to X and X, respectively, since X.
+proof
+definition
+  Let the subset of qubits that suffer an erasure error (equation X) on a lattice X be denoted by X. Edges in X are replaced by uniformly distributed X for the primal lattice (and X for the dual lattice). Let the set of edges that suffer a Pauli error due to this replacement by X.
+definition
+definition
+  The Pauli product of a set of edges X is the defined as the product of Pauli operators on each of the edges in the set
+  where the Pauli operator X corresponds to X if X and otherwise X when X.
+definition
+
+Decoder process
+In this section, we will only consider the sub-graph X and denote it simply by X. We describe the decoding process of an erasure X with errors on X. Error detection is performed in the same way as Pauli errors; by measuring the set of stabilizer operators on vertices X, which returns a set of nontrivial syndrome measurements X (see Definition X). The decoder of an erasure error is thus provided with the extra information X on top of the nontrivial measurements X. The decoding process of sub-graph X is equivalent to the process of X.
+lemma
+  For an erasure X whose qubits are reinitialized with uniformly distributed Pauli errors resulting in errors on X, and a measured syndrome X, any error X that produces X in a measurement is the most likely set of errors.
+lemma
+proof
+  In the absence of Pauli errors, all edges with some error must lie inside X. Therefore, for any measured syndrome X, the path of errors must also be in the erasure, which can be denoted by X. Since all errors in X are uniformly distributed, any set of edges with errors X with syndrome X is the most likely set.
+proof
+
+For this reason, if the correction X is applied to the lattice, the resulting decoder is a maximum likelihood decoder. In order to find X, the objective is not to find paths within X that pair the syndrome vertices of X, but rather try to recursively shrink the set of edges on which a decision is to be made.
+definition
+  The vertex boundary or composition of a set of edges X denotes the set of vertices X that supports all edges X.
+definition
+definition
+  A spanning forest X is a maximal subset of edges of a set of edges X that contains no cycles and X. Each connected element of the forest is a tree. 
+definition
+The first step  is to produce X inside X, where all syndrome vertices X are included in the composition per definition X. Hence, if X is a connected graph, then X is a connected acyclic graph. Such a forest can be found in linear time by a depth-first search of X. We initiate X as an empty set, pick some vertex v in X and add edges X to X and apply it recursively to the vertices u (Algorithm X). Next, the decoder further reduces the size of the spanning forest X by sequentially peeling edges from the tree, while constructing the correction set X, initiated as an empty set. The decoder loops over all edges in X, each time picking a leaf edge X, connected to the forest by only one vertex v, removing the leaf edge from X. If the so-called pendant vertex u belong to the set of nontrivial syndrome measurements X, remove u from X, add e to X, and flip the vertex v in X, such that v is added to X if X, and removed from X if X.  If X, the edge e is simply removed from X (see algorithm X). On account of these rules, edges on a branch that had a syndrome-vertex as a leaf will continuously be added to X until it encounters another syndrome-vertex, creating a correction path between a syndrome pair. The forest is peeled until there are not edges in X and X.
+
+
+
+
+Decoder validity
+The spanning forest X can be constructed in linear time. Also, the loop over the forest can be operated in linear if the list of leaves is pre-computed and updated during the loop. Thus, the Peeling decoder has a linear time complexity in the size of the erasure X and therefore also in the number of qubits X. The structure of the forest X is dependent on the root vertex from which the depth-first search is started, and proof is required that any forest of X is valid. Also, we show that for all forests, the peeling process returns the same correction.
+
+lemma
+  For any choice of X, there exists a subset X such that X corrects the syndrome set X.
+lemma
+proof
+  There exists a subset of edges X such that X has a syndrome X. By the definition of the forest X, adding another edge X creates a cycle X, where X denotes the symmetric difference between two sets. Now X can be replaced by X whose Pauli product X has the same syndrome X, as X augments the matching path between syndromes within X. Now, any edge X can be removed from X to create a new forest X. For any cycle that exists from larger than 3 elements, X must exist. Thus, the Pauli product of subset X is also a valid error with syndrome X, and X corrects X. This can be done any number of times, thus every X is valid.
+proof
+lemma
+  For each forest X, the outcome X after peeling is unique and independent of the order of peeling.
+lemma
+proof
+  If there exists two subsets X and X, such that X and X corrects X, then X commutes with the stabilizer. This means that either X is a cycle or X. Since X has no cycles, it means that X must be unique within X.
+proof
+
+Per lemmas X and X, for some error X on erasure X, the Peeling decoder will always output some correction X such that X commutes with the stabilizer. This correction is also the most likely correction per lemma X. Finally, we will prove that this is true for any erasure X.
+theorem
+  For any connected erasure X with Pauli error on X, if the parity of the number syndrome vertices within the graph is even, applying the Peeling decoder (algorithm X) will produce a valid correction X.
+theorem
+proof
+  Consider a spanning forest X containing X syndrome vertices. The forest is being stripped by the Peeling decoder on the leaf edge X, where the vertex v is the pendant vertex. If X, e is simply removed from X and X is unaltered. If X, u is removed from X such that X. Vertex v is now flipped in X, meaning that if X, it is removed and X, or if  X, it is added and X. After peeling, it must be that X, from which follows that all erasures with even parity can be solved.
+proof
+
+definition
+  Let a cluster X be a sub-graph of X constructed by a set of erased edges X and vertices X that form a connected graph. The set of connected edges can be a subset of an erasure X, or a tree component or subset of a forest X, denoted by X and X, respectively. The set of vertices of a cluster is denoted by X.
+definition
+definition
+  Let the parity of a cluster X be the number of syndromes in its vertex set X. The size of a cluster is the size of its vertex set. 
+definition
+lemma
+  Two clusters X must have disjoint edge sets and disjoint vertex sets, such that
+lemma
+proof
+  If there exists some edge e that belongs to two clusters X, they are connected via e. Per definition X clusters X must be a single cluster. The same is true for some vertex v that belongs to both X and X.
+proof
+Given a graph X that is subjected to pure erasure noise, X may not be a single subset of connected edges, but rather many connected subsets of erased edges belonging to clusters, denoted by X. For each cluster edge set X, all syndromes caused by errors on X must be in X. Since every cluster must be strictly disjoint per lemma X, the parity for each X must therefore be even, and X can be decoded individually per theorem X. Here, for every X a tree X is made and peeled. This is why erasure noise is the scope of the Peeling decoder. As other types of noise are added, modifications to the Peeling decoder are needed, as we will see later.
+theorem
+  The Peeling decoder (algorithm X) is a linear-time maximum likelihood decoder for erasures up to X qubits, where d is the minimum distance of the code.
+theorem
+proof
+  If the erasure X is not a superset of edges X such that X some logical operator, a correction X to some error X cannot result in a logical error, as X. As X, this is the case for any erasure pattern up to X qubits. Furthermore, on account of lemmas X, X and X, any correction set X is the most likely correction.
+proof
+
+Bounded surfaces
+For bounded surfaces such as the planar code (sec X), the Peeling deoder needs some small alterations. Recall that the graph of the primal lattice is now denoted by X. Syndrome measurements on such a graph are limited to X, as X are open vertices that only exist to support boundary edges X, and do not refer to some stabilizer generator or physical measurement. The missing information on X makes it impossible to apply the pendant vertex rule at these vertices. To ensure that the peeling algorithm does not become stuck, we add the restriction for the pendant vertex X. Furthermore, the construction of the forest X requires an additional alteration.
+lemma
+  Two vertices u,v within a forest X that satisfy X is equivalent to a cycle in X.
+lemma
+proof
+  If there are an even number of vertices in a forest X that are in X, it means that there are a number of unique paths within X that lead from an element of X to another element of X. Such a path is equivalent to some X-operators and commutes with the stabilizer. Hence, it cannot be caused by some detected error which anticommutes with the stabilizer.
+proof
+
+Due to this, we ensure that each forest X can only be supported by a maximum of 1 element of X. The forests are grown starting from vertices of the set X, and the algorithm is completed by a depth-first search same as before with the additional requirement. Note that now for every cluster, more than one connected acyclic forests may be formed, dependent on the number edges connected to the boundary. But as all forests X that are subsets of the same cluster are disjoint, each edge is peeled only once and every forest can be peeled independently per lemma X. With these extra rules in mind, we present the pseudo-code of the Peeling decoder for bounded surfaces in algorithm X.
+
+
+
+
+
+
+
+Union-Find decoder
+The Union-Find decoder [0] is a modification of the Peeling decoder that utilizes the Union-Find data structure [0] to additionally solve for Pauli errors, on top of erasure errors. In this section, we will first describe why a modification is needed, then how the Union-Find data structure is applied, and finally move on the algorithm itself, and analyze its complexity.
+
+The Peeling decoder solves exclusively for erasure errors. To be able to compare with the Minimum-Weight Perfect Matching decoder, or any other type of decoders, Pauli noise must be included. To this end, we use the independent noise model of equations X and X. Pauli-X errors, now caused by both erasure and bit-flips, exclusively trigger nontrivial star operator measurements on the vertices of the primal lattice. Pauli-Z errors, now caused by both erasure and phase-flips, exclusively trigger nontrivial plaquette measurements on vertices of the dual lattice. This means that theorem X still holds for the combined independent Pauli and erasure noise model, such that the primal and dual lattices can be decoded separately. Again, we will only consider the primal lattice of graph X subjected to Pauli-X errors and erasures with replacement from uniformly distributed X, as the process of decoding the dual lattice is analogous to the primal lattice. For a combined noise model of erasure noise and depolarizing noise of equation X, theorem X fails, and is for this reason not considered in this thesis.
+
+The independent noise model introduces extra Pauli-X errors on qubits or edges X such that not all Pauli errors are in the erasures X, where the Pauli errors induced by the erasure is denoted by X (see Figure Xa. This means also that not all syndromes are in the vertex boundary of the erasure X (definition X), and odd-parity clusters can occur (definitions X, X) (see Figure X b). Per theorem X, the Peeling decoder cannot solve for these errors. To this end, we construct an altered erasure X that contains only even-parity clusters in a preprocessing step that is dubbed syndrome validation. The validated erasure X is compatible with the Peeling deoder. To do this, we sequentially grow the odd-parity clusters in diameter by adding neighboring vertices and edges to the clusters, effecting growing the erasure. While these added edges are not truly erased, it does not matter for the decoder. When two odd-parity clusters meet, the merged cluster will have an even parity, and can now be solved by the Peeling decoder. A schematic of the structure is included in Figure X.
+proposition
+  The Peeling decoder can be altered to additionally solve for Pauli errors by a preprocessing step that initializes some altered erasure X, such that theorem X is satisfied. The validated erasure X and syndrome set X are passed to the Peeling decoder and can decoded as before.
+proposition
+
+
+Per lemma X, an edge can only be in a single cluster X and a vertex in a single X. The merge of two clusters thus requires the update of the parent cluster of at least one set of vertices and edges. The challenge is to efficiently store this cluster index value such that the update complexity after each merge is minimized. This is done via the Union-Find data structure.
+
+Application of the Union-Find data structure
+The Union-Find data structure, also known as the disjoint-set data structure [0], consist of two functions Union and Find for manipulating a set of n elements partitioned into a number of disjoint subsets in the form of disjoint-set trees. Function Find follows a sequence of parent pointers in the tree to find the representation root element of the tree T, and function Union merges the trees of two disjoint subsets. This data structure has the property that the worst-case complexity for a sequence of Union's and Find's is X, where X is the inverse of Ackermann's function that grows at such slow rate that for all practical purposes, X. 
+
+In the context of the surface code, the vertices X are the elements and each disjoint-set tree is equivalent to a cluster X with vertex set X and edge set X, where each vertex X points to a parent vertex and the root vertex X represents the cluster (see Figure Xb-f, right). Recall from Definition X that the edge set X contain only erased edges.
+The minimum size of a cluster is now defined by an empty edge set and a single syndrome-vertex in the vertex set. Note that while the nodes in the tree are equivalent to vertices X, parent pointers in the disjoint-set tree structure are not equivalent to edges X. The edge set X with its erasure subset X and subsequently cluster edges X and tree X are related to physical qubits and the lattice structure of the surface code, whereas edges of the tree X exists to point towards the representative element at the root.
+definition
+  Let X denote (sub)tree rooted in vertex v, and let X denote the number of vertices in the (sub)tree. The tree rooted at X is equivalent to the set X. The height of an element v of X is the distance from v to the X. The tree's rank is the maximum height in the tree. 
+definition
+
+Function FindX is performed by following the parent pointers to the root X (algorithm X), and its cost is therefore dependent on the height of the vertex in the tree; the distance of an element to the root. The function can be applied recursively such that all vertices in the sequence of parent pointers are pointed to the root, which decreases the height of the tree and reduces the cost to every future call to Find. This is called path compression. 
+
+
+The function UnionX links the trees of vertex roots X and X by making one of the roots a child of another. By comparing the sizes of the trees X, the height of the combined tree can be minimized, again to reduce the cost to any future calls to Find. This is called union by weight, where the weight stands of the number of elements in the tree (algorithm X). Alternatively, union by rank compares the ranks of vertex nodes X, where the rank is defined as the maximum height of the tree (algorithm X).
+
+
+The Union-Find data structure, its tree implementation, the union by rank, union by weight and path compression rules are all elaborately covered in appendix X. Here, we also make a full analysis of its X complexity based on [0]. The Ackermann's function and its inverse are detailed in appendix X.
+
+Additional data structure
+We define in this section what it means to grow a cluster, and the additional data structure needed to facilitate such growth. For a cluster defined by disjoint-set tree of vertices X, an iteration of growth means to add another layer of neighboring vertices that lie on the outer boundary of the cluster. 
+definition
+  For a cluster X, let its boundary be defined by a subset of edges and vertices X, X. The boundary vertex set X supports one or more edges connected to vertices not in X. This set of edges is the boundary edge set X, and can be considered as paths that lead to the neighboring vertices. To walk such path is dubbed as tracing an edge. 
+definition
+To grow a cluster, these paths are traced and all vertices X are added to X by pointing v toward the root X in the tree. Note that every single-vertex addition to the tree can be viewed as a union event. If v does not belong to another cluster, the addition is a union event between the tree of X and a single-element tree X. If v does belong to another cluster with tree X, it is a union event between two trees X. We thus always apply X and X to find the respective roots X, and if X apply X to merge the trees.
+
+For two vertices u,v that belong to different odd-parity clusters and connected by X, where X, a round of growth where both clusters are grown would mean that the path of X is traced twice. This does not make sense, as during the second trace, both vertices already belong to the same cluster. To this end, we only trace the path a half-edge length per round of growth. In the case such as above, both traces from vertices u and v on edge X cover a half-edge and meet in the middle, which prompts a single union event (see Figure Xc-d). 
+definition
+  Let the support of an edge be how many times a path on e has been traced; the number of growth iterations the edge has been in some cluster boundary X. The support of an edge can have values X; 0 for untraced, 1 for half-traced and 2 for traced.
+definition
+This can be stored in some look-up table Support, or as an attribute at the edge object e.support. To trace an edge e means to increase the e.support by 1, and to merge the cluster if X. This data structure implies that it is redundant to explicitly store the set of edges X or the boundary edge set X for each cluster. Lemma X implies that if a vertex X, that all traced edges supported by v satisfy X, such that
+Thus, for every cluster X, the disjoint-set tree of vertices X, the boundary vertex set X and the table Support or attribute e.support provides the necessary data for constructing the forest X and the subsequent peeling in the Peeling decoder.
+
+Finally, in each round of growth, there may be many odd-parity clusters X, which we collect in a list X. If two clusters are immediately merged within the same time step t when some boundary edge e reaches X, these clusters are merged into one, and it is not possible to track which part of the merged cluster have completed its growth and which have not. To this end, in a round of growth, Unions are applied after all clusters have grown. This is accomplished by initiating a merging list X at the start of each round of growth; fully-traced edges are appended to this list; and merges are applied at the end of each round. We denote the subroutine for the growth of a cluster Grow (Algorithm X).
+
+
+Syndrome validation
+We now describe the preprocessing step of syndrome validation. A round of growth at time t is initiated by collecting a list X of odd-parity clusters. A cluster X is grown by X, during which all edges with X are added to merging list X. After all clusters are grown, for each edge X, apply X and X. If X, the trees of both clusters are merged by X. At time same time, we find new boundary vertices X that consists of the newly added vertices v and merge the new boundary lists X and X during X. We remove all even cluster from X and remove any duplicate elements. The process can be repeated until X, at which point all clusters have even parity. The set of all even clusters, which is the validated erasure X, can be decoded by the Peeling decoder (see Figure Xf). The pseudo-code for the Union-Find decoder, which includes syndrome validation and the Peeling decoder, is listed in algorithm X. This algorithm fulfills Proposition X.
+
+
+
+
+
+
+
+
+
+
+Time complexity of the Union-Find decoder
+
+For a system of n qubits, the initialization of the cluster X and its boundaries X and the odd parity cluster list X all take X time. Each edge can be traced a maximum of 2 iterations, thus tracing also takes X. Maintaining X is proportional to the number of unions, which is limited to X. As we already know that the Peeling decoder takes X time, hence the worst-case time complexity of the Union-Find decoder is dominated by the complexity of the Union-Find data structure, which is X. Here X denotes the inverse of Ackermann's function (see appendix X), which is very slow growing, such that for any physical values of n, X. This certifies the proclaim that the Union-Find decoder is a ``Almost-linear time decoding algorithm'' [0]. 
+
+Implementations of the Union-Find decoder
+
+The vanilla Union-Find decoder of Algorithm X has been reported to have a code threshold of X for independent Pauli noise [0] on a toric code. Recall from Section X that X is the threshold error rate below which the chance of successful correction can be increased by increasing the system size or the number of qubits on the surface code. Delfosse et Al. has shown that this threshold can be improved to X by applying weighted growth, where the order of cluster growth is sorted according to the sizes of the cluster trees. However, the authors have not provided a description for this sorting. We will show an implementation of weighted growth in Section X. Furthermore, we introduce another implementation that dynamically maintains a forest during growth in Section X.
+
+Bucket weighted growth
+In this section, we will first show why weighted growth improves the threshold, and provide a description of a sorting method utilizing Bucket sort that operates within the time complexity of the Union-Find decoder. 
+
+
+
+
+lemma
+  For two clusters X with sizes X, X will add fewer redundant edges X to X compared to X to X, where redundant edges are not in the outputted correction set X. 
+lemma
+proof
+  Recall from Definition X that the size of a cluster is the number of vertices in its cluster tree. Consider an odd-parity cluster X. This cluster will be continuously grown until it merges with another odd cluster X. During a round of growth, X edges are added to the cluster, but only one edge in X will be in X, connecting the residual syndrome vertices from the two clusters, and all other edges will be peeled. Thus, only X of edges are not added redundantly. For any cluster the size of its boundary will be proportional to the size of the cluster itself X, which proves the stated lemma. 
+proof
+
+If there are only two clusters X on the lattice with different cluster sizes, it would not matter which cluster is grown first. The number of clusters growths needed is equal to the minimum distance X between the two clusters. Either a sequence of X growths for X, X growths for X, or X growths distributed among X and X would achieve the same goal: connecting the two clusters into a single even-parity cluster. It is due to the existence of other clusters that weighted growth makes a difference. If there are clusters X with arbitrary parity located nearer to X than X, the distribution of the X growths among X and X now determines the shape of the resulting clusters. If only X is grown, it may be possible that it is merged with X first, whereas if only X is grown this may not be the case. The redundant edges of lemma X are therefore not insignificant, as it may lead to a different set of clusters entirely that may result to a right correction set X, or not at all. Nevertheless, by growing smaller clusters first, each newly added edge has a higher possibility to be in X than edges added during the growth of a larger cluster, which is why weighted growth leads to an increased threshold.
+
+
+Sorting method
+
+The challenging aspect to weighted growth is that the sizes of clusters change as they grow and merge. For X clusters on a lattice at time t, where n denotes the number of vertices, sorting these X clusters using any comparison sort methods such as Quicksort, Merge sort, Heapsort has a worst-case complexity of X at best. Here, any time the size of a clusters changes, we need to compare its new size with all other clusters sizes. For a total of X clusters growths, the total number of operations needed to sort these X clusters X times may lead to a complexity that is worse than X. Luckily, as the sizes of clusters can only take on integer values and is limited to n, we can utilize a non-comparison sorting algorithm. Now, as the size of a cluster changes, we need not compare it with the other clusters. Specifically, we will be using Bucket sort. 
+definition
+  Bucket sort is a non-comparison sorting algorithm that distributes n elements into X buckets, after which each bucket is sorted individually. Bucket sort has average-case performance X. The worst-case complexity for Bucket sort is X, when all the elements are placed into a single bucket. Each bucket is labeled as X and the list of all buckets is labeled as X. 
+definition
+In the context of weighted growth, if two clusters have the same size, it does not matter which cluster is grown first. Thus, if for every cluster size j we define a bucket X, it is not necessary to sort each bucket, and sorting each cluster takes X time. To apply Bucket sort as the sorting algorithm for weighted growth in the Union-Find decoder, we must do the following: 1) initiate X per Definition X; 2) place the initial odd-parity clusters into these buckets, where the smallest single-vertex clusters are sorted into X and the largest possible clusters into X; 3) grow and merge clusters sequentially from buckets starting from X, iterating over every bucket until X; sort grown and merged odd-parity clusters into buckets; 4) continue until all clusters have even parity. 
+definition
+  The support of a cluster X is the number of growth iterations a cluster has maintained the same size X, and can either be 0 or 1. 
+definition
+As we trace the boundary edges per half-edge, a single round of growth does not necessarily add new vertices and increase X. Nevertheless, a cluster with size X and boundary edges with support 1 is arguably larger than a cluster with the same size X and boundary edges with support 0. For this reason, we define 2 buckets per cluster size X. Based on the preceding paragraphs, we define a function Place in Algorithm X that sorts a cluster in an appropriate bucket. After a cluster X is grown, during which it may have merged with other clusters, we apply X immediately to place it in a new bucket if it has odd parity. However, as merges between clusters are maintained by the merging list X and merges are applied after cluster growths of the same iterations, we need to maintain an additional list X place a list of cluster after merges.  
+
+
+
+
+
+
+
+
+
+Growing buckets
+
+In the original algorithm, we keep iterating over X whilst there are odd-parity clusters remaining in the list, where in each round of growth the clusters increase in size and potentially merge to even parity. Here, we made sure that at the end of each round, the even-parity clusters are removed from X. 
+
+With weighted grow, the list of odd clusters X from algorithm X is replaced with the list of buckets X. Growing each bucket X is now equivalent to a round of growth. In each round k, we grow all clusters X in X with X. However, it is now possible for an odd-parity cluster X to be grown and placed in bucket X in round k, merged with some other odd-parity cluster to an even parity cluster in round X, and merged with another odd-parity cluster in round X and placed in bucket X. Thus, in round X, the placement of X in X is invalid as its parity is even, and in round X the placement is equally invalid as it is placed in both X and X. The placement is X is thus a redundant placement (see Figure X).
+
+To avoid the growth of a redundantly placed cluster X, we check before X) that the cluster X still belongs to the bucket X. To facilitate this check, at the end of the function Place (Algorithm X), which is called immediately after a cluster is grown, we additionally store the bucket number at the cluster object X. When iterating over the bucket X, a cluster X is conditionally grown only if X. When a cluster is merged to have even parity, its bucket number is updated to X, such that it will not be grown.  
+
+
+lemma
+  To apply Bucket sort for weighted growth on a lattice of n vertices, a total of X buckets are needed. 
+lemma
+proof
+  On a lattice of n vertices, a cluster X can have a maximum size of X. The number of buckets needed for using Bucket sort for weighted growth is thus seemingly X, where for each cluster size two buckets are initiated. However, any cluster reaching size X, there must be at least on another cluster X with size X. Cluster X thus belongs to a lower bucket with X that is grown before cluster X. As there are only n vertices on the lattice, these clusters must merge before cluster X is grown. Thus buckets X with X are always empty or contain strictly redundant placements.
+proof
+Actually, for either a toric or planar code, the number of buckets required is slightly less than n. But these slight reductions do not reduce the time or space complexity of the algorithm, and we will not define these values explicitly. 
+
+Initiating n buckets takes X time. The placement of each cluster in a bucket and checking its bucket number takes X time. The total number of placements, including redundantly placed clusters, is upper bounded by the number of growths, which has not changed due to weighted growth, and thus does not add to the complexity. Hence, the overall complexity of X is preserved. 
+
+
+
+
+
+
+
+
+
+
+Dynamic forest
+Syndrome validation outputs a validated erasure X, a set of connected clusters with even syndrome parities with edge sets X. The task of the Peeling decoder is now to 1) make a set of trees such that the edges sets of clusters are X and 2) peel these forests and output a correction X where X. Recall that a tree X (Definition X) can be created by a depth-first search of the edge set X. We now show that via a simple extra step in syndrome validation, clusters X can be grown such that it is always acyclic and X. 
+
+definition
+  The dynamic cluster tree X is a subset of X, the edge set of a cluster X, where the property of Definition X is always maintained during growth, such that
+definition
+The dynamic cluster tree X replaces X as the edge set of a cluster X and can be maintained by an additional step when considering all edges from the merging list X in Algorithm X. Previously, we merged the trees of X and X if X. Now, if X, vertices u and v already are in the same tree. Adding X to the tree would be equivalent to a cycle. We therefore subtract 1 from X if X. 
+
+proposition
+  As the Minimum-Weight Perfect Matching decoder has been reported to have a higher code threshold than the Union-Find decoder, there is an intuition that the weight of the matching X within the Union-Find decoder must also be kept minimal. 
+proposition
+When dynamic cluster trees are not maintained, the shape of the forest X created during the first step of the Peeling decoder (Algorithm X) is dependent on the seed from which the depth-first search is started (Algorithm X).  If the seeds are selected randomly, minimum weight matching within X can not be ensured. Instead of the depth-first search of Algorithm X, minimal X can be achieved by a number of parallel breadth-first searches with syndrome vertices X as seeds, where sequentially edges of the same breadth or same distance from any syndrome-vertex are added to X. We will not provide a pseudo-code for this alternative Forest function here, as maintaining dynamic forests achieves the exact same result. Edges added to a dynamic tree X during some growth iteration are equivalent to the breadth of edges added to X in one of the breadth-first searches. Furthermore, to dynamically maintain a forest of clusters is crucial for a modification of the Union-Find decoder that will be presented in the next chapter, which is reliant on clusters that are always acyclic. 
+
+
+Decoder labelling
+With the application of weighted growth through bucket sort and the maintenance of a dynamic forest, we now have several implementations of the Union-Find decoder. From this point on, we refer to Algorithm X as the Static-Forest Union-Find decoder, as it does not maintain a dynamic forest. We dub the Static-Forest Union-Find decoder with weighted growth applied via the bucket sort method introduced in this section the Static-Forest Bucket Union-Find decoder. The pseudo-code for this decoder is presented in Algorithm X. We dub the Union-Find decoder with dynamically maintained trees the Dynamic-Forest Union-Find decoder. The pseudo-code for this decoder is presented in Algorithm X. The decoder that combines both methods is dubbed the Dynamic-Forest Bucket Union-Find decoder, and its pseudo-code is presented in Algorithm X. As we compare the performance of these implementations in the next section, we will be using abbreviations according to Table X.
+
+
+Performance
+We benchmark the performance of each of the implementations of the Union-Find decoder in Table X using our own implementation in Python3 (see Appendix X). This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold as described in Section X. We simulate for the decoder success rate on lattice sizes X for the independent noise model (Definition X), and on lattice sizes X for the phenomenal noise model (Definition X) with a minimum of 96.000 samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table X. 
+
+
+From the literature, the vanilla unweighted Union-Find decoder is reported to have a threshold of X for independent noise and X for phenomenological noise. The weighted variant, for which no description was provided and led to our implementation using bucket sort, is reported to have a threshold of X for independent noise and X for phenomenological noise [0]. The SUF decoder should be equivalent to the vanilla unweighted Union-Find decoder. However, the threshold values of these implementations clear do not match. This points towards other differences in implementation that is unfortunately unknown to us. For better or worse, we have not been able to further reduce the threshold of our implementation. The SBUF decoder should be equivalent to the vanilla weighted variant. The threshold values differ within a range of about 0.001, or X. While this may seem as they are within range to conclude that they match, note that the threshold of the Minimum-Weight Perfect Matching decoder is only X higher at X. As the threshold for the unweighted variant already pointed to other differences in implementations, we speculate that our implementation improves upon the original. 
+
+Furthermore, it can be concluded from Table X that the dynamic forest variants of the decoders have a slightly increased or equal threshold and decoding success rate. To find out whether the intuition from Proposition X is true, we compare the matching weight X for every implementation of the Union-Find decoder with the minimum weight obtained with the Minimum-Weight Perfect Matching decoder in Figures X and X, for a toric code with independent noise on X. Similar comparisons for simulations on the planar code and with phenomenological noise are included in Figure X. From these figures, we can conclude that dynamic forest does decrease the matching weight. This adds to the credibility to the intuition from Proposition X. We restate the proposition as the following:
+proposition
+  There is an intuition that a decreased weight is to some extent a heuristic for an increased threshold. 
+proposition
+
+
+Finally, we compare the average running times for every implementation of the Union-Find decoder with independent noise in Figures X and X. Similar comparisons for simulations on the planar code and with phenomenological noise are included in Figure X. From these figures we can conclude that maintaining a dynamic forest reduces the running time slightly. This does not come unexpected, as the dynamic forest eliminates the necessity of calling Forest (Algorithm X). However, the gained performance is not substantial enough to advertise dynamic forest as a major improvement over static forest. Nevertheless, we remind the reader that maintaining a dynamic forest is crucial for our modification of the Union-Find decoder in the next chapter, while in this chapter, the concept of dynamic forest helped us formalize Proposition X. Similar figures under phenomenological noise show the same heuristic (Section X).
+
+
+In this chapter, we have fully described the Union-Find decoder, and provided implementations of this decoder with varying performance. Based on simulated results, we proposed an intuition that a decreased matching is a heuristic for an increased code threshold. In the next chapter, we continue to speculate on this intuition. With the goal of further reducing the matching weight within the Union-Find decoder, we propose a modification that has performs comparably with the Minimum-Weight Perfect Matching decoder in terms of code threshold. 
+
+

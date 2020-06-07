@@ -1,0 +1,26 @@
+\begin{figure}[htpb]
+  \tikzstyle{coloredcircle}=[draw, circle, line width= 1, text=black, inner sep=0, minimum width=0.7cm]
+  \centering
+  \begin{tikzpicture}
+    \node[OrangeRed, fill=OrangeRed!50!white, coloredcircle] (s1) at (0,1.5) {$\sigma$};
+    \node[NavyBlue, fill=NavyBlue!50!white, coloredcircle] (e1) at (0,.5) {$\m{R}$};
+    \node[OrangeRed, fill=OrangeRed!50!white, coloredcircle] (s2) at (5,1.5) {$\sigma$};
+    \node[NavyBlue, fill=NavyBlue!50!white, coloredcircle] (e2) at (5,.5) {$\bar{\m{R}}$};
+    \draw[OrangeRed, line width = 1] (s2) -- +(-1,0);
+    \draw[NavyBlue, line width = 1] (e2) -- +(-1,0);
+    \draw[OrangeRed, line width = 1, -latex]  (s1) -- +(1,0);
+    \draw[OrangeRed, line width = 1, -latex] (s2) -- +(1,0);
+    \draw[NavyBlue, line width = 1, -latex] (e1) -- +(1,0);
+    \draw[NavyBlue, line width = 1, -latex] (e2) -- +(1,0);
+    \node[Green, fill=Green!50!white, coloredcircle] (c) at (10,1) {$C$};
+    \draw[Green, line width = 1, latex-] (c) -- +(-1,0);
+    \node[left=0 of s1, align=right] {syndrome};
+    \node[left=0 of e1, align=right] {erasure};
+    \node[right=0 of c, align=left] {correction};
+    \draw[line width=1] (1,0) rectangle +(3,2) (6,0) rectangle ++(3,2);
+    \node[text width = 2cm, align=center] at (2.5,1) {\emph{Syndrome validation $f(\m{R}, \sigma)$}};
+    \node[text width = 2cm, align=center] at (7.5,1) {\emph{Peeling decoder}};
+  \end{tikzpicture}
+  \caption{Stages of decoding of the Union-Find decoder. A preprocessing step that is called \emph{syndrome validation} is added to the Peeling decoder such that an altered erasure $\bar{\m{R}}$ is constructed that satisfies theorem \ref{the:anyevenparity}, where all erasures have an even number of syndromes (inspired by \cite{delfosse2017almost}).}
+  \label{fig:ufstages}
+\end{figure}

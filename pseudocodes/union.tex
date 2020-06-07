@@ -1,0 +1,36 @@
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{Vertex roots $r_u\in \m{V}$, $r_v\in \m{V}$}
+  \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
+  \BlankLine
+  \uIf{$|T(r_u)|<|T(r_v)|$}{
+    $\text{parent}(r_u)=r_v$\;
+  }
+  \uElseIf{$|T(r_u)|>|T(r_v)|$}{
+    $\text{parent}(r_v)=r_u$\;
+  }
+  \Else(equal weights){
+    $\text{parent}(r_u)=r_v$ \;
+  }
+  \BlankLine
+  \caption{\codefunc{Union} with \emph{union by weight}}\label{algo:unionweight}
+\end{algorithm}
+
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{Vertex roots $r_u\in \m{V}$, $r_v\in \m{V}$}
+  \KwResult{Merged tree $T(r)$ with $\{r_u,r_v\}\subseteq T(r)$ (def. \ref{def:trees})}
+  \BlankLine
+  \uIf{$\text{rank}(r_u)<\text{rank}(r_v)$}{
+    $\text{parent}(r_u)=r_v$\;
+  }
+  \uElseIf{$\text{rank}(r_u)>\text{rank}(r_v)$}{
+    $\text{parent}(r_v)=r_u$\;
+  }
+  \Else(equal ranks){
+    $\text{parent}(r_u)=r_v$ \;
+    $\text{rank}(r_u) = \text{rank}(r_u) + 1$ \;
+  }
+  \BlankLine
+  \caption{\codefunc{Union} with \emph{union by rank}}\label{algo:unionrank}
+\end{algorithm}

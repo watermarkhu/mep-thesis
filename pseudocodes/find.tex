@@ -1,0 +1,13 @@
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{A vertex $v\in \m{V}$ of graph $G=(\m{V},\m{E})$}
+  \KwResult{The root $r_v$ of $T(r_v)\ni v$ (def. \ref{def:trees})}
+  \BlankLine
+  \eIf{$v=\text{parent}(v)$}{
+    \KwRet{$v$}\;
+  }{
+    $\text{parent}(v)=\codefunc{Find}(\text{parent}(v))$ \tcp*{Recursiveness facilitates \emph{path compression}}
+  }
+  \BlankLine
+  \caption{\codefunc{Find}}\label{algo:find}
+\end{algorithm}

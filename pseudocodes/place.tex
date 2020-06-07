@@ -1,0 +1,22 @@
+
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{Cluster $c_i$, list of buckets $\m{L}_b$}
+  \KwResult{Cluster placed in bucket if it has odd parity}
+  \BlankLine
+
+  \uIf(odd-parity cluster){$c_i$ is odd}{
+    \eIf{$Support(\m{V}_i)= 0$}{
+      bucket number $k = 2(|\m{V}_i|-1) + 1$
+    }{
+      bucket number $k = 2(|\m{V}_i|-1) + 2$
+    }
+    add $\m{V}_i$ to bucket $b_k = \m{L}_b[j]$\;
+    store bucket number at cluster object $c_i.bucket = j$\;
+  }
+  \Else(even-parity cluster){
+    store zero bucket number at cluster object $c_i.bucket = 0$\;
+  }
+  \BlankLine
+  \caption{\codefunc{Place}}\label{algo:place}
+\end{algorithm}

@@ -35,7 +35,7 @@
     add \vertex to \graph}
     \If{\vertex $\notin$ \clusters}{
         add new \cluster\;
-        \nlset{1} \neigh $=$ \FVN{\vertex, \cluster} (Alg. \ref{al:fvn})\;
+        \nlset{1} \neigh $=$ \FVN{\vertex, \cluster} (Algorithm \ref{al:fvn})\;
         \nlset{+n} \While(\tcc*[h]{a maximum of n extra vertices are added on initial loop}){\neigh $\neq$ None}{
             \For{\vertex in \neigh}{
                 \nlset{1} new \neigh $=$ \FVN{\vertex, \cluster}
@@ -69,7 +69,7 @@
 \KwResult{\graph containing only even clusters}
 \BlankLine
 
-\nlset{n} select \cluster with \sgc (Alg. \ref{al:sgc}) \;
+\nlset{n} select \cluster with \sgc (Algorithm \ref{al:sgc}) \;
 \nlset{$\downarrow$}\While{uneven \clusters $\in$ \graph}{
     \nlset{n} \For(\tcc*[h]{total cluster growths scales with n}){\cluster in selection}{
         \For{\bound (\edge, near \vertex, far \vertex) in \cluster}{
@@ -80,7 +80,7 @@
                 \cluster\ $\leftarrow$ near \hedge \;
                 \eIf{far \hedge $\in$ \clusters}{
                     \cluster\ $\leftarrow$ \edge \;
-                    \nlset{n} \pcluster $=$ \gpc{far \edge}\ (Alg. \ref{al:gpc})\;
+                    \nlset{n} \pcluster $=$ \gpc{far \edge}\ (Algorithm \ref{al:gpc})\;
                     \eIf{\pcluster $=$ \cluster}{
                         \remlist $\leftarrow$ \bound
                     }{
@@ -113,7 +113,7 @@
         \BlankLine
         \nlset{1} \For(\tcc*[h]{dependent on cluster size}){\vertex in \nblist}{
             \tcc{vertices lie on far end of completely grown edge, this is the new boundary}
-            find new \bound with \fvn (Alg. \ref{al:fvn})
+            find new \bound with \fvn (Algorithm \ref{al:fvn})
         }
     }
     \BlankLine

@@ -36,7 +36,7 @@ We now have a very simple analytical function to place clusters into buckets, wh
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=\linewidth]{buckets_ranges.pdf}
-  \caption{The first six buckets for a) method A from definition \ref{3.def.placebucket1} and b) method B from definition \ref{3.def.placebucket2}. Even buckets contains fully grown clusters, odd buckets contain half-grown clusters of the same size.}\label{3.fig.bucketsranges}
+  \caption{The first six buckets for a) method A from Definition \ref{3.def.placebucket1} and b) method B from Definition \ref{3.def.placebucket2}. Even buckets contains fully grown clusters, odd buckets contain half-grown clusters of the same size.}\label{3.fig.bucketsranges}
 \end{figure}
 
 Single-generator clusters, or clusters with size 1, is never caused by an only an erasure error. It might therefore by useful to give these clusters their own bucket, such that these single-generator clusters are always grown first, such as in Figure \ref{3.fig.bucketsranges}b.
@@ -45,7 +45,7 @@ Single-generator clusters, or clusters with size 1, is never caused by an only a
   For separate single-generator buckets, check whether the cluster has size 1, in which case the clusters belongs in bucket 0 or 1 depending on its growth state. Otherwise, a cluster with size $S$ belongs in bucket number $i$ of $l$ buckets with $i=2\lfloor (\sqrt{2S-3} - 1)/2 \rfloor + 1$ if cluster is fully grown, or $i=2\lfloor (\sqrt{2S-3} - 1)/2 \rfloor + 2$ otherwise.
 \end{definition}
 
-To compare method 1 of definition \ref{3.def.placebucket1} and method 2 of definition \ref{3.def.placebucket2}, let us find the size of the largest odd possible on a lattice. Given that any two odd parity clusters grow simultaneously, this size is $S_{max} = (\lfloor l/2\rfloor-1)l$. We calculate the bucket number (for the half-grown state) for both methods and plot them versus the lattice size in Figure \ref{3.fig.maxbucket}. The bucket number of the largest odd parity cluster for method 2 is exactly the largest available bucket. Therefore method 2 is most probably superior.
+To compare method 1 of Definition \ref{3.def.placebucket1} and method 2 of Definition \ref{3.def.placebucket2}, let us find the size of the largest odd possible on a lattice. Given that any two odd parity clusters grow simultaneously, this size is $S_{max} = (\lfloor l/2\rfloor-1)l$. We calculate the bucket number (for the half-grown state) for both methods and plot them versus the lattice size in Figure \ref{3.fig.maxbucket}. The bucket number of the largest odd parity cluster for method 2 is exactly the largest available bucket. Therefore method 2 is most probably superior.
 
 \begin{figure}[htpb]
   \centering

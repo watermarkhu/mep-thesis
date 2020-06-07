@@ -1,0 +1,15 @@
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{Connected graph $\m{R}$}
+  \KwResult{Connected acyclic graph $\m{T}_\m{R}$}
+  \BlankLine
+  initiate $\m{T}_\m{R} = \emptyset$ \;
+  pick some vertex $v \in \m{R}$ \;
+  \For{$(v,u) \notin \m{T}_\m{R}$ }{
+    add $(v,u)$ to $\m{T}_\m{R}$\;
+    repeat lines 2-4 with $v=u$
+  }
+  \KwRet{$\m{T}_\m{R}$}
+  \BlankLine
+  \caption{\codefunc{Forest}}\label{algo:forest}
+\end{algorithm}

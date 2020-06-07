@@ -1,0 +1,26 @@
+\begin{algorithm}[htpb]
+  \BlankLine
+  \KwData{A graph $G=(\m{V},\m{E})$, an erasure $\m{R} \subseteq \m{E}$ and syndrome $\sigma \subseteq \m{V}$}
+  \KwResult{Correction set $\m{C}$}
+  \BlankLine
+  \tcp{Syndrome validation}
+  initialize clusters $c_i$ with disjoint-set trees $\m{V}_i$ and boundaries $\delta \m{V}_i$ (def. \ref{def:clusterboud})\;
+  initialize odd-parity clusters list $\m{L}_o$\;
+  \While{$\m{L}_o \neq \emptyset$}{
+    initialize $\m{L}_m=\emptyset$ \;
+    \For{$c_i$ in $\m{L}_o$}{
+      $\codefunc{Grow}(c_i, \m{L}_m)$ (Algorithm \ref{algo:ufgrow});
+    }
+    \For{$(u,v)$ in $\m{L}_m$}{
+      get roots $r_u=\codefunc{Find}(u), r_v=\codefunc{Find}(v)$ (Algorithm \ref{algo:find})\;
+      if $r_u \neq r_v$ apply $\codefunc{Union}(r_u,r_v)$ (Algorithm \ref{algo:unionweight} or \ref{algo:unionrank}), merge boundary lists\;
+    } 
+    remove even clusters from $\m{L}_o$\;
+  }
+  \KwRet{Validated erasure $\bar{\m{R}}$}
+  \BlankLine
+  \tcp{Peeling decoder}
+  Run Peeling decoder (Algorithm \ref{algo:peel} or \ref{algo:peelbound}) with grown erasure $\bar{\m{R}}$
+  \BlankLine
+  \caption{(Static-forest) Union-Find decoder \cite{delfosse2017almost}}\label{algo:suf}
+\end{algorithm}
