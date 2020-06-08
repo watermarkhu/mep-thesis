@@ -53,9 +53,9 @@ For $x=2$, Ackermann's function as a function of $k$ already grows at such speed
     A(3,2) &= 2\cdot 2^{2(1+2^2)} = 2^11 = 2048\\
     A(4,2) &\geq 2\uparrow^2 2048 = \underbrace{2^{2^{2^{.^{.^2}}}}}_{2048}
 \end{align*}
-We define t inverse Ackermann's function $a(n)$ that focuses on this $k=2$:
+We define t inverse Ackermann's function $\alpha(N)$ that focuses on this $k=2$:
 \begin{equation}
-    \alpha(n) = \min\{k | A(k,2) \geq n \}.
+    \alpha(N) = \min\{k | A(k,2) \geq N \}.
 \end{equation}
 
-For any system of physical size $n$, the inverse of Ackermann's function satisfies $\alpha(n) \leq 4$. This Ackermann's function grows at roughly the same rate as in the proof of the complexity of the Union-Find data structure by Tarjan \cite{tarjan1975efficiency}, and thus its inverse is also similar.
+For any system of physical size $N$, the inverse of Ackermann's function satisfies $\alpha(N) \leq 4$. This Ackermann's function grows at roughly the same rate as in the proof of the complexity of the Union-Find data structure by Tarjan \cite{tarjan1975efficiency}, and thus its inverse is also similar.

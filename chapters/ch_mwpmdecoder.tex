@@ -1,20 +1,17 @@
 
 \chapter{Minimum-Weight Perfect Matching decoder}\label{ch:mwpm}
 
-In this chapter, we will provide a short description of the most commonly used decoder for surface codes: the Minimum-Weight Perfect Matching decoder. This decoder was, in fact, the first decoder for surface code \cite{dennis2002topological}. The Minimum-Weight Perfect Matching decoder has a worst-case complexity of between $\m{O}(n^3)$ and $\m{O}(n^7)$, depending on the implementation \cite{edmonds1965paths, kolmogorov2009blossom}, but has a relatively high decoder threshold. Many have improved upon the decoder to extend it to more general noise models or to optimize its performance \cite{fowler2012towards, fowler2012surface, fowler2013optimal, stace2009thresholds, stace2010error}. Most notably, at the cost of space complexity, the average-case complexity of the decoder has been reduced to $\m{O}(1)$ time \cite{fowler2013minimum}. We will outline the concept of minimum-weight perfect matching in Section \ref{sec:mwpm} and show its performance on a simulated lattice in Section \ref{sec:mwpmperformance}.
+In this chapter, we will provide a short description of the most commonly used decoder for surface codes: the Minimum-Weight Perfect Matching decoder. This decoder was, in fact, the first decoder for surface code \cite{dennis2002topological}. The Minimum-Weight Perfect Matching decoder has a worst-case complexity of between $\m{O}(N^3)$ and $\m{O}(N^7)$, depending on the implementation \cite{edmonds1965paths, kolmogorov2009blossom}, but has a relatively high decoder threshold. Many have improved upon the decoder to extend it to more general noise models or to optimize its performance \cite{fowler2012towards, fowler2012surface, fowler2013optimal, stace2009thresholds, stace2010error}. Most notably, the average-case complexity of the decoder has been reduced to $\m{O}(1)$ time, however at the cost of space complexity \cite{fowler2013minimum}. We will outline the concept of minimum-weight perfect matching in Section \ref{sec:mwpm} and show its performance on a simulated lattice in Section \ref{sec:mwpmperformance}.
 
 \section{Minimum-weight perfect matching}\label{sec:mwpm}
 
 Recall from Section \ref{sec:quasiparticle} that decoding a surface code can be performed by pairing anyons in the syndrome. The challenge for the decoder is choosing a pairing that is not likely to result in a logical error. 
 
 The basic principle behind the minimum-weight perfect matching approach is to identify the \emph{lowest weight} error configuration that can produce the observed syndrome $\sigma$. If independent errors occur on a lattice of $N$ qubits with probability $p$, then the likelihood of some error operator $\hat{E}$ with $|\hat{E}|$ errors is
-\begin{equation}
-  P(\hat{E}) = p^{\abs{\hat{E}}}(1-p)^{N-\abs{\hat{E}}},
-\end{equation}
-and therefore
-\begin{equation}
-  P(\hat{E})\propto \left(\frac{p}{1-p}\right)^\abs{\hat{E}}.
-\end{equation}
+\begin{align}
+  P(\hat{E}) &= p^{\abs{\hat{E}}}(1-p)^{N-\abs{\hat{E}}}, \\
+             &\propto \left(\frac{p}{1-p}\right)^\abs{\hat{E}}.
+\end{align}
 As $0<p/(1-p)<1$, the probability of $\hat{E}$ occurring is maximized when $|\hat{E}|$ is minimized. This means that the error configuration with the smallest amount of errors is the most probable one. 
 
 Recall from Section \ref{sec:correction} that the goal in error correction is to find the correction operator $\hat{C}$ that is most likely to return the code to the codespace. Finding the lowest weight configuration does not correspond to this problem. To find the most probable correction, one would have to consider \emph{all} possible error configurations that could produce the observed syndrome $\sigma$, find to which class they belong, and weigh each class accordingly to find the most likely correction. The lowest weight configuration is, in general, a good approximation of the decoding problem, but not in all cases. Due to this discrepancy the error threshold of the Minimum-Weight Perfect Matching decoder is lower than the optimal value. 
@@ -25,22 +22,22 @@ For a set of anyons in the quasiparticle representation, finding the minimum-wei
 
 \section{Boundaries}\label{sec:mwpmboundaries}
 
-For surfaces with boundaries such as the planar code (Section \ref{sec:surface_planar}), the number of anyons in the syndrome is now not guaranteed to be even. In the graph representation, an error on an edge in $\m{E}_delta$ will cause only a non-trivial syndrome measurement on one of its supporting vertices. The other vertex is in the open vertex set $\m{V}_\omega$, which is not equivalent to an ancilla qubit or stabilizer measurement. Thus, the concept of pairing must include the possibility of an anyon to pair with the code boundary, in addition to paring with other anyons. 
+For surfaces with boundaries such as the planar code (Section \ref{sec:surface_planar}), the number of anyons in the syndrome is now not guaranteed to be even. In the graph representation, an error on an edge in $\m{E}_\delta$ will cause only a non-trivial syndrome measurement on one of its supporting vertices. The other vertex is in the open vertex set $\m{V}_\omega$, which is not equivalent to an ancilla qubit or stabilizer measurement. Thus, the concept of pairing must include the possibility of an anyon to pair with the code boundary, in addition to paring with other anyons. 
 
 The procedure of mapping anyons to a graph matching problem must now be modified to include this extra pairing possibility. This is done by creating for every anyon an additional ``virtual'' node in the graph that is located at the boundary of the code \cite{wang2011surface}. An edge connects the node corresponding to the anyon with its virtual pair. Furthermore, the set of virtual nodes are all connected by edges of weight 0. This allows a node to pair with the virtual node at the boundary, and all ``unused'' virtual nodes to pair with each other such that they are efficiently removed. 
 
 \section{Performance}\label{sec:mwpmperformance}
 
-We benchmark the performance of the Minimum-Weight Perfect Matching decoder using our own implementation in Python3 (see Appendix \ref{ap:oopsurfacecode}) for a simulated lattice and the BlossomV algorithm, implemented in C, for finding the minimum-weight matching \cite{kolmogorov2009blossom}. This is done by Monte Carlo simulations of decoding on a simulated lattice and fitting for the code threshold, as described in Section \ref{sec:simthres}. For the independent noise model (Definition \ref{def:independent}), we simulate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ with a minimum of $52.800$ samples. For the phenomenological noise model (Definition \ref{def:pheno}), we simulate on lattice sizes $L_{small}=[8,10,12,14,16,18,20,22]$ with a minimum of $52.800$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:mwpm}.
+We benchmark the performance of the Minimum-Weight Perfect Matching decoder using our own implementation in Python3 (see Appendix \ref{ap:oopsurfacecode}) for a simulated lattice and the BlossomV algorithm, implemented in C, for finding the minimum-weight matching \cite{kolmogorov2009blossom}. This is done by Monte Carlo simulations of decoding on a simulated lattice and fitting for the code threshold, as described in Section \ref{sec:simthres}. For the independent noise model (Definition \ref{def:independent}), we simulate on lattice sizes $[8, 16, 24, 32, 40, 48, 56, 64]$ with a minimum of $52.800$ samples. For the phenomenological noise model (Definition \ref{def:pheno}), we simulate on lattice sizes $[8,10,12,14,16,18,20,22]$ with a minimum of $52.800$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:mwpm}.
 
-\begin{table}[htpb]
+\begin{table}[htbp]
   \centering
-  \begin{tabularx}{\textwidth} { | R{1} || C{1.5} | C{.5} | C{1.5} | C{.5} | }
+  \begin{tabularx}{\textwidth} { | R{1} || C{1.4} | C{.6} | C{1.4} | C{.6} | }
    \hline
    & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenal noise} \\
    \hline
    & $p_{th}$ & $k_C$ & $p_{th}$ & $k_C$ \\
-   \hhline{|=#=|=|=|=|}
+   \hhline{|=::=:=:=:=|}
    Toric code & $0.10349 \pm 0.00004$ & $0.7158$ & $0.02965 \pm 0.00003$ & $0.9024$ \\
    \hline
    Planar code  & $0.10292 \pm 0.00005$ & $0.8478$ & $0.02928 \pm 0.00003$ & $0.928$ \\

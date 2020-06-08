@@ -15,7 +15,7 @@
 \tikzstyle{onset}=[node1, thick, densely dashed, double, font=\footnotesize]
 \tikzstyle{subtree}=[node1, opacity=0.3,dotted, font=\footnotesize]
 
-% Recall that in the Union-Find decoder, each cluster represented by a set of vertices $C_i = |\{v_1, v_2, ...\}$ stored as a disjoint-set tree of the Union-Find data structure. To find the parent cluster of any given vertex, we follow subsequent parent pointers to the root vertex of the tree, which is the representative element of the cluster. Merges between clusters is done by simply pointing the root of one tree to another. By implementing additional rules \emph{path compression} and either \emph{union by weight} or \emph{union by rank}, the heights of the trees are dynamically kept low, such that the overall complexity of the algorithm for a system of $n$ qubits is $n\alpha(n)$, where $\alpha(n)\leq 4$ for all physical values of $n$. 
+% Recall that in the Union-Find decoder, each cluster represented by a set of vertices $C_i = |\{v_1, v_2, ...\}$ stored as a disjoint-set tree of the Union-Find data structure. To find the parent cluster of any given vertex, we follow subsequent parent pointers to the root vertex of the tree, which is the representative element of the cluster. Merges between clusters is done by simply pointing the root of one tree to another. By implementing additional rules \emph{path compression} and either \emph{union by weight} or \emph{union by rank}, the heights of the trees are dynamically kept low, such that the overall complexity of the algorithm for a system of $n$ qubits is $N\alpha(N)$, where $\alpha(N)\leq 4$ for all physical values of $n$. 
 
 In this chapter, we describe a modification of the Union-Find decoder, dubbed the \emph{Union-Find Balanced-Bloom} decoder, that increases the Union-Find decoder's code threshold by improving its heuristic for minimum-weight matching. We show that the modified decoder retains a relatively low time-complexity. 
 
@@ -537,7 +537,7 @@ In the Union-Find Balanced-Bloom decoder of Algorithm \ref{algo:ufbb}, partial p
 
 \section{Complexity of Balanced-Bloom}\label{sec:ufbbcomplexity}
 
-In this section, we will find the time complexity of the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) using an analytic approach. As the Union-Find Balanced-Bloom decoder is a modification of the Dynamic-forest Bucket Union-Find decoder (Algorithm \ref{algo:dbuf}), which is known to have a time complexity of $\m{O}(n\alpha(n))$ (Section \ref{sec:ufcomplexity}), we will only consider the added complexity that is made by the modification. The additional contribution to the complexity of the Dynamic-forest Bucket Union-Find decoder can be divided into two parts. First is the contribution by the depth-first searches of \codefunc{Calcparity} and \codefunc{Calcdelay}, the parity and delay calculations, which we dub the \emph{PDC complexity}, treated in Section \ref{sec:pdfcomplexity}. The second contribution will be caused by the replacement of \codefunc{Grow} with \codefunc{Ngrow}, where now an additional depth-first search of the node-tree of every cluster needs to be performed to access its boundary edges stored at the nodes and grow them with \codefunc{Bloom}. We call this second contribution the \emph{bloom complexity}, which is detailed in Section \ref{sec:bloomcomplexity}.
+In this section, we will find the time complexity of the Union-Find Balanced-Bloom decoder (Algorithm \ref{algo:ufbb}) using an analytic approach. As the Union-Find Balanced-Bloom decoder is a modification of the Dynamic-forest Bucket Union-Find decoder (Algorithm \ref{algo:dbuf}), which is known to have a time complexity of $\m{O}(N\alpha(N))$ (Section \ref{sec:ufcomplexity}), we will only consider the added complexity that is made by the modification. The additional contribution to the complexity of the Dynamic-forest Bucket Union-Find decoder can be divided into two parts. First is the contribution by the depth-first searches of \codefunc{Calcparity} and \codefunc{Calcdelay}, the parity and delay calculations, which we dub the \emph{PDC complexity}, treated in Section \ref{sec:pdfcomplexity}. The second contribution will be caused by the replacement of \codefunc{Grow} with \codefunc{Ngrow}, where now an additional depth-first search of the node-tree of every cluster needs to be performed to access its boundary edges stored at the nodes and grow them with \codefunc{Bloom}. We call this second contribution the \emph{bloom complexity}, which is detailed in Section \ref{sec:bloomcomplexity}.
 
 \subsection{PDC complexity}\label{sec:pdfcomplexity}
 Recall from Lemmas \ref{lem:nodecalc_even} and \ref{lem:nodecalc_odd} that the node parities and delays within become undefined in the entire node-tree after an even-join, and that partial parity and delay calculations are to be performed in the even subtree after an odd-join. Lemma \ref{lem:delaywhengrown} proves that these calculations can be limited to the even subtrees in \emph{final odd-joins}. The size of the even subtrees in these final odd-joins, multiplied by the number of final odd-join operations thus estimates the cost of the parity and delay calculations. 
@@ -829,14 +829,14 @@ To account for these erasures, we must construct the node-trees for these initia
 \section{Performance}
 
 We benchmark the performance of the Union-Find Balanced-Bloom decoder of Algorithm \ref{algo:ufbb} using our application in Python3 (see Appendix \ref{ap:oopsurfacecode}). This is done by Monte Carlo simulations of decoding on a simulated lattice and to fit for the code threshold, described in Section \ref{sec:simthres}. For the independent noise model (Definition \ref{def:independent}), we simulate on lattice sizes $L_{small}=[8, 16, 24, 32, 40, 48, 56, 64]$ with a minimum of $96.000$ samples and on $L_{big}=[72, 80, 88, 96]$ with a minimum of $28.800$ samples. For the phenomenological noise model (Definition \ref{def:pheno}), we simulate on lattice sizes $L_{small}=[8,12,16,20,24]$ with a minimum of $105.600$ samples and on lattice sizes $L_{big}=[28, 32, 36, 40, 44]$ with $13.200$ samples. The code thresholds for the toric and planar codes with independent and phenomenological noise are listed in Table \ref{tab:ufbb}, which also includes thresholds of the Minimum Weight Perfect Matching (MWPM) decoder (Table \ref{tab:mwpm}) and the Dynamic-forest Bucket Union-Find (DBUF) decoder (Table \ref{tab:uftable}) for comparison.
-\begin{table}[htpb]
+\begin{table}[htbp]
   \centering
   \begin{tabularx}{\textwidth}{ | L{.7} | R{0.7} || C{1.7} | C{.6} | C{1.7} | C{.6} | }
     \hline
     \multicolumn{2}{|c|}{\multirow{2}{*}{}} & \multicolumn{2}{c|}{Independent noise}& \multicolumn{2}{c|}{Phenomenological noise} \\
     \cline{3-6}
     \multicolumn{2}{|c|}{}    & $p_{th}$ & $k_{th}$ & $p_{th}$ & $k_{th}$ \\
-    \hhline{|=|=#=|=|=|=|}
+    \hhline{|--::=:=:=:=|}
     \multirow{4}{*}{Toric}  &\gc MWPM &\gc $0.10349 \pm 0.00004$ &\gc $0.7158$ &\gc $0.02965 \pm 0.00003$ &\gc $0.9024$ \\
                             \cline{2-6}
                             &\gc DBUF &\gc $0.10014 \pm 0.00003$ &\gc $0.7271$ &\gc $0.02685 \pm 0.00001$ &\gc $0.9208$ \\
@@ -844,7 +844,7 @@ We benchmark the performance of the Union-Find Balanced-Bloom decoder of Algorit
                             & $L_{small}$ & $0.10229 \pm 0.00007$ & $0.7312$ & $0.02846 \pm 0.00003$ & $0.9165$ \\
                             \cline{2-6}
                             & $L_{big}$ & $0.1007 \pm 0.0001$ & $0.7690 $ & $0.0278 \pm 0.0001$ & $0.943$ \\ 
-    \hhline{|=|=#=|=|=|=|}
+    \hhline{|=:=::=:=:=:=|}
     \multirow{3}{*}{Planar} &\gc MWPM  &\gc $0.10292 \pm 0.00005$ &\gc $0.8478$ &\gc $0.02928 \pm 0.00003$ &\gc $0.928$ \\
                             \cline{2-6}
                             &\gc DBUF &\gc $0.09974 \pm 0.00004$ &\gc $0.8480$ &\gc $0.02660 \pm 0.00001$ &\gc $0.9322$\\
@@ -920,13 +920,13 @@ From the Figure, we can conclude that for a constant value of the equilibrium fa
 
 Finally, we plot the average matching weight and running time of the Union-Find Balanced-Bloom $UFBB$ compared with the Dynamic-forest Bucket Union-Find decoder (DBUF) and the Minimum-Weight Perfect Matching (MWPM) decoder for data acquired on simulations on a toric code with independent noise and $p_X = 0.1$ in Figure \ref{fig:ufbb_tmwcomp_toric_2d}. We can see from this figure that the Union-Find Balanced-Bloom decoder has a constant decreased weight. As for the running time, the UFBB decoder offers a midway choice between the MWPM decoder and DBUF decoder. We refer to Figures \ref{fig:mwcomp_ufbb} and \ref{fig:tcomp_ufbb} for the same plots but on a planar code or phenomenological noise, for which we observe the same behavior. 
 
-We find that the decrease in weight is constant across the range of values of $p_X$, which is also the case for the planar code, the phenomenological noise model. We can compare the decrease in matching weight as the ratios between the normalized matching weight between the UFBB and DBUF decoders as
+We find that the decrease in weight is constant across the range of values of $p_X$, which is also the case for the planar code and the phenomenological noise model. We can compare the decrease in matching weight as the ratios between the normalized matching weight between the UFBB and DBUF decoders as
 \begin{equation}
   r_{\abs{\m{C}}}=\frac{\abs{\m{C}_{UFBB}}/\abs{\m{C}_{MWPM}}}{\abs{\m{C}_{DBUF}}/\abs{\m{C}_{MWPM}}}. 
 \end{equation}
 We find the averaged values for $r_{\abs{\m{C}}}$ from the Monte Carlo simulations on the toric and planar lattices, and with the independent and phenomenological noise models in Table \ref{tab:nmwratio}. The Union-Find Balanced-Bloom decoder successfully decreases the matching weight from the Dynamic-forest Bucket Union-Find decoder. The decrease is more apparent under the independent noise model. 
 
-\begin{table}[htpb]
+\begin{table}[htbp]
   \centering
   \begin{tabularx}{\textwidth}{ | C{1} || C{1} | C{1} | }
     \hline

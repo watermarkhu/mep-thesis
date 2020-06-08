@@ -1,13 +1,13 @@
 \chapter{Bucket sort}\label{ap.bucketsort}
 
 \paragraph{Maximum number of growth iterations}
-To categorize the clusters into buckets, we need to know how many buckets we would need. To find out, let us look at two generators that are placed maximally far from each other. On a even toric lattice with length $l$, they are placed $l/2$ horizontally and $l/2$ vertically from each other. If clusters from each bucket grow simultaneously by a half-edge, these two single-generator clusters would meet each other after $l$ iterations, or including odd lattices, after $2\lfloor l/2 \rfloor$ iterations. As illustrated in Figure \ref{3.fig.maxgrowthit}, we see that now the entire lattice is covered, thus this is exactly the number of iterations needed.
+To categorize the clusters into buckets, we need to know how many buckets we would need. To find out, let us look at two generators that are placed maximally far from each other. On an even toric lattice with length $l$, they are placed $l/2$ horizontally and $l/2$ vertically from each other. If clusters from each bucket grow simultaneously by a half-edge, these two single-generator clusters would meet each other after $l$ iterations, or including odd lattices, after $2\lfloor l/2 \rfloor$ iterations. As illustrated in Figure \ref{3.fig.maxgrowthit}, we see that now the entire lattice is covered, thus this is exactly the number of iterations needed.
 
 \begin{lemma}
   Given a toric lattice with size $\{l,l\}$, a maximum number of $N_B = 2\lfloor l/2 \rfloor$ buckets is required for all generators to be connected, where clusters from each bucket is grown simultaneously.
 \end{lemma}
 
-\begin{figure}[htpb]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{max_growth_iterations.pdf}
   \caption{If two single-generator clusters are placed a) maximally far from each other, b) a maximal number of growth iterations is needed. c) After $2\lfloor l/2 \rfloor$ iterations, the entire lattice is covered.}\label{3.fig.maxgrowthit}
@@ -33,7 +33,7 @@ We now have a very simple analytical function to place clusters into buckets, wh
   A cluster with size $S$ is placed in bucket number $i$ of $l$ buckets with $i=2\lfloor (\sqrt{2S-1} - 1)/2 \rfloor$ if cluster is fully grown, or $i=2\lfloor (\sqrt{2S-1} - 1)/2 \rfloor + 1$ otherwise.
 \end{definition}
 
-\begin{figure}[htpb]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{buckets_ranges.pdf}
   \caption{The first six buckets for a) method A from Definition \ref{3.def.placebucket1} and b) method B from Definition \ref{3.def.placebucket2}. Even buckets contains fully grown clusters, odd buckets contain half-grown clusters of the same size.}\label{3.fig.bucketsranges}
@@ -47,7 +47,7 @@ Single-generator clusters, or clusters with size 1, is never caused by an only a
 
 To compare method 1 of Definition \ref{3.def.placebucket1} and method 2 of Definition \ref{3.def.placebucket2}, let us find the size of the largest odd possible on a lattice. Given that any two odd parity clusters grow simultaneously, this size is $S_{max} = (\lfloor l/2\rfloor-1)l$. We calculate the bucket number (for the half-grown state) for both methods and plot them versus the lattice size in Figure \ref{3.fig.maxbucket}. The bucket number of the largest odd parity cluster for method 2 is exactly the largest available bucket. Therefore method 2 is most probably superior.
 
-\begin{figure}[htpb]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.7\linewidth]{max_bucket.pdf}
   \caption{The largest bucket that will be utilized for methods A and B (see fig. \ref{3.fig.bucketsranges}). Method A does not utilize the largest two buckets. }\label{3.fig.maxbucket}

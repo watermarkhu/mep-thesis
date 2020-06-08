@@ -6,23 +6,23 @@ The disjoint-set data structure consists of two types of instructions for manipu
   \item $\codefunc{Find}(x)$ computes the unique set containing the element $x$
   \item $\codefunc{Union}(A,B)$ combines sets $A$ and $B$ into a new combined set
 \end{itemize}
-We first show a straightforward implementation that runs in $\m{O}(n^2)$ time. Applying the \emph{union by weight} rule, this is reduced to $\m{O}(n \log n)$. Combined with the \emph{Path compression} rule, the overall complexity is $\m{O}(n \alpha (n))$, where $\alpha$ is the inverse of Ackermann's function. The original proof \cite{tarjan1975efficiency} was further reinforced by subsequent publications \cite{tarjan1979class,tarjan1984worst} and was proven to be optimal \cite{fredman1989cell}. In this thesis, we will follow a simplified approach, where the \emph{union by weight} rule is replaced by a different but similar \emph{union by rank} rule \cite{kozen1992design}. Later Tarjan and other sources used this to cast this analysis in terms of potential functions \cite{tarjan1999handout, harfst2000potential, cormen2009introduction}. Another approach is provided by Seidel and Sharir \cite{seidel2005top}, where the upper bound is computed via a top-down method. 
+We first show a straightforward implementation that runs in $\m{O}(N^2)$ time. Applying the \emph{union by weight} rule, this is reduced to $\m{O}(N\log{N})$. Combined with the \emph{Path compression} rule, the overall complexity is $\m{O}(N\alpha(N))$, where $\alpha$ is the inverse of Ackermann's function. The original proof \cite{tarjan1975efficiency} was further reinforced by subsequent publications \cite{tarjan1979class,tarjan1984worst} and was proven to be optimal \cite{fredman1989cell}. In this thesis, we will follow a simplified approach, where the \emph{union by weight} rule is replaced by a different but similar \emph{union by rank} rule \cite{kozen1992design}. Later Tarjan and other sources used this to cast this analysis in terms of potential functions \cite{tarjan1999handout, harfst2000potential, cormen2009introduction}. Another approach is provided by Seidel and Sharir \cite{seidel2005top}, where the upper bound is computed via a top-down method. 
 
 \section{Simple implementation}
-A simple implementation of the instructions would be to store for each set $X$ a list $l_X$ of all the elements it contains, and a pointer to $l_X$ at all elements $x\in l_X$, called the \emph{linked-list} representation. The function $\codefunc{find}(x)$ simply returns the list $l_X$, which represents the set. After a call to $\codefunc{Union}(X, Y)$, all elements of $l_Y$ are appended to $l_X$, and the pointers of all elements $y\in Y$ are updated. This takes $\m{O}(m)$ operations, where $m=|l_Y|$ the number of elements. In a system of $n$ elements, there may be a maximum of $n-1$ calls to \codefunc{Union}. As the $i$\textsuperscript{th} call involves sets $|l_X|=1$ and $|l_Y|=i$, the number of updates is 
+A simple implementation of the instructions would be to store for each set $X$ a list $l_X$ of all the elements it contains, and a pointer to $l_X$ at all elements $x\in l_X$, called the \emph{linked-list} representation. The function $\codefunc{find}(x)$ simply returns the list $l_X$, which represents the set. After a call to $\codefunc{Union}(X, Y)$, all elements of $l_Y$ are appended to $l_X$, and the pointers of all elements $y\in Y$ are updated. This takes $\m{O}(m)$ operations, where $m=|l_Y|$ the number of elements. In a system of $N$ elements, there may be a maximum of $N-1$ calls to \codefunc{Union}. As the $i$\textsuperscript{th} call involves sets $|l_X|=1$ and $|l_Y|=i$, the number of updates is 
 \begin{equation}
-  \sum_{i=1}^{n-1} i = \m{O}(n^2),
+  \sum_{i=1}^{N-1} i = \m{O}(N^2),
 \end{equation}
-where each \codefunc{Union} operation has on average $\m{O}(n)$ updates. 
+where each \codefunc{Union} operation has on average $\m{O}(N)$ updates. 
 
 \section{Union by weight}
-In the above case, we assume in each \codefunc{Union} the worst-case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule always to append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(n \log n)$. 
+In the above case, we assume in each \codefunc{Union} the worst-case where a larger list is appended to a smaller list, and the pointers of the largest list must be updated. Suppose that each list $l_X$ additionally stores the length of the list itself, which can be easily maintained, it can be set as a rule always to append the smaller list to the larger list. With this simple rule, the complexity of the Union-Find algorithm can be reduced to $\m{O}(N\log{N})$. 
 
 \begin{theorem}
-  A sequence of \codefunc{Union} and \codefunc{Find} operations on $n$ initial single element disjoint sets using the weighted union rule takes $\m{O}(n \log n)$ time. 
+  A sequence of \codefunc{Union} and \codefunc{Find} operations on $N$ initial single element disjoint sets using the weighted union rule takes $\m{O}(N\log{N})$ time. 
 \end{theorem}
 \begin{proof}
-  Consider a set $X$ with list $l_X$ that undergoes a sequence of \codefunc{Union} and \codefunc{Find} operations. The first time all pointers in $l_X$ are updated, the resulting set must have at least two elements. Similarly, the next time all pointers are updated, the resulting set must have at least four elements due to the weighted union rule. With system size $n$, any initial set $X$ can be updated at most $\log n$ times, where the update size is proportional to $n$. Hence, the sequence takes $\m{O}(n \log n)$ time. 
+  Consider a set $X$ with list $l_X$ that undergoes a sequence of \codefunc{Union} and \codefunc{Find} operations. The first time all pointers in $l_X$ are updated, the resulting set must have at least two elements. Similarly, the next time all pointers are updated, the resulting set must have at least four elements due to the weighted union rule. With system size $N$, any initial set $X$ can be updated at most $\log{N}$ times, where the update size is proportional to $N$. Hence, the sequence takes $\m{O}(N\log{N})$ time. 
 \end{proof}
 
 \section{Disjoint-set trees}
@@ -31,7 +31,7 @@ The pointer update in each set during a \codefunc{Union} can be minimized by a d
 \tikzstyle{lw1}=[line width=1]
 \tikzstyle{fnode}=[draw, circle, minimum size=0.55cm, inner sep=0, lw1]
 
-\begin{figure}[htpb]
+\begin{figure}[htbp]
   \centering
   \begin{tikzpicture}[on grid]
     \node at (1.5,-1) {\emph{(a)}};
@@ -90,7 +90,7 @@ The union by rank rule is then as follows: to merge sets $X$ and $Y$, apply $\co
   \end{equation}
 \end{lemma}
 \begin{proof}
-  Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus, equality \eqref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is either the case that the tree is unchanged, or thatsome other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$. Hence, $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
+  Initially, each set contains only a single element $T_0(x) = \{x\}$, with rank $R_0(x)=0$ and $|T_0(x)|=1$. Thus, equality \eqref{eq:rankeq} holds at time $0$. If the equality for $x$ holds at some time $t$ and the rank does not increase in the next step $t+1$, it is either the case that the tree is unchanged, or that some other tree $T_t(y)$ with $R_t(y)<R_t(x)$ is pointed to $x$. Hence, $|T_{t+1}(x)| \geq  |T_t(x)|$ and the equality holds. 
   
   If $R_{t+1}(x) = R_t(x) + 1$, then at time $t$ a union occurred that merged $T_t(x)$ and $T_t(y)$ by pointing $y$ to $x$, where
   \begin{equation*}
@@ -107,7 +107,7 @@ The union by rank rule is then as follows: to merge sets $X$ and $Y$, apply $\co
   and the equality must hold for all $t$ and $x$. 
 \end{proof}
 \begin{lemma}\label{lem:maxrank}
-    The maximum rank in all disjoint-set trees after a sequence calls to \codefunc{Find} and \codefunc{Union} in a system of $n$ elements is at most $\lfloor \log n \rfloor$, where $\lfloor \rfloor$ denotes the floor function. 
+    The maximum rank in all disjoint-set trees after a sequence calls to \codefunc{Find} and \codefunc{Union} in a system of $N$ elements is at most $\lfloor \log{N} \rfloor$, where $\lfloor \rfloor$ denotes the floor function. 
 \end{lemma}
 \begin{proof}
     By the previous Lemma \ref{lem:rank}, 
@@ -116,10 +116,10 @@ The union by rank rule is then as follows: to merge sets $X$ and $Y$, apply $\co
     \end{equation*}
     Which leads to 
     \begin{equation*}
-        \lfloor \log n \rfloor \geq R(x).
+        \lfloor \log{N} \rfloor \geq R(x).
     \end{equation*}
 \end{proof}
-As the rank of the trees are bounded by $\m{O}(\log n)$, this results to an overall complexity of $\m{O}(n\log n)$ with $n-1$ unions. This complexity is the same when the \emph{union by weight} rule is applied. We will introduce one more lemma that further improves the intuition of balanced trees. 
+As the rank of the trees are bounded by $\m{O}(\log n)$, this results to an overall complexity of $\m{O}(N\log{N})$ with $N-1$ unions. This complexity is the same when the \emph{union by weight} rule is applied. We will introduce one more lemma that further improves the intuition of balanced trees. 
 
 \begin{lemma}\label{lem:noderank}
   The total number of elements with the same rank $r$ is limited by 
@@ -143,7 +143,7 @@ The \emph{path compression} rule for the \codefunc{Find} function is also straig
   \node[fnode] at (#1,#2) (#3) {$#3$};
   \draw[lw1, fill=white!80!black] (#3.south) -- +(0.3,-1) -- +(-0.3,-1) -- cycle;
 }
-\begin{figure}[htpb]
+\begin{figure}[htbp]
   \centering
   \begin{tikzpicture}
     \DRAWTREE{0}{0}{e}
@@ -167,11 +167,11 @@ The \emph{path compression} rule for the \codefunc{Find} function is also straig
   \label{fig:pathcompression}
 \end{figure}
 
-To find the complexity of a sequence of \codefunc{Union} and \codefunc{Find} operations when path compression is applied, we use a version of Ackermann's function $\akker(k,l)$ \cite{ackermann1928hilbertschen, kozen1992design}, which is very fast growing, and its inverse slow-growing $\alpha(n)$. For any system of practical size $n$, the inverse Ackermann's function satisfies $\alpha(n)\leq 4$ (see Appendix \ref{ap:ackermann} for the full definition). 
+To find the complexity of a sequence of \codefunc{Union} and \codefunc{Find} operations when path compression is applied, we use a version of Ackermann's function $\akker(k,l)$ \cite{ackermann1928hilbertschen, kozen1992design}, which is very fast growing, and its inverse slow-growing $\alpha(N)$. For any system of practical size $N$, the inverse Ackermann's function satisfies $\alpha(N)\leq 4$ (see Appendix \ref{ap:ackermann} for the full definition). 
 \begin{align}
   \nonumber \akker(0,l) &= l + 1\\
   \akker(k+1,l) &= A^l(k,l) \\
-  \nonumber \alpha(n) &= \min\big\{k | A(k,2) \geq n \big\}
+  \nonumber \alpha(N) &= \min\big\{k | A(k,2) \geq n \big\}
 \end{align}
 
 Let $x.p$ denote the parent of an element $x$. With path compression, the parent $x.p$ can change over time. Nevertheless, it must still always be the case that $R(x)<R(x.p)$, as path compression does not switch children with parents, but only points elements $x_i$ along the path from to the root $r_x$, where $R(x_i)<R(r_x)$. The value $R(x.p) - R(x)$ can hence only increase over time. Especially, we consider the conditions for every $k$ the equality:
@@ -193,7 +193,7 @@ where $\akker(0,2)=3$ (see Appendix \ref{ap:ackermann}) and the level is thus at
 \section{Disjoint-set tree complexity}
 Using the disjoint-set tree data structure, each \codefunc{Union} is preceded by two \codefunc{Find}s to traverse the paths of each of the merging elements to their respective roots, while applying path compression. If the roots are different, the \codefunc{Union} operation takes constant time by making one root point to another, while applying union by rank. The trees will not be merged if the roots are the same, but the \codefunc{Find} operations that preceded it were not in vain. Path compression decreases the length of the paths to roots such that any future calls to \codefunc{Find} in the same trees take less time.
 
-Each \codefunc{Union} operation thus requires constant time, and $m\leq n-1$ unions run in $\m{O}(n)$ time. For the cost of the \codefunc{Find} function, we introduce here the concept of \emph{charge assignment}. The cost of each \codefunc{Find} function is equivalent to the number of elements along the path of the root, where each element $x$ takes one time unit. This time unit is then charged as follows:
+Each \codefunc{Union} operation thus requires constant time, and $m\leq N-1$ unions run in $\m{O}(N)$ time. For the cost of the \codefunc{Find} function, we introduce here the concept of \emph{charge assignment}. The cost of each \codefunc{Find} function is equivalent to the number of elements along the path of the root, where each element $x$ takes one time unit. This time unit is then charged as follows:
 \begin{itemize}
   \item If $x$ has only one ancestor, which is the root of the tree, \codefunc{Find}$(x)$ is trivial, and no time unit is charged. 
   \item If $x$ has an ancestor $a$ on the path to root $r\neq a$ such that $K(x)=K(a)$, the charge of $x$' time unit is assigned to element $x$ itself.
@@ -202,20 +202,20 @@ Each \codefunc{Union} operation thus requires constant time, and $m\leq n-1$ uni
 Using this charge assignment method, we can (a) sum over all charged vertices and available levels and (b) sum over all charged \codefunc{Find} operations that satisfy the condition to find the total number of charge time units. First, we find an upper bound for level $K(x)$. 
 
 \begin{lemma}\label{lem:maxakker}
-  When path compression and union by rank are applied, for a system of size $n\geq 5$, the level of a node is upper bounded $K(x) \leq \alpha(n) -1$, where $\alpha(n)$ is the inverse of Ackermann's function. 
+  When path compression and union by rank are applied, for a system of size $N\geq 5$, the level of a node is upper bounded $K(x) \leq \alpha(N) -1$, where $\alpha(N)$ is the inverse of Ackermann's function. 
 \end{lemma}
 \begin{proof}
-  For $n\geq 5$, we find the following inequalities:
+  For $N\geq 5$, we find the following inequalities:
   \begin{align*}
     n &> \lfloor \log n \rfloor + 2 \\
     &\geq R(x.p) + 2 \text{ by Lemma \ref{lem:maxrank}}\\
     &\geq \akker(k,R(x)+2) \text{ by equation \eqref{eq:rankakker}}\\
     &\geq \akker(k,2),
   \end{align*}
-  where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns $\alpha(n) > k$, which gives us the upper bound of $K(x)$. 
+  where union by rank allows for step 2 and path compression step 3. Inverting the last inequality returns $\alpha(N) > k$, which gives us the upper bound of $K(x)$. 
 \end{proof}
 
-First, we find the time units assigned to charged \codefunc{Find} functions. Since no charge is assigned to \codefunc{Find}$(x)$ if $x$'s parent is the root, which is the case after path compression, the total number of charged \codefunc{Find}s is proportional to $m\leq n-1$ \codefunc{Union}s. For each \codefunc{Find}$(x)$, on the path from $x$ to the root $r$, there may be at most $\alpha(n)$ cases in which an ancestor $a$ satisfies $K(a)\neq K(x)$ per Lemma \ref{lem:maxakker}. Hence, the total number of time units charges assigned to the \codefunc{Find} function is $\m{O}(n\alpha(n))$. 
+First, we find the time units assigned to charged \codefunc{Find} functions. Since no charge is assigned to \codefunc{Find}$(x)$ if $x$'s parent is the root, which is the case after path compression, the total number of charged \codefunc{Find}s is proportional to $m\leq N-1$ \codefunc{Union}s. For each \codefunc{Find}$(x)$, on the path from $x$ to the root $r$, there may be at most $\alpha(N)$ cases in which an ancestor $a$ satisfies $K(a)\neq K(x)$ per Lemma \ref{lem:maxakker}. Hence, the total number of time units charges assigned to the \codefunc{Find} function is $\m{O}(N\alpha(N))$. 
 
 Next, we count the charges to a particular element $x$ over the entire sequence of operations. 
 \begin{lemma}\label{lem:xcharge}
@@ -318,14 +318,14 @@ Next, we count the charges to a particular element $x$ over the entire sequence 
 
 The above lemmas provide us with the necessary information to prove the disjoint-set tree data structure's overall complexity. 
 \begin{theorem}\label{the:ufcomplexity}
-  The Union-Find data structure of a sequence of \codefunc{Union} and \codefunc{Find} operations runs in $\m{O}(n\alpha(n))$ time, where $\alpha(n$) is the inverse of Ackermann's function.
+  The Union-Find data structure of a sequence of \codefunc{Union} and \codefunc{Find} operations runs in $\m{O}(N\alpha(N))$ time, where $\alpha(N)$) is the inverse of Ackermann's function.
 \end{theorem}
 \begin{proof}
-  All charges assigned to the \codefunc{Find} function account to $\m{O}(n\alpha(n))$ time units. For charges assigned to elements of the disjoint-set trees, we bring together lemmas \ref{lem:maxrank}, \ref{lem:maxakker}, \ref{lem:noderank} and \ref{lem:xcharge} to find 
+  All charges assigned to the \codefunc{Find} function account to $\m{O}(N\alpha(N))$ time units. For charges assigned to elements of the disjoint-set trees, we bring together lemmas \ref{lem:maxrank}, \ref{lem:maxakker}, \ref{lem:noderank} and \ref{lem:xcharge} to find 
   \begin{align*}
     \text{Charge} &= \text{ ranks } \cdot \text{ levels } \cdot \text{ elements per rank } \cdot \text{charge per element per level per rank}\\
-    &= \sum_{r=0}^{\lfloor \log n \rfloor} (\alpha(n)-1)\cdot \frac{n}{2^r}\cdot r\\
-    &= n\cdot (\alpha(n)-1)\sum_{r=0}^{\lfloor \log n \rfloor}\frac{r}{2^r} \\
-    &= \m{O}(n\alpha(n)).
+    &= \sum_{r=0}^{\lfloor \log{N} \rfloor} (\alpha(N)-1)\cdot \frac{N}{2^r}\cdot r\\
+    &= n\cdot (\alpha(N)-1)\sum_{r=0}^{\lfloor \log{N} \rfloor}\frac{r}{2^r} \\
+    &= \m{O}(N\alpha(N)).
   \end{align*}
 \end{proof}
