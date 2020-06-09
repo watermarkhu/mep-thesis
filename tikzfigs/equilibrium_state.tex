@@ -46,7 +46,7 @@
 %       \draw[l1, ->] (a8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \eqref{eq:2ddelay}};
 %       \draw[l1, ->] (c8) ++(1,-.35) -- +(0,-2) node[midway, right, text width = 5cm, align=left] {Grow and calculate \\delay with eq. \eqref{eq:delayequation},\\ $K_{bloom} = 0.5$};
     \end{tikzpicture}
-    \caption{The delay values $n_i.d$ and the equilibrium-states $(I:M)$ for 3 odd clusters $\{\nset_1, \nset_2, \nset_3\}$ of 3 nodes that grow and join into a size-9 cluster. Initially (top), parity and delay calculations  are performed with delay equation \eqref{eq:2ddelay} on each odd cluster which have equilibrium-states $(0:2)$, with delay $2$ in the middle node. The clusters are grown (middle), where the middle node is delayed, such that it's delay value decreases to $1$, and the clusters have equilibrium-states $(1:2)$. The clusters join (bottom) to a single odd cluster, which is selected for growth. Hence parity and delay calculation is performed again, and the equilibrium-state is $(0:4)$, thus requiring 4 growth iterations before equal potential matching weight is reached in all nodes.}\label{fig:kbloom}
+    \caption{The delay values $n_i.d$ and the equilibrium-states $(I:k_{eq}M)$ for 3 odd clusters $\{\nset_1, \nset_2, \nset_3\}$ of 3 nodes that grow and join into a size-9 cluster. (Top) Initially, parity and delay calculations  are performed with delay equation \eqref{eq:2ddelay} on each odd cluster which have equilibrium-states $(0:2)$, with delay $2$ in the middle node. (Middle) The clusters are grown, where the middle node is delayed, such that it's delay value decreases to $1$, and the clusters have equilibrium-states $(1:2)$. (Bottom) The clusters join to a single odd cluster, which is selected for growth. Hence, parity and delay calculation is performed again, and the equilibrium-state is $(0:4)$, thus requiring 4 growth iterations before equal potential matching weight is reached in all nodes.}\label{fig:kbloom}
 \end{figure}
 
 \begin{figure}[p]
@@ -89,5 +89,5 @@
       \node at (10, -5) [align=right, text width = 3cm] {\codefunc{Join}, \underline{PDC}};
 
   \end{tikzpicture}
-  \caption{The same clusters, growths and joins as in Figure \ref{fig:kbloom}, but now with delay equation \eqref{eq:delayequation} for $f_{eq} = 1/2$. With the equilibrium factor, $(f_{eq}M:M)$ can be reached in fewer growth iterations; e.g. after 1 round (middle), $(1:1)$ is reached. Also after join to a single cluster (bottom), fewer iterations are needed (2 compared to 4 in Figure \ref{fig:kbloom}).}\label{fig:kbloom2}
+  \caption{The same clusters, growths and joins as in Figure \ref{fig:kbloom}, but now with delay equation \eqref{eq:delayequation} for $k_{eq} = 1/2$. With the equilibrium factor, $(k_{eq}M:k_{eq}M)$ can be reached in fewer growth iterations; e.g. after 1 round (middle), $(1:1)$ is reached. Also, after join to a single cluster (bottom), fewer iterations are needed (2 compared to 4 in Figure \ref{fig:kbloom}).}\label{fig:kbloom2}
 \end{figure}

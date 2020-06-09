@@ -8,11 +8,11 @@
     \draw[l1] (0,1) -- (0,-1);
     \draw[l1] (2,1) -- (2,-1);
     \draw[l1] (4,1) -- (4,-1);
-    \node[node] at (0,0) (1) {$v_1$};
+    \node[node, fill=white] at (0,0) (1) {$v_1$};
     \node[node, draw=mblue, fill=mblue, fill opacity=.2, text opacity=1, dashed] at (0,2) (2) {$v_o$};
-    \node[node] at (2,0) (3){$v_2$};
+    \node[node, fill=white] at (2,0) (3){$v_2$};
     \node[node, draw=morange, fill=morange, fill opacity=.2, text opacity=1,dotted] at (2,2) (4) {$v_o$};
-    \node[node] at (4,0) (5) {$v_3$};
+    \node[node, fill=white] at (4,0) (5) {$v_3$};
     \node[node, draw=mgreen, fill=mgreen, fill opacity=.2, text opacity=1,dashdotted] at (4,2) (6) {$v_o$};
 
     \draw[l1, dashed, mblue] (1) -- (2);
@@ -23,5 +23,5 @@
     \draw[l1, dashdotted, mgreen, transform canvas={yshift=3pt}] (3) -- (1);
 
   \end{tikzpicture}
-  \caption{Unequal matching weight in cluster vertex-tree $\vset_e$. The matching edges (dashed) correspond to the position of $v_o$. If $v_o$ is connected to $v_1$ or $v_3$, the resulting matchings have a weight of 2. If $v_o$ is connected to $v_2$, the resulting matching has a weight of 3.}\label{fig:PMW}
+  \caption{Unequal matching weight in cluster vertex-tree $\vset_e$. The matching edges (dashed) correspond to the position of $v_o$. If $v_o$ is connected to $v_1$ or $v_3$, the resulting matching has a weight of 2. If $v_o$ is connected to $v_2$, the resulting matching has a weight of 3.}\label{fig:PMW}
 \end{figure}
