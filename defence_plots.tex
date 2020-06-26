@@ -3,15 +3,15 @@
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[section]{placeins}
 \usepackage[utf8]{inputenc}
-\usepackage[colorlinks]{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage[mathscr]{euscript}
-\usepackage[table, cmyk]{xcolor}
+\usepackage[table]{xcolor}
 \usepackage{physics, adjustbox}
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{framed,enumitem} 
 \usepackage{xparse, todonotes}
 \usepackage{titlesec}
-
+\usepackage{cleveref}
 
 % Define colors
 \definecolor{mblue}{HTML}{1F77B4}
@@ -24,13 +24,6 @@
 \definecolor{mgrey}{HTML}{7F7F7F}
 \definecolor{mlime}{HTML}{BCBD22}
 \definecolor{mcyan}{HTML}{17BECF}
-
-\hypersetup{
-    colorlinks,
-    linkcolor={mblue},
-    citecolor={mgreen},
-    urlcolor={mcyan}
-}
 
 
 % Set math environments
@@ -93,10 +86,9 @@
 \usepackage{listings}
 \lstset{language=C,keywordstyle={\bfseries \color{blue}}}
 
-\usepackage{tikz}
-\usetikzlibrary{quantikz,shapes,calc,math,patterns,arrows,positioning}
-\usepackage{pgfplots}
+\usepackage{tikz, pgfplots}
 \usepgfplotslibrary{groupplots,dateplot}
+\usetikzlibrary{quantikz,shapes,calc,math,patterns,arrows}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 \SetAlFnt{\footnotesize}
 \tikzset{bellstar/.style ={draw, star,star points = 8, star point height = 1em, star point ratio = 1.8, minimum size = 1em, inner sep = 0pt}}
@@ -112,7 +104,7 @@
 \usepackage{glossary-mcols}
 
 \makeglossaries
-\input{gls_symbols}
+\input{gls_symbols.tex}
 
 \renewcommand*{\glossarypreamble}{\vspace{-\baselineskip}}
 \newcommand*{\Ngroupname}{Objects, elements of sets}
@@ -122,7 +114,7 @@
 \newcommand*{\Zgroupname}{Others}
 
 % Referencing
-\usepackage[style=numeric-comp, sorting=nyt]{biblatex}
+\usepackage[style=numeric-comp, sorting=none]{biblatex}
 \addbibresource{cit.bib}
 
 % Tables
@@ -139,52 +131,98 @@
 
 \begin{document}
 
-  \pagenumbering{roman} 
+    \input{tikzfigs/function_draw_lattices}
 
-  \include{_titlepage}
-  
-  \addcontentsline{toc}{chapter}{Abstract}
-  \include{chapters/ch_abstract}
+    \def\QS{15}
+    \def\s{1.5}
+    \def\lw{0.5}
 
-  \setcounter{tocdepth}{1}
-  \tableofcontents
-  \include{chapters/ch_notations}
-  \printglossary[type=symbols, style={mcoltreegroup}]
-  \clearpage
 
-  \input{tikzfigs/function_draw_lattices}
+    \begin{tikzpicture}
+        \DRAWTORIC{3}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+        \DRAWTORIC{4}
+        \DRAWERROR{1}{2}{0}{z}
+        \DRAWERROR{2}{0}{0}{z}
+        \DRAWERROR{1}{0}{0}{z}
+        \DRAWSTAR{1}{2}{5}
+        \DRAWSTAR{2}{2}{5}
+        \DRAWSTAR{1}{0}{5}
+        \DRAWSTAR{3}{0}{5}
+        \begin{pgfonlayer}{edges}
+            \draw[synz] (N-1-0-0) -- (N-2-0-0);
+        \end{pgfonlayer}
+    \end{tikzpicture}
+    \newline
+    \begin{tikzpicture}
+        \DRAWTORIC{4}
+        \DRAWSTAR{1}{2}{5}
+        \DRAWSTAR{2}{2}{5}
+        \DRAWSTAR{1}{0}{5}
+        \DRAWSTAR{3}{0}{5}
+    \end{tikzpicture}
 
-  \pagenumbering{arabic} 
-  % \include{chapters/preliminary_report}
-  \include{chapters/ch_introduction}
-  \include{chapters/ch_qec_basics}
-  \include{chapters/ch_surface_code}
-  \include{chapters/ch_mwpmdecoder}
-  \include{chapters/ch_ufdecoder}
-  \include{chapters/ch_ufbb}
-  \include{chapters/ch_conclusions}
-  % \include{chapters/ch_ufmodifications}
+    \tikzstyle{rednode}=[circle, fill=red!50, minimum size=4]
+    \tikzstyle{bluenode}=[circle, fill=cyan!50, minimum size=4]
+    \tikzstyle{redline}=[red!50, line width = 2]
+    \tikzstyle{blueline}=[cyan!50, line width = 2]
+    \tikzstyle{legend}=[anchor=west, font=\small]
 
-  % \include{chapters/ch_threshold_results}
-  \include{peeling_objects_1}
+    \newcommand{\drawquasigrid}{
+    \draw[step=.4cm, opacity=.25] (0,-.8) grid (4,3.2);
+    \draw (0,-.8) rectangle (4,3.2);
+    \node[rednode] (N1) at (0.5,0.4) {};
+    \node[rednode] (N2) at (2,0.7) {};
+    \node[rednode] (N3) at (2.5,1.2) {};
+    \node[rednode] (N4) at (3.6,1) {};
+    \node[rednode] (N5) at (0.75,2.1) {};
+    \node[rednode] (N6) at (1.95,1.8) {};
+    \draw[blueline] (N1) to[in=170, out=20] (N2);
+    \draw[blueline] (N3) to[in=180, out=-10] (N4);
+    \draw[blueline] (N5) to[in=170, out=-20] (N6);
+    }
+    \begin{figure}[htbp]
+        \centering
+        \begin{tikzpicture}[scale=0.9]
+            \drawquasigrid
+        \end{tikzpicture}
+        \hspace{.3cm}
+        \begin{tikzpicture}[scale=0.9]
+            \drawquasigrid
+            \draw[dashed, blueline] (N1) to[out=90, in=270] (N5);
+            \draw[dashed, blueline] (N2) to[out=80, in=275] (N6);
+            \draw[dashed, blueline] (N3) to[out=10, in=160] (N4);
+        \end{tikzpicture}
+        \hspace{.3cm}
+        \begin{tikzpicture}[scale=0.9]
+        \drawquasigrid
+            \draw[yellow, line width=6, opacity=.3] (N3) to[in=180, out=-10] (N4);
+            \draw[yellow, line width=6, opacity=.3] (N5) to[in=170, out=-20] (N6);
+            \draw[yellow, line width=6, opacity=.3] (N3) to[out=120, in=-30] (N6);
+            \draw[yellow, line width=6, opacity=.3] (N5) to[out=200, in=45] (0, 1.75);
+            \draw[yellow, line width=6, opacity=.3] (N4) to[out=80, in=225] (4, 1.75);
+            \draw[dashed, blueline] (N1) to[out=0, in=200] (N2);
+            \draw[dashed, blueline] (N3) to[out=120, in=-30] (N6);
+            \draw[dashed, blueline] (N5) to[out=200, in=45] (0, 1.75);
+            \draw[dashed, blueline] (N4) to[out=80, in=225] (4, 1.75);
+        \end{tikzpicture}
 
-  \begin{appendices}
-    \titleformat{\chapter}[display]
-      {\normalfont\Large\bfseries}% <- font for label "Appendix A", default \huge
-      {\chaptertitlename\ \thechapter}{10pt}
-      {\LARGE}% <- font for title, default \Huge
-    \titlespacing*{\chapter}{0pt}{0pt}{15pt}
-    % \include{appendices/ap_bucket_sort}
-    \include{appendices/ap_unionfind}
-    \include{appendices/ap_ackermann}
-    \include{appendices/ap_ufpseudocodes}
-    \include{appendices/ap_figmwpm}
-    \include{appendices/ap_figuf}
-    \include{appendices/ap_figufbb}
-    \include{appendices/ap_oopsurfacecode}
+    \end{figure}
 
-  \end{appendices}
 
-  \addcontentsline{toc}{chapter}{Bibliography}
-  \printbibliography
+    \def\QS{4}
+    \def\s{1.5}
+    \def\lw{0.5}
+    \begin{tikzpicture}[scale=0.5]
+        \DRAWTORIC{8}
+    \end{tikzpicture}
+
+    \def\QS{0.15}
+    \def\s{1.5}
+    \def\lw{0.5}
+    \begin{tikzpicture}[scale=0.4]
+        \DRAWTORIC{24}
+    \end{tikzpicture}
+
 \end{document}

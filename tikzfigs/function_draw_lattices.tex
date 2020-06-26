@@ -36,10 +36,10 @@
   \def\LS{\MINUS{#1}}
   \begin{pgfonlayer}{edges}
     \foreach \x in {0,...,\LS}{
-      \draw (0,\s*\x) -- (\s*\LS+\s,\s*\x) (\s*\x, -\s) -- (\s*\x, \s*\LS);
-      \draw[dotted] (0,\s*\x - \s/2) -- (\s*\LS+\s,\s*\x - \s/2) (\s*\x + \s/2, -\s) -- (\s*\x + \s/2, \s*\LS);
+      \draw[line width=\lw] (0,\s*\x) -- (\s*\LS+\s,\s*\x) (\s*\x, -\s) -- (\s*\x, \s*\LS);
+      \draw[line width=\lw, dotted] (0,\s*\x - \s/2) -- (\s*\LS+\s,\s*\x - \s/2) (\s*\x + \s/2, -\s) -- (\s*\x + \s/2, \s*\LS);
       }
-    \draw[dashed] (0, -\s) -- (\s*\LS+\s, -\s) -- (\s*\LS+\s, \s*\LS);
+    \draw[line width=\lw, dashed] (0, -\s) -- (\s*\LS+\s, -\s) -- (\s*\LS+\s, \s*\LS);
   \end{pgfonlayer}
   \begin{pgfonlayer}{qubits}
     \foreach \x in {0,...,\LS}
