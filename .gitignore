@@ -262,3 +262,4 @@ TSWLatexianTemp*
 
 .vscode/
 .build/
+!fig/*
