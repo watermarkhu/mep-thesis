@@ -11,7 +11,7 @@
 \usepackage{framed,enumitem} 
 \usepackage{xparse, todonotes}
 \usepackage{titlesec}
-
+\usepackage{tcolorbox}
 
 % Define colors
 \definecolor{mblue}{HTML}{1F77B4}
@@ -77,16 +77,6 @@
 \SetKwIF{If}{ElseIf}{Else}{if}{ then}{else if}{else}{}
 \SetKwFor{While}{while}{ do}{}
 \SetAlgoNoEnd\DontPrintSemicolon
-
-% Set algorithm title custom box
-\usepackage[most]{tcolorbox}
-\tcbset{algotitle/.style={title={ \strut Algorithm~\thetcbcounter\ifstrempty{#1}{\ignorespaces}{:~#1}}}}
-\newtcolorbox[auto counter]{algo}[1][]{
-    colback=white, colframe=black, boxrule=0.5pt,
-    titlerule=0pt, sharp corners, colbacktitle=white,enhanced,
-    attach boxed title to top center={yshift=-10pt},
-    boxed title style={boxrule=-1pt},
-    fonttitle=\bfseries, coltitle=black, algotitle={}, #1}
 
 
 % listings of pseudo-codes

@@ -743,6 +743,19 @@ This fragmentation number does not come unexpectedly. If $k_f=2$, a fragmentatio
 
 Let us now try to maximize $N_{PDC}$ of Equation \eqref{eq:npdc}, not from the perspective of fragmentations, but from the perspective of cluster growth. During a growth iteration, some $N_v$ vertices are added to the cluster $c_j$, and some other clusters merge with $c_j$ that also require the join of their respective node-trees. If no join operations occur, the node-tree stays unchanged. The cluster is allowed to continue to grow without delay calculations per Lemma \ref{lem:calconce}. To maximize $N_{PDC}$, $N_v$ must be minimized, as every added vertex here is one that could have been part of a node in some other node-tree, and thus does not add to $N_{PDC}$. 
 
+\begin{tcolorbox}[title=Revised addition]
+  \begin{lemma}\label{lem:localmax}
+    Local maximization of the fragmentation ratio of the even subtree $R_{-1}=\tilde{R}_1+\tilde{R}_2$ leads to global maximization of $N_{PDC}$.
+  \end{lemma}
+  \begin{proof}
+    Recall from Equation \eqref{eq:pfe} that in the partial fragmentation $f_o$ of $\pre{k-1}\nset^o$, the size of the fragmented even ancestral subtree is
+    \begin{equation*}
+      \abs{\pre{k}\nset^e_{-1}} = R_{-1}\abs{\pre{k-1}\nset^o}, 
+    \end{equation*}
+    which counts towards $N_{PDC}$ in the full fragmentation. In the fragmentation step $k$, $\pre{k-1}\nset^o$ is fragmented according to fragmentation ratios $\{R_0, \tilde{R}_1, \tilde{R}_2\}_k$. In the next fragmentation step $k+1$, the odd node-trees of $\m{F}_k=\{\pre{k}\nset^o_0, \pre{k}\nset^o_1, \pre{k}\nset^o_1\}$ are to fragmented into ancestral node-trees. The framentation ratios for each of the fragmentations $f(\pre{k}\nset^o_0), f(\pre{k}\nset^o_1), f(\pre{k}\nset^o_1)$ are not dependant on $\{R_0, \tilde{R}_1, \tilde{R}_2\}_k$. Thus global maximization of $N_{PDC}$ is achieved by local maximization of $R_{-1}=\tilde{R}_1+\tilde{R}_2$ in every fragmentation. 
+  \end{proof}
+\end{tcolorbox}
+
 \begin{theorem}\label{the:fragratio}
   For the fragmentation ratios $R_0 = \tilde{R}_1 = \tilde{R}_2 = \frac{1}{3}$, $N_{PDC}$ of Definition \ref{def:npdc} and Equation \eqref{eq:npdc} is maximized in a Union-Find Balanced-Bloom decoder with weighted growth (see Section \ref{sec:bucketwg}). 
 \end{theorem}
@@ -767,7 +780,7 @@ Let us now try to maximize $N_{PDC}$ of Equation \eqref{eq:npdc}, not from the p
   \begin{equation*}
     R_0 \geq \tilde{R}1 \approx \tilde{R}2,
   \end{equation*}
-  To maximize $N_{PDC}$, we want to maximize $\abs{\nset^e_{-1}} = \abs{\nset^o_1} + \abs{\nset^o_2}$ or $\tilde{R}1 + \tilde{R}2$. Since \eqref{eq:bigratios}, $R_0$ must be as small as possible, and thus $R_0 = \tilde{R}1 = \tilde{R}2 = \frac{1}{3}$. 
+  To maximize $N_{PDC}$, we want to maximize $\abs{\nset^e_{-1}} = \abs{\nset^o_1} + \abs{\nset^o_2}$ or $R_{-1}=\tilde{R}1 + \tilde{R}2$ (per Lemma \ref{lem:localmax}\footnote{Added in revision}). Since \eqref{eq:bigratios}, $R_0$ must be as small as possible, and thus $R_0 = \tilde{R}1 = \tilde{R}2 = \frac{1}{3}$. 
 \end{proof}
 
 \input{tikzfigs/fragratio}
