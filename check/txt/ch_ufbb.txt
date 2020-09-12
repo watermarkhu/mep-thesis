@@ -22,7 +22,7 @@ Within the vanilla Union-Find decoder, not all odd-parity clusters are grown at 
 
 From the simulated results of several of our implementations of the Union-Find decoder (Section X), we grew the intuition that a decreased weight is to some extent a heuristic for an increased code threshold (formalized in Proposition X). In fact, the instruction of the Union-Find decoder mostly tries to obtain a low weight matching; by growing the odd-parity clusters on their boundaries a single layer at the time, unions between odd-parity clusters mostly occur on nearest neighbors. The discrete coordinates of the lattice limits the number of growth iterations to a constant proportional to the lattice. But also due to this discreteness, there may be many unions within each growth iteration, and nearest-neighbor unions between clusters may not result in a minimum-weight matching between syndromes. Especially as the clusters increase in size, also does their boundaries, and an increasingly larger amount of ``incorrect edges'' are added to the cluster. Weighted grow reduces the number of large-cluster growths, but does not decrease the number of ``incorrect edges'' if a large cluster is grown. This leaves us with the question: Should all boundary edges of a cluster be grown simultaneously?
 
-We suspect that the error threshold of the Union-Find decoder can be increased by improving the heuristic for minimum-weight matching. In this chapter, we accomplish this by sorting the growth of specific subsets of a cluster according to a parameter that we dub the potential matching weight, explained in X. We introduce a new data structure that we call the node-tree of a cluster in X. Within this node-tree, we compute the node parity and delay in X and X, which sets the order of boundary edge growth. In X through X, we cover the rules for growth and join operations for the node-trees, which are more complex than those of the Union-Find decoder. The modified decoder, the Union-Find Balanced-Bloom decoder, still has a relatively low worst-case quasilinear-time complexity, which is approximated in X. 
+We suspect that the error threshold of the Union-Find decoder can be increased by improving the heuristic for minimum-weight matching. In this chapter, we accomplish this by sorting the growth of specific subsets of a cluster according to a parameter that we dub the potential matching weight, explained in X. We introduce a new data structure that we call the node-tree of a cluster in X. Within this node-tree, we compute the node-suspension and delay in X and X, which sets the order of boundary edge growth. In X through X, we cover the rules for growth and join operations for the node-trees, which are more complex than those of the Union-Find decoder. The modified decoder, the Union-Find Balanced-Bloom decoder, still has a relatively low worst-case quasilinear-time complexity, which is approximated in X. 
 
 A potential matching weight
 
@@ -112,18 +112,18 @@ To finalize, the node-tree X of a cluster X is a reduced tree of the graph forme
 
 
 Node parity and delay
-The node-tree data structure allows for a reduction in the calculation of the potential matching weight, as the value for boundary vertices within the node are equal. However, if this calculation is done naively by calculating the potential matching weight for each node individually, where in each calculation the entire node-tree is traversed, the full calculation runs in quadratic time. Luckily, as we will explore in this section, the node-tree data structure allows us to calculate several values that relate closely to the potential matching weight; the node parity and node delay, by two depth-first searches from the root node. 
+The node-tree data structure allows for a reduction in the calculation of the potential matching weight, as the value for boundary vertices within the node are equal. However, if this calculation is done naively by calculating the potential matching weight for each node individually, where in each calculation the entire node-tree is traversed, the full calculation runs in quadratic time. Luckily, as we will explore in this section, the node-tree data structure allows us to calculate several values that relate closely to the potential matching weight; the node-suspension and node delay, by two depth-first searches from the root node. 
 
 definition
   Let the node delay X be the difference in the number of bloom delay iterations of a node n and the root node X in the node-tree of an odd-parity cluster.
 definition
 
 definition
-  Let the node parity X be an indicator for whether a node X has a larger delay compared to its parent in an odd-parity cluster; for even parity X then X, and for odd parity X then X. Even nodes are relatively prioritized and odd nodes are relatively delayed.
+  Let the node-suspension X be an indicator for whether a node X has a larger delay compared to its parent in an odd-parity cluster; for even parity X then X, and for odd parity X then X. Even nodes are relatively prioritized and odd nodes are relatively delayed.
 definition
 
 theorem
-  The node parity of a node X is only dependent on its own attributes and its children X:
+  The node-suspension of a node X is only dependent on its own attributes and its children X:
   The node delay of a node X is only dependent on its own attributes and its parent X:
   multline
     s_\beta.d = s_\alpha.d + \Bigg \lceil k_eq \Bigg( 2\bigg(\fracs_\beta.r{2} - \fracs_\alpha.r + s_\beta.r \bmod 2{2} - (-1)^s_\beta.p(s_\beta,s_\alpha)\bigg)
@@ -140,7 +140,7 @@ We will prove Theorem X throughout the following sections. In Section X, we intr
 
 One-dimensional node-tree parity and delay
 
-We introduce the concepts of node parity and node delay from Definitions X and X through a one-dimensional node-tree X of exclusively syndrome-nodes. In this simplification, all nodes lie on a horizontal line from X to X (Figure X). Let us calculate the potential matching weights for the nodes in this cluster. Recall from Definition X that the radius of the node s.r is equal to number of bloom iterations, one half-edge on the boundaries per iteration. This means that if a merge with some other cluster occurs on a boundary edge of s, the weight of the matching edges within the node s is equal to X or. For a merge on X, the matching weight X is the sum of X, the length of edges X, and some value k corresponding to the weight of matching edges in the remainder of the cluster. This calculation can be continued for other nodes:
+We introduce the concepts of node-suspension and node delay from Definitions X and X through a one-dimensional node-tree X of exclusively syndrome-nodes. In this simplification, all nodes lie on a horizontal line from X to X (Figure X). Let us calculate the potential matching weights for the nodes in this cluster. Recall from Definition X that the radius of the node s.r is equal to number of bloom iterations, one half-edge on the boundaries per iteration. This means that if a merge with some other cluster occurs on a boundary edge of s, the weight of the matching edges within the node s is equal to X or. For a merge on X, the matching weight X is the sum of X, the length of edges X, and some value k corresponding to the weight of matching edges in the remainder of the cluster. This calculation can be continued for other nodes:
 The difference in the potential matching weight of a node X and its parent X has a more constant definition that is only dependent on the radii of X,  X, and the length of the edge connecting the two:
 
 There is a trend in which contribution of the edge length the difference in the potential matching weight is dependent on the parity of the node number i. The difference X for some integer i has the positive addition of X, whereas the difference X has the subtraction of X. Thus, we can generalize the difference as
@@ -183,25 +183,25 @@ Realistic node-tree parity and delay
 
 The one-dimensional node-tree from the previous section does not accurately represent node-trees that occupy a real lattice. On a two-dimensional lattice (independent noise) and a three-dimensional lattice (phenomenological noise), the node-tree X is allowed to form in the same dimensions as an acyclic graph, instead of a linear set with index number i. The delay calculation on an entire node tree is not a sequence of calculations from node X to X, but a depth-first search from the root node X. Just as the previous section, we assume that X has excursively syndrome-nodes. Using the same strategy as in the previous section, we find that the equation for calculating the node delays is quite similar. The delay calculation is performed on a node X comparatively with the parent node X, which means that there must be some directed path within X, such that there is a clear direction, and the calculation is started from the root node s.r by setting X.
 
-The edge contribution to the node parity X, whose sign was previously determined by the node index i, is now set by the node parity (Definition X). 
+The edge contribution to the node-suspension X, whose sign was previously determined by the node index i, is now set by the node-suspension (Definition X). 
 lemma
-  For a node-tree of exclusively syndrome-nodes, the concept of the node parity can be defined as the number of descendant nodes modulo 2 (see Figure X). It can be calculated without counting the number of descendants for every node by using the recursive relation where the parity of a node X is only dependent on the parities of its immediate children X:
+  For a node-tree of exclusively syndrome-nodes, the concept of the node-suspension can be defined as the number of descendant nodes modulo 2 (see Figure X). It can be calculated without counting the number of descendants for every node by using the recursive relation where the parity of a node X is only dependent on the parities of its immediate children X:
 lemma
 proof
-  For a node X with a set of children nodes X, the node parity X can only be even if it has an even number of children nodes with even parity X, and an even number of children nodes with odd parity X. This is accomplished by Equation X. 
+  For a node X with a set of children nodes X, the node-suspension X can only be even if it has an even number of children nodes with even parity X, and an even number of children nodes with odd parity X. This is accomplished by Equation X. 
 proof
-Note that this definition of the node parity is identical as in a one-dimensional syndrome-node-tree, where a node with an odd index effectively has an even number of descendant nodes and results in a contribution X, and an even indexed node results in a contribution X. The parity calculation thus requires the parity of every child node to be known, which means that the parity calculation of X is related to a depth-first search from the root node X, with a tail-recursive function to calculate the parities from the bottom up. To calculate the node delays within X, a second depth-first search is applied with
+Note that this definition of the node-suspension is identical as in a one-dimensional syndrome-node-tree, where a node with an odd index effectively has an even number of descendant nodes and results in a contribution X, and an even indexed node results in a contribution X. The parity calculation thus requires the parity of every child node to be known, which means that the parity calculation of X is related to a depth-first search from the root node X, with a tail-recursive function to calculate the parities from the bottom up. To calculate the node delays within X, a second depth-first search is applied with
 multline
   s_\beta.d = s_\alpha.d + 2\Bigg(\fracs_\beta.r{2} - \fracs_\alpha.r + s_\beta.r \bmod 2{2} - (-1)^s_\beta.p(s_\beta,s_\alpha)\Bigg) - 
   (s_\beta.r - s_\alpha.r) \bmod 2 
 multline
-where X is the node of interest and X is a parent of X, and the sign of the edge component is now dependent on the node parity s.p.
+where X is the node of interest and X is a parent of X, and the sign of the edge component is now dependent on the node-suspension s.p.
 
 
 
-Linking-node parity and delay
+Linking-node-suspension and delay
 
-Up until now, the existence of linking-nodes has been neglected in the node parity and delays calculations. In this section, we will extend upon the previous equations for node parity and delay to include linking-nodes. Luckily, the delay calculation of Equation X still holds for linking-nodes. However, the parity of a linking-node is calculated differently. Consider an example node-tree X with 5 syndrome-nodes X lined up linearly with distance 1 between them and X (Figure Xa). Let us consider a delay X from Equation X but leaving out the node radius components as we are now only interested in the parity component X. The parity of X is odd, therefore
+Up until now, the existence of linking-nodes has been neglected in the node-suspension and delays calculations. In this section, we will extend upon the previous equations for node-suspension and delay to include linking-nodes. Luckily, the delay calculation of Equation X still holds for linking-nodes. However, the parity of a linking-node is calculated differently. Consider an example node-tree X with 5 syndrome-nodes X lined up linearly with distance 1 between them and X (Figure Xa). Let us consider a delay X from Equation X but leaving out the node radius components as we are now only interested in the parity component X. The parity of X is odd, therefore
 
 
 
@@ -224,7 +224,7 @@ lemma
   Any node X is a valid root. The root X, which has parity X, determines the node parities within the node-tree. 
 lemma
 proof
-  Since the node parities are calculated from the descendants to the root, and the node delays are subjected to an arbitrarily chosen delay for the root X, any node in X can be chosen as the root. Recall from Definition X that the node parity is only defined for an odd-parity cluster. For a node-tree of exclusively syndrome-nodes, this means that X must have an even number of descendant nodes, and thus per Lemma X it must be that X. From a node-tree of mixed syndrome-nodes and linking-nodes, recall from Lemma X that linking-nodes always copies the parity of the nearest descendant syndrome-node, thus X. Choosing which node X is the root node X for this reason determines the parities in the node-tree (see Figure X). 
+  Since the node parities are calculated from the descendants to the root, and the node delays are subjected to an arbitrarily chosen delay for the root X, any node in X can be chosen as the root. Recall from Definition X that the node-suspension is only defined for an odd-parity cluster. For a node-tree of exclusively syndrome-nodes, this means that X must have an even number of descendant nodes, and thus per Lemma X it must be that X. From a node-tree of mixed syndrome-nodes and linking-nodes, recall from Lemma X that linking-nodes always copies the parity of the nearest descendant syndrome-node, thus X. Choosing which node X is the root node X for this reason determines the parities in the node-tree (see Figure X). 
 proof
 
 The node-tree has undirected edges, such that it is not set in stone which node is the root. When to clusters merge into one, their respective node trees need to be merged too. As the edges in the node-tree reflect one or many physical edges on the lattice, the merge of node-trees can not be applied by simply pointing one root to another, such as in the Union-Find data structure. In stead, the node-trees X are joined on the nodes X containing the boundary vertices that support the newly grown edge that links the clusters. This can be done by setting one of the nodes X or X as the subroot if its tree and connecting it with the other. This motivates the use of undirected edges. New roots can be chosen that allows for the union of node-trees. More on the union of node-trees is described in Section X. 
@@ -318,7 +318,7 @@ lemma
   If node-trees merge into an even node-tree X, all node parities and delays within X become invalid or undefined. 
 lemma
 proof
-  Recall from Definitions X and X that the node parity and delay are only defined for odd-parity clusters. An even-parity cluster does not have a potential matching weight, as the matching within the cluster are already defined. However, X merge with another odd-parity cluster with node-tree X in a larger odd-join. In that case, we might think about ``reusing'' some node parities and delays that were already calculated in X. To reuse prior calculated parities and delays, a depth-first search on X is needed to find which sections are still valid, and which sections are not. This is especially the case when the clusters in the E-join are the results of joins within the same growth iteration. Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the calculation of parity and delays over the subtree X. Hence, the node parities and delays in the joined set after an E-join are undefined.
+  Recall from Definitions X and X that the node-suspension and delay are only defined for odd-parity clusters. An even-parity cluster does not have a potential matching weight, as the matching within the cluster are already defined. However, X merge with another odd-parity cluster with node-tree X in a larger odd-join. In that case, we might think about ``reusing'' some node parities and delays that were already calculated in X. To reuse prior calculated parities and delays, a depth-first search on X is needed to find which sections are still valid, and which sections are not. This is especially the case when the clusters in the E-join are the results of joins within the same growth iteration. Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the calculation of parity and delays over the subtree X. Hence, the node parities and delays in the joined set after an E-join are undefined.
 proof
 
 lemma

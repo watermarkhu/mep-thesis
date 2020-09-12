@@ -1,9 +1,4 @@
-\tikzstyle{edge}=[above,midway,font=\tiny]
-\newcommand\DLINE[4]{
-  \draw (#1, #2) ++ (-.3,-.9) node[inner sep=0] (lb) {} ++(#3,0) ++(.6,0) node[inner sep=0] (rb) {} ++(0,0.4) node[inner sep=0] (rt) {};;
-  \path[fill=white!80!black, rounded corners=2pt] (lb) rectangle (rt);
-  \ifnumequal{#4}{1}{\draw[thin] (lb) -- (rb);}{}
-}
+
 \begin{figure}[p]
 \centering
     \begin{tikzpicture}[on grid, scale=1]

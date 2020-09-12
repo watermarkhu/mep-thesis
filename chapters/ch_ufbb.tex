@@ -14,7 +14,13 @@
 \tikzstyle{enset}=[node1, thick, double, font=\footnotesize]
 \tikzstyle{onset}=[node1, thick, densely dashed, double, font=\footnotesize]
 \tikzstyle{subtree}=[node1, opacity=0.3,dotted, font=\footnotesize]
-
+\tikzstyle{undef}=[node1, dotted, pattern=dots, pattern color=black!25!white]
+\tikzstyle{edge}=[above,midway,font=\tiny]
+\newcommand\DLINE[4]{
+  \draw (#1, #2) ++ (-.3,-.9) node[inner sep=0] (lb) {} ++(#3,0) ++(.6,0) node[inner sep=0] (rb) {} ++(0,0.4) node[inner sep=0] (rt) {};;
+  \path[fill=white!80!black, rounded corners=2pt] (lb) rectangle (rt);
+  \ifnumequal{#4}{1}{\draw[thin] (lb) -- (rb);}{}
+}
 % Recall that in the Union-Find decoder, each cluster represented by a set of vertices $C_i = |\{v_1, v_2, ...\}$ stored as a disjoint-set tree of the Union-Find data structure. To find the parent cluster of any given vertex, we follow subsequent parent pointers to the root vertex of the tree, which is the representative element of the cluster. Merges between clusters is done by simply pointing the root of one tree to another. By implementing additional rules \emph{path compression} and either \emph{union by weight} or \emph{union by rank}, the heights of the trees are dynamically kept low, such that the overall complexity of the algorithm for a system of $n$ qubits is $N\alpha(N)$, where $\alpha(N)\leq 4$ for all physical values of $n$. 
 
 In this chapter, we describe a modification of the Union-Find decoder, dubbed the \emph{Union-Find Balanced-Bloom} decoder, that increases the Union-Find decoder's code threshold by improving its heuristic for minimum-weight matching. We show that the modified decoder retains a relatively low time-complexity. 
@@ -152,18 +158,18 @@ The node-tree $\nset_j$ of a cluster $c_j$ is a reduced tree of the graph formed
 
 
 \section{Node parity and delay}\label{sec:nodedelay}
-The node-tree data structure allows for a reduction in the calculation of the potential matching weight, as the value for boundary vertices within the node are equal. However, if this calculation is done naively by calculating the potential matching weight for each node individually, where the entire node-tree is traversed in each calculation, the full calculation runs in quadratic time. Luckily, as we will explore in this section, the node-tree data structure allows us to calculate several values that relate closely to the potential matching weight, the \emph{node parity} and \emph{node delay}, by two depth-first searches from the root node. 
+The node-tree data structure allows for a reduction in the calculation of the potential matching weight, as the value for boundary vertices within the node are equal. However, if this calculation is done naively by calculating the potential matching weight for each node individually, where the entire node-tree is traversed in each calculation, the full calculation runs in quadratic time. Luckily, as we will explore in this section, the node-tree data structure allows us to calculate several values that relate closely to the potential matching weight, the \emph{node-suspension} and \emph{node delay}, by two depth-first searches from the root node. 
 
 \begin{definition}\label{def:nodedelay}
   Let the \emph{node delay} $\gls{nndelay}$ be the difference in the number of bloom delay iterations of a node $n$ and the root node $n_r$ in the node-tree of an odd-parity cluster.
 \end{definition}
 
 \begin{definition}\label{def:nodeparity}
-  Let the \emph{node parity} $\gls{nnparity}$ be an indicator for whether a node $n_\beta$ has a larger delay than its parent in an odd-parity cluster. For even parity $n_\beta.p=0$, then $n_\beta.d < n_\alpha.d$. For odd parity $n_\beta.p=1$, then $n_\beta.d > n_\alpha.d$. Even nodes are relatively prioritized, and odd nodes are relatively delayed.
+  Let the \emph{node-suspension} $\gls{nnparity}$ be an indicator for whether a node $n_\beta$ has a larger delay than its parent in an odd-parity cluster. For even parity $n_\beta.p=0$, then $n_\beta.d < n_\alpha.d$. For odd parity $n_\beta.p=1$, then $n_\beta.d > n_\alpha.d$. Even nodes are relatively prioritized, and odd nodes are relatively delayed.
 \end{definition}
 
 \begin{theorem}\label{the:delayequation}
-  The node parity of a node $n_\beta$ is only dependent on its own attributes and its children $\{n_{\gamma,1}, ...\}$:
+  The node-suspension of a node $n_\beta$ is only dependent on its own attributes and its children $\{n_{\gamma,1}, ...\}$:
   \begin{equation}\label{eq:nodeparity}
     n_\beta.p =
     \begin{cases}
@@ -187,7 +193,7 @@ We will prove Theorem \ref{the:delayequation} throughout the following sections.
 
 \subsection{One-dimensional node-tree parity and delay}\label{sec:1dnodetree}
 \input{tikzfigs/onedimensialtree}
-We introduce the concepts of node parity and node delay from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} through a one-dimensional node-tree $\nset_{1D}$ of exclusively syndrome-nodes. In this simplification, all nodes lie on a horizontal line from $s_1$ to $s_{|\nset_{1D}|}$ (Figure \ref{fig:1dnodetree}). Let us calculate the potential matching weights for the nodes in this cluster. Recall from Definition \ref{def:bloom} that the radius of the node $s.r$ is equal to the number of bloom iterations, one half-edge on the boundaries per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $s$, the weight of the matching edges within the node $s$ is equal to $\floor{s.r/2}+1$ or. For a merge on $s_1$, the matching weight $|\m{C}|$ is the sum of $\floor{s.r/2}+1$, the length of edges $(s_2,s_3), (s_4,s_5)$, and some value $k$ corresponding to the weight of matching edges in the remainder of the cluster. This calculation can be continued for other nodes:
+We introduce the concepts of node-suspension and node delay from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} through a one-dimensional node-tree $\nset_{1D}$ of exclusively syndrome-nodes. In this simplification, all nodes lie on a horizontal line from $s_1$ to $s_{|\nset_{1D}|}$ (Figure \ref{fig:1dnodetree}). Let us calculate the potential matching weights for the nodes in this cluster. Recall from Definition \ref{def:bloom} that the radius of the node $s.r$ is equal to the number of bloom iterations, one half-edge on the boundaries per iteration. This means that if a merge with some other cluster occurs on a boundary edge of $s$, the weight of the matching edges within the node $s$ is equal to $\floor{s.r/2}+1$ or. For a merge on $s_1$, the matching weight $|\m{C}|$ is the sum of $\floor{s.r/2}+1$, the length of edges $(s_2,s_3), (s_4,s_5)$, and some value $k$ corresponding to the weight of matching edges in the remainder of the cluster. This calculation can be continued for other nodes:
 \begin{align*}
 % \nonumber % Remove numbering (before each equation)
   PMW(s_1) &= \floor{s_1.r/2}+1 + \abs{(s_2,s_3)} + \abs{(s_4,s_5)} + k \\
@@ -284,17 +290,17 @@ Note that in Definition \ref{def:absolutedelay}, the general node element $n$ is
 
 The one-dimensional node-tree from the previous section does not accurately represent node-trees that occupy a real lattice. On a two-dimensional lattice (independent noise) and a three-dimensional lattice (phenomenological noise), the node-tree $\nset$ is allowed to form in the same dimensions as an acyclic graph, instead of a linear set with index number $i$. The delay calculation on an entire node tree is not a sequence of calculations from node $s_1$ to $s_{|\nset_{1D}|}$, but a depth-first search from the root node $s_r$. Just as the previous section, we assume that $\nset$ has excursively syndrome-nodes. Using the same strategy as in the previous section, we find that the equation for calculating the node delays is quite similar. The delay calculation is performed on a node $s_\beta$ comparatively with the parent node $s_\alpha$, which means that there must be some directed path within $\nset$, such that there is a clear direction, and the calculation is started from the root node $s.r$ by setting $s.r.d=0$.
 
-The edge contribution to the node parity $|(s_\beta, s_\alpha)|$, whose sign was previously determined by the node index $i$, is now set by the node parity (Definition \ref{def:nodeparity}). 
+The edge contribution to the node-suspension $|(s_\beta, s_\alpha)|$, whose sign was previously determined by the node index $i$, is now set by the node-suspension (Definition \ref{def:nodeparity}). 
 \begin{lemma}\label{lem:nodeparitypart}
-  For a node-tree of exclusively syndrome-nodes, the node parity concept can be defined as the number of descendant nodes modulo 2 (see Figure \ref{fig:parities}). It can be calculated without counting the number of descendants for every node by using the recursive relation where the parity of a node $n_\beta$ is only dependent on the parities of its immediate children $n_\gamma$:
+  For a node-tree of exclusively syndrome-nodes, the node-suspension concept can be defined as the number of descendant nodes modulo 2 (see Figure \ref{fig:parities}). It can be calculated without counting the number of descendants for every node by using the recursive relation where the parity of a node $n_\beta$ is only dependent on the parities of its immediate children $n_\gamma$:
   \begin{equation}\label{eq:nodeparitypart}
     s_\beta.p = \big( \sum_{s_\gamma} (1-s_\gamma.p) \big ) \bmod 2 \hspace{1em} | \hspace{1em} s_\gamma \text{ child node of } s_\beta.
   \end{equation}
 \end{lemma}
 \begin{proof}
-  For a node $s_\beta$ with a set of children nodes $\{s_\gamma, ...\}$, the node parity $s_\beta.p$ can only be even if it has an even number of children nodes with even parity $s_\gamma.p = 0$, and an even number of children nodes with odd parity $s_\gamma.p=1$. This is accomplished by Equation \ref{eq:nodeparitypart}. 
+  For a node $s_\beta$ with a set of children nodes $\{s_\gamma, ...\}$, the node-suspension $s_\beta.p$ can only be even if it has an even number of children nodes with even parity $s_\gamma.p = 0$, and an even number of children nodes with odd parity $s_\gamma.p=1$. This is accomplished by Equation \ref{eq:nodeparitypart}. 
 \end{proof}
-Note that this definition of the node parity is identical as in a one-dimensional syndrome-node-tree, where a node with an odd index effectively has an even number of descendant nodes and results in a contribution $-|(s_i, s_{i-1})|$ and an even indexed node results in a contribution $+|(s_i, s_{i-1})|$. The parity calculation thus requires the parity of every child node to be known. This means that the parity calculation of $\nset$ is related to a depth-first search from the root node $s_r$, with a tail-recursive function to calculate the parities from the bottom up. To calculate the node delays within $\nset$, a second depth-first search is applied with
+Note that this definition of the node-suspension is identical as in a one-dimensional syndrome-node-tree, where a node with an odd index effectively has an even number of descendant nodes and results in a contribution $-|(s_i, s_{i-1})|$ and an even indexed node results in a contribution $+|(s_i, s_{i-1})|$. The parity calculation thus requires the parity of every child node to be known. This means that the parity calculation of $\nset$ is related to a depth-first search from the root node $s_r$, with a tail-recursive function to calculate the parities from the bottom up. To calculate the node delays within $\nset$, a second depth-first search is applied with
 % \begin{multline}
 %   n_\beta.d = n_\alpha.d + 2\bigg(\floor{\frac{(n_\beta.s+n_\beta.g)}{2}} - \floor{\frac{(n_\alpha.s+n_\beta.g)}{2}} + (-1)^{n_\beta.p-1+1}(n_\alpha,n_\beta)\bigg) \\
 %          - (n_\beta.g + n_\alpha.g)\bmod 2 \hspace{.5cm} | \hspace{.5cm} n_r.d = 0, \hspace{.2cm} n_\beta \mbox{ child of } n_\alpha,
@@ -303,13 +309,13 @@ Note that this definition of the node parity is identical as in a one-dimensiona
   s_\beta.d = s_\alpha.d + 2\Bigg(\ceil{\frac{s_\beta.r}{2}} - \floor{\frac{s_\alpha.r + s_\beta.r \bmod 2}{2}} - (-1)^{s_\beta.p}\abs{(s_\beta,s_\alpha)}\Bigg) - \\
   (s_\beta.r - s_\alpha.r) \bmod 2 \hspace{1em} | \hspace{1em} s_\beta \neq s_r,
 \end{multline}
-where $n_\beta$ is the node of interest, and $n_\alpha$ is a parent of $n_\beta$, and the sign of the edge component is now dependent on the node parity $s.p$.
+where $n_\beta$ is the node of interest, and $n_\alpha$ is a parent of $n_\beta$, and the sign of the edge component is now dependent on the node-suspension $s.p$.
 
 \input{tikzfigs/parities}
 
-\subsection{Linking-node parity and delay}\label{sec:linkparitydelay}
+\subsection{Linking-node-suspension and delay}\label{sec:linkparitydelay}
 
-Up until now, the existence of linking-nodes has been neglected in the node parity and delays calculations. In this section, we will extend upon the previous equations for node parity and delay to include linking-nodes. Luckily, the delay calculation of Equation \eqref{eq:2ddelay} still holds for linking-nodes. However, the parity of a linking-node is calculated differently. Consider an example node-tree $\nset_s$ with five syndrome-nodes $\{s_1,...,s_5\}$ lined up linearly with distance 1 between them and $n_r = s_1$ (Figure \ref{fig:linkingparity}a). Let us consider a delay $n.d^*$ from Equation \eqref{eq:2ddelay} but leaving out the node radius components as we are now only interested in the parity component $- (-1)^{s_\beta.p}\abs{(s_\beta,s_\alpha)}$. The parity of $s_4$ is odd, therefore
+Up until now, the existence of linking-nodes has been neglected in the node-suspension and delays calculations. In this section, we will extend upon the previous equations for node-suspension and delay to include linking-nodes. Luckily, the delay calculation of Equation \eqref{eq:2ddelay} still holds for linking-nodes. However, the parity of a linking-node is calculated differently. Consider an example node-tree $\nset_s$ with five syndrome-nodes $\{s_1,...,s_5\}$ lined up linearly with distance 1 between them and $n_r = s_1$ (Figure \ref{fig:linkingparity}a). Let us consider a delay $n.d^*$ from Equation \eqref{eq:2ddelay} but leaving out the node radius components as we are now only interested in the parity component $- (-1)^{s_\beta.p}\abs{(s_\beta,s_\alpha)}$. The parity of $s_4$ is odd, therefore
 \begin{equation*}
   s_4.d^* = s_3.d^* + 2(s_3, s_4).
 \end{equation*}
@@ -354,7 +360,7 @@ Recall from the last paragraph of Section \ref{sec:nodeset} that the edges of th
   Any node $n_i \in \m{N}$ is a valid root. The root $n_r$, which has parity $n_r.p=0$, determines the node parities within the node-tree. 
 \end{lemma}
 \begin{proof}
-  Since the node parities are calculated from the descendants to the root and the node delays are subjected to an arbitrarily chosen delay for the root $n_r.d$, any node in $\nset$ can be chosen as the root. Recall from Definition \ref{def:nodeparity} that the node parity is only defined for an odd-parity cluster. For a node-tree of exclusively syndrome-nodes, $n_r$ must have an even number of descendant nodes, and thus per Lemma \ref{lem:nodeparitypart}, it must be that $s_r.p=0$. From a node-tree of mixed syndrome-nodes and linking-nodes, recall from Lemma \ref{lem:nodeparity} that linking-nodes always copies the parity of the nearest descendant syndrome-node, thus $n_r.p=0$. Choosing which node $n_i \in \nset$ is the root node $n_r$, for this reason, determines the parities in the node-tree (see Figure \ref{fig:parities}). 
+  Since the node parities are calculated from the descendants to the root and the node delays are subjected to an arbitrarily chosen delay for the root $n_r.d$, any node in $\nset$ can be chosen as the root. Recall from Definition \ref{def:nodeparity} that the node-suspension is only defined for an odd-parity cluster. For a node-tree of exclusively syndrome-nodes, $n_r$ must have an even number of descendant nodes, and thus per Lemma \ref{lem:nodeparitypart}, it must be that $s_r.p=0$. From a node-tree of mixed syndrome-nodes and linking-nodes, recall from Lemma \ref{lem:nodeparity} that linking-nodes always copies the parity of the nearest descendant syndrome-node, thus $n_r.p=0$. Choosing which node $n_i \in \nset$ is the root node $n_r$, for this reason, determines the parities in the node-tree (see Figure \ref{fig:parities}). 
 \end{proof}
 
 The node-tree has undirected edges, such that it is not set in stone which node is the root. When to clusters merge into one, their respective node trees need to be merged too. As the edges in the node-tree reflect one or many physical edges on the lattice, the merge of node-trees can not be applied by simply pointing one root to another, such as in the Union-Find data structure. Instead, the node-trees $\nset_i, \nset_j$ are joined on the nodes $n_i \in \nset_i, n_j\in \nset_j$ containing the boundary vertices that support the newly grown edge that links the clusters. This can be done by setting one of the nodes $n_i$ or $n_j$ as the \emph{subroot} if its tree, and connecting it with the other. This motivates the use of undirected edges. New roots can be chosen that allow for the union of node-trees. More on the union of node-trees is described in Section \ref{sec:nodejoin}. 
@@ -466,7 +472,7 @@ Let us categorize the joins of two node-trees into two types: even-joins and odd
   If node-trees merge into an even node-tree $\nset^e$, all node parities and delays within $\nset^e$ become invalid or \emph{undefined}. 
 \end{lemma}
 \begin{proof}
-  Recall from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} that the node parity and delay are only defined for odd-parity clusters. An even-parity cluster does not have a potential matching weight, as the matching within the cluster is already defined. However, $\nset^e$ can merge with another odd-parity cluster with node-tree $\nset^o$ in a larger odd-join. In that case, we might think about ``reusing'' some node parities and delays that were already calculated in $\nset^e$. To reuse prior calculated parities and delays, a depth-first search on $\nset^e$ is needed to find which sections are still valid, and which sections are not. This is especially the case when the clusters in the even-join are the results of joins within the same growth iteration. Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the calculation of parity and delays over the subtree $\nset^e$. Hence, the node parities and delays in the joined set after an even-join are \emph{undefined}.
+  Recall from Definitions \ref{def:nodeparity} and \ref{def:nodedelay} that the node-suspension and delay are only defined for odd-parity clusters. An even-parity cluster does not have a potential matching weight, as the matching within the cluster is already defined. However, $\nset^e$ can merge with another odd-parity cluster with node-tree $\nset^o$ in a larger odd-join. In that case, we might think about ``reusing'' some node parities and delays that were already calculated in $\nset^e$. To reuse prior calculated parities and delays, a depth-first search on $\nset^e$ is needed to find which sections are still valid, and which sections are not. This is especially the case when the clusters in the even-join are the results of joins within the same growth iteration. Checking the validity to reuse prior parities and delays then acquires the same complexity as redoing the calculation of parity and delays over the subtree $\nset^e$. Hence, the node parities and delays in the joined set after an even-join are \emph{undefined}.
 \end{proof}
 
 \begin{lemma}\label{lem:nodecalc_odd}
@@ -487,7 +493,7 @@ Let us categorize the joins of two node-trees into two types: even-joins and odd
 %
 % For case a), an even number of nodes of $'\m{N}^e$ is attached to $n^o$, and the ancestry in $'\m{N}^o$ hasn't changed. This means that the parities in $'\m{N}^o$ do not change per Lemma \ref{lem:anynoderoot}, and the delays in $'\m{N}^o$ are still valid as per Lemma \ref{lem:nodecalc_ancestrypath}. In $'\m{N}^e$, as the ancestry path has changed, we are certain to traverse $'\m{N}^e$ from the subroot $n^e$ to calculate the delays in this subset which is in the order of $S_{'\m{N}^e}$.
 %
-% In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the subroot $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node parity changes in $'\m{N}^e$ will be dependent on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
+% In case b), as an odd number of nodes of $'\m{N}^o$ is attached to $n^e$, it means that parities of all ancestor of $n^e$ are flipped. As the ancestry in $'\m{N}^{o}$ has changed, we are certain to traverse $'\m{N}^o$ from the subroot $n^o$ to calculate the delays which is in the order of $S_{'\m{N}^o}$. The node-suspension changes in $'\m{N}^e$ will be dependent on the location of $n^e$ in the ancestry compared to $n^1$ and $n^2$, and all children nodes of these parity changes will have to recalculate their delays. Let's call the number of nodes needs to calculate parity and delays in $'\m{N}^e$ a value $S_e \leq S_{'\m{N}^e}$, leaving the total number of operations in the order of $S_e + S_{'\m{N}^o}$.
 %
 % For $'\m{N}^e$ consisting of two subsets, keeping track of the parity changes between $n^e$, $n^0$ and $n^1$ is still an easy task, and we might gain in minimization in operations in case b) compared to case a) for some value $S_e$ such that $S_e + S_{'\m{N}^o} < S_{'\m{N}^e}$. But as the number of subsets in $'\m{N}^e$ increases, the task of finding the ancestry paths of parity changes becomes analogous to traversing $'\m{N}^e$ entirely $S_e \rightarrow S_{'\m{N}^e}$. To simplify, we always choose case a.
 

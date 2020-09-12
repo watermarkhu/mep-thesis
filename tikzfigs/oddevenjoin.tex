@@ -1,6 +1,5 @@
 \begin{figure}[htbp]
     \centering
-    \tikzstyle{undef}=[node1, dotted, pattern=dots, pattern color=black!25!white]
     \begin{tikzpicture}[on grid]
       \node (o1) [even] at (1.5, 1) {$s_1$};
       \node (o2) [even] at (1, 0) {$s_2$};
@@ -8,7 +7,7 @@
       \node (e4) [undef] at (3.5,1) {$s_4$};
       \node (e5) [undef] at (3.5,0) {$s_5$};
       \draw[l1] (o2) -- (o1) -- (o3) (e4) -- (e5);
-      \draw[l1, dashed] (o3) -- (e5) node[midway,below] (a) {};
+      \draw[l1, dashed] (o3) -- (e) node[midway,below] (a) {};
       \draw[l1, <-] (a) -- ++(0,-.5) node[below] {$\codefunc{Join}(s_3, s_5)$};
     
       \begin{scope}[shift={(4.5,1)}]
